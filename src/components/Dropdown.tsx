@@ -14,7 +14,7 @@ type DropdownProps = {
 export default function Dropdown(props:DropdownProps){
   function renderMethods(){
     if(props.name=="Data Loader"){
-      return <TextField id="dataPath--input" label="Data" variant="outlined" required helperText="Please enter path to your data file" fullWidth/>
+      return <TextField id="dataPath--input" size="small" label="Data" variant="outlined" required helperText="Please enter path to your data file" fullWidth/>
     }
     else if(props.name=="Normalisation"){
       return <Normalisation />
@@ -30,7 +30,7 @@ export default function Dropdown(props:DropdownProps){
           <Typography>{props.name}</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Box sx={{background:'#fff',p:2,borderRadius:1.5}}>
+          <Box sx={{background:'#fff',p:2,borderRadius:1.5,width:9/10,m:"auto"}}>
             {renderMethods()}
           </Box>
         </AccordionDetails>
