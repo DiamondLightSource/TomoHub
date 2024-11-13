@@ -3,13 +3,24 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Normalisation from './method_components/Normalisation';
 
 type DropdownProps = {
     name:string;
 }
 
 export default function Dropdown(props:DropdownProps){
-    return (
+  function renderMethods(){
+    if(props.name=="Data Loader"){
+      return <TextField id="dataPath--input" label="Data" variant="outlined" required helperText="Please enter path to your data file" fullWidth/>
+    }
+    else if(props.name=="Normalisation"){
+      return <Normalisation />
+    }
+  }
+  return (
         <Accordion>
         <AccordionSummary
           expandIcon={<ArrowDownwardIcon />}
@@ -19,10 +30,9 @@ export default function Dropdown(props:DropdownProps){
           <Typography>{props.name}</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            malesuada lacus ex, sit amet blandit leo lobortis eget.
-          </Typography>
+          <Box sx={{background:'#fff',p:2,borderRadius:1.5}}>
+            {renderMethods()}
+          </Box>
         </AccordionDetails>
       </Accordion>
     )

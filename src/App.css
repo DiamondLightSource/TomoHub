@@ -3,7 +3,7 @@ body{
 }
 .container {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Two equal-width columns */
+    grid-template-columns: 1.35fr 1fr; /* Two equal-width columns */
     gap: 16px; /* Adds space between the sections */
     height: 100vh; /* Makes it full viewport height */
     padding: 3%;
@@ -11,4 +11,9 @@ body{
 
 header.topHeader>h4,header.topHeader,section.dropdowns{
     margin: 25px auto;    
+}
+section.right-section{
+    display: flex;
+    padding: 40px;
+    justify-content: center;
 }

@@ -3,6 +3,7 @@ import './App.css'
 import Dropdown from './components/Dropdown';
 import Header from './components/Header';
 import Submit from './components/Submit';
+import Steps from './components/Steps'
 
 function App() {
 
@@ -22,6 +23,7 @@ function App() {
           <Submit />
         </section>
         <section className="right-section">
+          <Steps />
         </section>
       </div>
   )
