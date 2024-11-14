@@ -4,12 +4,14 @@ import Dropdown from './components/Dropdown';
 import Header from './components/Header';
 import Submit from './components/Submit';
 import Steps from './components/Steps'
+import Footer from './components/Footer';
 
 function App() {
 
   let [name,setName] = React.useState<string>("Mobin");
 
   return (
+    <div className='app'>
       <div className="container">
         <section className="left-section">
           <Header />
@@ -25,6 +27,9 @@ function App() {
         <section className="right-section">
           <Steps />
         </section>
+        
+      </div>
+      <Footer />
       </div>
   )
 }

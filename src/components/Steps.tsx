@@ -59,7 +59,7 @@ const steps = [
     };
   
     return (
-      <Box sx={{ maxWidth: 400,backgroundColor:'#222725',padding:2,borderRadius:2 }}>
+      <Box sx={{ maxWidth: 400,backgroundColor:'#222725',padding:2,borderRadius:2,height:'max-content' }}>
         <Stepper activeStep={activeStep} orientation="vertical">
           {steps.map((step, index) => (
             <Step key={step.label}>
