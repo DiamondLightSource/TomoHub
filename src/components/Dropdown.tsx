@@ -3,15 +3,16 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Normalisation from './method_components/Normalisation';
+import CenterOfRotation from './method_components/CenterOfRotation';
 
 type DropdownProps = {
     name:string;
 }
 
 export default function Dropdown(props:DropdownProps){
+
   function renderMethods(){
     if(props.name=="Data Loader"){
       return <TextField id="dataPath--input" size="small" label="Data" variant="outlined" required helperText="Please enter path to your data file" fullWidth/>
@@ -19,7 +20,11 @@ export default function Dropdown(props:DropdownProps){
     else if(props.name=="Normalisation"){
       return <Normalisation />
     }
+    else if(props.name==="Center of Rotation"){
+      return <CenterOfRotation />
+    }
   }
+
   return (
         <Accordion>
         <AccordionSummary
@@ -30,9 +35,7 @@ export default function Dropdown(props:DropdownProps){
           <Typography>{props.name}</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Box sx={{background:'#fff',p:2,borderRadius:1.5,width:9/10,m:"auto"}}>
             {renderMethods()}
-          </Box>
         </AccordionDetails>
       </Accordion>
     )

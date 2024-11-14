@@ -54,7 +54,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   background: "#F7F7F2",
 }));
 
-export default function Normalisation() {
+export default function CenterOfRotation() {
   const [expanded, setExpanded] = React.useState<string | false>("");
 
   const handleChange =
@@ -69,15 +69,15 @@ export default function Normalisation() {
         onChange={handleChange("panel1")}
       >
         <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
-          <Typography>Normalise</Typography>
+          <Typography>find COR with Naghia Vo's method </Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Grid container spacing={0.5}>
             <Grid size={8}>
               <Typography>
-                Normalise
+                find_center_vo 
                 <Link
-                  href="https://tomopy.readthedocs.io/en/stable/api/tomopy.prep.normalize.html#tomopy.prep.normalize.normalize"
+                  href="https://tomopy.readthedocs.io/en/stable/api/tomopy.recon.rotation.html#tomopy.recon.rotation.find_center_vo"
                   target="_blank"
                 >
                   <InfoIcon sx={{ verticalAlign: "middle" }} />
@@ -113,50 +113,6 @@ export default function Normalisation() {
                 variant="outlined"
                 disabled
                 helperText="Amount of cutoff"
-                fullWidth
-              />
-            </Grid>
-          </Grid>
-        </AccordionDetails>
-      </Accordion>
-      <Accordion
-        expanded={expanded === "panel2"}
-        onChange={handleChange("panel2")}
-      >
-        <AccordionSummary aria-controls="panel2d-content" id="panel2d-header">
-          <Typography>Minus log</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Grid container spacing={0.5}>
-            <Grid size={8}>
-              <Typography>
-                Minus_Log
-                <Link
-                  href="https://tomopy.readthedocs.io/en/stable/api/tomopy.prep.normalize.html#tomopy.prep.normalize.minus_log"
-                  target="_blank"
-                >
-                  <InfoIcon sx={{ verticalAlign: "middle" }} />
-                </Link>
-              </Typography>
-            </Grid>
-            <Grid size={4}>
-              <Stack direction="row" justifyContent={"flex-end"} spacing={0.5}>
-                <IconButton aria-label="delete" size="small" disabled>
-                  <DeleteIcon />
-                </IconButton>
-                <Button variant="contained" size="small" endIcon={<AddIcon />}>
-                  Add
-                </Button>
-              </Stack>
-            </Grid>
-            <Grid size={12}>
-              <TextField
-                id="minuslog--parameters--input"
-                size="small"
-                label="Parameters"
-                variant="outlined"
-                disabled
-                helperText="Amount of averaging"
                 fullWidth
               />
             </Grid>
