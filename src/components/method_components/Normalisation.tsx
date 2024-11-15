@@ -16,6 +16,8 @@ import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
 import InfoIcon from "@mui/icons-material/Info";
 import { Link } from "@mui/material";
+import { useContext } from "react";
+import { MethodsContext } from "../../MethodsContext";
 
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -54,13 +56,26 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   background: "#F7F7F2",
 }));
 
+
+
 export default function Normalisation() {
   const [expanded, setExpanded] = React.useState<string | false>("");
-
+    const methods = useContext(MethodsContext);
+    
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
       setExpanded(newExpanded ? panel : false);
     };
+
+    const testCont = () => {
+        methods.push(
+            {
+                "name":"normalise",
+                "averaging" : "mean" 
+            }
+        )
+        console.log(methods)
+    }
 
   return (
     <div>
@@ -89,7 +104,7 @@ export default function Normalisation() {
                 <IconButton aria-label="delete" size="small" disabled>
                   <DeleteIcon />
                 </IconButton>
-                <Button variant="contained" size="small" endIcon={<AddIcon />}>
+                <Button variant="contained" size="small" endIcon={<AddIcon />} onClick={() => testCont()}>
                   Add
                 </Button>
               </Stack>

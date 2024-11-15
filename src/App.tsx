@@ -1,37 +1,38 @@
-import React from 'react'
-import './App.css'
-import Dropdown from './components/Dropdown';
-import Header from './components/Header';
-import Submit from './components/Submit';
-import Steps from './components/Steps'
-import Footer from './components/Footer';
+import React from "react";
+import "./App.css";
+import Dropdown from "./components/Dropdown";
+import Header from "./components/Header";
+import Submit from "./components/Submit";
+import Steps from "./components/Steps";
+import Footer from "./components/Footer";
+import MethodsListProvider from "./MethodsContext";
 
 function App() {
-
-  let [name,setName] = React.useState<string>("Mobin");
+  let [name, setName] = React.useState<string>("Mobin");
 
   return (
-    <div className='app'>
-      <div className="container">
-        <section className="left-section">
-          <Header />
-          <section className='dropdowns'>
-            <Dropdown name="Data Loader"/>
-            <Dropdown name="Normalisation"/>
-            <Dropdown name="Center of Rotation"/>
-            <Dropdown name="Reconstruction"/>
-            <Dropdown name="Save"/> 
+    <MethodsListProvider>
+      <div className="app">
+        <div className="container">
+          <section className="left-section">
+            <Header />
+            <section className="dropdowns">
+              <Dropdown name="Data Loader" />
+              <Dropdown name="Normalisation" />
+              <Dropdown name="Center of Rotation" />
+              <Dropdown name="Reconstruction" />
+              <Dropdown name="Save" />
+            </section>
+            <Submit />
           </section>
-          <Submit />
-        </section>
-        <section className="right-section">
-          <Steps />
-        </section>
-        
+          <section className="right-section">
+            <Steps />
+          </section>
+        </div>
+        <Footer />
       </div>
-      <Footer />
-      </div>
-  )
+    </MethodsListProvider>
+  );
 }
 
-export default App
+export default App;

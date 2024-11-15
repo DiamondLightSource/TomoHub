@@ -6,12 +6,13 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import TextField from '@mui/material/TextField';
 import Normalisation from './method_components/Normalisation';
 import CenterOfRotation from './method_components/CenterOfRotation';
+import React  from 'react';
 
 type DropdownProps = {
     name:string;
 }
 
-export default function Dropdown(props:DropdownProps){
+ const Dropdown:React.FC<DropdownProps> = (props) =>{
 
   function renderMethods(){
     if(props.name=="Data Loader"){
@@ -40,3 +41,4 @@ export default function Dropdown(props:DropdownProps){
       </Accordion>
     )
 }
+export default Dropdown
