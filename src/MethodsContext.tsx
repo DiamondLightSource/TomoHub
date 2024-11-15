@@ -1,19 +1,40 @@
-import {createContext,useState,useContext,ReactNode } from "react";
+import { createContext, useState, ReactNode, useContext } from "react";
 
 type Method = {
-    name:string;
-    [parameters:string]:string|number|boolean|object;
-}
+  id : string;
+  parameters?:{ [key:string] : string | number | boolean | object};
+};
 
-export const MethodsContext = createContext<Method[]>([]);
+type MethodsContextType = {
+    methods: Method[];
+    addMethod: (method: Method) => void;
+    removeMethod: (methodId: string) => void;
+};
 
-const MethodsListProvider:React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [methods,setMethods] = useState<Method[]>([]);
-    return (
-        <MethodsContext.Provider value={methods}>
-            {children}
-        </MethodsContext.Provider>
-    )
-}
+const MethodsContext = createContext<MethodsContextType | undefined>(undefined);
 
-export default MethodsListProvider
+export const MethodsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [methods, setMethods] = useState<Method[]>([]);
+
+  const addMethod = (method: Method) => {
+    setMethods((prev) => [...prev, method]);
+  };
+
+  const removeMethod = (methodId: string) => {
+    setMethods((prev) => prev.filter((method) => method.id !== methodId));
+  };
+
+  return (
+    <MethodsContext.Provider value={{ methods, addMethod, removeMethod }}>
+      {children}
+    </MethodsContext.Provider>
+  );
+};
+
+export const useMethods = () => {
+  const context = useContext(MethodsContext);
+  if (!context) {
+    throw new Error('useMethods must be used within a MethodsProvider');
+  }
+  return context;
+};

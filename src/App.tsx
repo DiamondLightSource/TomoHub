@@ -5,13 +5,11 @@ import Header from "./components/Header";
 import Submit from "./components/Submit";
 import Steps from "./components/Steps";
 import Footer from "./components/Footer";
-import MethodsListProvider from "./MethodsContext";
+import { MethodsProvider } from "./MethodsContext";
 
-function App() {
-  let [name, setName] = React.useState<string>("Mobin");
-
-  return (
-    <MethodsListProvider>
+const App:React.FC = () => {
+return (
+    <MethodsProvider>
       <div className="app">
         <div className="container">
           <section className="left-section">
@@ -31,7 +29,7 @@ function App() {
         </div>
         <Footer />
       </div>
-    </MethodsListProvider>
+    </MethodsProvider>
   );
 }
 

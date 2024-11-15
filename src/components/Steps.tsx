@@ -8,12 +8,11 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
+
 const steps = [
     {
       label: 'Data Loader',
-      description: `For each ad campaign that you create, you can control how much
-                you're willing to spend on clicks and conversions, which networks
-                and geographical locations you want your ads to show on, and more.`,
+      description: 'test',
     },
     {
       label: 'Normalisation',
@@ -45,7 +44,7 @@ const steps = [
   
   export default function Steps() {
     const [activeStep, setActiveStep] = React.useState(0);
-  
+
     const handleNext = () => {
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
     };
@@ -60,6 +59,7 @@ const steps = [
   
     return (
       <Box sx={{ maxWidth: 400,backgroundColor:'#222725',padding:2,borderRadius:2,height:'max-content' }}>
+
         <Stepper activeStep={activeStep} orientation="vertical">
           {steps.map((step, index) => (
             <Step key={step.label}>
