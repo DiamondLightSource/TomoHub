@@ -8,6 +8,7 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
+import { useMethods } from "../MethodsContext";
 
 const steps = [
     {
@@ -56,11 +57,12 @@ const steps = [
     const handleReset = () => {
       setActiveStep(0);
     };
-  
-    return (
-      <Box sx={{ maxWidth: 400,backgroundColor:'#222725',padding:2,borderRadius:2,height:'max-content' }}>
+    const { methods, addMethod, removeMethod } = useMethods();
 
-        <Stepper activeStep={activeStep} orientation="vertical">
+    return (
+      <Box sx={{ maxWidth: 400,backgroundColor:'#222725',color:'#fff',padding:2,borderRadius:2,height:'max-content' }}>
+
+        {/* <Stepper activeStep={activeStep} orientation="vertical">
           {steps.map((step, index) => (
             <Step key={step.label}>
               <StepLabel
@@ -102,7 +104,8 @@ const steps = [
               Reset
             </Button>
           </Paper>
-        )}
+        )} */}
+        {JSON.stringify(methods)}
       </Box>
     );
   }
