@@ -1,65 +1,51 @@
 import * as React from "react";
 import { styled } from "@mui/material/styles";
+import { TextField, Select, MenuItem, Typography, Grid, Button, Stack, IconButton, Accordion as MuiAccordion, AccordionSummary as MuiAccordionSummary, AccordionDetails as MuiAccordionDetails, AccordionProps, AccordionSummaryProps } from "@mui/material";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
-import MuiAccordion, { AccordionProps } from "@mui/material/Accordion";
-import MuiAccordionSummary, {
-  AccordionSummaryProps,
-} from "@mui/material/AccordionSummary";
-import MuiAccordionDetails from "@mui/material/AccordionDetails";
-import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid2";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import Stack from "@mui/material/Stack";
-import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
 import InfoIcon from "@mui/icons-material/Info";
-import { Link } from "@mui/material";
 import { useMethods } from "../../MethodsContext";
 
-const corMethods = [{
-    id:"find_center_vo",
-    parameters : {
-        ind:null,
-        smin:-50,
-        smax:6,
-        step:0.25,
-        ratio:0.5,
-        drop:20
-    }
-}]
+// Define Method template
+const corMethods = [
+  {
+    id: "find_center_vo",
+    methodName: "find COR using Naghia Vo's method ",
+    linkToDoc: "https://tomopy.readthedocs.io/en/stable/api/tomopy.recon.rotation.html#tomopy.recon.rotation.find_center_vo",
+    parameters: {
+      ind: ["int","Index of the slice to be used for reconstruction", null],
+      smin: ["int","Coarse search radius", -50],
+      smax: ["int","Coarse search radius", 50],
+      srad: ["float","Fine search radius", 6],
+      step: ["float","Step of fine searching", 0.25],
+      ratio: ["float","The ratio between the FOV of the camera and the size of object", 0.5],
+      drop: ["int","Drop lines around vertical center of the mask", 20],
+      ncore: ["int","Number of cores that will be assigned to jobs", null],
+    },
+  },
+  {
+    id:"find_center_pc",
+    methodName: "find COR using phase correlation in Fourier space",
+    linkToDoc : "https://tomopy.readthedocs.io/en/stable/api/tomopy.recon.rotation.html#tomopy.recon.rotation.find_center_pc",
+    parameters : {}
+  }
+];
 
-
-const Accordion = styled((props: AccordionProps) => (
-  <MuiAccordion disableGutters elevation={0} square {...props} />
-))(({ theme }) => ({
+// Styled MUI Accordion components
+const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
-  "&:not(:last-child)": {
-    borderBottom: 0,
-  },
-  "&::before": {
-    display: "none",
-  },
+  "&:not(:last-child)": { borderBottom: 0 },
+  "&::before": { display: "none" },
 }));
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
-  <MuiAccordionSummary
-    expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: "0.9rem" }} />}
-    {...props}
-  />
+  <MuiAccordionSummary expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: "0.9rem" }} />} {...props} />
 ))(({ theme }) => ({
   backgroundColor: "#F7F7F2",
   flexDirection: "row-reverse",
-  "& .MuiAccordionSummary-expandIconWrapper.Mui-expanded": {
-    transform: "rotate(90deg)",
-  },
-  "& .MuiAccordionSummary-content": {
-    marginLeft: theme.spacing(1),
-  },
-  ...theme.applyStyles("dark", {
-    backgroundColor: "rgba(255, 255, 255, .05)",
-  }),
+  "& .MuiAccordionSummary-expandIconWrapper.Mui-expanded": { transform: "rotate(90deg)" },
+  "& .MuiAccordionSummary-content": { marginLeft: theme.spacing(1) },
 }));
 
 const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
@@ -68,147 +54,112 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   background: "#F7F7F2",
 }));
 
+// Main component
 export default function CenterOfRotation() {
   const [expanded, setExpanded] = React.useState<string | false>("");
-  const handleChange =
-    (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
-      setExpanded(newExpanded ? panel : false);
-    };
-    const { methods, addMethod, removeMethod } = useMethods();
-    
-    const addMethodButton = (event: React.MouseEvent<HTMLButtonElement>) =>{
-        const methodID = event.currentTarget.id;
-        addMethod({id:methodID});
-        console.log(methods);
+  const { methods, addMethod, removeMethod } = useMethods();
+
+  const handleChange = (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
+    setExpanded(newExpanded ? panel : false);
+  };
+
+  // Check if the method is added
+  const isMethodAdded = (methodId: string) => methods.some((method) => method.id === methodId);
+
+  // Add method handler
+  const handleAddMethod = (methodId: string) => {
+    addMethod({ id: methodId });
+  };
+
+  // Remove method handler
+  const handleRemoveMethod = (methodId: string) => {
+    removeMethod(methodId);
+  };
+
+  // Render parameter inputs based on type
+  const renderParameterInput = (paramName: string, [type, helperText ,defaultValue]: [string, string,any], isEnabled: boolean) => {
+    switch (type) {
+      case "int":
+      case "float":
+        return (
+          <TextField
+            key={paramName}
+            label={paramName}
+            type="number"
+            defaultValue={defaultValue}
+            variant="outlined"
+            size="small"
+            disabled={!isEnabled}
+            helperText={helperText}
+            fullWidth
+          />
+        );
+      case "select":
+        return (
+          <Select
+            key={paramName}
+            defaultValue={defaultValue}
+            disabled={!isEnabled}
+            fullWidth
+            variant="outlined"
+            size="small"
+          >
+            {/* Placeholder values for select options */}
+            <MenuItem value="Option 1">Option 1</MenuItem>
+            <MenuItem value="Option 2">Option 2</MenuItem>
+            <MenuItem value="Option 3">Option 3</MenuItem>
+          </Select>
+        );
+      default:
+        return null;
     }
-    const removeMethodButton = (event: React.MouseEvent<HTMLButtonElement>) =>{
-        const methodID = event.currentTarget.id;
-        removeMethod(methodID);
-        console.log(methods);
-    }
+  };
+
   return (
     <div>
-      <Accordion
-        expanded={expanded === "panel1"}
-        onChange={handleChange("panel1")}
-      >
-        <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
-          <Typography>find COR with Naghia Vo's method </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Grid container spacing={0.5}>
-            <Grid size={8}>
-              <Typography>
-                find_center_vo 
-                <Link
-                  href="https://tomopy.readthedocs.io/en/stable/api/tomopy.recon.rotation.html#tomopy.recon.rotation.find_center_vo"
-                  target="_blank"
-                >
-                  <InfoIcon sx={{ verticalAlign: "middle" }} />
-                </Link>
-              </Typography>
-            </Grid>
-            <Grid size={4}>
-              <Stack direction="row" justifyContent={"flex-end"} spacing={0.5}>
-                <IconButton aria-label="delete" size="small" id="del_find_center_vo" onClick={removeMethodButton}>
-                  <DeleteIcon />
-                </IconButton>
-                <Button id="add_find_center_vo" variant="contained" size="small" endIcon={<AddIcon />} onClick={addMethodButton}>
-                  Add
-                </Button>
-              </Stack>
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                id="find_center_vo--ind--input"
-                size="small"
-                label="ind"
-                variant="outlined"
-                disabled
-                helperText="Index of the slice to be used for reconstruction."
-                fullWidth
-              />
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                id="find_center_vo--smin--input"
-                size="small"
-                label="smin"
-                variant="outlined"
-                disabled
-                helperText="Coarse search radius"
-                fullWidth
-              />
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                id="find_center_vo--smax--input"
-                size="small"
-                label="smax"
-                variant="outlined"
-                disabled
-                helperText="Coarse search radius"
-                fullWidth
-              />
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                id="find_center_vo--srad--input"
-                size="small"
-                label="srad"
-                variant="outlined"
-                disabled
-                helperText="Fine search radius"
-                fullWidth
-              />
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                id="find_center_vo--step--input"
-                size="small"
-                label="step"
-                variant="outlined"
-                disabled
-                helperText="Step of fine searching"
-                fullWidth
-              />
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                id="find_center_vo--ratio--input"
-                size="small"
-                label="ratio"
-                variant="outlined"
-                disabled
-                helperText="The ratio between the FOV of the camera and the size of object"
-                fullWidth
-              />
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                id="find_center_vo--drop--input"
-                size="small"
-                label="drop"
-                variant="outlined"
-                disabled
-                helperText="Drop lines around vertical center of the mask"
-                fullWidth
-              />
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                id="find_center_vo--ncore--input"
-                size="small"
-                label="ncore"
-                variant="outlined"
-                disabled
-                helperText="Number of cores that will be assigned to jobs"
-                fullWidth
-              />
-            </Grid>
-          </Grid>
-        </AccordionDetails>
-      </Accordion>
+      {corMethods.map((method) => {
+        const isAdded = isMethodAdded(method.id);
+        return (
+          <Accordion key={method.id} expanded={expanded === method.id} onChange={handleChange(method.id)}>
+            <AccordionSummary aria-controls={`${method.id}-content`} id={`${method.id}-header`}>
+              <Typography>{method.methodName}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={1}>
+                <Grid item xs={8}>
+                  <Typography>
+                    {method.id}
+                    <IconButton size="small" href={method.linkToDoc} target="_blank">
+                      <InfoIcon fontSize="small" />
+                    </IconButton>
+                  </Typography>
+                </Grid>
+                <Grid item xs={4}>
+                  <Stack direction="row" justifyContent="flex-end" spacing={1}>
+                    <IconButton onClick={() => handleRemoveMethod(method.id)} disabled={!isAdded}>
+                      <DeleteIcon />
+                    </IconButton>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      endIcon={<AddIcon />}
+                      onClick={() => handleAddMethod(method.id)}
+                      disabled={isAdded}
+                    >
+                      Add
+                    </Button>
+                  </Stack>
+                </Grid>
+                {Object.entries(method.parameters).map(([paramName, paramDetails]) => (
+                  <Grid item xs={6} key={paramName}>
+                    {renderParameterInput(paramName, paramDetails as [string,string, any], isAdded)}
+                  </Grid>
+                ))}
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+        );
+      })}
     </div>
   );
 }
