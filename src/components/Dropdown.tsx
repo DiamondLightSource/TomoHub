@@ -6,6 +6,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import TextField from '@mui/material/TextField';
 import Normalisation from './method_components/Normalisation';
 import CenterOfRotation from './method_components/CenterOfRotation';
+import Reconstruction from './method_components/Reconstruction';
 import React  from 'react';
 
 type DropdownProps = {
@@ -23,6 +24,9 @@ type DropdownProps = {
     }
     else if(props.name==="Center of Rotation"){
       return <CenterOfRotation />
+    }
+    else if(props.name=="Reconstruction"){
+      return <Reconstruction />
     }
   }
 

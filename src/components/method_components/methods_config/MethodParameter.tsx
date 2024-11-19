@@ -1,34 +1,45 @@
 import React from 'react';
-import { Grid, TextField, Select, MenuItem, Tooltip } from "@mui/material";
+import { Grid, TextField,Typography, Select,Stack, MenuItem,FormControl,InputLabel, FormControlLabel,Switch, Tooltip,FormHelperText } from "@mui/material";
 import { ParameterType } from '../types';
 
 interface MethodParameterProps {
   methodId: string;
   paramName: string;
   paramDetails: ParameterType;
-  value: any;
+  value: any ;
   isEnabled: boolean;
   onChange: (value: any) => void;
 }
 
 export const MethodParameter: React.FC<MethodParameterProps> = ({
   paramName,
-  paramDetails: [type, helperText, defaultValue],
+  paramDetails: [type, helperText, defaultValue,options],
   value,
   isEnabled,
   onChange,
 }) => {
-  const handleInputChange = (
-    event: React.ChangeEvent<HTMLInputElement | { value: unknown }>
-  ) => {
-    const newValue =
-      type === "int"
-        ? parseInt(event.target.value as string)
-        : type === "float"
-        ? parseFloat(event.target.value as string)
-        : event.target.value;
-    onChange(newValue);
-  };
+
+    const handleInputChange = (
+        event: React.ChangeEvent<HTMLInputElement | { value: unknown }>
+    ) => {
+        const inputValue = event.target.value as string;
+        let newValue;
+        switch (type) {
+            case "int":
+                newValue = parseInt(inputValue);
+                break;
+            case "float":
+                newValue = parseFloat(inputValue);
+                break;
+            case "bool":
+                newValue = (event.target as HTMLInputElement).checked;
+                break;
+            default:
+                newValue = inputValue;
+        }
+        
+        onChange(newValue);
+    };
 
   const renderInput = () => {
     switch (type) {
@@ -63,20 +74,42 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
             helperText={helperText}
           />
         );
-    //   case "select":
-    //     return (
-    //       <Select
-    //         value={value ?? defaultValue}
-    //         onChange={handleInputChange}
-    //         fullWidth
-    //         variant="outlined"
-    //         size="small"
-    //       >
-    //         <MenuItem value="Option 1">Option 1</MenuItem>
-    //         <MenuItem value="Option 2">Option 2</MenuItem>
-    //         <MenuItem value="Option 3">Option 3</MenuItem>
-    //       </Select>
-    //     );
+    case "bool":
+        return (
+            <Tooltip title={helperText} placement="top-start">
+            <FormControl sx={{display:'flex',justifyContent:'center'}}>
+            <FormControlLabel
+                control={ <Switch disabled={!isEnabled} checked={value ?? defaultValue} onChange={handleInputChange} name="gilad" /> }
+                label={paramName} labelPlacement='bottom'
+            />
+            </FormControl>
+            </Tooltip>
+
+        )
+        case "list":
+            return (
+                <FormControl required variant="standard" fullWidth>
+                    <InputLabel id={`${paramName}-label-id`}>{paramName}</InputLabel>
+                    <Select
+                        labelId={`${paramName}-label-id`}
+                        id={`${paramName}-select-id`}
+                        label={paramName}
+                        size="medium"
+                        value={value ?? defaultValue}
+                        onChange={(event) => onChange(event.target.value)}
+                        disabled={!isEnabled}
+                    >
+                        {
+                        options?.map((item) => (
+                            <MenuItem key={item} value={item}>
+                                {item}
+                            </MenuItem>
+                        ))
+                        }
+                    </Select>
+                    <FormHelperText>{helperText}</FormHelperText>
+                </FormControl>
+            );
       default:
         return null;
     }

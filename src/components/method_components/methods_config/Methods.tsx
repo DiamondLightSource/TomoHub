@@ -55,3 +55,15 @@ export const normalisationMethods:Method[] = [
          }
     }
 ]
+
+export const reconstructionMethods:Method[] = [
+  {
+    id: "recon",
+    methodName: "Reconstruction job",
+    linkToDoc: "https://tomopy.readthedocs.io/en/stable/api/tomopy.recon.algorithm.html#tomopy.recon.algorithm.recon",
+    parameters: {
+      "algorithm" : ["list","Reconstruction algorithm (see method docs for more info)"," ",["art","bart","fbp","gridrec","mlem","osem","ospml_hybrid","ospml_quad","pml_hybrid","pml_quad","sirt","tv","grad","tikh"]],
+      "singoram_order" : ["bool","Determins whether data is a stack of sinograms (True, y-axis first axis) or a stack of radiographs (False, theta first axis)",false]
+    }
+  }
+]
