@@ -1,5 +1,6 @@
-// Define Method template (corMethods)
-export const corMethods = [
+import Method from '../types'
+
+export const corMethods:Method[] = [
     {
       id: "find_center_vo",
       methodName: "find COR using Naghia Vo's method ",
@@ -34,3 +35,23 @@ export const corMethods = [
     },
 ];
 
+export const normalisationMethods:Method[] = [
+    {
+        id: "normalize",
+        methodName: "normalize",
+        linkToDoc: "https://tomopy.readthedocs.io/en/stable/api/tomopy.prep.normalize.html#tomopy.prep.normalize.normalize",
+        parameters: {
+            "cutoff":["float","Permitted maximum vlaue for the normalized data",null],
+            "averaging":["string","‘mean’ or ‘median’, how the flat and dark arrays should be averaged","mean"]
+        }
+    }
+    ,
+    {
+        id:"minus_log",
+        methodName: "minus",
+        linkToDoc: "https://tomopy.readthedocs.io/en/stable/api/tomopy.prep.normalize.html#tomopy.prep.normalize.minus_log",
+        parameters:{
+          
+         }
+    }
+]

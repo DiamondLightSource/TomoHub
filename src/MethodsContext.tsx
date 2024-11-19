@@ -3,7 +3,7 @@ import { createContext, useState, ReactNode, useContext } from "react";
 // Define Method type
 type Method = {
   id: string;
-  parameters: { [key: string]: any };  // This will hold parameter values, such as numbers, strings, etc.
+  parameters: { [key: string]: any };  
 };
 
 // Define context type
