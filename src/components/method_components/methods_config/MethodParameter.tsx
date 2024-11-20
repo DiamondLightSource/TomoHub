@@ -62,7 +62,7 @@ const handleInputChange = (
       case "int":
       case "float":
         return (
-          <Tooltip title={`${type} value`} placement="top-start">
+          <Tooltip title={`${type} - default : ${defaultValue}`} placement="top-start">
             <TextField
               label={paramName}
               type="number"
@@ -79,6 +79,7 @@ const handleInputChange = (
         );
       case "string":
         return (
+        <Tooltip title={`${type} - default : ${defaultValue}`} placement="top-start">
           <TextField
             label={paramName}
             type="text"
@@ -91,6 +92,7 @@ const handleInputChange = (
             helperText={helperText}
             required={isParamRequired}
           />
+          </Tooltip>
         );
     case "bool":
         return (

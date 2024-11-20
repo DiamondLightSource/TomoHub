@@ -3,7 +3,7 @@ import "./App.css";
 import Dropdown from "./components/Dropdown";
 import Header from "./components/Header";
 import Submit from "./components/Submit";
-import Steps from "./components/Steps";
+import Steps from "./components/Visualiser";
 import Footer from "./components/Footer";
 import { MethodsProvider } from "./MethodsContext";
 
