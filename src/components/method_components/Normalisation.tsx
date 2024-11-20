@@ -19,7 +19,7 @@ export default function CenterOfRotation() {
     if (methodTemplate) {
       const defaultParams = Object.fromEntries(
         Object.entries(methodTemplate.parameters).map(
-          ([key, [, , defaultValue]]) => [key, defaultValue]
+          ([key, [, , ,defaultValue]]) => [key, defaultValue]
         )
       );
       addMethod(methodId, defaultParams);

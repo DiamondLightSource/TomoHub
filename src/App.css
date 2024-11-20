@@ -9,9 +9,9 @@ body{
 
 .container {
     display: grid;
-    grid-template-columns: 1.15fr 1fr; /* Two columns */
-    gap: 16px;
-    padding: 3%;
+    grid-template-columns: 1.5fr 1fr; /* Two columns */
+    gap: 30px;
+    padding: 5%;
     flex: 1; /* Take up available space */
 }
 

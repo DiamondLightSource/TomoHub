@@ -3,7 +3,7 @@ import { Grid, Typography } from "@mui/material";
 import { Accordion, AccordionSummary, AccordionDetails } from './StyledAccordion';
 import { MethodHeader } from './MethodHeader';
 import { MethodParameter } from './MethodParameter';
-import Method from '../types';
+import Method from '../uitypes';
 
 interface MethodAccordionProps {
   method: Method;

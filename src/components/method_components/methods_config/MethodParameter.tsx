@@ -1,11 +1,11 @@
 import React from 'react';
 import { Grid, TextField,Typography, Select,Stack, MenuItem,FormControl,InputLabel, FormControlLabel,Switch, Tooltip,FormHelperText } from "@mui/material";
-import { ParameterType } from '../types';
+import { UIParameterType } from '../uitypes';
 
 interface MethodParameterProps {
   methodId: string;
   paramName: string;
-  paramDetails: ParameterType;
+  paramDetails: UIParameterType;
   value: any ;
   isEnabled: boolean;
   onChange: (value: any) => void;
@@ -13,33 +13,49 @@ interface MethodParameterProps {
 
 export const MethodParameter: React.FC<MethodParameterProps> = ({
   paramName,
-  paramDetails: [type, helperText, defaultValue,options],
+  paramDetails: [type,isParamRequired ,helperText, defaultValue,options],
   value,
   isEnabled,
   onChange,
 }) => {
+const handleInputChange = (
+    event: React.ChangeEvent<HTMLInputElement | { value: unknown }>
+) => {
+    const inputValue = event.target.value as string;
 
-    const handleInputChange = (
-        event: React.ChangeEvent<HTMLInputElement | { value: unknown }>
-    ) => {
-        const inputValue = event.target.value as string;
-        let newValue;
-        switch (type) {
-            case "int":
-                newValue = parseInt(inputValue);
-                break;
-            case "float":
+    let newValue: any;
+
+    switch (type) {
+        case "int":
+            if (inputValue === '' || inputValue === '-') {
+                newValue = null;
+            } else if (/^-?\d+$/.test(inputValue)) {
+                newValue = parseInt(inputValue, 10);
+            } else {
+                return;
+            }
+            break;
+
+        case "float":
+            if (inputValue === '' || inputValue === '-' || inputValue === '.' || inputValue === '-.') {
+                newValue = null;
+            } else if (/^-?\d*\.?\d*$/.test(inputValue)) {
                 newValue = parseFloat(inputValue);
-                break;
-            case "bool":
-                newValue = (event.target as HTMLInputElement).checked;
-                break;
-            default:
-                newValue = inputValue;
-        }
-        
-        onChange(newValue);
-    };
+            } else {
+                return; 
+            }
+            break;
+
+        case "bool":
+            newValue = (event.target as HTMLInputElement).checked;
+            break;
+
+        default:
+            newValue = inputValue;
+    }
+
+    onChange(newValue);
+};
 
   const renderInput = () => {
     switch (type) {
@@ -50,13 +66,14 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
             <TextField
               label={paramName}
               type="number"
-              value={value ?? defaultValue}
+              value={value ?? ''}
               onChange={handleInputChange}
               variant="outlined"
               disabled={!isEnabled}
               size="small"
               fullWidth
               helperText={helperText}
+              required={isParamRequired}
             />
           </Tooltip>
         );
@@ -72,6 +89,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
             size="small"
             fullWidth
             helperText={helperText}
+            required={isParamRequired}
           />
         );
     case "bool":
@@ -98,6 +116,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
                         value={value ?? defaultValue}
                         onChange={(event) => onChange(event.target.value)}
                         disabled={!isEnabled}
+                        required={isParamRequired}
                     >
                         {
                         options?.map((item) => (
