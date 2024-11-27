@@ -3,9 +3,11 @@ import "./App.css";
 import Dropdown from "./components/Dropdown";
 import Header from "./components/Header";
 import Submit from "./components/Submit";
-import Steps from "./components/Visualiser";
+import Visualiser from "./components/Visualiser";
 import Footer from "./components/Footer";
 import { MethodsProvider } from "./MethodsContext";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 const App:React.FC = () => {
 return (
@@ -24,7 +26,9 @@ return (
             <Submit />
           </section>
           <section className="right-section">
-            <Steps />
+            <DndProvider backend={HTML5Backend}> 
+            <Visualiser />
+            </DndProvider>
           </section>
         </div>
         <Footer />

@@ -34,6 +34,14 @@ export const corMethods:UIMethod[] = [
           "rotc_guess":["float",false,"Initual guess value for the rotation center",null]
       },
     },
+    {
+      id:"find_center",
+      methodName:"find center",
+      linkToDoc:"https://tomopy.readthedocs.io/en/stable/api/tomopy.recon.rotation.html#tomopy.recon.rotation.find_center",
+      parameters:{
+        "ind":["int",false,"some help text",null]
+      }
+    }
 ];
 
 export const normalisationMethods:UIMethod[] = [

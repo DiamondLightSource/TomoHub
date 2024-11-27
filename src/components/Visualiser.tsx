@@ -1,20 +1,22 @@
+// Visualiser.tsx
 import React from 'react';
-import {
-  Button,
-  Box,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  IconButton,
-} from '@mui/material';
-import { useMethods } from "../MethodsContext";
+import { Button, Box, Typography } from '@mui/material';
+import { useMethods } from '../MethodsContext';
 import { ClearAll } from '@mui/icons-material';
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit"
+import VisualiserMethods from './VisualiserMethods';
 
-export default function Steps() {
-  const { methods, clearMethods, removeMethod } = useMethods();
+export default function Visualiser() {
+  const { methods, clearMethods, removeMethod, setMethods } = useMethods();
+
+  const moveMethod = (draggedId: string, hoverId: string) => {
+    const draggedIndex = methods.findIndex((method) => method.id === draggedId);
+    const hoverIndex = methods.findIndex((method) => method.id === hoverId);
+    if (draggedIndex === -1 || hoverIndex === -1) return;
+    const updatedMethods = [...methods];
+    const [draggedMethod] = updatedMethods.splice(draggedIndex, 1);
+    updatedMethods.splice(hoverIndex, 0, draggedMethod);
+    setMethods(updatedMethods); // Update the context state
+  };
 
   const methodsDisplay = () => {
     if (methods.length === 0) {
@@ -27,60 +29,17 @@ export default function Steps() {
       return (
         <Box sx={{ width: '100%' }}>
           {methods.map((method) => (
-            <Box
-              key={`${method.id}-method-listItem`}
-              sx={{
-                background: '#fff',
-                color: '#000',
-                margin: '10px 0',
-                borderRadius: 2,
-                p: 1.5,
-              }}
-            >
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <Typography fontSize={16} fontWeight={"bold"}>{method.id}</Typography>
-                <Box marginLeft={"auto"}>
-                <IconButton
-                  edge="end"
-                  aria-label="delete"
-                  size='small'
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  edge="start"
-                  aria-label="delete"
-                  size='small'
-                  onClick={() => removeMethod(method.id)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-                </Box>
-              </Box>
-              <List dense>
-                {method.parameters &&
-                  Object.entries(method.parameters).map(([key, value]) => (
-                    <ListItem key={`${method.id}-${key}`} sx={{ py: 0 }}>
-                      <ListItemText
-                        primary={`${key}: ${value}`}
-                        primaryTypographyProps={{ variant: 'body2',fontSize:'small' }}
-                      />
-                    </ListItem>
-                  ))}
-              </List>
-            </Box>
+            <VisualiserMethods
+              key={method.id}
+              method={method}
+              removeMethod={removeMethod}
+              moveMethod={moveMethod}
+            />
           ))}
         </Box>
       );
     }
   };
-
   return (
     <Box
       sx={{
@@ -100,7 +59,7 @@ export default function Steps() {
           flexDirection: 'column',
           p: 2,
           borderRadius: 2,
-          height: 700,
+          height: 500,
           overflowY: 'scroll',
         }}
       >

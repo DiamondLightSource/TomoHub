@@ -12,7 +12,8 @@ type MethodsContextType = {
   addMethod: (methodId: string, defaultParams: { [key: string]: any }) => void;
   removeMethod: (methodId: string) => void;
   updateMethodParameter: (methodId: string, paramName: string, value: any) => void;
-  clearMethods: () => void; 
+  clearMethods: () => void;
+  setMethods: React.Dispatch<React.SetStateAction<Method[]>>; // Expose setMethods
 };
 
 const MethodsContext = createContext<MethodsContextType | undefined>(undefined);
@@ -56,7 +57,7 @@ export const MethodsProvider: React.FC<{ children: ReactNode }> = ({ children })
   };
 
   return (
-    <MethodsContext.Provider value={{ methods, addMethod, removeMethod, updateMethodParameter,clearMethods }}>
+    <MethodsContext.Provider value={{ methods, addMethod, removeMethod, updateMethodParameter, clearMethods, setMethods }}>
       {children}
     </MethodsContext.Provider>
   );
