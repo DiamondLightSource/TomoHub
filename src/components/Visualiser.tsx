@@ -1,23 +1,46 @@
-// Visualiser.tsx
 import React from 'react';
 import { Button, Box, Typography } from '@mui/material';
 import { useMethods } from '../MethodsContext';
 import { ClearAll } from '@mui/icons-material';
 import VisualiserMethods from './VisualiserMethods';
+import { 
+  DndContext, 
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import { 
+  arrayMove, 
+  SortableContext, 
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy 
+} from '@dnd-kit/sortable';
 
 export default function Visualiser() {
   const { methods, clearMethods, removeMethod, setMethods } = useMethods();
 
-  const moveMethod = (draggedId: string, hoverId: string) => {
-    const draggedIndex = methods.findIndex((method) => method.id === draggedId);
-    const hoverIndex = methods.findIndex((method) => method.id === hoverId);
-    if (draggedIndex === -1 || hoverIndex === -1) return;
-    const updatedMethods = [...methods];
-    const [draggedMethod] = updatedMethods.splice(draggedIndex, 1);
-    updatedMethods.splice(hoverIndex, 0, draggedMethod);
-    setMethods(updatedMethods); // Update the context state
-  };
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    
+    if (active.id !== over.id) {
+      setMethods((methods) => {
+        const oldIndex = methods.findIndex((method) => method.id === active.id);
+        const newIndex = methods.findIndex((method) => method.id === over.id);
+        
+        return arrayMove(methods, oldIndex, newIndex);
+      });
+    }
+  };
+  console.log(methods);
   const methodsDisplay = () => {
     if (methods.length === 0) {
       return (
@@ -27,19 +50,27 @@ export default function Visualiser() {
       );
     } else {
       return (
-        <Box sx={{ width: '100%' }}>
-          {methods.map((method) => (
-            <VisualiserMethods
-              key={method.id}
-              method={method}
-              removeMethod={removeMethod}
-              moveMethod={moveMethod}
-            />
-          ))}
-        </Box>
+        <DndContext 
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={methods.map(method => method.id)} strategy={verticalListSortingStrategy}>
+            <Box sx={{ width: '100%' }}>
+              {methods.map((method) => (
+                <VisualiserMethods
+                  key={method.id}
+                  method={method}
+                  removeMethod={removeMethod}
+                />
+              ))}
+            </Box>
+          </SortableContext>
+        </DndContext>
       );
     }
   };
+
   return (
     <Box
       sx={{

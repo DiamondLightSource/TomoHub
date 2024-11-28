@@ -1,19 +1,17 @@
 import { createContext, useState, ReactNode, useContext } from "react";
 
-// Define Method type
-type Method = {
+export type Method = {
   id: string;
   parameters: { [key: string]: any };  
 };
 
-// Define context type
 type MethodsContextType = {
   methods: Method[];
   addMethod: (methodId: string, defaultParams: { [key: string]: any }) => void;
   removeMethod: (methodId: string) => void;
   updateMethodParameter: (methodId: string, paramName: string, value: any) => void;
   clearMethods: () => void;
-  setMethods: React.Dispatch<React.SetStateAction<Method[]>>; // Expose setMethods
+  setMethods: React.Dispatch<React.SetStateAction<Method[]>>;
 };
 
 const MethodsContext = createContext<MethodsContextType | undefined>(undefined);
@@ -21,7 +19,6 @@ const MethodsContext = createContext<MethodsContextType | undefined>(undefined);
 export const MethodsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [methods, setMethods] = useState<Method[]>([]);
 
-  // Add method to the context with default parameters
   const addMethod = (methodId: string, defaultParams: { [key: string]: any }) => {
     setMethods((prev) => [
       ...prev,
@@ -29,12 +26,10 @@ export const MethodsProvider: React.FC<{ children: ReactNode }> = ({ children })
     ]);
   };
 
-  // Remove method by its ID
   const removeMethod = (methodId: string) => {
     setMethods((prev) => prev.filter((method) => method.id !== methodId));
   };
 
-  // Update a specific method parameter value
   const updateMethodParameter = (methodId: string, paramName: string, value: any) => {
     setMethods((prev) =>
       prev.map((method) =>
@@ -51,9 +46,8 @@ export const MethodsProvider: React.FC<{ children: ReactNode }> = ({ children })
     );
   };
 
-  // Clear all methods
   const clearMethods = () => {
-    setMethods([]); // Reset state to an empty array
+    setMethods([]); 
   };
 
   return (
