@@ -1,15 +1,15 @@
 import { createContext, useState, ReactNode, useContext } from "react";
 
 export type Method = {
-  id: string;
-  parameters: { [key: string]: any };  
+  name: string;
+  parameters: { [key: string]: string };  
 };
 
 type MethodsContextType = {
   methods: Method[];
-  addMethod: (methodId: string, defaultParams: { [key: string]: any }) => void;
-  removeMethod: (methodId: string) => void;
-  updateMethodParameter: (methodId: string, paramName: string, value: any) => void;
+  addMethod: (methodName: string, defaultParams: { [key: string]: any }) => void;
+  removeMethod: (methodName: string) => void;
+  updateMethodParameter: (methodName: string, paramName: string, value: any) => void;
   clearMethods: () => void;
   setMethods: React.Dispatch<React.SetStateAction<Method[]>>;
 };
@@ -19,21 +19,21 @@ const MethodsContext = createContext<MethodsContextType | undefined>(undefined);
 export const MethodsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [methods, setMethods] = useState<Method[]>([]);
 
-  const addMethod = (methodId: string, defaultParams: { [key: string]: any }) => {
+  const addMethod = (methodName: string, defaultParams: { [key: string]: any }) => {
     setMethods((prev) => [
       ...prev,
-      { id: methodId, parameters: { ...defaultParams } },
+      { name: methodName, parameters: { ...defaultParams } },
     ]);
   };
 
   const removeMethod = (methodId: string) => {
-    setMethods((prev) => prev.filter((method) => method.id !== methodId));
+    setMethods((prev) => prev.filter((method) => method.name !== methodId));
   };
 
-  const updateMethodParameter = (methodId: string, paramName: string, value: any) => {
+  const updateMethodParameter = (methodName: string, paramName: string, value: any) => {
     setMethods((prev) =>
       prev.map((method) =>
-        method.id === methodId
+        method.name === methodName
           ? {
               ...method,
               parameters: {

@@ -18,7 +18,7 @@ import {
   verticalListSortingStrategy 
 } from '@dnd-kit/sortable';
 
-export default function Visualiser() {
+const Visualiser:React.FC = () => {
   const { methods, clearMethods, removeMethod, setMethods } = useMethods();
 
   const sensors = useSensors(
@@ -31,16 +31,15 @@ export default function Visualiser() {
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
     
-    if (active.id !== over.id) {
+    if (active.name !== over.id) {
       setMethods((methods) => {
-        const oldIndex = methods.findIndex((method) => method.id === active.id);
-        const newIndex = methods.findIndex((method) => method.id === over.id);
+        const oldIndex = methods.findIndex((method) => method.name === active.id);
+        const newIndex = methods.findIndex((method) => method.name === over.id);
         
         return arrayMove(methods, oldIndex, newIndex);
       });
     }
   };
-  console.log(methods);
   const methodsDisplay = () => {
     if (methods.length === 0) {
       return (
@@ -55,11 +54,11 @@ export default function Visualiser() {
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          <SortableContext items={methods.map(method => method.id)} strategy={verticalListSortingStrategy}>
+          <SortableContext items={methods.map(method => method.name)} strategy={verticalListSortingStrategy}>
             <Box sx={{ width: '100%' }}>
               {methods.map((method) => (
                 <VisualiserMethods
-                  key={method.id}
+                  key={method.name}
                   method={method}
                   removeMethod={removeMethod}
                 />
@@ -110,3 +109,5 @@ export default function Visualiser() {
     </Box>
   );
 }
+
+export default Visualiser;

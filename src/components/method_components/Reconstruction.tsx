@@ -11,8 +11,8 @@ export default function Reconstruction() {
     setExpanded(isExpanded ? methodId : false);
   };
 
-  const isMethodAdded = (methodId: string) =>
-    methods.some((method) => method.id === methodId);
+  const isMethodAdded = (methodName: string) =>
+    methods.some((method) => method.name === methodName);
 
   const handleAddMethod = (methodId: string) => {
     const methodTemplate = reconstructionMethods.find((method) => method.id === methodId);
@@ -35,7 +35,7 @@ export default function Reconstruction() {
           isExpanded={expanded === method.id}
           isMethodAdded={isMethodAdded(method.id)}
           currentParameters={
-            methods.find((m) => m.id === method.id)?.parameters ?? {}
+            methods.find((m) => m.name === method.id)?.parameters ?? {}
           }
           onExpand={(isExpanded) => handleMethodExpand(method.id, isExpanded)}
           onAddMethod={() => handleAddMethod(method.id)}

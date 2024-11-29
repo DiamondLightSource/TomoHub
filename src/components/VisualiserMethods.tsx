@@ -19,10 +19,10 @@ import { CSS } from '@dnd-kit/utilities';
 
 interface VisualiserMethodProps {
   method: {
-    id: string;
+    name: string;
     parameters?: Record<string, any>;
   };
-  removeMethod: (id: string) => void;
+  removeMethod: (name: string) => void;
 }
 
 const VisualiserMethod: React.FC<VisualiserMethodProps> = ({ method, removeMethod }) => {
@@ -33,7 +33,7 @@ const VisualiserMethod: React.FC<VisualiserMethodProps> = ({ method, removeMetho
     transform,
     transition,
     isDragging
-  } = useSortable({ id: method.id });
+  } = useSortable({ id: method.name });
 
   const style = {
     transform: transform
@@ -81,12 +81,12 @@ const VisualiserMethod: React.FC<VisualiserMethodProps> = ({ method, removeMetho
         alignItems: 'center',
       }}>
         <DragIndicatorIcon />
-        <Typography fontSize={16} fontWeight="bold">{method.id}</Typography>
+        <Typography fontSize={16} fontWeight="bold">{method.name}</Typography>
         <Box marginLeft="auto">
           <IconButton edge="end" aria-label="edit" size="small">
             <EditIcon />
           </IconButton>
-          <IconButton edge="start" aria-label="delete" size="small" onClick={() => removeMethod(method.id)}>
+          <IconButton edge="start" aria-label="delete" size="small" onClick={() => removeMethod(method.name)}>
             <DeleteIcon />
           </IconButton>
         </Box>
@@ -104,8 +104,8 @@ const VisualiserMethod: React.FC<VisualiserMethodProps> = ({ method, removeMetho
         >
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
-            aria-controls={`parameters-content-${method.id}`}
-            id={`parameters-header-${method.id}`}
+            aria-controls={`parameters-content-${method.name}`}
+            id={`parameters-header-${method.name}`}
             sx={{
               m:0,
               p:"0 10px",
@@ -121,7 +121,7 @@ const VisualiserMethod: React.FC<VisualiserMethodProps> = ({ method, removeMetho
             <List dense sx={{p:0,mb:1}}>
               {method.parameters &&
                 Object.entries(method.parameters).map(([key, value]) => (
-                  <ListItem key={`${method.id}-${key}`} sx={{ py: 0 , pl:1,pr:1}}>
+                  <ListItem key={`${method.name}-${key}`} sx={{ py: 0 , pl:1,pr:1}}>
                     <ListItemText
                       primary={`${key}: ${value}`}
                       primaryTypographyProps={{ variant: 'body2', fontSize: 'small' }}

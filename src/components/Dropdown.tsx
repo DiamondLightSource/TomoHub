@@ -3,11 +3,11 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import TextField from '@mui/material/TextField';
 import Normalisation from './method_components/Normalisation';
 import CenterOfRotation from './method_components/CenterOfRotation';
 import Reconstruction from './method_components/Reconstruction';
 import React  from 'react';
+import InputOutput from './Inputdata';
 
 type DropdownProps = {
     name:string;
@@ -16,8 +16,8 @@ type DropdownProps = {
  const Dropdown:React.FC<DropdownProps> = (props) =>{
 
   function renderMethods(){
-    if(props.name=="Data Loader"){
-      return <TextField id="dataPath--input" size="small" label="Data" variant="outlined" required helperText="Please enter path to your data file" fullWidth/>
+    if(props.name=="Input/Output"){
+      return <InputOutput />
     }
     else if(props.name=="Normalisation"){
       return <Normalisation />
