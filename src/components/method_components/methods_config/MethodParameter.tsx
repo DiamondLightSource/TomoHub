@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, TextField,Typography, Select,Stack, MenuItem,FormControl,InputLabel, FormControlLabel,Switch, Tooltip,FormHelperText } from "@mui/material";
+import { Grid, TextField, Select, MenuItem,FormControl,InputLabel, FormControlLabel,Switch, Tooltip,FormHelperText } from "@mui/material";
 import { UIParameterType } from '../uitypes';
 
 interface MethodParameterProps {

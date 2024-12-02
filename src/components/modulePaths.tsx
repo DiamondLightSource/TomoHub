@@ -1,3 +1,4 @@
+// for writing the module paths in the YAML pipeline 
 export const paths = {
     "normalize" : "tomopy.prep.normalize",
     "minus_log" : "tomopy.prep.normalize",

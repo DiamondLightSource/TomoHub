@@ -12,8 +12,6 @@ const YMLG = () => {
     setYamlFileName(event.target.value);
   }
   const createAndDownloadYAML = () => {
-
-
     // Convert methods context state to YAML
     const transformedMethods = methods.map((method) => {
       // Construct the new object with modifications
@@ -24,31 +22,29 @@ const YMLG = () => {
       };
     
       // Add conditional extra data
-      if (method.name === "method2") {
+      if (method.name === "find_center_vo" || method.name === "find_center_pc") {
         return {
           ...transformedMethod,
-          extra_object: { extraKey: "extraValue" }, // Add an extra object if the condition is met
+          id : "centering",
+          sideoutput : { cor: "center_of_rotation" }, // Add an extra object if the condition is met
         };
-      }
-    
+      }    
       return transformedMethod;
     });
-    
+  
     const yamlContent = stringify(transformedMethods);
-    console.log(yamlContent);
+    
     // Create a Blob object with YAML content
     const blob = new Blob([yamlContent], { type: 'application/x-yaml' });
   
-    // Create a download link
+    // Create a download link and download 
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `${yamlFileName}.yaml`;
-  
-    // Programmatically trigger the download
     link.click();
-  
     // Clean up
     URL.revokeObjectURL(link.href);
+
   };
   
   return (
