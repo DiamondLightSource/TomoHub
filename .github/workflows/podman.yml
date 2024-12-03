@@ -1,0 +1,35 @@
+name: Podman CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Install Podman
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y podman
+
+    - name: Build Container Image
+      run: |
+        podman build -t my-react-app .
+
+    - name: Test the Container
+      run: |
+        podman run --rm -p 8080:80 my-react-app curl http://localhost:8080
+
+    - name: Push to GitHub Container Registry
+      env:
+        CR_PAT: ${{ secrets.CR_PAT }}
+      run: |
+        podman login ghcr.io -u USERNAME -p $CR_PAT
+        podman tag my-react-app ghcr.io/USERNAME/my-react-app:latest
+        podman push ghcr.io/USERNAME/my-react-app:latest
