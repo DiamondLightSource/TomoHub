@@ -2,7 +2,6 @@ name: Tomohub
 
 on:
   workflow_call:
-  workflow_dispatch:
   
 jobs:
   build_and_deploy:
@@ -48,8 +47,8 @@ jobs:
         uses: docker/build-push-action@v6.10.0
         with:
           context: . # DockerFile location
-          push: true
-          load: true
+          push: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
+          load: ${{ !(github.event_name == 'push' && startsWith(github.ref, 'refs/tags')) }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
