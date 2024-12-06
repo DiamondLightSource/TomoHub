@@ -23,7 +23,7 @@ const theme = createTheme({
         fontSize: '1rem',
       },
     },
-    spacing: 10, // Define base spacing unit, 8px by default
+    spacing: 10, 
   });
   
 export default theme
