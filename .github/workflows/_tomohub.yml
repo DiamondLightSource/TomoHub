@@ -18,7 +18,7 @@ jobs:
 
       # Generate the image name dynamically
       - name: Generate Image Name
-        run: echo IMAGE_REPOSITORY=ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]' | tr '[_]' '[\-]')-tomohub >> $GITHUB_ENV
+        run: echo IMAGE_REPOSITORY=ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]' | tr '[_]' '[\-]') >> $GITHUB_ENV
 
       # Log in to GitHub Container Registry
       - name: Log in to GitHub Docker Registry
@@ -48,8 +48,8 @@ jobs:
         uses: docker/build-push-action@v6.10.0
         with:
           context: . # DockerFile location
-          push: true
-          load: true
+          push: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
+          load: ${{ !(github.event_name == 'push' && startsWith(github.ref, 'refs/tags')) }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
