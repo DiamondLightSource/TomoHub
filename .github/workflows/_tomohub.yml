@@ -2,8 +2,6 @@ name: Tomohub
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
 jobs:
