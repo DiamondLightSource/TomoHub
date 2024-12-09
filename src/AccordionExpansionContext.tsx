@@ -30,10 +30,13 @@ export const AccordionExpansionProvider: React.FC<{ children: ReactNode }> = ({ 
   };
 
   const expandMethodAndParent = (parentId: string, methodId: string) => {
-    // Ensure both parent and method are expanded
-    setExpandedMethod(prev => prev === methodId ? null : methodId);
-    setExpandedParent(prev => prev === parentId ? null : parentId);
+    // Ensure method is toggled (expand/collapse)
+    setExpandedMethod(prev => (prev === methodId ? null : methodId));
+  
+    // Only set the parent if it's different from the current parent
+    setExpandedParent(prev => (prev === parentId ? prev : parentId));
   };
+  
 
   return (
     <AccordionExpansionContext.Provider 
