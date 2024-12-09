@@ -23,9 +23,15 @@ interface VisualiserMethodProps {
     parameters?: Record<string, any>;
   };
   removeMethod: (name: string) => void;
+  editMethod: (name: string) => void;
+
 }
 
-const VisualiserMethod: React.FC<VisualiserMethodProps> = ({ method, removeMethod }) => {
+const VisualiserMethod: React.FC<VisualiserMethodProps> = ({ 
+  method, 
+  removeMethod, 
+  editMethod
+}) => {
   const {
     attributes,
     listeners,
@@ -83,10 +89,20 @@ const VisualiserMethod: React.FC<VisualiserMethodProps> = ({ method, removeMetho
         <DragIndicatorIcon />
         <Typography fontSize={16} fontWeight="bold">{method.name}</Typography>
         <Box marginLeft="auto">
-          <IconButton edge="end" aria-label="edit" size="small">
+          <IconButton 
+            edge="end" 
+            aria-label="edit" 
+            size="small" 
+            onClick={()=>editMethod(method.name)}
+          >
             <EditIcon />
           </IconButton>
-          <IconButton edge="start" aria-label="delete" size="small" onClick={() => removeMethod(method.name)}>
+          <IconButton 
+            edge="start" 
+            aria-label="delete" 
+            size="small" 
+            onClick={() => removeMethod(method.name)}
+          >
             <DeleteIcon />
           </IconButton>
         </Box>

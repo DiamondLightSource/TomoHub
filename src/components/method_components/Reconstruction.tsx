@@ -2,15 +2,16 @@ import React from 'react';
 import { useMethods } from "../../MethodsContext";
 import { reconstructionMethods } from "./methods_config/Methods";
 import { MethodAccordion } from './methods_config/MethodAccordion';
+import { useAccordionExpansion } from '../../AccordionExpansionContext';
 
 export default function Reconstruction() {
-  const [expanded, setExpanded] = React.useState<string | false>("");
+  const { 
+    expandedMethod, 
+    expandedParent, 
+    toggleMethodExpansion, 
+  } = useAccordionExpansion();
   const { methods, addMethod, removeMethod, updateMethodParameter } = useMethods();
-
-  const handleMethodExpand = (methodId: string, isExpanded: boolean) => {
-    setExpanded(isExpanded ? methodId : false);
-  };
-
+  console.log(expandedMethod);
   const isMethodAdded = (methodName: string) =>
     methods.some((method) => method.name === methodName);
 
@@ -32,12 +33,17 @@ export default function Reconstruction() {
         <MethodAccordion
           key={method.id}
           method={method}
-          isExpanded={expanded === method.id}
+          isExpanded={
+            expandedMethod === method.id && 
+            expandedParent === 'Reconstruction' // Add parent check
+          }
           isMethodAdded={isMethodAdded(method.id)}
           currentParameters={
             methods.find((m) => m.name === method.id)?.parameters ?? {}
           }
-          onExpand={(isExpanded) => handleMethodExpand(method.id, isExpanded)}
+          onExpand={() => {
+            toggleMethodExpansion(method.id);
+          }}
           onAddMethod={() => handleAddMethod(method.id)}
           onRemoveMethod={() => removeMethod(method.id)}
           onParameterChange={(paramName, value) =>
