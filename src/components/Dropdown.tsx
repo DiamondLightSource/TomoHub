@@ -1,3 +1,4 @@
+import React from 'react';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -6,43 +7,42 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import Normalisation from './method_components/Normalisation';
 import CenterOfRotation from './method_components/CenterOfRotation';
 import Reconstruction from './method_components/Reconstruction';
-import React  from 'react';
 import InputOutput from './Inputdata';
+import { useAccordionExpansion } from '../AccordionExpansionContext';
 
 type DropdownProps = {
-    name:string;
+    name: string;
 }
 
- const Dropdown:React.FC<DropdownProps> = (props) =>{
+const methodComponents = {
+    "Input/Output": InputOutput,
+    "Normalisation": Normalisation,
+    "Center of Rotation": CenterOfRotation,
+    "Reconstruction": Reconstruction
+};
 
-  function renderMethods(){
-    if(props.name=="Input/Output"){
-      return <InputOutput />
-    }
-    else if(props.name=="Normalisation"){
-      return <Normalisation />
-    }
-    else if(props.name==="Center of Rotation"){
-      return <CenterOfRotation />
-    }
-    else if(props.name=="Reconstruction"){
-      return <Reconstruction />
-    }
-  }
+const Dropdown: React.FC<DropdownProps> = (props) => {
+    const { expandedParent, toggleParentExpansion } = useAccordionExpansion();
+    
+    const MethodComponent = methodComponents[props.name];
 
-  return (
-        <Accordion>
-        <AccordionSummary
-          expandIcon={<ArrowDownwardIcon />}
-          aria-controls="panel1-content"
-          id="panel1-header"
+    return (
+        <Accordion
+            expanded={expandedParent === props.name}
+            onChange={() => toggleParentExpansion(props.name)}
         >
-          <Typography>{props.name}</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-            {renderMethods()}
-        </AccordionDetails>
-      </Accordion>
+            <AccordionSummary
+                expandIcon={<ArrowDownwardIcon />}
+                aria-controls={`${props.name}-content`}
+                id={`${props.name}-header`}
+            >
+                <Typography>{props.name}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+                {MethodComponent ? <MethodComponent /> : null}
+            </AccordionDetails>
+        </Accordion>
     )
 }
-export default Dropdown
+
+export default Dropdown;

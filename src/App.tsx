@@ -6,9 +6,11 @@ import Visualiser from "./components/Visualiser";
 import Footer from "./components/Footer";
 import { MethodsProvider } from "./MethodsContext";
 import YMLG from "./components/YamlGenerator";
+import {AccordionExpansionProvider} from "./AccordionExpansionContext";
 
 const App:React.FC = () => {
 return (
+  <AccordionExpansionProvider>
     <MethodsProvider>
       <div className="app">
         <div className="container">
@@ -28,7 +30,9 @@ return (
         </div>
         <Footer />
       </div>
-    </MethodsProvider>
+      </MethodsProvider>
+      </AccordionExpansionProvider>
+    
   );
 }
 

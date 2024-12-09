@@ -17,9 +17,11 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy 
 } from '@dnd-kit/sortable';
+import { useAccordionExpansion } from '../AccordionExpansionContext';
 
 const Visualiser:React.FC = () => {
   const { methods, clearMethods, removeMethod, setMethods } = useMethods();
+  const { expandMethodAndParent } = useAccordionExpansion(); // Use the context
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -40,6 +42,33 @@ const Visualiser:React.FC = () => {
       });
     }
   };
+
+  const handleEditMethod = (methodName: string) => {
+    // Determine the parent accordion based on method name
+    const getParentAccordion = (methodName: string) => {
+      const parentMappings = {
+        'find_center_vo': 'Center of Rotation',
+        'find_center_pc': 'Center of Rotation',
+        'normalize': 'Normalisation',
+        'minus_log': 'Normalisation',
+        'recon' : 'Reconstruction'
+        // Add more mappings as needed
+      };
+
+      // Find a matching key or default to a parent if exact match not found
+      const parentKey = Object.keys(parentMappings).find(key => 
+        methodName.includes(key)
+      );
+
+      return parentKey ? parentMappings[parentKey] : 'Center of Rotation';
+    };
+
+    const parentAccordion = getParentAccordion(methodName);
+    
+    // Expand both parent and method
+    expandMethodAndParent(parentAccordion, methodName);
+  } 
+  
   const methodsDisplay = () => {
     if (methods.length === 0) {
       return (
@@ -61,6 +90,7 @@ const Visualiser:React.FC = () => {
                   key={method.name}
                   method={method}
                   removeMethod={removeMethod}
+                  editMethod={handleEditMethod}
                 />
               ))}
             </Box>
