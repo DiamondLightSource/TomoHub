@@ -1,0 +1,625 @@
+{
+    "httomolib.prep.phase": {
+        "paganin_filter": {
+            "method": "paganin_filter",
+            "module_path": "httomolib.prep.phase",
+            "method_desc": "Perform single-material phase retrieval from flats/darks corrected tomographic measurements.",
+            "parameters": {
+                "pixel_size": {
+                    "type": "float",
+                    "value": 0.0001,
+                    "desc": "Detector pixel size in cm."
+                },
+                "dist": {
+                    "type": "float",
+                    "value": 50.0,
+                    "desc": "Propagation distance of the wavefront in cm."
+                },
+                "energy": {
+                    "type": "float",
+                    "value": 53.0,
+                    "desc": "Energy of incident wave in keV."
+                },
+                "alpha": {
+                    "type": "float",
+                    "value": 0.001,
+                    "desc": "Regularization parameter, the ratio of delta/beta. Larger values lead to more smoothing."
+                }
+            }
+        }
+    },
+    "httomolib.misc.images": {
+        "save_to_images": {
+            "method": "save_to_images",
+            "module_path": "httomolib.misc.images",
+            "method_desc": "Saves data as 2D images.",
+            "parameters": {
+                "subfolder_name": {
+                    "type": "str",
+                    "value": "images",
+                    "desc": "Subfolder name within the main output directory. Defaults to 'images'."
+                },
+                "axis": {
+                    "type": "int",
+                    "value": "auto",
+                    "desc": "Specify the axis to use to slice the data (if `data` is a 3D array)."
+                },
+                "file_format": {
+                    "type": "str",
+                    "value": "tif",
+                    "desc": "Specify the file format to use, e.g. \"png\", \"jpeg\", or \"tif\". Defaults to \"tif\"."
+                },
+                "asynchronous": {
+                    "type": "bool",
+                    "value": true,
+                    "desc": "Perform write operations synchronously or asynchronously."
+                }
+            }
+        }
+    },
+    "httomolib.misc.morph": {
+        "data_reducer": {
+            "method": "data_reducer",
+            "module_path": "httomolib.misc.morph",
+            "method_desc": "Reduce the data along the given axis dimension using the preferred method.",
+            "parameters": {
+                "axis": {
+                    "type": "int",
+                    "value": "auto",
+                    "desc": "Axis along which the reduction is applied. Defaults to 0."
+                },
+                "method": {
+                    "type": "str",
+                    "value": "mean",
+                    "desc": "Selection of the reduction method. Defaults to 'mean'."
+                }
+            }
+        }
+    },
+    "httomolib.misc.segm": {
+        "binary_thresholding": {
+            "method": "binary_thresholding",
+            "module_path": "httomolib.misc.segm",
+            "method_desc": "Performs binary thresholding to the input data",
+            "parameters": {
+                "val_intensity": {
+                    "type": "float",
+                    "value": 0.1,
+                    "desc": "The grayscale intensity value that defines the binary threshold. Defaults to 0.1"
+                },
+                "otsu": {
+                    "type": "bool",
+                    "value": false,
+                    "desc": "If set to True, val_intensity will be overwritten by Otsu method."
+                },
+                "foreground": {
+                    "type": "bool",
+                    "value": true,
+                    "desc": "Get the foreground, otherwise background."
+                },
+                "axis": {
+                    "type": "int",
+                    "value": "auto",
+                    "desc": "Specify the axis to use to slice the data (if data is the 3D array)."
+                }
+            }
+        }
+    },
+    "httomolibgpu.misc.morph": {
+        "sino_360_to_180": {
+            "method": "sino_360_to_180",
+            "module_path": "httomolibgpu.misc.morph",
+            "method_desc": "Converts 0-360 degrees sinogram to a 0-180 sinogram.",
+            "parameters": {
+                "overlap": {
+                    "type": "int",
+                    "value": "${{centering.side_outputs.overlap}}",
+                    "desc": "Overlapping number of pixels."
+                },
+                "rotation": {
+                    "type": "Literal[left, right]",
+                    "value": "left",
+                    "desc": "'left' if rotation center is close to the left of the field-of-view, 'right' otherwise."
+                }
+            }
+        },
+        "data_resampler": {
+            "method": "data_resampler",
+            "module_path": "httomolibgpu.misc.morph",
+            "method_desc": "Down/Up-resampler of the input data implemented through interpn function.",
+            "parameters": {
+                "newshape": {
+                    "type": "list",
+                    "value": "REQUIRED",
+                    "desc": "2d list that defines the 2D slice shape of new shape data."
+                },
+                "axis": {
+                    "type": "int",
+                    "value": "auto",
+                    "desc": "Axis along which the scaling is applied. Defaults to 1."
+                },
+                "interpolation": {
+                    "type": "str",
+                    "value": "linear",
+                    "desc": "Selection of interpolation method. Defaults to 'linear'."
+                }
+            }
+        }
+    },
+    "httomolibgpu.misc.rescale": {
+        "rescale_to_int": {
+            "method": "rescale_to_int",
+            "module_path": "httomolibgpu.misc.rescale",
+            "method_desc": "Rescales the data given as float32 type and converts it into the range of an unsigned integer type with the given number of bits.",
+            "parameters": {
+                "perc_range_min": {
+                    "type": "float",
+                    "value": 0.0,
+                    "desc": "The lower cutoff point in the input data, in percent of the data range (defaults to 0). The lower bound is computed as min + perc_range_min/100*(max-min)"
+                },
+                "perc_range_max": {
+                    "type": "float",
+                    "value": 100.0,
+                    "desc": "The upper cutoff point in the input data, in percent of the data range (defaults to 100). The upper bound is computed as min + perc_range_max/100*(max-min)"
+                },
+                "bits": {
+                    "type": "Literal[8, 16, 32]",
+                    "value": 8,
+                    "desc": "The number of bits in the output integer range (defaults to 8). Allowed values are: - 8 -> uint8 - 16 -> uint16 - 32 -> uint32"
+                },
+                "glob_stats": {
+                    "type": "Optional[tuple[float, float, float, int]]",
+                    "value": "${{statistics.side_outputs.glob_stats}}",
+                    "desc": "Global statistics of the full dataset (beyond the data passed into this call). It's a tuple with (min, max, sum, num_items). If not given, the min/max is computed from the given data."
+                }
+            }
+        }
+    },
+    "httomolibgpu.prep.alignment": {
+        "distortion_correction_proj_discorpy": {
+            "method": "distortion_correction_proj_discorpy",
+            "module_path": "httomolibgpu.prep.alignment",
+            "method_desc": "Unwarp a stack of images using a backward model.",
+            "parameters": {
+                "metadata_path": {
+                    "type": "str",
+                    "value": "REQUIRED",
+                    "desc": "The path to the file containing the distortion coefficients for the data."
+                },
+                "order": {
+                    "type": "int",
+                    "value": 3,
+                    "desc": "The order of the spline interpolation, default is 3. Must be in the range 0-5."
+                },
+                "mode": {
+                    "type": "str",
+                    "value": "constant",
+                    "desc": "Points outside the boundaries of the input are filled according to the given mode ('constant', 'nearest', 'mirror', 'reflect', 'wrap', 'grid-mirror', 'grid-wrap', 'grid-constant' or 'opencv')."
+                }
+            }
+        }
+    },
+    "httomolibgpu.prep.normalize": {
+        "normalize": {
+            "method": "normalize",
+            "module_path": "httomolibgpu.prep.normalize",
+            "method_desc": "Normalize raw projection data using the flat and dark field projections.",
+            "parameters": {
+                "cutoff": {
+                    "type": "float",
+                    "value": 10.0,
+                    "desc": "Permitted maximum value for the normalised data."
+                },
+                "minus_log": {
+                    "type": "bool",
+                    "value": true,
+                    "desc": "Apply negative log to the normalised data."
+                },
+                "nonnegativity": {
+                    "type": "bool",
+                    "value": false,
+                    "desc": "Remove negative values in the normalised data."
+                },
+                "remove_nans": {
+                    "type": "bool",
+                    "value": false,
+                    "desc": "Remove NaN and Inf values in the normalised data."
+                }
+            }
+        }
+    },
+    "httomolibgpu.prep.phase": {
+        "paganin_filter_savu": {
+            "method": "paganin_filter_savu",
+            "module_path": "httomolibgpu.prep.phase",
+            "method_desc": "Apply Paganin filter (for denoising or contrast enhancement) to projections.",
+            "parameters": {
+                "ratio": {
+                    "type": "float",
+                    "value": 250.0,
+                    "desc": "Ratio of delta/beta."
+                },
+                "energy": {
+                    "type": "float",
+                    "value": 53.0,
+                    "desc": "Beam energy in keV."
+                },
+                "distance": {
+                    "type": "float",
+                    "value": 1.0,
+                    "desc": "Distance from sample to detector in metres."
+                },
+                "resolution": {
+                    "type": "float",
+                    "value": 1.28,
+                    "desc": "Pixel size in microns."
+                },
+                "pad_y": {
+                    "type": "int",
+                    "value": 100,
+                    "desc": "Pad the top and bottom of projections."
+                },
+                "pad_x": {
+                    "type": "int",
+                    "value": 100,
+                    "desc": "Pad the left and right of projections."
+                },
+                "pad_method": {
+                    "type": "str",
+                    "value": "edge",
+                    "desc": "Numpy pad method to use."
+                },
+                "increment": {
+                    "type": "float",
+                    "value": 0.0,
+                    "desc": "Increment all values by this amount before taking the log."
+                }
+            }
+        },
+        "paganin_filter_tomopy": {
+            "method": "paganin_filter_tomopy",
+            "module_path": "httomolibgpu.prep.phase",
+            "method_desc": "Perform single-material phase retrieval from flats/darks corrected tomographic measurements.",
+            "parameters": {
+                "pixel_size": {
+                    "type": "float",
+                    "value": 0.0001,
+                    "desc": "Detector pixel size in cm."
+                },
+                "dist": {
+                    "type": "float",
+                    "value": 50.0,
+                    "desc": "Propagation distance of the wavefront in cm."
+                },
+                "energy": {
+                    "type": "float",
+                    "value": 53.0,
+                    "desc": "Energy of incident wave in keV."
+                },
+                "alpha": {
+                    "type": "float",
+                    "value": 0.001,
+                    "desc": "Regularization parameter, the ratio of delta/beta. Larger values lead to more smoothing."
+                }
+            }
+        }
+    },
+    "httomolibgpu.prep.stripe": {
+        "remove_stripe_based_sorting": {
+            "method": "remove_stripe_based_sorting",
+            "module_path": "httomolibgpu.prep.stripe",
+            "method_desc": "Remove full and partial stripe artifacts from sinogram using Nghia Vo's approach, see :cite:`vo2018superior`.",
+            "parameters": {
+                "size": {
+                    "type": "int",
+                    "value": 11,
+                    "desc": "Window size of the median filter."
+                },
+                "dim": {
+                    "type": "int",
+                    "value": 1,
+                    "desc": "Dimension of the window."
+                }
+            }
+        },
+        "remove_stripe_ti": {
+            "method": "remove_stripe_ti",
+            "module_path": "httomolibgpu.prep.stripe",
+            "method_desc": "Removes stripes with the method of V.",
+            "parameters": {
+                "beta": {
+                    "type": "float",
+                    "value": 0.1,
+                    "desc": "filter parameter, lower values increase the filter strength. Default is 0.1."
+                }
+            }
+        },
+        "remove_all_stripe": {
+            "method": "remove_all_stripe",
+            "module_path": "httomolibgpu.prep.stripe",
+            "method_desc": "Remove all types of stripe artifacts from sinogram using Nghia Vo's approach, see :cite:`vo2018superior` (combination of algorithm 3,4,5, and 6).",
+            "parameters": {
+                "snr": {
+                    "type": "float",
+                    "value": 3.0,
+                    "desc": "Ratio used to locate large stripes. Greater is less sensitive."
+                },
+                "la_size": {
+                    "type": "int",
+                    "value": 61,
+                    "desc": "Window size of the median filter to remove large stripes."
+                },
+                "sm_size": {
+                    "type": "int",
+                    "value": 21,
+                    "desc": "Window size of the median filter to remove small-to-medium stripes."
+                },
+                "dim": {
+                    "type": "int",
+                    "value": 1,
+                    "desc": "Dimension of the window."
+                }
+            }
+        },
+        "raven_filter": {
+            "method": "raven_filter",
+            "module_path": "httomolibgpu.prep.stripe",
+            "method_desc": "Applies FFT-based Raven filter :cite:`raven1998numerical` to a 3D CuPy array.",
+            "parameters": {
+                "pad_y": {
+                    "type": "int",
+                    "value": 20,
+                    "desc": "Pad the top and bottom of projections."
+                },
+                "pad_x": {
+                    "type": "int",
+                    "value": 20,
+                    "desc": "Pad the left and right of projections."
+                },
+                "pad_method": {
+                    "type": "str",
+                    "value": "edge",
+                    "desc": "Numpy pad method to use."
+                },
+                "uvalue": {
+                    "type": "int",
+                    "value": 20,
+                    "desc": "The shape of filter."
+                },
+                "nvalue": {
+                    "type": "int",
+                    "value": 4,
+                    "desc": "The shape of filter."
+                },
+                "vvalue": {
+                    "type": "int",
+                    "value": 2,
+                    "desc": "The number of rows to be applied the filter"
+                }
+            }
+        }
+    },
+    "httomolibgpu.recon.algorithm": {
+        "FBP": {
+            "method": "FBP",
+            "module_path": "httomolibgpu.recon.algorithm",
+            "method_desc": "Perform Filtered Backprojection (FBP) reconstruction using ASTRA toolbox :cite:`van2016fast` and ToMoBAR :cite:`kazantsev2020tomographic` wrappers.",
+            "parameters": {
+                "center": {
+                    "type": "Optional[float]",
+                    "value": "${{centering.side_outputs.centre_of_rotation}}",
+                    "desc": "The center of rotation (CoR)."
+                },
+                "filter_freq_cutoff": {
+                    "type": "Optional[float]",
+                    "value": 1.1,
+                    "desc": "Cutoff frequency parameter for the sinc filter, the lowest values produce more crispy but noisy reconstruction."
+                },
+                "recon_size": {
+                    "type": "Optional[int]",
+                    "value": null,
+                    "desc": "The [recon_size, recon_size] shape of the reconstructed slice in pixels. By default (None), the reconstructed size will be the dimension of the horizontal detector."
+                },
+                "recon_mask_radius": {
+                    "type": "Optional[float]",
+                    "value": null,
+                    "desc": "The radius of the circular mask that applies to the reconstructed slice in order to crop out some undesirable artifacts. The values outside the diameter will be set to zero. None by default, to see the effect of the mask try setting the value in the range [0.7-1.0]."
+                }
+            }
+        },
+        "LPRec": {
+            "method": "LPRec",
+            "module_path": "httomolibgpu.recon.algorithm",
+            "method_desc": "Fourier direct inversion in 3D on unequally spaced (also called as Log-Polar) grids using CuPy array as an input.",
+            "parameters": {
+                "center": {
+                    "type": "Optional[float]",
+                    "value": "${{centering.side_outputs.centre_of_rotation}}",
+                    "desc": "The center of rotation (CoR)."
+                },
+                "recon_size": {
+                    "type": "Optional[int]",
+                    "value": null,
+                    "desc": "The [recon_size, recon_size] shape of the reconstructed slice in pixels. By default (None), the reconstructed size will be the dimension of the horizontal detector."
+                },
+                "recon_mask_radius": {
+                    "type": "Optional[float]",
+                    "value": null,
+                    "desc": "The radius of the circular mask that applies to the reconstructed slice in order to crop out some undesirable artifacts. The values outside the diameter will be set to zero. None by default, to see the effect of the mask try setting the value in the range [0.7-1.0]."
+                }
+            }
+        },
+        "SIRT": {
+            "method": "SIRT",
+            "module_path": "httomolibgpu.recon.algorithm",
+            "method_desc": "Perform Simultaneous Iterative Recostruction Technique (SIRT) using ASTRA toolbox :cite:`van2016fast` and ToMoBAR :cite:`kazantsev2020tomographic` wrappers.",
+            "parameters": {
+                "center": {
+                    "type": "Optional[float]",
+                    "value": "${{centering.side_outputs.centre_of_rotation}}",
+                    "desc": "The center of rotation (CoR)."
+                },
+                "recon_size": {
+                    "type": "Optional[int]",
+                    "value": null,
+                    "desc": "The [recon_size, recon_size] shape of the reconstructed slice in pixels. By default (None), the reconstructed size will be the dimension of the horizontal detector."
+                },
+                "iterations": {
+                    "type": "Optional[int]",
+                    "value": 300,
+                    "desc": "The number of SIRT iterations."
+                },
+                "nonnegativity": {
+                    "type": "Optional[bool]",
+                    "value": true,
+                    "desc": "Impose nonnegativity constraint on reconstructed image."
+                }
+            }
+        },
+        "CGLS": {
+            "method": "CGLS",
+            "module_path": "httomolibgpu.recon.algorithm",
+            "method_desc": "Perform Congugate Gradient Least Squares (CGLS) using ASTRA toolbox :cite:`van2016fast` and ToMoBAR :cite:`kazantsev2020tomographic` wrappers.",
+            "parameters": {
+                "center": {
+                    "type": "Optional[float]",
+                    "value": "${{centering.side_outputs.centre_of_rotation}}",
+                    "desc": "The center of rotation (CoR)."
+                },
+                "recon_size": {
+                    "type": "Optional[int]",
+                    "value": null,
+                    "desc": "The [recon_size, recon_size] shape of the reconstructed slice in pixels. By default (None), the reconstructed size will be the dimension of the horizontal detector."
+                },
+                "iterations": {
+                    "type": "Optional[int]",
+                    "value": 20,
+                    "desc": "The number of CGLS iterations."
+                },
+                "nonnegativity": {
+                    "type": "Optional[bool]",
+                    "value": true,
+                    "desc": "Impose nonnegativity constraint on reconstructed image."
+                }
+            }
+        }
+    },
+    "httomolibgpu.recon.rotation": {
+        "find_center_vo": {
+            "method": "find_center_vo",
+            "module_path": "httomolibgpu.recon.rotation",
+            "method_desc": "Find the rotation axis location (aka the centre of rotation) using Nghia Vo's method.",
+            "parameters": {
+                "ind": {
+                    "type": "Optional[int]",
+                    "value": null,
+                    "desc": "Index of the slice to be used to estimate the CoR. If None is given, then the central sinogram will be extracted from the data array with a possible averaging, see ."
+                },
+                "average_radius": {
+                    "type": "Optional[int]",
+                    "value": 0,
+                    "desc": "Averaging multiple sinograms around the ind-indexed sinogram to improve the signal-to-noise ratio. It is recommended to keep this parameter smaller than 10."
+                },
+                "cor_initialisation_value": {
+                    "type": "Optional[float]",
+                    "value": null,
+                    "desc": "The initial approximation for the centre of rotation. If the value is None, use the horizontal centre of the projection/sinogram image."
+                },
+                "smin": {
+                    "type": "int",
+                    "value": -100,
+                    "desc": "Coarse search radius. Reference to the horizontal center of the sinogram."
+                },
+                "smax": {
+                    "type": "int",
+                    "value": 100,
+                    "desc": "Coarse search radius. Reference to the horizontal center of the sinogram."
+                },
+                "srad": {
+                    "type": "float",
+                    "value": 6.0,
+                    "desc": "Fine search radius."
+                },
+                "step": {
+                    "type": "float",
+                    "value": 0.25,
+                    "desc": "Step of fine searching."
+                },
+                "ratio": {
+                    "type": "float",
+                    "value": 0.5,
+                    "desc": "The ratio between the FOV of the camera and the size of object. It's used to generate the mask."
+                },
+                "drop": {
+                    "type": "int",
+                    "value": 20,
+                    "desc": "Drop lines around vertical center of the mask."
+                }
+            }
+        },
+        "find_center_360": {
+            "method": "find_center_360",
+            "module_path": "httomolibgpu.recon.rotation",
+            "method_desc": "Find the center-of-rotation (COR) in a 360-degree scan and also an offset to perform data transformation from 360 to 180 degrees scan.",
+            "parameters": {
+                "ind": {
+                    "type": "Optional[int]",
+                    "value": null,
+                    "desc": "Index of the slice to be used for estimate the CoR and the overlap."
+                },
+                "win_width": {
+                    "type": "int",
+                    "value": 10,
+                    "desc": "Window width used for finding the overlap area."
+                },
+                "side": {
+                    "type": "Optional[Literal[0, 1]]",
+                    "value": null,
+                    "desc": "Overlap size. Only there options: None, 0, or 1. \"None\" corresponds to fully automated determination. \"0\" corresponds to the left side. \"1\" corresponds to the right side."
+                },
+                "denoise": {
+                    "type": "bool",
+                    "value": true,
+                    "desc": "Apply the Gaussian filter if True."
+                },
+                "norm": {
+                    "type": "bool",
+                    "value": false,
+                    "desc": "Apply the normalisation if True."
+                },
+                "use_overlap": {
+                    "type": "bool",
+                    "value": false,
+                    "desc": "Use the combination of images in the overlap area for calculating correlation coefficients if True."
+                }
+            }
+        },
+        "find_center_pc": {
+            "method": "find_center_pc",
+            "module_path": "httomolibgpu.recon.rotation",
+            "method_desc": "Find rotation axis location by finding the offset between the first projection and a mirrored projection 180 degrees apart using phase correlation in Fourier space.",
+            "parameters": {
+                "proj1": {
+                    "type": "ndarray",
+                    "value": "auto",
+                    "desc": "Projection from the 0th degree angle."
+                },
+                "proj2": {
+                    "type": "ndarray",
+                    "value": "auto",
+                    "desc": "Projection from the 180th degree angle."
+                },
+                "tol": {
+                    "type": "float",
+                    "value": 0.5,
+                    "desc": "Subpixel accuracy. Defaults to 0.5."
+                },
+                "rotc_guess": {
+                    "type": "Union[float, str, NoneType]",
+                    "value": null,
+                    "desc": "Initial guess value for the rotation center. Defaults to None."
+                }
+            }
+        }
+    }
+}

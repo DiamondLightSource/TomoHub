@@ -43,15 +43,25 @@ def _get_discard_params() -> List[str]:
     ]
     return discard_params
 
+def _get_mustchange_params() ->List[str]:
+    mustchange_params = [
+        "proj1",
+        "proj2",
+        "axis",
+        "asynchronous",
+        "center",
+        "glob_stats",
+        "overlap"
+    ]
+    return mustchange_params
+
 def set_param_value(name: str):
-    if name in ["proj1", "proj2"]:
+    if name in ["proj1", "proj2","axis"]:
         return "auto"            
     elif name == "kwargs":
         # params_dict["#additional parameters"] = "AVAILABLE"
         # parsing hashtag to yaml comes with quotes, for now we simply ignore the field
         pass
-    elif name == "axis":
-        return "auto"
     elif name == "asynchronous":
         return True
     elif name == "center":
@@ -83,7 +93,8 @@ def generate_method_template(module_name: str, method_name: str) -> Dict:
     
     # Getting the discarded params list 
     discard_params = _get_discard_params()
-    
+    mustchange_params = _get_mustchange_params()
+
     # Import the module
     imported_module = importlib.import_module(str(module_name))
     
@@ -102,8 +113,6 @@ def generate_method_template(module_name: str, method_name: str) -> Dict:
     
     for name, param in method_signature.parameters.items():
         if name not in discard_params:
-        # Determine if the parameter is optional
-            is_optional = param.default != inspect.Parameter.empty
         
             # Get parameter type
             param_type = "Any"
@@ -111,7 +120,12 @@ def generate_method_template(module_name: str, method_name: str) -> Dict:
                 param_type = _convert_type_to_string(param.annotation)
         
             # Get default value
-            default_value = param.default if is_optional else set_param_value(name)
+
+            default_value = (
+                    "REQUIRED" if (param.default == inspect.Parameter.empty and name not in mustchange_params) else
+                    param.default if (name not in mustchange_params) 
+                    else set_param_value(name)
+            )
         
             # Get parameter description from docstring
             param_desc = ""
@@ -123,7 +137,7 @@ def generate_method_template(module_name: str, method_name: str) -> Dict:
                 "type": param_type,
                 "value": default_value,
                 "desc": param_desc,
-                "optional": is_optional
+
             }
     
     # Construct method dictionary
@@ -153,7 +167,7 @@ def parse_docstring(docstring):
         A dictionary containing description and parameter details
     """
     # Split the docstring into sections
-    sections = re.split(r'\n(Parameters|Returns)\n-+', docstring)
+    sections = re.split(r'\n(Parameters|Raises|Returns)\n-+', docstring)
     
     # Clean and extract first sentence
     description_text = sections[0].strip().replace('\n', ' ')
