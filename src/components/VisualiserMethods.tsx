@@ -87,7 +87,9 @@ const VisualiserMethod: React.FC<VisualiserMethodProps> = ({
         alignItems: 'center',
       }}>
         <DragIndicatorIcon />
-        <Typography fontSize={16} fontWeight="bold">{method.name}</Typography>
+        <Typography fontSize={method.name.length > 25 ? 11 : 15} fontWeight="bold">
+          {method.name}
+        </Typography>
         <Box marginLeft="auto">
           <IconButton 
             edge="end" 
@@ -131,7 +133,7 @@ const VisualiserMethod: React.FC<VisualiserMethodProps> = ({
               },
             }}
           >
-            <Typography variant="body2" color="textSecondary">Parameters</Typography>
+            <Typography variant="body2" color="textSecondary" fontSize={13}>Parameters</Typography>
           </AccordionSummary>
           <AccordionDetails sx={{p:0.2}}>
             <List dense sx={{p:0,mb:1}}>

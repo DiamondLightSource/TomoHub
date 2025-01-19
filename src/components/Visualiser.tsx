@@ -47,12 +47,28 @@ const Visualiser:React.FC = () => {
     // Determine the parent accordion based on method name
     const getParentAccordion = (methodName: string) => {
       const parentMappings = {
-        'find_center_vo': 'Center of Rotation',
-        'find_center_pc': 'Center of Rotation',
+        'save_to_images' : 'Image Saving',
+        'rescale_to_int' : 'Image Saving',
+        'binary_thresholding' : 'Segmentation',
+        'data_reducer' : 'Morphological Operations',
+        'sino_360_to_180' : 'Morphological Operations',
+        'data_resampler' : 'Morphological Operations',
         'normalize': 'Normalisation',
-        'minus_log': 'Normalisation',
-        'recon' : 'Reconstruction'
-        // Add more mappings as needed
+        'paganin_filter' : 'Phase Retrieval',
+        'paganin_filter_savu' : 'Phase Retrieval',
+        'paganin_filter_tomopy' : 'Phase Retrieval',
+        'remove_stripe_based_sorting' : 'Stripe Removal',
+        'remove_stripe_ti' : 'Stripe Removal',
+        'remove_all_stripe' : 'Stripe Removal',
+        'raven_filter' : 'Stripe Removal',
+        'distortion_correction_proj_discorpy' : 'Distortion Correction',
+        'find_center_vo': 'Rotation Center Finding',
+        'find_center_pc': 'Rotation Center Finding',
+        'find_center_360' : 'Rotation Center Finding',        
+        'FBP' : 'Reconstruction',
+        'LPRec' : 'Reconstruction',
+        'SIRT' : 'Reconstruction',
+        'CGLS' : 'Reconstruction',
       };
 
       // Find a matching key or default to a parent if exact match not found
