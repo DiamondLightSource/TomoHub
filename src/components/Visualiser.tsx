@@ -35,8 +35,8 @@ const Visualiser:React.FC = () => {
     
     if (active.name !== over.id) {
       setMethods((methods) => {
-        const oldIndex = methods.findIndex((method) => method.name === active.id);
-        const newIndex = methods.findIndex((method) => method.name === over.id);
+        const oldIndex = methods.findIndex((method) => method.method_name === active.id);
+        const newIndex = methods.findIndex((method) => method.method_name === over.id);
         
         return arrayMove(methods, oldIndex, newIndex);
       });
@@ -99,11 +99,11 @@ const Visualiser:React.FC = () => {
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          <SortableContext items={methods.map(method => method.name)} strategy={verticalListSortingStrategy}>
+          <SortableContext items={methods.map(method => method.method_name)} strategy={verticalListSortingStrategy}>
             <Box sx={{ width: '100%' }}>
               {methods.map((method) => (
                 <VisualiserMethods
-                  key={method.name}
+                  key={method.method_name}
                   method={method}
                   removeMethod={removeMethod}
                   editMethod={handleEditMethod}

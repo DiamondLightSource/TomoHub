@@ -1,28 +1,29 @@
 import { stringify } from 'yaml';
 import { useMethods } from '../MethodsContext';
-import {Button,Box } from '@mui/material';
+import {Button,Box,Typography,Alert } from '@mui/material';
 import TextField from '@mui/material/TextField';
-import { paths } from './modulePaths';
 import React from 'react';
 
 const YMLG = () => {
   const {methods} = useMethods();
   const [yamlFileName,setYamlFileName] = React.useState<string>("config");
+  // const [showRunCommand, setShowRunCommand] = React.useState<boolean>(false); // State to control
   const changeFileName = (event:React.ChangeEvent<HTMLInputElement>) =>{
     setYamlFileName(event.target.value);
   }
   const createAndDownloadYAML = () => {
+
     // Convert methods context state to YAML
     const transformedMethods = methods.map((method) => {
       // Construct the new object with modifications
       const transformedMethod = {
-        method: method.name, // Replace "name" with "method"\
-        module_path: paths[method.name as keyof typeof paths], // Explicit type assertion
+        method: method.method_name, // Replace "name" with "method"\
+        module_path: method.method_module, // Explicit type assertion
         parameters: { ...method.parameters }, // Copy parameters
       };
     
       // Add conditional extra data
-      if (method.name === "find_center_vo" || method.name === "find_center_pc") {
+      if (method.method_name === "find_center_vo" || method.method_name === "find_center_pc") {
         return {
           ...transformedMethod,
           id : "centering",
@@ -44,7 +45,7 @@ const YMLG = () => {
     link.click();
     // Clean up
     URL.revokeObjectURL(link.href);
-
+    // setShowRunCommand(true);
   };
   
   return (
