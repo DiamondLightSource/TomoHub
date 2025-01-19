@@ -141,10 +141,16 @@ def generate_method_template(module_name: str, method_name: str) -> Dict:
             }
     
     # Construct method dictionary
+    if(module_name.split(".")[0]=="httomolib"):
+        linkToDoc = f"https://diamondlightsource.github.io/httomolib/api/{module_name}.html"
+    else:
+        linkToDoc = f"https://diamondlightsource.github.io/httomolibgpu/api/{module_name}.html"
+        
     method_dict = {
-        "method": method_name,
+        "method_name": method_name,
         "module_path": module_name,
         "method_desc" :docstring_params["desc"],
+        "method_doc" : linkToDoc,
         "parameters": parameters_dict
     }
     

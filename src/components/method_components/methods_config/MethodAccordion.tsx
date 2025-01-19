@@ -31,16 +31,16 @@ export const MethodAccordion: React.FC<MethodAccordionProps> = ({
     onChange={(_, newExpanded) => onExpand(newExpanded)}
   >
     <AccordionSummary
-      aria-controls={`${method.id}-content`}
-      id={`${method.id}-header`}
+      aria-controls={`${method.method_name}-content`}
+      id={`${method.method_name}-header`}
     >
-      <Typography>{method.methodName}</Typography>
+      <Typography>{method.method_name}</Typography>
     </AccordionSummary>
     <AccordionDetails>
       <Grid container spacing={1}>
         <MethodHeader
-          id={method.id}
-          linkToDoc={method.linkToDoc}
+          id={method.method_desc}
+          linkToDoc={method.method_doc}
           isMethodAdded={isMethodAdded}
           onAddMethod={onAddMethod}
           onRemoveMethod={onRemoveMethod}
@@ -48,7 +48,7 @@ export const MethodAccordion: React.FC<MethodAccordionProps> = ({
         {Object.entries(method.parameters).map(([paramName, paramDetails]) => (
           <MethodParameter
             key={paramName}
-            methodId={method.id}
+            methodId={method.method_name}
             paramName={paramName}
             paramDetails={paramDetails}
             value={currentParameters?.[paramName]}
