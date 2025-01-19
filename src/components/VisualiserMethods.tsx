@@ -19,7 +19,7 @@ import { CSS } from '@dnd-kit/utilities';
 
 interface VisualiserMethodProps {
   method: {
-    name: string;
+    method_name: string;
     parameters?: Record<string, any>;
   };
   removeMethod: (name: string) => void;
@@ -39,7 +39,7 @@ const VisualiserMethod: React.FC<VisualiserMethodProps> = ({
     transform,
     transition,
     isDragging
-  } = useSortable({ id: method.name });
+  } = useSortable({ id: method.method_name });
 
   const style = {
     transform: transform
@@ -87,15 +87,15 @@ const VisualiserMethod: React.FC<VisualiserMethodProps> = ({
         alignItems: 'center',
       }}>
         <DragIndicatorIcon />
-        <Typography fontSize={method.name.length > 25 ? 11 : 15} fontWeight="bold">
-          {method.name}
+        <Typography fontSize={method.method_name.length > 25 ? 11 : 15} fontWeight="bold">
+          {method.method_name}
         </Typography>
         <Box marginLeft="auto">
           <IconButton 
             edge="end" 
             aria-label="edit" 
             size="small" 
-            onClick={()=>editMethod(method.name)}
+            onClick={()=>editMethod(method.method_name)}
           >
             <EditIcon />
           </IconButton>
@@ -103,7 +103,7 @@ const VisualiserMethod: React.FC<VisualiserMethodProps> = ({
             edge="start" 
             aria-label="delete" 
             size="small" 
-            onClick={() => removeMethod(method.name)}
+            onClick={() => removeMethod(method.method_name)}
           >
             <DeleteIcon />
           </IconButton>
@@ -122,8 +122,8 @@ const VisualiserMethod: React.FC<VisualiserMethodProps> = ({
         >
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
-            aria-controls={`parameters-content-${method.name}`}
-            id={`parameters-header-${method.name}`}
+            aria-controls={`parameters-content-${method.method_name}`}
+            id={`parameters-header-${method.method_name}`}
             sx={{
               m:0,
               p:"0 10px",
@@ -139,7 +139,7 @@ const VisualiserMethod: React.FC<VisualiserMethodProps> = ({
             <List dense sx={{p:0,mb:1}}>
               {method.parameters &&
                 Object.entries(method.parameters).map(([key, value]) => (
-                  <ListItem key={`${method.name}-${key}`} sx={{ py: 0 , pl:1,pr:1}}>
+                  <ListItem key={`${method.method_name}-${key}`} sx={{ py: 0 , pl:1,pr:1}}>
                     <ListItemText
                       primary={`${key}: ${value}`}
                       primaryTypographyProps={{ variant: 'body2', fontSize: 'small' }}

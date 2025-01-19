@@ -1,13 +1,20 @@
 import React,{createContext, useState, ReactNode, useContext } from "react";
 
 export type Method = {
-  name: string;
-  parameters: { [key: string]: string };  
+  method_name: string; // The name of the method
+  method_module:string;
+  parameters: { 
+    [key: string]: { // Each key is a parameter name
+      type: string;  // The type of the parameter
+      desc: string;  // A description of the parameter
+      value: any;    // The value of the parameter (can be any type)
+    };
+  };
 };
 
 type MethodsContextType = {
   methods: Method[];
-  addMethod: (methodName: string, defaultParams: { [key: string]: any }) => void;
+  addMethod: (methodName: string,methodModule:string, defaultParams: { [key: string]: any }) => void;
   removeMethod: (methodName: string) => void;
   updateMethodParameter: (methodName: string, paramName: string, value: any) => void;
   clearMethods: () => void;
@@ -19,21 +26,21 @@ const MethodsContext = createContext<MethodsContextType | undefined>(undefined);
 export const MethodsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [methods, setMethods] = useState<Method[]>([]);
 
-  const addMethod = (methodName: string, defaultParams: { [key: string]: any }) => {
+  const addMethod = (methodName: string, methodModule:string,defaultParams: { [key: string]: any }) => {
     setMethods((prev) => [
       ...prev,
-      { name: methodName, parameters: { ...defaultParams } },
+      { method_name: methodName,method_module:methodModule, parameters: { ...defaultParams } },
     ]);
   };
 
   const removeMethod = (methodId: string) => {
-    setMethods((prev) => prev.filter((method) => method.name !== methodId));
+    setMethods((prev) => prev.filter((method) => method.method_name !== methodId));
   };
 
   const updateMethodParameter = (methodName: string, paramName: string, value: any) => {
     setMethods((prev) =>
       prev.map((method) =>
-        method.name === methodName
+        method.method_name === methodName
           ? {
               ...method,
               parameters: {

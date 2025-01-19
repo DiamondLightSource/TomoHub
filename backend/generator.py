@@ -172,6 +172,9 @@ def parse_docstring(docstring):
     Dict
         A dictionary containing description and parameter details
     """
+    # Remove citations in the format :cite:`something`
+    docstring = re.sub(r':cite:`[^`]+`', '', docstring)
+    
     # Split the docstring into sections
     sections = re.split(r'\n(Parameters|Raises|Returns)\n-+', docstring)
     

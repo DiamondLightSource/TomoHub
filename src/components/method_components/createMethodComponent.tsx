@@ -7,7 +7,6 @@ import { ApiSchema, Method, MethodComponentConfig } from '../../types/APIrespons
 export function createMethodComponent({ methodType, fetchMethod }: MethodComponentConfig) {
   return function MethodComponent() {
     const [methods, setMethods] = useState<Method[]>([]);
-    
     useEffect(() => {
       const fetchMethods = async () => {
         try {
@@ -29,19 +28,18 @@ export function createMethodComponent({ methodType, fetchMethod }: MethodCompone
       toggleMethodExpansion, 
     } = useAccordionExpansion();
     const { methods: selectedMethods, addMethod, removeMethod, updateMethodParameter } = useMethods();
-    
     const isMethodAdded = (methodName: string) =>
-      selectedMethods.some((method) => method.name === methodName);
+      selectedMethods.some((method) => method.method_name === methodName);
 
-    const handleAddMethod = (methodId: string) => {
-      const methodTemplate = methods.find((method) => method.method_name === methodId);
+    const handleAddMethod = (methodName: string,methodModule:string) => {
+      const methodTemplate = methods.find((method) => method.method_name === methodName);
       if (methodTemplate) {
         const defaultParams = Object.fromEntries(
           Object.entries(methodTemplate.parameters).map(
             ([key, paramDetails]) => [key, paramDetails.value]
           )
         );
-        addMethod(methodId, defaultParams);
+        addMethod(methodName,methodModule,defaultParams);
       }
     };
 
@@ -57,10 +55,10 @@ export function createMethodComponent({ methodType, fetchMethod }: MethodCompone
             }
             isMethodAdded={isMethodAdded(method.method_name)}
             currentParameters={
-              selectedMethods.find((m) => m.name === method.method_name)?.parameters ?? {}
+              selectedMethods.find((m) => m.method_name === method.method_name)?.parameters ?? {}
             }
             onExpand={() => toggleMethodExpansion(method.method_name)}
-            onAddMethod={() => handleAddMethod(method.method_name)}
+            onAddMethod={() => handleAddMethod(method.method_name,method.module_path)}
             onRemoveMethod={() => removeMethod(method.method_name)}
             onParameterChange={(paramName, value) =>
               updateMethodParameter(method.method_name, paramName, value)
