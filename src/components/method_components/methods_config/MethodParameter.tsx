@@ -1,136 +1,198 @@
 import React from 'react';
-import { Grid, TextField, Select, MenuItem,FormControl,InputLabel, FormControlLabel,Switch, Tooltip,FormHelperText } from "@mui/material";
+import {
+  Grid,
+  TextField,
+  Tooltip,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Switch,
+  RadioGroup,
+  Radio,
+} from '@mui/material';
 import { UIParameterType } from '../uitypes';
 
 interface MethodParameterProps {
   methodId: string;
   paramName: string;
   paramDetails: UIParameterType;
-  value: any ;
+  value: any;
   isEnabled: boolean;
   onChange: (value: any) => void;
 }
 
 export const MethodParameter: React.FC<MethodParameterProps> = ({
   paramName,
-  paramDetails: [type,isParamRequired ,helperText, defaultValue,options],
+  paramDetails,
   value,
   isEnabled,
   onChange,
 }) => {
-const handleInputChange = (
+  const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | { value: unknown }>
-) => {
+  ) => {
     const inputValue = event.target.value as string;
-
     let newValue: any;
 
-    switch (type) {
-        case "int":
-            if (inputValue === '' || inputValue === '-') {
-                newValue = null;
-            } else if (/^-?\d+$/.test(inputValue)) {
-                newValue = parseInt(inputValue, 10);
-            } else {
-                return;
-            }
-            break;
+    // Handle Optional types
+    const actualType = paramDetails.type.replace('Optional[', '').replace(']', '');
 
-        case "float":
-            if (inputValue === '' || inputValue === '-' || inputValue === '.' || inputValue === '-.') {
-                newValue = null;
-            } else if (/^-?\d*\.?\d*$/.test(inputValue)) {
-                newValue = parseFloat(inputValue);
-            } else {
-                return; 
-            }
-            break;
+    switch (actualType) {
+      case 'int':
+        if (inputValue === '' || inputValue === '-') {
+          newValue = null;
+        } else if (/^-?\d+$/.test(inputValue)) {
+          newValue = parseInt(inputValue, 10);
+        } else {
+          return;
+        }
+        break;
 
-        case "bool":
-            newValue = (event.target as HTMLInputElement).checked;
-            break;
+      case 'float':
+        if (
+          inputValue === '' ||
+          inputValue === '-' ||
+          inputValue === '.' ||
+          inputValue === '-.'
+        ) {
+          newValue = null;
+        } else if (/^-?\d*\.?\d*$/.test(inputValue)) {
+          newValue = parseFloat(inputValue);
+        } else {
+          return;
+        }
+        break;
 
-        default:
-            newValue = inputValue;
+      case 'bool':
+        newValue = (event.target as HTMLInputElement).checked;
+        break;
+
+      default:
+        newValue = inputValue;
     }
 
     onChange(newValue);
-};
+  };
 
   const renderInput = () => {
-    switch (type) {
-      case "int":
-      case "float":
+    let actualType = paramDetails.type;
+    // Handle Optional types
+    if (actualType.includes('Optional[')) {
+      actualType = actualType.replace('Optional[', '').replace(']', '');
+    }
+
+    if (actualType.startsWith('Literal[')) {
+      // Extract the values from the Literal type string
+      const literals = actualType
+        .replace('Literal[', '')
+        .replace(']', '')
+        .split(', ')
+        .map((literal) => {
+          // Remove quotes if present
+          if (literal.startsWith("'") && literal.endsWith("'")) {
+            return literal.slice(1, -1);
+          }
+          return literal;
+        });
+
+      // Determine the current value or fallback to the default value
+      const currentValue = value ?? paramDetails.value;
+
+      return (
+        <Tooltip title={paramDetails.desc} placement="top-start">
+          <FormControl component="fieldset" disabled={!isEnabled} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <FormLabel component="legend" sx={{ m: 'auto' }}>{paramName}</FormLabel>
+            <RadioGroup
+              value={currentValue} // Use the current value or default value
+              onChange={(event) => {
+                // Convert to number if the literal is a number
+                const newValue = isNaN(Number(event.target.value)) ? event.target.value : Number(event.target.value);
+                onChange(newValue);
+              }}
+              row
+              sx={{ m: 'auto' }}
+            >
+              {literals.map((literal) => (
+                <FormControlLabel
+                  key={literal}
+                  value={literal}
+                  control={<Radio />}
+                  label={literal}
+                  labelPlacement="bottom"
+                  
+                />
+              ))}
+            </RadioGroup>
+          </FormControl>
+        </Tooltip>
+      );
+    }
+
+    switch (actualType) {
+      case 'int':
+      case 'float':
+      case 'tuple[float, float, float, int]':
         return (
-          <Tooltip title={`${type} - default : ${defaultValue}`} placement="top-start">
+          <Tooltip
+            title={`${actualType} - default: ${paramDetails.value ?? 'None'}`}
+            placement="top-start"
+          >
             <TextField
               label={paramName}
-              type="number"
-              value={value ?? ''}
+              type="text"
+              value={paramName === 'axis' ? (value ?? 'auto') : (value ?? '')}
+              onChange={handleInputChange}
+              variant="outlined"
+              disabled={!isEnabled || (typeof value === 'string' && (value.startsWith('$') || paramName === "axis"))}
+              size="small"
+              fullWidth
+              helperText={paramDetails.desc}
+            />
+          </Tooltip>
+        );
+
+      case 'str':
+      case 'list':
+      case 'Union[float, str, NoneType]':
+      case 'ndarray':
+        return (
+          <Tooltip
+            title={`${actualType} - default: ${paramDetails.value ?? 'None'}`}
+            placement="top-start"
+          >
+            <TextField
+              label={paramName}
+              type="text"
+              value={value ?? paramDetails.value}
               onChange={handleInputChange}
               variant="outlined"
               disabled={!isEnabled}
               size="small"
               fullWidth
-              helperText={helperText}
-              required={isParamRequired}
+              helperText={paramDetails.desc}
             />
           </Tooltip>
         );
-      case "string":
-        return (
-        <Tooltip title={`${type} - default : ${defaultValue}`} placement="top-start">
-          <TextField
-            label={paramName}
-            type="text"
-            value={value ?? defaultValue}
-            onChange={handleInputChange}
-            variant="outlined"
-            disabled={!isEnabled}
-            size="small"
-            fullWidth
-            helperText={helperText}
-            required={isParamRequired}
-          />
-          </Tooltip>
-        );
-    case "bool":
-        return (
-            <Tooltip title={helperText} placement="top-start">
-            <FormControl sx={{display:'flex',justifyContent:'center'}}>
-            <FormControlLabel
-                control={ <Switch disabled={!isEnabled} checked={value ?? defaultValue} onChange={handleInputChange} name="gilad" /> }
-                label={paramName} labelPlacement='bottom'
-            />
-            </FormControl>
-            </Tooltip>
 
-        )
-        case "list":
-            return (
-                <FormControl required variant="standard" fullWidth>
-                    <InputLabel id={`${paramName}-label-id`}>{paramName}</InputLabel>
-                    <Select
-                        labelId={`${paramName}-label-id`}
-                        id={`${paramName}-select-id`}
-                        label={paramName}
-                        size="medium"
-                        value={value ?? defaultValue}
-                        onChange={(event) => onChange(event.target.value)}
-                        disabled={!isEnabled}
-                        required={isParamRequired}
-                    >
-                        {
-                        options?.map((item) => (
-                            <MenuItem key={item} value={item}>
-                                {item}
-                            </MenuItem>
-                        ))
-                        }
-                    </Select>
-                    <FormHelperText>{helperText}</FormHelperText>
-                </FormControl>
-            );
+      case 'bool':
+        return (
+          <Tooltip title={paramDetails.desc} placement="top-start">
+            <FormControl sx={{ display: 'flex', justifyContent: 'center' }}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    disabled={!isEnabled}
+                    checked={value ?? paramDetails.value}
+                    onChange={handleInputChange}
+                  />
+                }
+                label={paramName}
+                labelPlacement="bottom"
+              />
+            </FormControl>
+          </Tooltip>
+        );
+
       default:
         return null;
     }

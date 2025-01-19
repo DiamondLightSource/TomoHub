@@ -1,16 +1,15 @@
-export type UIParameterType = [
-    string,  // type
-    boolean, // isRequired
-    string,  // description
-    string | number | boolean | null | undefined,  // default value
-    string[]? // for selects
-];
+export type UIParameterType = {
+    type : string;
+    value:  string | number | boolean | null | undefined;
+    desc: string;  
+};
 
 // Define the method type that can be used for all methods
 type UIMethod = {
-    id: string;
-    methodName: string;
-    linkToDoc: string;
+    method_name: string;
+    module_path: string;
+    method_desc: string;
+    method_doc: string;
     parameters: Record<string, UIParameterType>;
 }
 export default UIMethod

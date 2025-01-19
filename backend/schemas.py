@@ -9,9 +9,10 @@ class ParameterInfo(BaseModel):
 
 class MethodTemplate(BaseModel):
     """Schema for individual method template"""
-    method: str = Field(..., description="Name of the method")
+    method_name: str = Field(..., description="Name of the method")
     module_path: str = Field(..., description="Full path to the module containing the method")
     method_desc: str = Field(..., description="Description of what the method does")
+    method_doc: str = Field(..., description="Link to Docs for the method")
     parameters: Dict[str, ParameterInfo] = Field(..., description="Dictionary of parameter information")
 
 class ModuleTemplates(RootModel):

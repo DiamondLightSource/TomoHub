@@ -4,10 +4,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import Normalisation from './method_components/Normalisation';
-import CenterOfRotation from './method_components/CenterOfRotation';
-import Reconstruction from './method_components/Reconstruction';
-import InputOutput from './Inputdata';
+import * as MethodComponents from './method_components';
 import { useAccordionExpansion } from '../AccordionExpansionContext';
 
 type DropdownProps = {
@@ -15,10 +12,16 @@ type DropdownProps = {
 }
 
 const methodComponents = {
-    "Input/Output": InputOutput,
-    "Normalisation": Normalisation,
-    "Center of Rotation": CenterOfRotation,
-    "Reconstruction": Reconstruction
+    "Image Saving": MethodComponents.ImageSaving,
+    "Segmentation": MethodComponents.Segmentation,
+    "Morphological Operations": MethodComponents.Morphological,
+    "Normalisation": MethodComponents.Normalisation,
+    "Phase Retrieval": MethodComponents.PhaseRetrieval,
+    "Stripe Removal": MethodComponents.StripeRemoval,
+    "Distortion Correction": MethodComponents.DistortionCorrection,
+    "Rotation Center Finding": MethodComponents.RotationCenterFinding,
+    "Reconstruction": MethodComponents.Reconstruction,
+    
 };
 
 const Dropdown: React.FC<DropdownProps> = (props) => {
@@ -42,7 +45,7 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
                 {MethodComponent ? <MethodComponent /> : null}
             </AccordionDetails>
         </Accordion>
-    )
-}
+    );
+};
 
 export default Dropdown;
