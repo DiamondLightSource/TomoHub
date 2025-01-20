@@ -108,3 +108,7 @@ async def get_all_methods():
         return AllTemplates(root=all_templates)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/methods/loaders", response_model=AllTemplates)
+async def get_loader_method():
+    pass

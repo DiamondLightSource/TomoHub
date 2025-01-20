@@ -1,5 +1,5 @@
 // src/api/services/someService.ts
-import apiClient from '../api/client'
+import apiClient from './client'
 import type { ApiSchema } from '../types/APIresponse';
 
 export const methodsService = {
