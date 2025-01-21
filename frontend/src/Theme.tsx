@@ -6,11 +6,11 @@ const theme = createTheme({
         main: '#899878', // Define primary color
       },
       secondary: {
-        main: '#E4E6C3', // Define secondary color
+        main: '#F7F7F2', // Define secondary color
       },
       background: {
-        default: '#F7F7F2',
-        paper: '#E4E6C3',
+        default: '#FFFFFF',
+        paper: '#FFF',
       },
     },
     typography: {

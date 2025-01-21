@@ -3,6 +3,7 @@ import { useMethods } from '../MethodsContext';
 import {Button,Box,Typography,Alert } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import React from 'react';
+import DownloadIcon from '@mui/icons-material/Download';
 
 const YMLG = () => {
   const {methods} = useMethods();
@@ -56,7 +57,7 @@ const YMLG = () => {
         }}
       >
     <TextField id="standard-basic" label="select a name for your config file" sx={{ flex: 1.5}} variant="standard" value={yamlFileName} onChange={changeFileName}/>
-     <Button variant="contained" onClick={createAndDownloadYAML} sx={{ flex: 1}} size='large'>
+     <Button variant="contained" startIcon={<DownloadIcon/>} onClick={createAndDownloadYAML} sx={{ flex: 1}} size='large'>
         get conifg 
      </Button>
     </Box>  

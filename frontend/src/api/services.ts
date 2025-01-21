@@ -7,6 +7,14 @@ export const methodsService = {
     const response = await apiClient.get('/methods');
     return response.data;
   },
+  getLoaderMethod: async (): Promise<ApiSchema> => {
+    const response = await apiClient.get('/methods/loaders');
+    return response.data;
+  },
+  getImageDenoiseArtifactRemoval: async (): Promise<ApiSchema> => {
+    const response = await apiClient.get('/methods/denoising-artefactsremoval');
+    return response.data;
+  },
   getCORmethods: async (): Promise<ApiSchema> => {
     const response = await apiClient.get('/methods/rotation-center');
     return response.data;

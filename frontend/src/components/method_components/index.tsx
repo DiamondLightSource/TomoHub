@@ -11,7 +11,10 @@ export const PhaseRetrieval  = createMethodComponent({
     methodType: 'Phase Retrieval',
     fetchMethod: methodsService.getPhaseRetrievalMethods
   });
-  
+export const ImageDenoiseArtefactRemoval = createMethodComponent({
+    methodType: 'Image denoising / Aretefacts Removal',
+    fetchMethod: methodsService.getImageDenoiseArtifactRemoval
+});  
 export const RotationCenterFinding = createMethodComponent({
   methodType: 'Rotation Center Finding',
   fetchMethod: methodsService.getCORmethods

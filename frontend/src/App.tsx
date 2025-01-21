@@ -17,12 +17,14 @@ return (
           <section className="left-section">
             <Header />
             <section className="dropdowns">
+              <Dropdown name="Loader" />
               <Dropdown name="Image Saving" />
               <Dropdown name="Segmentation" />
               <Dropdown name="Morphological Operations"/>
               <Dropdown name="Normalisation" />
               <Dropdown name="Phase Retrieval" />
               <Dropdown name="Stripe Removal" />
+              <Dropdown name="Image denoising / Aretefacts Removal"></Dropdown>
               <Dropdown name="Distortion Correction" />
               <Dropdown name="Rotation Center Finding"/>
               <Dropdown name="Reconstruction"/>
