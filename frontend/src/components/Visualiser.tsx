@@ -69,6 +69,10 @@ const Visualiser:React.FC = () => {
         'LPRec' : 'Reconstruction',
         'SIRT' : 'Reconstruction',
         'CGLS' : 'Reconstruction',
+        'remove_outlier' : 'Image denoising / Aretefacts Removal',
+        'median_filter' : 'Image denoising / Aretefacts Removal',
+        'total_variation_PD' : 'Image denoising / Aretefacts Removal',
+        'total_variation_ROF' : 'Image denoising / Aretefacts Removal',
       };
 
       // Find a matching key or default to a parent if exact match not found
