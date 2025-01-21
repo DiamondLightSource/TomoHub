@@ -10,7 +10,6 @@ body{
 .container {
     display: grid;
     grid-template-columns: 1.5fr 0.8fr; /* Two columns */
-    gap: 30px;
     padding: 3% 5%;
     flex: 1; /* Take up available space */
 }
