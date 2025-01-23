@@ -5,7 +5,7 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import * as MethodComponents from './method_components';
-import { useAccordionExpansion } from '../AccordionExpansionContext';
+import { useAccordionExpansion } from '../contexts/AccordionExpansionContext';
 
 type DropdownProps = {
     name: string;
