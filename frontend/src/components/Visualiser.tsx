@@ -23,7 +23,6 @@ import { useAccordionExpansion } from '../contexts/AccordionExpansionContext';
 const Visualiser:React.FC = () => {
   const { methods, clearMethods, removeMethod, setMethods } = useMethods();
   const { expandMethodAndParent } = useAccordionExpansion(); // Use the context
-
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
