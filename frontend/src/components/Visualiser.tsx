@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button, Box, Typography } from '@mui/material';
 import { useMethods } from '../MethodsContext';
@@ -18,7 +19,6 @@ import {
   verticalListSortingStrategy 
 } from '@dnd-kit/sortable';
 import { useAccordionExpansion } from '../contexts/AccordionExpansionContext';
-
 
 const Visualiser:React.FC = () => {
   const { methods, clearMethods, removeMethod, setMethods } = useMethods();
@@ -124,6 +124,7 @@ const Visualiser:React.FC = () => {
   return (
     <Box
       sx={{
+        width: 300,
         backgroundColor: '#222725',
         color: '#fff',
         padding: 2,
