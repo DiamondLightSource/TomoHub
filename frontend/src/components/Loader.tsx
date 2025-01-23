@@ -37,7 +37,9 @@ const Loader: React.FC = () => {
     <Card variant="outlined" sx={{ mx: "auto", mb: 2, p: 2, border: "1px solid #89987880", borderRadius: "4px" }}>
       {/* Title and Add Button */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-        <Typography gutterBottom>Loader</Typography>
+        <Typography gutterBottom variant="h6" color="primary" component="div">
+          <strong>Loader</strong>
+        </Typography>
         <Button
           variant="contained"
           onClick={toggleExtraFields}

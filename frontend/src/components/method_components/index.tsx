@@ -46,6 +46,6 @@ export const DistortionCorrection = createMethodComponent({
 });
 
 export const Reconstruction = createMethodComponent({
-  methodType: 'Reconstruction',
+  methodType: 'Algorithms',
   fetchMethod: methodsService.getReconstructionMethods
 });

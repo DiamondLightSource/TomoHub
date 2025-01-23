@@ -21,7 +21,7 @@ const methodComponents = {
     "Image denoising / Aretefacts Removal": MethodComponents.ImageDenoiseArtefactRemoval,
     "Distortion Correction": MethodComponents.DistortionCorrection,
     "Rotation Center Finding": MethodComponents.RotationCenterFinding,
-    "Reconstruction": MethodComponents.Reconstruction,
+    "Algorithms": MethodComponents.Reconstruction,
     
 };
 

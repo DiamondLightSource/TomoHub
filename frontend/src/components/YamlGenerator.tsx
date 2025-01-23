@@ -69,7 +69,8 @@ const YMLG = () => {
     <Box
         sx={{
           display: 'flex',
-          gap: 2, // Adds space between the buttons
+          gap: 2, 
+          mt:10
         }}
       >
     <TextField id="standard-basic" label="select a name for your config file" sx={{ flex: 1.5}} variant="standard" value={yamlFileName} onChange={changeFileName}/>

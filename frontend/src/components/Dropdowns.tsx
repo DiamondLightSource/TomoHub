@@ -1,62 +1,126 @@
 import React from "react";
+import { Card, Tabs, Tab, Box, Typography } from "@mui/material";
 import Dropdown from "./Dropdown";
-import { Card, Grid } from "@mui/material"; // Import Grid component
 import Loader from "./Loader";
 import Guide from "./Guide";
 
 const Dropdowns: React.FC = () => {
+  const [value, setValue] = React.useState(0); // State to manage the active tab
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue); // Update the active tab
+  };
+
   return (
-    <Grid container spacing={2}>
-      {/* Row 1 */}
-      <Grid item xs={6}>
-        <Guide />
-      </Grid>
-      <Grid item xs={6}>
-        <Loader />
-      </Grid>
-
-      {/* Row 2 */}
-      <Grid item xs={6}>
-        <Card
-          variant="outlined"
-          sx={{
-            mx: "auto",
-            mb: 2,
-            p: 2,
-            border: "1px solid #89987880",
-            borderRadius: "4px",
+    <Box sx={{ display: "flex",mt:5 }}>
+      {/* Vertical Tabs */}
+      <Tabs
+        orientation="vertical"
+        value={value}
+        variant="standard"
+        onChange={handleChange}
+        sx={{
+            borderRight: 1,
+            borderColor: "divider",
+            width:"200px",
+            minWidth:"200px"
           }}
-        >
-          <Dropdown name="Normalisation" />
-          <Dropdown name="Phase Retrieval" />
-          <Dropdown name="Stripe Removal" />
-          <Dropdown name="Distortion Correction" />
-          <Dropdown name="Rotation Center Finding" />
-          <Dropdown name="Morphological Operations" />
-        </Card>
-      </Grid>
-      <Grid item xs={6}>
-        <Dropdown name="Reconstruction" />
-        <Dropdown name="Image Saving" />
-      </Grid>
+      >
+        <Tab sx={{fontSize:"0.9rem"}} label="Start" />
+        <Tab sx={{fontSize:"0.9rem"}} label="Loader" />
+        <Tab sx={{fontSize:"0.9rem"}} label="Pre-processing" />
+        <Tab sx={{fontSize:"0.9rem"}} label="Reconstruction" />
+        <Tab sx={{fontSize:"0.9rem"}} label="Image Saving" />
+        <Tab sx={{fontSize:"0.9rem"}} label="Post-processing" />
+      </Tabs>
 
-      {/* Row 3 */}
-      <Grid item xs={6}>
-        <Card
-          variant="outlined"
-          sx={{
-            mx: "auto",
-            mb: 2,
-            p: 2,
-            border: "1px solid #89987880",
-            borderRadius: "4px",
-          }}
-        >
-          <Dropdown name="Segmentation" />
-          <Dropdown name="Image denoising / Artefacts Removal" />
-        </Card>
-      </Grid>
-    </Grid>
+      {/* Tab Content */}
+      <Box sx={{ p: 3, width: "100%" }}>
+        {value === 0 && (
+          <Guide/>
+        )}
+        {value === 1 && (
+            <Loader/>
+          )
+        }
+        {value === 2 && (
+          <Card
+            variant="outlined"
+            sx={{
+              mx: "auto",
+              mb: 2,
+              p: 2,
+              border: "1px solid #89987880",
+              borderRadius: "4px",
+            }}
+          >
+            <Typography gutterBottom sx={{mb:1}} variant="h6" color="primary" component="div">
+                <strong>Pre-processing methods</strong>
+            </Typography>
+            <Dropdown name="Normalisation" />
+            <Dropdown name="Phase Retrieval" />
+            <Dropdown name="Stripe Removal" />
+            <Dropdown name="Distortion Correction" />
+            <Dropdown name="Rotation Center Finding" />
+            <Dropdown name="Morphological Operations" />
+          </Card>
+        )}
+
+        {value === 3 && (
+                      <Card
+                      variant="outlined"
+                      sx={{
+                        mx: "auto",
+                        mb: 2,
+                        p: 2,
+                        border: "1px solid #89987880",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      <Typography gutterBottom sx={{mb:1}} variant="h6" color="primary" component="div">
+                          <strong>Reconstruction algorithms</strong>
+                      </Typography>
+            <Dropdown name="Algorithms" />
+            </Card>
+        )}
+        {value === 4 && (
+                      <Card
+                      variant="outlined"
+                      sx={{
+                        mx: "auto",
+                        mb: 2,
+                        p: 2,
+                        border: "1px solid #89987880",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      <Typography gutterBottom sx={{mb:1}} variant="h6" color="primary" component="div">
+                                    <strong>Post-proccessing methods</strong>
+                      </Typography>
+            <Dropdown name="Image Saving" />
+            </Card>
+        )}
+
+        {value === 5 && (
+          <Card
+            variant="outlined"
+            sx={{
+              mx: "auto",
+              mb: 2,
+              p: 2,
+              border: "1px solid #89987880",
+              borderRadius: "4px",
+            }}
+          >
+            <Typography gutterBottom sx={{mb:1}} variant="h6" color="primary" component="div">
+                          <strong>Post-proccessing methods</strong>
+            </Typography>
+            <Dropdown name="Segmentation" />
+            <Dropdown name="Image denoising / Aretefacts Removal" />
+          </Card>
+        )}
+      </Box>
+    </Box>
   );
 };
 
