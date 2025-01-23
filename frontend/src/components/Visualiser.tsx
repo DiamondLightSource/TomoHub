@@ -124,12 +124,13 @@ const Visualiser:React.FC = () => {
   return (
     <Box
       sx={{
-        width: 300,
+        width: 450,
         backgroundColor: '#222725',
         color: '#fff',
         padding: 2,
         borderRadius: 2,
         height: 'max-content',
+        m:"auto"
       }}
     >
       <Box
