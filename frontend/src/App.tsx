@@ -1,15 +1,17 @@
 import React from "react";
 import "./App.css";
-import Dropdown from "./components/Dropdown";
 import Header from "./components/Header";
 import Visualiser from "./components/Visualiser";
 import Footer from "./components/Footer";
 import { MethodsProvider } from "./MethodsContext";
 import YMLG from "./components/YamlGenerator";
-import {AccordionExpansionProvider} from "./AccordionExpansionContext";
+import {AccordionExpansionProvider} from "./contexts/AccordionExpansionContext";
+import { LoaderProvider } from "./contexts/LoaderContext";
+import Dropdowns from "./components/Dropdowns";
 
 const App:React.FC = () => {
 return (
+  <LoaderProvider>
   <AccordionExpansionProvider>
     <MethodsProvider>
       <div className="app">
@@ -17,17 +19,7 @@ return (
           <section className="left-section">
             <Header />
             <section className="dropdowns">
-              <Dropdown name="Loader" />
-              <Dropdown name="Image Saving" />
-              <Dropdown name="Segmentation" />
-              <Dropdown name="Morphological Operations"/>
-              <Dropdown name="Normalisation" />
-              <Dropdown name="Phase Retrieval" />
-              <Dropdown name="Stripe Removal" />
-              <Dropdown name="Image denoising / Aretefacts Removal"></Dropdown>
-              <Dropdown name="Distortion Correction" />
-              <Dropdown name="Rotation Center Finding"/>
-              <Dropdown name="Reconstruction"/>
+              <Dropdowns/>
             </section>
             <YMLG />
           </section>
@@ -39,7 +31,7 @@ return (
       </div>
       </MethodsProvider>
       </AccordionExpansionProvider>
-    
+    </LoaderProvider>
   );
 }
 

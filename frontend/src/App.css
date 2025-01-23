@@ -9,10 +9,11 @@ body{
 
 .container {
     display: grid;
-    grid-template-columns: 1.5fr 0.8fr; /* Two columns */
+    grid-template-columns: 1.5fr 0.7fr; /* Two columns */
     gap: 30px;
     padding: 3% 5%;
     flex: 1; /* Take up available space */
+    align-items: flex-start
 }
 
 /* Footer styles */
@@ -29,4 +30,5 @@ section.right-section{
     display: flex;
     padding: 40px;
     justify-content: center;
+    flex-direction: column;
 }

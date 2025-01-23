@@ -17,7 +17,8 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy 
 } from '@dnd-kit/sortable';
-import { useAccordionExpansion } from '../AccordionExpansionContext';
+import { useAccordionExpansion } from '../contexts/AccordionExpansionContext';
+
 
 const Visualiser:React.FC = () => {
   const { methods, clearMethods, removeMethod, setMethods } = useMethods();
@@ -123,7 +124,6 @@ const Visualiser:React.FC = () => {
   return (
     <Box
       sx={{
-        width: 400,
         backgroundColor: '#222725',
         color: '#fff',
         padding: 2,
