@@ -8,10 +8,12 @@ import YMLG from "./components/YamlGenerator";
 import {AccordionExpansionProvider} from "./contexts/AccordionExpansionContext";
 import { LoaderProvider } from "./contexts/LoaderContext";
 import Dropdowns from "./components/Dropdowns";
+import { SweepProvider } from "./contexts/SweepContext";
 
 const App:React.FC = () => {
 return (
   <LoaderProvider>
+    <SweepProvider>
   <AccordionExpansionProvider>
     <MethodsProvider>
       <div className="app">
@@ -31,6 +33,7 @@ return (
       </div>
       </MethodsProvider>
       </AccordionExpansionProvider>
+      </SweepProvider>
     </LoaderProvider>
   );
 }

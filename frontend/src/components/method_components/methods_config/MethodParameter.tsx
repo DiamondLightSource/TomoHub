@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Grid,
   TextField,
@@ -9,8 +9,20 @@ import {
   Switch,
   RadioGroup,
   Radio,
+  InputAdornment,
+  IconButton,
+  Modal,
+  Box,
+  Tabs,
+  Tab,
+  Typography,
+  Button,
 } from '@mui/material';
+import SettingsIcon from '@mui/icons-material/Settings';
+import CloseIcon from '@mui/icons-material/Close';
+import ClearIcon from '@mui/icons-material/Clear';
 import { UIParameterType } from '../uitypes';
+import { useSweep } from '../../../contexts/SweepContext';
 
 interface MethodParameterProps {
   methodId: string;
@@ -22,19 +34,56 @@ interface MethodParameterProps {
 }
 
 export const MethodParameter: React.FC<MethodParameterProps> = ({
+  methodId,
   paramName,
   paramDetails,
   value,
   isEnabled,
   onChange,
 }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+  const [start, setStart] = useState<number | null>(null);
+  const [stop, setStop] = useState<number | null>(null);
+  const [step, setStep] = useState<number | null>(null);
+  const [values, setValues] = useState<string>('');
+  const { activeSweep, setActiveSweep, clearActiveSweep } = useSweep();
+
+  const isSweepActiveForOtherParam = activeSweep && (activeSweep.methodId !== methodId || activeSweep.paramName !== paramName);
+
+  const isFormValid = () => {
+    if (activeTab === 0) {
+      return start !== null && stop !== null && step !== null;
+    } else {
+      return values.trim() !== '';
+    }
+  };
+
+  const getSweepDisplayText = () => {
+    if (activeTab === 0) {
+      return `RangeSweep start:${start ?? 'null'} stop:${stop ?? 'null'} step:${step ?? 'null'}`;
+    } else {
+      return `Sweep ${values}`;
+    }
+  };
+
+  const getSweepValue = () => {
+    if (activeTab === 0) {
+      return { start, stop, step };
+    } else {
+      return values
+        .split(',')
+        .map((val) => val.trim())
+        .map((val) => (val.includes('.') ? parseFloat(val) : parseInt(val, 10)));
+    }
+  };
+
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | { value: unknown }>
   ) => {
     const inputValue = event.target.value as string;
     let newValue: any;
 
-    // Handle Optional types
     const actualType = paramDetails.type.replace('Optional[', '').replace(']', '');
 
     switch (actualType) {
@@ -74,28 +123,40 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
     onChange(newValue);
   };
 
+  const handleSweepDone = () => {
+    const sweepValue = getSweepValue();
+    onChange(sweepValue);
+    setActiveSweep(methodId, paramName);
+    setIsModalOpen(false);
+  };
+
+  const handleCancelSweep = () => {
+    clearActiveSweep();
+    setStart(null);
+    setStop(null);
+    setStep(null);
+    setValues('');
+    onChange(null);
+  };
+
   const renderInput = () => {
     let actualType = paramDetails.type;
-    // Handle Optional types
     if (actualType.includes('Optional[')) {
       actualType = actualType.replace('Optional[', '').replace(']', '');
     }
 
     if (actualType.startsWith('Literal[')) {
-      // Extract the values from the Literal type string
       const literals = actualType
         .replace('Literal[', '')
         .replace(']', '')
         .split(', ')
         .map((literal) => {
-          // Remove quotes if present
           if (literal.startsWith("'") && literal.endsWith("'")) {
             return literal.slice(1, -1);
           }
           return literal;
         });
 
-      // Determine the current value or fallback to the default value
       const currentValue = value ?? paramDetails.value;
 
       return (
@@ -103,9 +164,8 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
           <FormControl component="fieldset" disabled={!isEnabled} sx={{ display: 'flex', justifyContent: 'center' }}>
             <FormLabel component="legend" sx={{ m: 'auto' }}>{paramName}</FormLabel>
             <RadioGroup
-              value={currentValue} // Use the current value or default value
+              value={currentValue}
               onChange={(event) => {
-                // Convert to number if the literal is a number
                 const newValue = isNaN(Number(event.target.value)) ? event.target.value : Number(event.target.value);
                 onChange(newValue);
               }}
@@ -119,7 +179,6 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
                   control={<Radio />}
                   label={literal}
                   labelPlacement="bottom"
-                  
                 />
               ))}
             </RadioGroup>
@@ -133,22 +192,144 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
       case 'float':
       case 'tuple[float, float, float, int]':
         return (
-          <Tooltip
-            title={`${actualType} - default: ${paramDetails.value ?? 'None'}`}
-            placement="top-start"
-          >
-            <TextField
-              label={paramName}
-              type="text"
-              value={paramName === 'axis' ? (value ?? 'auto') : (value ?? '')}
-              onChange={handleInputChange}
-              variant="outlined"
-              disabled={!isEnabled || (typeof value === 'string' && (value.startsWith('$') || paramName === "axis"))}
-              size="small"
-              fullWidth
-              helperText={paramDetails.desc}
-            />
-          </Tooltip>
+          <>
+            <Tooltip
+              title={`${actualType} - default: ${paramDetails.value ?? 'None'}`}
+              placement="top-start"
+            >
+              <TextField
+                label={paramName}
+                type="text"
+                value={
+                  activeSweep?.methodId === methodId && activeSweep?.paramName === paramName
+                    ? getSweepDisplayText()
+                    : value ?? ''
+                }
+                onChange={handleInputChange}
+                variant="outlined"
+                disabled={!isEnabled || (typeof value === 'string' && (value.startsWith('$') || paramName === "axis"))}
+                size="small"
+                fullWidth
+                helperText={paramDetails.desc}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={
+                          isSweepActiveForOtherParam
+                            ? undefined
+                            : () => setIsModalOpen(true)
+                        }
+                        edge="end"
+                        disabled={!isEnabled || !!isSweepActiveForOtherParam}
+                      >
+                        {isSweepActiveForOtherParam ? null : <SettingsIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Tooltip>
+            <Modal
+              open={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              aria-labelledby="modal-title"
+              aria-describedby="modal-description"
+            >
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: 400,
+                  bgcolor: 'background.paper',
+                  boxShadow: 24,
+                  p: 2,
+                  borderRadius: 1,
+                }}
+              >
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography id="modal-title" sx={{ fontSize: 15 }}>
+                    <strong>Sweep {paramName} Parameter</strong>
+                  </Typography>
+                  <IconButton onClick={() => setIsModalOpen(false)}>
+                    <CloseIcon />
+                  </IconButton>
+                </Box>
+
+                <Tabs
+                  value={activeTab}
+                  onChange={(event, newValue) => setActiveTab(newValue)}
+                  aria-label="tabs"
+                >
+                  <Tab sx={{ width: '50%' }} label="Range" />
+                  <Tab sx={{ width: '50%' }} label="Values" />
+                </Tabs>
+
+                {activeTab === 0 && (
+                  <Box sx={{ mt: 1 }}>
+                    <TextField
+                      label="Start"
+                      type="number"
+                      fullWidth
+                      required
+                      size='small'
+                      value={start ?? ''}
+                      onChange={(e) => setStart(parseFloat(e.target.value))}
+                      sx={{ mb: 1 }}
+                    />
+                    <TextField
+                      label="Stop"
+                      type="number"
+                      fullWidth
+                      required
+                      size='small'
+                      value={stop ?? ''}
+                      onChange={(e) => setStop(parseFloat(e.target.value))}
+                      sx={{ mb: 1 }}
+                    />
+                    <TextField
+                      label="Step"
+                      type="number"
+                      fullWidth
+                      required
+                      size='small'
+                      value={step ?? ''}
+                      onChange={(e) => setStep(parseFloat(e.target.value))}
+                      sx={{ mb: 1 }}
+                    />
+                  </Box>
+                )}
+                {activeTab === 1 && (
+                  <Box sx={{ mt: 1 }}>
+                    <TextField
+                      label="Values"
+                      type="text"
+                      fullWidth
+                      size='small'
+                      required
+                      value={values}
+                      onChange={(e) => setValues(e.target.value)}
+                      sx={{ mb: 1 }}
+                      placeholder='Enter comma-separated numbers (e.g., 1, 2, 3)'
+                    />
+                  </Box>
+                )}
+
+                <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button
+                    variant="contained"
+                    onClick={handleSweepDone}
+                    disabled={!isFormValid()}
+                    fullWidth
+                  >
+                    Done
+                  </Button>
+                </Box>
+              </Box>
+            </Modal>
+          </>
         );
 
       case 'str':
