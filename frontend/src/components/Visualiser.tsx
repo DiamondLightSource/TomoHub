@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button, Box, Typography } from '@mui/material';
-import { useMethods } from '../MethodsContext';
+import { useMethods } from '../contexts/MethodsContext';
 import { ClearAll } from '@mui/icons-material';
 import VisualiserMethods from './VisualiserMethods';
 import { 

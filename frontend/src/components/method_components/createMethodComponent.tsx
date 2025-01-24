@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useMethods } from "../MethodsContext";
-import { MethodAccordion } from '../components/method_components/methods_config/MethodAccordion';
-import { useAccordionExpansion } from './AccordionExpansionContext';
-import { ApiSchema, Method, MethodComponentConfig } from '../types/APIresponse';
+import { useMethods } from "../../contexts/MethodsContext";
+import { MethodAccordion } from './methods_config/MethodAccordion';
+import { useAccordionExpansion } from '../../contexts/AccordionExpansionContext';
+import { ApiSchema, Method, MethodComponentConfig } from '../../types/APIresponse';
 
 export function createMethodComponent({ methodType, fetchMethod }: MethodComponentConfig) {
   return function MethodComponent() {
