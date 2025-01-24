@@ -1,7 +1,7 @@
 import { Typography,ButtonGroup,Button } from '@mui/material';
 import React from 'react';
 import { useLoader } from "../contexts/LoaderContext";
-import { useMethods } from "../MethodsContext";
+import { useMethods } from "../contexts/MethodsContext";
 
 function Header(){
   const {

@@ -3,7 +3,7 @@ import "./App.css";
 import Header from "./components/Header";
 import Visualiser from "./components/Visualiser";
 import Footer from "./components/Footer";
-import { MethodsProvider } from "./MethodsContext";
+import { MethodsProvider } from "./contexts/MethodsContext";
 import YMLG from "./components/YamlGenerator";
 import {AccordionExpansionProvider} from "./contexts/AccordionExpansionContext";
 import { LoaderProvider } from "./contexts/LoaderContext";

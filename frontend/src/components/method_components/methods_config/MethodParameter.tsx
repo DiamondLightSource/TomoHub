@@ -24,13 +24,14 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { UIParameterType } from '../uitypes';
 import { useSweep } from '../../../contexts/SweepContext';
 
+// Define the props structure for the MethodParameter component
 interface MethodParameterProps {
-  methodId: string;
-  paramName: string;
-  paramDetails: UIParameterType;
-  value: any;
-  isEnabled: boolean;
-  onChange: (value: any) => void;
+  methodId: string;        // Unique identifier for the method
+  paramName: string;       // Name of the parameter
+  paramDetails: UIParameterType; // Detailed information about the parameter
+  value: any;              // Current value of the parameter
+  isEnabled: boolean;      // Whether the parameter input is enabled
+  onChange: (value: any) => void; // Callback function when parameter value changes
 }
 
 export const MethodParameter: React.FC<MethodParameterProps> = ({
@@ -41,24 +42,39 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
   isEnabled,
   onChange,
 }) => {
+  // State for managing the sweep configuration modal
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // State to track which tab is active in the sweep modal (range or values)
   const [activeTab, setActiveTab] = useState(0);
+  
+  // States for range sweep configuration
   const [start, setStart] = useState<number | null>(null);
   const [stop, setStop] = useState<number | null>(null);
   const [step, setStep] = useState<number | null>(null);
+  
+  // State for manual values sweep
   const [values, setValues] = useState<string>('');
+
+  // Access sweep context to manage active sweeps
   const { activeSweep, setActiveSweep, clearActiveSweep } = useSweep();
 
+  // Check if a sweep is active for a different parameter
   const isSweepActiveForOtherParam = activeSweep && (activeSweep.methodId !== methodId || activeSweep.paramName !== paramName);
+  // Check if a sweep is active for this specific parameter
+  const isSweepActiveForThisParam = activeSweep?.methodId === methodId && activeSweep?.paramName === paramName;
 
+  // Validate sweep form based on active tab
   const isFormValid = () => {
     if (activeTab === 0) {
+      // Range sweep requires start, stop, and step
       return start !== null && stop !== null && step !== null;
     } else {
+      // Values sweep requires non-empty input
       return values.trim() !== '';
     }
   };
 
+  // Generate display text for the current sweep configuration
   const getSweepDisplayText = () => {
     if (activeTab === 0) {
       return `RangeSweep start:${start ?? 'null'} stop:${stop ?? 'null'} step:${step ?? 'null'}`;
@@ -67,10 +83,13 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
     }
   };
 
+  // Convert sweep input to actual values
   const getSweepValue = () => {
     if (activeTab === 0) {
+      // For range sweep, return start, stop, and step
       return { start, stop, step };
     } else {
+      // For values sweep, parse comma-separated input
       return values
         .split(',')
         .map((val) => val.trim())
@@ -78,16 +97,20 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
     }
   };
 
+  // Handle input changes for different parameter types
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | { value: unknown }>
   ) => {
     const inputValue = event.target.value as string;
     let newValue: any;
 
+    // Remove Optional[] wrapper if present
     const actualType = paramDetails.type.replace('Optional[', '').replace(']', '');
 
+    // Type-specific parsing logic
     switch (actualType) {
       case 'int':
+        // Handle integer input with validation
         if (inputValue === '' || inputValue === '-') {
           newValue = null;
         } else if (/^-?\d+$/.test(inputValue)) {
@@ -98,6 +121,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
         break;
 
       case 'float':
+        // Handle float input with validation
         if (
           inputValue === '' ||
           inputValue === '-' ||
@@ -113,44 +137,64 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
         break;
 
       case 'bool':
+        // Handle boolean input (checkbox/switch)
         newValue = (event.target as HTMLInputElement).checked;
         break;
 
       default:
+        // Default to string input
         newValue = inputValue;
     }
 
+    // Call onChange with the parsed value
     onChange(newValue);
   };
 
+  // Finalize sweep configuration
   const handleSweepDone = () => {
     const sweepValue = getSweepValue();
+    const sweepType = activeTab === 0 ? 'range' : 'values';
+    
+    // Update parameter value
     onChange(sweepValue);
-    setActiveSweep(methodId, paramName);
+    
+    // Set active sweep in context
+    setActiveSweep(methodId, paramName, sweepType);
+    
+    // Close modal
     setIsModalOpen(false);
   };
 
+  // Cancel and clear sweep configuration
   const handleCancelSweep = () => {
     clearActiveSweep();
+    
+    // Reset sweep states
     setStart(null);
     setStop(null);
     setStep(null);
     setValues('');
+    
+    // Reset parameter value
     onChange(null);
   };
 
+  // Render appropriate input based on parameter type
   const renderInput = () => {
+    // Handle Optional[] type wrapping
     let actualType = paramDetails.type;
     if (actualType.includes('Optional[')) {
       actualType = actualType.replace('Optional[', '').replace(']', '');
     }
 
+    // Handle Literal[] type (radio button group)
     if (actualType.startsWith('Literal[')) {
       const literals = actualType
         .replace('Literal[', '')
         .replace(']', '')
         .split(', ')
         .map((literal) => {
+          // Remove quotes from string literals
           if (literal.startsWith("'") && literal.endsWith("'")) {
             return literal.slice(1, -1);
           }
@@ -166,6 +210,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
             <RadioGroup
               value={currentValue}
               onChange={(event) => {
+                // Convert to number if possible
                 const newValue = isNaN(Number(event.target.value)) ? event.target.value : Number(event.target.value);
                 onChange(newValue);
               }}
@@ -187,12 +232,14 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
       );
     }
 
+    // Render input based on parameter type
     switch (actualType) {
       case 'int':
       case 'float':
       case 'tuple[float, float, float, int]':
         return (
           <>
+            {/* Numeric input with sweep functionality */}
             <Tooltip
               title={`${actualType} - default: ${paramDetails.value ?? 'None'}`}
               placement="top-start"
@@ -201,13 +248,13 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
                 label={paramName}
                 type="text"
                 value={
-                  activeSweep?.methodId === methodId && activeSweep?.paramName === paramName
+                  isSweepActiveForThisParam
                     ? getSweepDisplayText()
                     : value ?? ''
                 }
                 onChange={handleInputChange}
                 variant="outlined"
-                disabled={!isEnabled || (typeof value === 'string' && (value.startsWith('$') || paramName === "axis"))}
+                disabled={!isEnabled || isSweepActiveForThisParam || (typeof value === 'string' && (value.startsWith('$') || paramName === "axis"))}
                 size="small"
                 fullWidth
                 helperText={paramDetails.desc}
@@ -218,24 +265,29 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
                         onClick={
                           isSweepActiveForOtherParam
                             ? undefined
+                            : isSweepActiveForThisParam
+                            ? handleCancelSweep
                             : () => setIsModalOpen(true)
                         }
                         edge="end"
                         disabled={!isEnabled || !!isSweepActiveForOtherParam}
                       >
-                        {isSweepActiveForOtherParam ? null : <SettingsIcon />}
+                        {isSweepActiveForThisParam ? <ClearIcon /> : <SettingsIcon />}
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
               />
             </Tooltip>
+            
+            {/* Sweep configuration modal */}
             <Modal
               open={isModalOpen}
               onClose={() => setIsModalOpen(false)}
               aria-labelledby="modal-title"
               aria-describedby="modal-description"
             >
+              {/* Modal content for sweep configuration */}
               <Box
                 sx={{
                   position: 'absolute',
@@ -249,6 +301,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
                   borderRadius: 1,
                 }}
               >
+                {/* Modal header */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                   <Typography id="modal-title" sx={{ fontSize: 15 }}>
                     <strong>Sweep {paramName} Parameter</strong>
@@ -258,6 +311,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
                   </IconButton>
                 </Box>
 
+                {/* Tabs for range and values sweep */}
                 <Tabs
                   value={activeTab}
                   onChange={(event, newValue) => setActiveTab(newValue)}
@@ -267,6 +321,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
                   <Tab sx={{ width: '50%' }} label="Values" />
                 </Tabs>
 
+                {/* Range sweep inputs */}
                 {activeTab === 0 && (
                   <Box sx={{ mt: 1 }}>
                     <TextField
@@ -301,6 +356,8 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
                     />
                   </Box>
                 )}
+                
+                {/* Manual values sweep input */}
                 {activeTab === 1 && (
                   <Box sx={{ mt: 1 }}>
                     <TextField
@@ -317,6 +374,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
                   </Box>
                 )}
 
+                {/* Done button for sweep configuration */}
                 <Box sx={{ mt: 1, display: 'flex', justifyContent: 'flex-end' }}>
                   <Button
                     variant="contained"
@@ -332,6 +390,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
           </>
         );
 
+      // Render inputs for other parameter types
       case 'str':
       case 'list':
       case 'Union[float, str, NoneType]':
@@ -355,6 +414,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
           </Tooltip>
         );
 
+      // Render boolean switch
       case 'bool':
         return (
           <Tooltip title={paramDetails.desc} placement="top-start">
@@ -374,10 +434,12 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
           </Tooltip>
         );
 
+      // Fallback for unknown types
       default:
         return null;
     }
   };
 
+  // Render the parameter input in a grid item
   return <Grid item xs={6}>{renderInput()}</Grid>;
 };

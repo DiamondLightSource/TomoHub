@@ -1,9 +1,10 @@
-import React,{createContext, useState, ReactNode, useContext } from "react";
+import React, { createContext, useState, ReactNode, useContext } from "react";
+import { useSweep } from "./SweepContext"; // Import the useSweep hook
 
 export type Method = {
   method_name: string; // The name of the method
-  method_module:string;
-  parameters: { 
+  method_module: string;
+  parameters: {
     [key: string]: { // Each key is a parameter name
       type: string;  // The type of the parameter
       desc: string;  // A description of the parameter
@@ -14,7 +15,7 @@ export type Method = {
 
 type MethodsContextType = {
   methods: Method[];
-  addMethod: (methodName: string,methodModule:string, defaultParams: { [key: string]: any }) => void;
+  addMethod: (methodName: string, methodModule: string, defaultParams: { [key: string]: any }) => void;
   removeMethod: (methodName: string) => void;
   updateMethodParameter: (methodName: string, paramName: string, value: any) => void;
   clearMethods: () => void;
@@ -25,15 +26,20 @@ const MethodsContext = createContext<MethodsContextType | undefined>(undefined);
 
 export const MethodsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [methods, setMethods] = useState<Method[]>([]);
+  const { activeSweep, clearActiveSweep } = useSweep(); // Access the SweepContext
 
-  const addMethod = (methodName: string, methodModule:string,defaultParams: { [key: string]: any }) => {
+  const addMethod = (methodName: string, methodModule: string, defaultParams: { [key: string]: any }) => {
     setMethods((prev) => [
       ...prev,
-      { method_name: methodName,method_module:methodModule, parameters: { ...defaultParams } },
+      { method_name: methodName, method_module: methodModule, parameters: { ...defaultParams } },
     ]);
   };
 
   const removeMethod = (methodId: string) => {
+    // Check if the method being removed has an active sweep
+    if (activeSweep && activeSweep.methodId === methodId) {
+      clearActiveSweep(); // Clear the active sweep
+    }
     setMethods((prev) => prev.filter((method) => method.method_name !== methodId));
   };
 
@@ -54,7 +60,10 @@ export const MethodsProvider: React.FC<{ children: ReactNode }> = ({ children })
   };
 
   const clearMethods = () => {
-    setMethods([]); 
+    if (activeSweep) {
+      clearActiveSweep(); // Clear the active sweep if any method is being cleared
+    }
+    setMethods([]);
   };
 
   return (
