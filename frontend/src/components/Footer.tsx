@@ -1,4 +1,4 @@
-import { Box, Typography, Container,Link } from "@mui/material";
+import { Box, Typography, Link } from "@mui/material";
 import React from 'react';
 
 export default function Footer() {
@@ -7,16 +7,23 @@ export default function Footer() {
       sx={(theme) => ({
         py: 3,
         px: 2,
-        mt: "auto",
+        mt: 10,
         backgroundColor: theme.palette.primary.main,
-
+        width:"100%"
       })}
+    
     >
-      <Container maxWidth="sm">
-        <Typography variant="body2" color='#F7F7F2' align="center">
-          {new Date().getFullYear()} <Link color="inherit" target="_blank" href="https://www.diamond.ac.uk/Home.html">Diamond Light Sources Ltd</Link>
+        <Typography variant="body2" color="text.secondary" align="center">
+          {new Date().getFullYear()}{" "}
+          <Link
+            color="inherit"
+            target="_blank"
+            href="https://www.diamond.ac.uk/Home.html"
+            underline="hover"
+          >
+            Diamond Light Sources Ltd
+          </Link>
         </Typography>
-      </Container>
     </Box>
   );
 }

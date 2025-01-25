@@ -1,9 +1,9 @@
-import { Typography,ButtonGroup,Button } from '@mui/material';
+import { Typography, ButtonGroup, Button, Box } from '@mui/material';
 import React from 'react';
 import { useLoader } from "../contexts/LoaderContext";
 import { useMethods } from "../contexts/MethodsContext";
 
-function Header(){
+function Header() {
   const {
     setDataPath,
     setImageKeyPath,
@@ -14,6 +14,7 @@ function Header(){
   } = useLoader();
 
   const { addMethod } = useMethods();
+
   const handleClick = () => {
     // Predefined values for LoaderContext
     setDataPath("/predefined/data/path");
@@ -25,12 +26,12 @@ function Header(){
 
     // Predefined values for MethodsContext
     addMethod("find_center_360", "httomolibgpu.recon.rotation", {
-      "ind": "mid",
-      "win_width": 10,
-      "side":null,
-      "denoise":true,
-      "norm":false,
-      "use_overlap":false
+      ind: "mid",
+      win_width: 10,
+      side: null,
+      denoise: true,
+      norm: false,
+      use_overlap: false,
     });
 
     addMethod("predefined_method_2", "predefined_module_2", {
@@ -38,17 +39,33 @@ function Header(){
       param4: "value4",
     });
   };
+
   return (
-    <header className="topHeader">
-      <Typography variant="h4">TOMOHUB -  GUI for HTTOMO package </Typography>
-      <ButtonGroup variant="outlined" className="topHeader--ButtonGroup" aria-label="Basic button group" fullWidth>
+    <Box
+      component="header"
+      sx={{
+        textAlign: "center",
+        py: 3,
+        px: 2,
+        backgroundColor: "background.paper",
+      }}
+    >
+      <Typography variant="h4" gutterBottom>
+        TOMOHUB - GUI for HTTOMO package
+      </Typography>
+      <ButtonGroup
+        variant="outlined"
+        aria-label="Full pipeline button group"
+        fullWidth
+        sx={{ mt: 2 }}
+      >
         <Button>Full Pipeline 1</Button>
         <Button>Full Pipeline 2</Button>
         <Button>Full Pipeline 3</Button>
         <Button onClick={handleClick}>Full Pipeline 4</Button>
       </ButtonGroup>
-    </header>
+    </Box>
   );
-};
+}
 
 export default Header;
