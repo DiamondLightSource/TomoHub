@@ -1,7 +1,19 @@
 import React, { useState } from "react";
-import { ToggleButton, ToggleButtonGroup, TextField, Box, Typography, Button, Grid, Card } from "@mui/material";
+import {
+  ToggleButton,
+  ToggleButtonGroup,
+  TextField,
+  Box,
+  Typography,
+  Button,
+  Grid,
+  Card,
+  Modal,
+} from "@mui/material";
 import ContrastIcon from "@mui/icons-material/Contrast";
+import PreviewIcon from "@mui/icons-material/Visibility"; // Icon for the preview button
 import { useLoader } from "../contexts/LoaderContext"; // Import the custom hook
+import LoaderPreview from "./LoaderPreview"; // Import the new modal component
 
 const Loader: React.FC = () => {
   const {
@@ -14,11 +26,12 @@ const Loader: React.FC = () => {
     setUserDefinedRotationAngles,
     setDarks,
     setFlats,
-    removeDarksAndFlats, // Use the new function
+    removeDarksAndFlats,
   } = useLoader();
 
   const [mode, setMode] = useState("setAddress");
   const [showExtraFields, setShowExtraFields] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // State for modal visibility
 
   const handleModeChange = (event, newMode) => {
     if (newMode !== null) {
@@ -33,21 +46,39 @@ const Loader: React.FC = () => {
     setShowExtraFields(!showExtraFields);
   };
 
+  const handlePreviewClick = () => {
+    setIsPreviewModalOpen(true); // Open the modal
+  };
+
+  const handleClosePreviewModal = () => {
+    setIsPreviewModalOpen(false); // Close the modal
+  };
+
   return (
     <Card variant="outlined" sx={{ mx: "auto", mb: 2, p: 2, border: "1px solid #89987880", borderRadius: "4px" }}>
-      {/* Title and Add Button */}
+      {/* Title and Buttons */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
         <Typography gutterBottom variant="h6" color="primary" component="div">
           <strong>Loader</strong>
         </Typography>
-        <Button
-          variant="contained"
-          onClick={toggleExtraFields}
-          endIcon={<ContrastIcon />}
-          sx={{ fontSize: "0.7rem" }}
-        >
-          {showExtraFields ? "Remove" : "Load separate darks and flats"}
-        </Button>
+        <Box>
+          <Button
+            variant="contained"
+            onClick={toggleExtraFields}
+            endIcon={<ContrastIcon />}
+            sx={{ fontSize: "0.7rem", mr: 1 }} // Add margin to separate buttons
+          >
+            {showExtraFields ? "Remove" : "Load separate darks and flats"}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handlePreviewClick}
+            endIcon={<PreviewIcon />}
+            sx={{ fontSize: "0.7rem" }}
+          >
+            Enable Preview
+          </Button>
+        </Box>
       </Box>
 
       {/* Input Field */}
@@ -215,6 +246,25 @@ const Loader: React.FC = () => {
           </Grid>
         </Grid>
       )}
+
+      {/* Modal for Preview */}
+      <Modal open={isPreviewModalOpen} onClose={handleClosePreviewModal}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 900,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 1,
+          }}
+        >
+          <LoaderPreview onClose={handleClosePreviewModal} /> {/* Pass the close handler */}
+        </Box>
+      </Modal>
     </Card>
   );
 };

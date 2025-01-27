@@ -1,6 +1,14 @@
 import React, { createContext, useState, ReactNode, useContext } from "react";
 
 // Define the type for the parameters object
+export interface PreviewType {
+  start?: number | "begin" | "mid" | "end";
+  start_offset?: number;
+  stop?: number | "begin" | "mid" | "end";
+  stop_offset?: number;
+  mid?: "begin" | "mid" | "end"; // Only these values are allowed for mid
+}
+
 interface ParametersType {
   data_path: string;
   image_key_path?: string;
@@ -20,12 +28,16 @@ interface ParametersType {
     file: string;
     data_path: string;
   };
+  preview?: {
+    detector_x?: PreviewType; // Renamed from preview_x to detector_x
+    detector_y?: PreviewType; // Renamed from preview_y to detector_y
+  };
 }
 
 interface LoaderContextType {
   method: string;
   module_path: string;
-  parameters: ParametersType; // Use the defined type
+  parameters: ParametersType;
   setDataPath: (path: string) => void;
   setImageKeyPath: (path: string) => void;
   setRotationAnglesDataPath: (path: string) => void;
@@ -33,12 +45,14 @@ interface LoaderContextType {
   setDarks: (file: string, dataPath: string) => void;
   setFlats: (file: string, dataPath: string) => void;
   removeDarksAndFlats: () => void;
+  setDetectorX: (preview: PreviewType | null) => void; // Changed to accept null
+  setDetectorY: (preview: PreviewType | null) => void; // Changed to accept null
+  removePreview: () => void;
 }
 
 const LoaderContext = createContext<LoaderContextType | undefined>(undefined);
 
 export const LoaderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Initialize the parameters object with all possible fields
   const [parameters, setParameters] = useState<ParametersType>({
     data_path: "",
     rotation_angles: {},
@@ -93,6 +107,51 @@ export const LoaderProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     });
   };
 
+  const removePreview = () =>{
+    setParameters((prev) => {
+      const { preview, ...rest } = prev;
+      return rest;
+    });
+  }
+
+  const setDetectorX = (preview: PreviewType | null) => {
+    setParameters((prev) => {
+      const updatedPreview = { ...prev.preview };
+  
+      if (preview) {
+        updatedPreview.detector_x = preview; // Add/update detector_x
+      } else {
+        delete updatedPreview.detector_x; // Remove detector_x entirely
+      }
+  
+      // Remove the preview object entirely if it's empty
+      const hasDetectors = Object.keys(updatedPreview).length > 0;
+      return {
+        ...prev,
+        preview: hasDetectors ? updatedPreview : undefined,
+      };
+    });
+  };
+  
+  const setDetectorY = (preview: PreviewType | null) => {
+    setParameters((prev) => {
+      const updatedPreview = { ...prev.preview };
+  
+      if (preview) {
+        updatedPreview.detector_y = preview; // Add/update detector_y
+      } else {
+        delete updatedPreview.detector_y; // Remove detector_y entirely
+      }
+  
+      // Remove the preview object entirely if it's empty
+      const hasDetectors = Object.keys(updatedPreview).length > 0;
+      return {
+        ...prev,
+        preview: hasDetectors ? updatedPreview : undefined,
+      };
+    });
+  };
+
   return (
     <LoaderContext.Provider
       value={{
@@ -106,6 +165,9 @@ export const LoaderProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         setDarks,
         setFlats,
         removeDarksAndFlats,
+        setDetectorX, // Updated from setPreviewX to setDetectorX
+        setDetectorY, // Updated from setPreviewY to setDetectorY
+        removePreview
       }}
     >
       {children}
