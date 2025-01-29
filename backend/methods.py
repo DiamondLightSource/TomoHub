@@ -41,7 +41,7 @@ METHOD_CATEGORIES = {
     },
     "reconstruction": {
         "httomolibgpu.recon.algorithm": ["FBP", "LPRec", "SIRT", "CGLS"]
-    }
+    },
 }
 
 standard_tomo_loader = {
