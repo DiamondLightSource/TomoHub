@@ -236,7 +236,6 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
     switch (actualType) {
       case 'int':
       case 'float':
-      case 'tuple[float, float, float, int]':
         return (
           <>
             {/* Numeric input with sweep functionality */}
@@ -416,6 +415,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
 
       // Render boolean switch
       case 'bool':
+      case 'tuple[float, float, float, int]':
         return (
           <Tooltip title={paramDetails.desc} placement="top-start">
             <FormControl sx={{ display: 'flex', justifyContent: 'center' }}>
