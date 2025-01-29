@@ -35,7 +35,7 @@ const Dropdowns: React.FC = () => {
       </Tabs>
 
       {/* Tab Content */}
-      <Box sx={{ p: 3, width: "900px" }}>
+      <Box sx={{ p: 3, width: "100%" }}>
         {value === 0 && (
           <Guide/>
         )}
