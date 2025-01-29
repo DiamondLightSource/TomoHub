@@ -106,7 +106,13 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
 
     // Remove Optional[] wrapper if present
     const actualType = paramDetails.type.replace('Optional[', '').replace(']', '');
-
+    if (paramName === 'glob_stats' && actualType === 'tuple[float, float, float, int]') {
+      // If the switch is toggled on, set the newValue to the default value
+      // If the switch is toggled off, set the newValue to null
+      newValue = (event.target as HTMLInputElement).checked ? paramDetails.value : null;
+      onChange(newValue);
+      return;
+    }
     // Type-specific parsing logic
     switch (actualType) {
       case 'int':
@@ -236,7 +242,6 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
     switch (actualType) {
       case 'int':
       case 'float':
-      case 'tuple[float, float, float, int]':
         return (
           <>
             {/* Numeric input with sweep functionality */}
@@ -433,6 +438,34 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
             </FormControl>
           </Tooltip>
         );
+        case 'tuple[float, float, float, int]':
+  return (
+    <Tooltip title={paramDetails.desc} placement="top-start">
+      <FormControl sx={{ display: 'flex',alignItems:'center', justifyContent: 'center' }}>
+        <Typography gutterBottom>
+          glob_stats
+        </Typography>
+        <Button
+          variant="contained"
+          onClick={() => {
+            // Toggle between the default value and null
+            const newValue = value === null ? paramDetails.value : null;
+            onChange(newValue);
+          }}
+          fullWidth
+          disabled={!isEnabled}
+          sx={{
+            backgroundColor: value !== null ? 'primary.main' : 'grey.500',
+            '&:hover': {
+              backgroundColor: value !== null ? 'primary.dark' : 'grey.600',
+            },
+          }}
+        >
+          {value !== null ? 'On' : 'Off'}
+        </Button>
+      </FormControl>
+    </Tooltip>
+  );
 
       // Fallback for unknown types
       default:
