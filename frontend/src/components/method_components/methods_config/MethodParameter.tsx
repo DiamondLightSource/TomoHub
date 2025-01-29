@@ -440,7 +440,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
         );
         case 'tuple[float, float, float, int]':
   return (
-    <Tooltip title={paramDetails.desc} placement="top-start">
+    <Tooltip title={paramDetails.desc+"\nDO NOT CHANGE IF YOU DON'T WANT TO CALCULATE MIN/MAX FROM GIVEN DATA"} placement="top-start">
       <FormControl sx={{ display: 'flex',alignItems:'center', justifyContent: 'center' }}>
         <Typography gutterBottom>
           glob_stats
