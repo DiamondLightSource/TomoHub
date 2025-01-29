@@ -29,6 +29,7 @@ export const MethodsProvider: React.FC<{ children: ReactNode }> = ({ children })
   const { activeSweep, clearActiveSweep } = useSweep(); // Access the SweepContext
 
   const addMethod = (methodName: string, methodModule: string, defaultParams: { [key: string]: any }) => {
+    
     setMethods((prev) => [
       ...prev,
       { method_name: methodName, method_module: methodModule, parameters: { ...defaultParams } },
