@@ -21,7 +21,7 @@ const AppContainer = styled(Box)({
 
 const MainContainer = styled(Box)({
   display: "grid",
-  gridTemplateColumns: "3.3fr 0.3fr", // Two columns
+  gridTemplateColumns: "1.3fr 0.3fr", // Two columns
   gap: "30px", // Space between columns
   padding: "40px", // Generous padding
   flex: 1, // Take up available space
