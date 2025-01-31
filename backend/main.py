@@ -4,6 +4,7 @@ from Models.MethodsTemplate import AllTemplates
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, List
 from methods import METHOD_CATEGORIES,standard_tomo_loader
+from httomo_backends.scripts.json_pipelines_generator import process_all_yaml_files
 
 app = FastAPI()
 
@@ -39,6 +40,7 @@ def get_methods_templates(module_methods: Dict[str, List[str]]) -> Dict:
             print(f"Could not import module {module}")
     return result
 
+
 # Generic endpoint generator
 def create_category_endpoint(category: str):
     async def endpoint():
@@ -54,6 +56,13 @@ def create_category_endpoint(category: str):
 for category in METHOD_CATEGORIES.keys():
     endpoint = create_category_endpoint(category)
     app.get(f"/methods/{category}", response_model=AllTemplates)(endpoint)
+
+@app.get("/fullpipelines")
+async def get_full_pipelines():
+    try:
+        return process_all_yaml_files()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Main endpoint for all methods
 @app.get("/methods", response_model=AllTemplates)
