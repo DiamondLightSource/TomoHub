@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useMethods } from "../../contexts/MethodsContext";
 import { MethodAccordion } from './methods_config/MethodAccordion';
 import { useAccordionExpansion } from '../../contexts/AccordionExpansionContext';
-import { ApiSchema, Method, MethodComponentConfig } from '../../types/APIresponse';
+import { ApiMethodsSchema, Method, MethodComponentConfig } from '../../types/APIresponse';
 
 export function createMethodComponent({ methodType, fetchMethod }: MethodComponentConfig) {
   return function MethodComponent() {
@@ -11,7 +11,7 @@ export function createMethodComponent({ methodType, fetchMethod }: MethodCompone
       const fetchMethods = async () => {
         try {
           const response = await fetchMethod();
-          const methodsList = Object.entries(response as ApiSchema)
+          const methodsList = Object.entries(response as ApiMethodsSchema)
             .flatMap(([_modulePath, moduleMethods]) => Object.values(moduleMethods));
           setMethods(methodsList);
         } catch (error) {

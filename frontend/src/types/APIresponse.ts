@@ -1,5 +1,5 @@
 
-export type ApiSchema = {
+export type ApiMethodsSchema = {
   [modulePath: string]: {
     [methodName: string]: {
       method_name: string;
@@ -17,9 +17,21 @@ export type ApiSchema = {
   };
 };
 
-export type Method = ApiSchema[string][string];
+
+export type Method = ApiMethodsSchema[string][string];
 
 export type MethodComponentConfig = {
   methodType: string;
-  fetchMethod: () => Promise<ApiSchema>;
+  fetchMethod: () => Promise<ApiMethodsSchema>;
+};
+
+export type ApiFullPipelineSchema = {
+  [pipelineName: string]: {
+    [methodName: string]: {
+      module_path: string;
+      parameters: {
+        [key: string]:any;
+      };
+    };
+  };
 };

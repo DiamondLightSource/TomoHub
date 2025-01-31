@@ -19,6 +19,7 @@ import {
   verticalListSortingStrategy 
 } from '@dnd-kit/sortable';
 import { useAccordionExpansion } from '../contexts/AccordionExpansionContext';
+import PipelineSelector from "./fullPipelinesSelector"
 
 const Visualiser:React.FC = () => {
   const { methods, clearMethods, removeMethod, setMethods } = useMethods();
@@ -121,6 +122,8 @@ const Visualiser:React.FC = () => {
   };
 
   return (
+    <>
+    <PipelineSelector/>
     <Box
       sx={{
         width: 350,
@@ -129,7 +132,7 @@ const Visualiser:React.FC = () => {
         padding: 2,
         borderRadius: 2,
         height: 'max-content',
-        m:"50px auto"
+        mt:2
       }}
     >
       <Box
@@ -158,6 +161,7 @@ const Visualiser:React.FC = () => {
         Clear all methods
       </Button>
     </Box>
+    </>
   );
 }
 

@@ -4,6 +4,7 @@ import { useLoader } from "../contexts/LoaderContext";
 import { useMethods } from "../contexts/MethodsContext";
 
 function Header() {
+  
   const {
     setDataPath,
     setImageKeyPath,
@@ -13,7 +14,6 @@ function Header() {
     setFlats,
   } = useLoader();
 
-  const { addMethod } = useMethods();
 
   const handleClick = () => {
     // Predefined values for LoaderContext
@@ -23,21 +23,6 @@ function Header() {
     setUserDefinedRotationAngles("0", "180", "360");
     setDarks("/predefined/darks/file", "/predefined/darks/data/path");
     setFlats("/predefined/flats/file", "/predefined/flats/data/path");
-
-    // Predefined values for MethodsContext
-    addMethod("find_center_360", "httomolibgpu.recon.rotation", {
-      ind: "mid",
-      win_width: 10,
-      side: null,
-      denoise: true,
-      norm: false,
-      use_overlap: false,
-    });
-
-    addMethod("predefined_method_2", "predefined_module_2", {
-      param3: "value3",
-      param4: "value4",
-    });
   };
 
   return (
@@ -62,7 +47,6 @@ function Header() {
         <Button>Full Pipeline 1</Button>
         <Button>Full Pipeline 2</Button>
         <Button>Full Pipeline 3</Button>
-        <Button onClick={handleClick}>Full Pipeline 4</Button>
       </ButtonGroup>
     </Box>
   );
