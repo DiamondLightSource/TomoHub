@@ -25,6 +25,12 @@ const Guide: React.FC = () => {
         <Typography variant="body1" gutterBottom>
           Please visit Tomohub's<a href="https://github.com/DiamondLightSource/TomoHub" target="_blank"> github</a> page 
         </Typography>
+        <Typography variant="h6">
+          Reporting issues
+        </Typography>
+        <Typography variant="body1">
+          To <a href="https://github.com/DiamondLightSource/TomoHub/issues/new?template=Blank+issue" target="_blank">report</a> any issue/feedback
+        </Typography>
        </Card>
   );
 };
