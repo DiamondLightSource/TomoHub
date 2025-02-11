@@ -52,6 +52,7 @@ const Dropdowns: React.FC = () => {
               p: 2,
               border: "1px solid #89987880",
               borderRadius: "4px",
+              minWidth:"650px"
             }}
           >
             <Typography gutterBottom sx={{mb:1}} variant="h6" color="primary" component="div">
@@ -75,6 +76,7 @@ const Dropdowns: React.FC = () => {
                         p: 2,
                         border: "1px solid #89987880",
                         borderRadius: "4px",
+                        minWidth:"650px"
                       }}
                     >
                       <Typography gutterBottom sx={{mb:1}} variant="h6" color="primary" component="div">
@@ -92,6 +94,7 @@ const Dropdowns: React.FC = () => {
                         p: 2,
                         border: "1px solid #89987880",
                         borderRadius: "4px",
+                                      minWidth:"650px"
                       }}
                     >
                       <Typography gutterBottom sx={{mb:1}} variant="h6" color="primary" component="div">
@@ -110,6 +113,7 @@ const Dropdowns: React.FC = () => {
               p: 2,
               border: "1px solid #89987880",
               borderRadius: "4px",
+                            minWidth:"650px"
             }}
           >
             <Typography gutterBottom sx={{mb:1}} variant="h6" color="primary" component="div">
