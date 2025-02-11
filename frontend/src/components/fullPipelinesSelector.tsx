@@ -51,7 +51,7 @@ const PipelineSelector: React.FC = () => {
                         borderRadius: "4px",
                       }}
                     >
-                        <Typography gutterBottom sx={{mb:1}}>Ready to use pipelines 
+                        <Typography gutterBottom sx={{mb:1,display:"flex",alignItems:"center"}}>Ready to use pipelines 
                         <Tooltip
                         title="Select to load predefined pipelines"
                         placement="top-start"
