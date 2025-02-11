@@ -9,11 +9,13 @@ import {
   Grid,
   Card,
   Modal,
+  Tooltip
 } from "@mui/material";
 import ContrastIcon from "@mui/icons-material/Contrast";
 import PreviewIcon from "@mui/icons-material/Visibility"; // Icon for the preview button
 import { useLoader } from "../contexts/LoaderContext"; // Import the custom hook
 import LoaderPreview from "./LoaderPreview"; // Import the new modal component
+import InfoIcon from "@mui/icons-material/Info";
 
 const Loader: React.FC = () => {
   const {
@@ -58,8 +60,14 @@ const Loader: React.FC = () => {
     <Card variant="outlined" sx={{ mx: "auto", mb: 2, p: 2, border: "1px solid #89987880", borderRadius: "4px" }}>
       {/* Title and Buttons */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-        <Typography gutterBottom variant="h6" color="primary" component="div">
+        <Typography gutterBottom variant="h6" color="primary" component="div" sx={{display:"flex",alignItems:"center"}}>
           <strong>Loader</strong>
+          <Tooltip
+                        title="Select to load predefined pipelines"
+                        placement="top-start"
+                        >
+                            <InfoIcon sx={{ml:0.5}} fontSize="small"/>
+                </Tooltip>
         </Typography>
         <Box>
           <Button
@@ -89,7 +97,7 @@ const Loader: React.FC = () => {
         size="small"
         value={parameters.data_path}
         onChange={(e) => setDataPath(e.target.value)}
-        placeholder="Enter memory address or reference"
+        placeholder="path to the dataset in the input hdf5/NeXuS file containing image data"
         sx={{ mb: 1 }}
       />
 
@@ -102,7 +110,7 @@ const Loader: React.FC = () => {
           size="small"
           value={parameters.image_key_path || ""}
           onChange={(e) => setImageKeyPath(e.target.value)}
-          placeholder="Enter memory address or reference"
+          placeholder="path to the image key in your data"
           sx={{ mb: 1 }}
         />
       )}
@@ -135,7 +143,7 @@ const Loader: React.FC = () => {
           size="small"
           value={parameters.rotation_angles.data_path || ""}
           onChange={(e) => setRotationAnglesDataPath(e.target.value)}
-          placeholder="Enter memory address or reference"
+          placeholder="Path to rotation angle dataset in your data"
           sx={{ mb: 1 }}
         />
       ) : (
@@ -154,7 +162,7 @@ const Loader: React.FC = () => {
                   parameters.rotation_angles.user_defined?.angles_total || ""
                 )
               }
-              placeholder="Enter X-axis rotation"
+              placeholder="First angle"
             />
           </Grid>
           <Grid item xs={4}>
@@ -171,7 +179,7 @@ const Loader: React.FC = () => {
                   parameters.rotation_angles.user_defined?.angles_total || ""
                 )
               }
-              placeholder="Enter Y-axis rotation"
+              placeholder="Last angle"
             />
           </Grid>
           <Grid item xs={4}>
@@ -188,7 +196,7 @@ const Loader: React.FC = () => {
                   e.target.value
                 )
               }
-              placeholder="Enter Z-axis rotation"
+              placeholder="Total angles between"
             />
           </Grid>
         </Grid>
@@ -209,6 +217,7 @@ const Loader: React.FC = () => {
               value={parameters.darks?.file || ""}
               onChange={(e) => setDarks(e.target.value, parameters.darks?.data_path || "")}
               sx={{ mb: 1 }}
+              placeholder="path to the hdf5/NeXuS darks file "
             />
             <TextField
               label="Data path"
@@ -218,6 +227,7 @@ const Loader: React.FC = () => {
               value={parameters.darks?.data_path || ""}
               onChange={(e) => setDarks(parameters.darks?.file || "", e.target.value)}
               sx={{ mb: 1 }}
+               placeholder="dataset that contains the darks data"
             />
           </Grid>
           <Grid item xs={6}>
@@ -225,14 +235,14 @@ const Loader: React.FC = () => {
               Flats
             </Typography>
             <TextField
-              label="Path"
+              label="Path to flats file"
               variant="outlined"
               fullWidth
               size="small"
               value={parameters.flats?.file || ""}
               onChange={(e) => setFlats(e.target.value, parameters.flats?.data_path || "")}
               sx={{ mb: 1 }}
-              placeholder="Path to flats file"
+              placeholder="path to the hdf5/NeXuS flats file"
             />
             <TextField
               label="Data path"
@@ -242,6 +252,7 @@ const Loader: React.FC = () => {
               value={parameters.flats?.data_path || ""}
               onChange={(e) => setFlats(parameters.flats?.file || "", e.target.value)}
               sx={{ mb: 1 }}
+              placeholder="dataset that contains the flats data"
             />
           </Grid>
         </Grid>
