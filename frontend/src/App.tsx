@@ -26,7 +26,7 @@ const MainContainer = styled(Box)({
   padding: "40px", // Generous padding
   flex: 1, // Take up available space
   alignItems: "flex-start",
-  margin:"auto"
+  margin:"auto",
 });
 
 const LeftSection = styled(Box)({
