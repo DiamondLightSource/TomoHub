@@ -19,7 +19,7 @@ jobs:
 
       # Install Git 
       - name: Install Git (for Docker build)
-      run: sudo apt-get update && sudo apt-get install -y git
+        run: sudo apt-get update && sudo apt-get install -y git
       
       # Generate the image names dynamically
       - name: Generate Image Names
