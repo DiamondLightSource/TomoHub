@@ -25,3 +25,9 @@ dist-ssr
 
 __pycache__
 venv
+
+
+# Ignore .env files
+.env
+.env.development
+.env.production
