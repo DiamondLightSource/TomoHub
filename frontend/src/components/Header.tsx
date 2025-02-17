@@ -36,18 +36,8 @@ function Header() {
       }}
     >
       <Typography variant="h4" gutterBottom>
-        TOMOHUB - GUI for HTTOMO package
+        TOMOHUB Demo - GUI for HTTOMO package
       </Typography>
-      <ButtonGroup
-        variant="outlined"
-        aria-label="Full pipeline button group"
-        fullWidth
-        sx={{ mt: 2 }}
-      >
-        <Button>Full Pipeline 1</Button>
-        <Button>Full Pipeline 2</Button>
-        <Button>Full Pipeline 3</Button>
-      </ButtonGroup>
     </Box>
   );
 }
