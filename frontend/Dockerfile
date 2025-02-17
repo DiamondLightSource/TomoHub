@@ -4,7 +4,17 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npm run build
-FROM docker.io/nginx:stable-alpine
+
+FROM nginx:stable-alpine
+
+# Copy the built React app
 COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx","-g","daemon off;"]
+
+# Copy custom Nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy and process the runtime config file
+COPY config.js.template /usr/share/nginx/html/config.js
+
+# Replace environment variables in config.js at runtime
+CMD ["/bin/sh", "-c", "envsubst < /usr/share/nginx/html/config.js > /usr/share/nginx/html/config.js && exec nginx -g 'daemon off;'"]
