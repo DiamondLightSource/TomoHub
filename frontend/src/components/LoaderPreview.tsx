@@ -13,7 +13,7 @@ import {
   ToggleButtonGroup,
 } from "@mui/material";
 import ClearIcon from '@mui/icons-material/Clear';
-import CloseIcon from '@mui/icons-material/Close'; // Import CloseIcon for the modal close button
+import CloseIcon from '@mui/icons-material/Close';
 import { useLoader, PreviewType } from "../contexts/LoaderContext";
 
 interface LoaderPreviewProps {
@@ -69,17 +69,16 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
       return;
     }
 
-    // Update detector_x and detector_y in the context based on their enabled state
     if (enableDetectorX) {
-      setDetectorX(detectorX); // Set detector_x if enabled
+      setDetectorX(detectorX);
     } else {
-      setDetectorX(null); // Remove detector_x entirely if not enabled
+      setDetectorX(null);
     }
 
     if (enableDetectorY) {
-      setDetectorY(detectorY); // Set detector_y if enabled
+      setDetectorY(detectorY);
     } else {
-      setDetectorY(null); // Remove detector_y entirely if not enabled
+      setDetectorY(null);
     }
 
     if (!enableDetectorX && !enableDetectorY) {
@@ -118,45 +117,61 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
           <Typography variant="subtitle2" gutterBottom>
             Start Position
           </Typography>
-          <TextField
-            label="Custom Start"
-            variant="outlined"
-            fullWidth
-            type="number"
-            size="small"
-            value={typeof state.start === "number" ? state.start : ""}
-            onChange={(e) => setState({ ...state, start: Number(e.target.value) })}
-            disabled={typeof state.start === "string"}
-            error={error && !state.start}
-            helperText={error && !state.start ? "Start position is required" : ""}
-            InputProps={{
-              startAdornment: state.start && (
-                <InputAdornment position="start">
-                  <IconButton
-                    size="small"
-                    onClick={() => setState({ ...state, start: undefined })}
-                    edge="start"
-                  >
-                    <ClearIcon />
-                  </IconButton>
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <ToggleButtonGroup
-                    value={state.start?.toString() || null}
-                    exclusive
-                    onChange={(_, value) => handlePresetChange(detector, "start", value)}
-                    size="small"
-                  >
-                    <ToggleButton value="begin">Begin</ToggleButton>
-                    <ToggleButton value="mid">Mid</ToggleButton>
-                    <ToggleButton value="end">End</ToggleButton>
-                  </ToggleButtonGroup>
-                </InputAdornment>
-              ),
-            }}
-          />
+          <Grid container spacing={1} alignItems="center">
+            <Grid item xs>
+              <TextField
+                label="Custom Start"
+                variant="outlined"
+                fullWidth
+                type="number"
+                size="small"
+                value={typeof state.start === "number" ? state.start : ""}
+                onChange={(e) => setState({ ...state, start: Number(e.target.value) })}
+                disabled={typeof state.start === "string"}
+                error={error && !state.start}
+                helperText={error && !state.start ? "Start position is required" : ""}
+                sx={{paddingRight:-14}}
+                InputProps={{
+                  startAdornment: state.start && (
+                    <InputAdornment position="start">
+                      <IconButton
+                        size="small"
+                        onClick={() => setState({ ...state, start: undefined })}
+                        edge="start"
+                      >
+                        <ClearIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <ToggleButtonGroup
+                        value={state.start?.toString() || null}
+                        exclusive
+                        onChange={(_, value) => handlePresetChange(detector, "start", value)}
+                        size="small"
+                        sx={{marginRight:"-14px"}}
+                      >
+                        <ToggleButton value="begin">Begin</ToggleButton>
+                        <ToggleButton value="mid">Mid</ToggleButton>
+                        <ToggleButton value="end">End</ToggleButton>
+                      </ToggleButtonGroup>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item>
+              <Button
+                variant="outlined"
+                onClick={() => setShowStartOffset(!showStartOffset)}
+                size="small"
+                sx={{padding:0.7}}
+              >
+                {showStartOffset ? "Remove Offset" : "Add Offset"}
+              </Button>
+            </Grid>
+          </Grid>
         </Box>
 
         {/* Start Offset */}
@@ -172,59 +187,66 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
             sx={{ mb: 1 }}
           />
         )}
-        <Button
-          variant="outlined"
-          onClick={() => setShowStartOffset(!showStartOffset)}
-          sx={{ mb: 1 }}
-          size="small"
-        >
-          {showStartOffset ? "Remove Start Offset" : "Add Start Offset"}
-        </Button>
 
         {/* Stop Controls */}
         <Box sx={{ mb: 1 }}>
           <Typography variant="subtitle2" gutterBottom>
             Stop Position
           </Typography>
-          <TextField
-            label="Custom Stop"
-            variant="outlined"
-            fullWidth
-            type="number"
-            size="small"
-            value={typeof state.stop === "number" ? state.stop : ""}
-            onChange={(e) => setState({ ...state, stop: Number(e.target.value) })}
-            disabled={typeof state.stop === "string"}
-            error={error && !state.stop}
-            helperText={error && !state.stop ? "Stop position is required" : ""}
-            InputProps={{
-              startAdornment: state.stop && (
-                <InputAdornment position="start">
-                  <IconButton
-                    size="small"
-                    onClick={() => setState({ ...state, stop: undefined })}
-                    edge="start"
-                  >
-                    <ClearIcon />
-                  </IconButton>
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <ToggleButtonGroup
-                    value={state.stop?.toString() || null}
-                    exclusive
-                    onChange={(_, value) => handlePresetChange(detector, "stop", value)}
-                    size="small"
-                  >
-                    <ToggleButton value="begin">Begin</ToggleButton>
-                    <ToggleButton value="mid">Mid</ToggleButton>
-                    <ToggleButton value="end">End</ToggleButton>
-                  </ToggleButtonGroup>
-                </InputAdornment>
-              ),
-            }}
-          />
+          <Grid container spacing={1} alignItems="center">
+            <Grid item xs>
+              <TextField
+                label="Custom Stop"
+                variant="outlined"
+                fullWidth
+                type="number"
+                size="small"
+                value={typeof state.stop === "number" ? state.stop : ""}
+                onChange={(e) => setState({ ...state, stop: Number(e.target.value) })}
+                disabled={typeof state.stop === "string"}
+                error={error && !state.stop}
+                helperText={error && !state.stop ? "Stop position is required" : ""}
+                InputProps={{
+                  startAdornment: state.stop && (
+                    <InputAdornment position="start">
+                      <IconButton
+                        size="small"
+                        onClick={() => setState({ ...state, stop: undefined })}
+                        edge="start"
+                      >
+                        <ClearIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <ToggleButtonGroup
+                        value={state.stop?.toString() || null}
+                        exclusive
+                        onChange={(_, value) => handlePresetChange(detector, "stop", value)}
+                        size="small"
+                        sx={{marginRight:"-14px"}}
+                      >
+                        <ToggleButton value="begin">Begin</ToggleButton>
+                        <ToggleButton value="mid">Mid</ToggleButton>
+                        <ToggleButton value="end">End</ToggleButton>
+                      </ToggleButtonGroup>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item>
+              <Button
+                variant="outlined"
+                onClick={() => setShowStopOffset(!showStopOffset)}
+                size="small"
+                sx={{padding:0.7}}
+              >
+                {showStopOffset ? "Remove Offset" : "Add Offset"}
+              </Button>
+            </Grid>
+          </Grid>
         </Box>
 
         {/* Stop Offset */}
@@ -240,14 +262,6 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
             sx={{ mb: 1 }}
           />
         )}
-        <Button
-          variant="outlined"
-          onClick={() => setShowStopOffset(!showStopOffset)}
-          sx={{ mb: 1 }}
-          size="small"
-        >
-          {showStopOffset ? "Remove Stop Offset" : "Add Stop Offset"}
-        </Button>
       </>
     );
   };
