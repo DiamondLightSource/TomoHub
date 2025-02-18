@@ -15,12 +15,16 @@ const PipelineSelector: React.FC = () => {
     const fetchPipelines = async () => {
       try {
         const data = await fullpipelinesService.getFullPipelines();
-        setPipelines(data);
+        // Filter out keys that start with "cpu_"
+        const filteredData = Object.fromEntries(
+          Object.entries(data).filter(([key]) => !key.startsWith("cpu_"))
+        );
+        setPipelines(filteredData);
       } catch (error) {
         console.error("Failed to fetch pipelines:", error);
       }
     };
-
+  
     fetchPipelines();
   }, []);
 

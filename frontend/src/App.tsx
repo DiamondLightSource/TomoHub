@@ -23,7 +23,7 @@ const MainContainer = styled(Box)({
   display: "grid",
   gridTemplateColumns: "1.3fr 0.3fr", // Two columns
   gap: "30px", // Space between columns
-  padding: "40px", // Generous padding
+  padding: "20px", // Generous padding
   flex: 1, // Take up available space
   alignItems: "flex-start",
   margin:"auto",
