@@ -6,7 +6,7 @@ from typing import Dict, List
 from methods import METHOD_CATEGORIES,standard_tomo_loader
 from httomo_backends.scripts.json_pipelines_generator import process_all_yaml_files
 
-app = FastAPI()
+app = FastAPI(root_path="/api")
 
 origins = [
     "*",
