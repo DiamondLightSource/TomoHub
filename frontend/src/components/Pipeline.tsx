@@ -3,7 +3,7 @@ import React from 'react';
 import { Button, Box, Typography } from '@mui/material';
 import { useMethods } from '../contexts/MethodsContext';
 import { ClearAll } from '@mui/icons-material';
-import VisualiserMethods from './VisualiserMethods';
+import PipelineMethod from './PipelineMethod';
 import { 
   DndContext, 
   closestCenter,
@@ -21,7 +21,7 @@ import {
 import { useAccordionExpansion } from '../contexts/AccordionExpansionContext';
 import PipelineSelector from "./fullPipelinesSelector"
 
-const Visualiser:React.FC = () => {
+const Pipeline:React.FC = () => {
   const { methods, clearMethods, removeMethod, setMethods } = useMethods();
   const { expandMethodAndParent } = useAccordionExpansion(); // Use the context
   const sensors = useSensors(
@@ -107,7 +107,7 @@ const Visualiser:React.FC = () => {
           <SortableContext items={methods.map(method => method.method_name)} strategy={verticalListSortingStrategy}>
             <Box sx={{ width: '100%' }}>
               {methods.map((method) => (
-                <VisualiserMethods
+                <PipelineMethod
                   key={method.method_name}
                   method={method}
                   removeMethod={removeMethod}
@@ -165,4 +165,4 @@ const Visualiser:React.FC = () => {
   );
 }
 
-export default Visualiser;
+export default Pipeline;

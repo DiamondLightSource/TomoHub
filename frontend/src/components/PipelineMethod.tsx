@@ -17,7 +17,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-interface VisualiserMethodProps {
+interface PipelineMethodProps {
   method: {
     method_name: string;
     parameters?: Record<string, any>;
@@ -27,7 +27,7 @@ interface VisualiserMethodProps {
 
 }
 
-const VisualiserMethod: React.FC<VisualiserMethodProps> = ({ 
+const PipelineMethod: React.FC<PipelineMethodProps> = ({ 
   method, 
   removeMethod, 
   editMethod
@@ -154,4 +154,4 @@ const VisualiserMethod: React.FC<VisualiserMethodProps> = ({
   );
 };
 
-export default VisualiserMethod;
+export default PipelineMethod;
