@@ -1,8 +1,10 @@
 import React from "react";
-import { Card, Tabs, Tab, Box, Typography } from "@mui/material";
+import { Card, Tabs, Tab, Box, Typography,Button } from "@mui/material";
 import Dropdown from "./Dropdown";
 import Loader from "./Loader";
 import Guide from "./Guide";
+import {Link} from "react-router-dom"
+import ArchitectureIcon from '@mui/icons-material/Architecture';
 
 const Dropdowns: React.FC = () => {
   const [value, setValue] = React.useState(0); // State to manage the active tab
@@ -36,6 +38,9 @@ const Dropdowns: React.FC = () => {
 
       {/* Tab Content */}
       <Box sx={{ p: 2, maxWidth:"700px" }}>
+      <Button sx={{mb:1,"a":{color:"white",textDecoration:"none",display:"flex",alignItems:"center"}}} variant="contained">
+        <Link to="CORfinder">COR finder <ArchitectureIcon sx={{ml:0.5}} fontSize="small"/></Link>
+      </Button>
         {value === 0 && (
           <Guide/>
         )}
