@@ -31,3 +31,5 @@ venv
 .env
 .env.development
 .env.production
+
+hdf5
