@@ -3,10 +3,17 @@ from generator import generate_method_template
 from Models.MethodsTemplate import AllTemplates
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, List
+import os
 from methods import METHOD_CATEGORIES,standard_tomo_loader
 from httomo_backends.scripts.json_pipelines_generator import process_all_yaml_files
 
+# Disable libhdf5 file locking since h5grove is only reading files
+# This needs to be done before any import of h5py, so before h5grove import
+os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
+from h5grove.fastapi_utils import router, settings  
+
 app = FastAPI(root_path="/api")
+app.include_router(router)
 
 origins = [
     "*",
@@ -20,7 +27,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 def get_methods_templates(module_methods: Dict[str, List[str]]) -> Dict:
     """
