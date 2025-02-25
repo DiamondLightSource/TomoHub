@@ -10,7 +10,7 @@ from httomo_backends.scripts.json_pipelines_generator import process_all_yaml_fi
 # Disable libhdf5 file locking since h5grove is only reading files
 # This needs to be done before any import of h5py, so before h5grove import
 os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
-from h5grove.fastapi_utils import router, settings  
+from h5grove.fastapi_utils import router 
 
 app = FastAPI(root_path="/api")
 app.include_router(router)
