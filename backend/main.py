@@ -7,13 +7,8 @@ import os
 from methods import METHOD_CATEGORIES,standard_tomo_loader
 from httomo_backends.scripts.json_pipelines_generator import process_all_yaml_files
 
-# Disable libhdf5 file locking since h5grove is only reading files
-# This needs to be done before any import of h5py, so before h5grove import
-os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
-from h5grove.fastapi_utils import router 
 
 app = FastAPI(root_path="/api")
-app.include_router(router)
 
 origins = [
     "*",
@@ -85,3 +80,8 @@ async def get_all_methods():
 @app.get("/methods/loaders", response_model=AllTemplates)
 async def get_loader_method():
     return standard_tomo_loader
+
+@app.post("/runCenterFinding")
+async def run_center_finding():
+    pass
+

@@ -25,7 +25,7 @@ dist-ssr
 
 __pycache__
 venv
-
+httomo_test_runs
 
 # Ignore .env files
 .env
