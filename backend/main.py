@@ -6,6 +6,17 @@ from typing import Dict, List
 import os
 from methods import METHOD_CATEGORIES,standard_tomo_loader
 from httomo_backends.scripts.json_pipelines_generator import process_all_yaml_files
+import os
+import json
+import yaml
+import tempfile
+import shutil
+import subprocess
+from typing import Optional
+from pathlib import Path
+from fastapi import FastAPI, UploadFile, Form, HTTPException
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 
 app = FastAPI(root_path="/api")
@@ -85,3 +96,123 @@ async def get_loader_method():
 async def run_center_finding():
     pass
 
+
+
+
+class ReconstructionResponse(BaseModel):
+    message: str
+    output_dir: Optional[str] = None
+
+RECONSTRUCTION_DIR = "./reconstruction_data"
+
+import yaml
+
+class SweepRange:
+    def __init__(self, start, stop, step):
+        self.start = start
+        self.stop = stop
+        self.step = step
+
+# Custom representer for PyYAML
+def sweep_range_representer(dumper, data):
+    return dumper.represent_mapping("!SweepRange", {
+        "start": data.start,
+        "stop": data.stop,
+        "step": data.step
+    })
+
+yaml.add_representer(SweepRange, sweep_range_representer)
+
+@app.post("/reconstruction", response_model=ReconstructionResponse)
+async def reconstruction(
+    file: UploadFile,
+    algorithm: str = Form(...),
+    start: int = Form(...),
+    stop: int = Form(...),
+    step: int = Form(...),
+    loader_context: str = Form(...)
+):
+    try:
+        # Parse the loader context
+        loader_data = json.loads(loader_context)
+        
+        # Create organized temp directory
+        temp_dir = os.path.join(RECONSTRUCTION_DIR, "temp_run")
+        os.makedirs(temp_dir, exist_ok=True)
+        
+        # Create subdirectories
+        cor_finder_dir = os.path.join(temp_dir, "cor_finder")
+        os.makedirs(cor_finder_dir, exist_ok=True)
+        output_dir = os.path.join(temp_dir, "output")
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # Save the uploaded file
+        file_path = os.path.join(temp_dir, file.filename)
+        with open(file_path, "wb") as f:
+            content = await file.read()
+            f.write(content)
+        
+        # Generate the YAML config file
+        config_path = os.path.join(temp_dir, "config.yaml")
+        
+        # Create the config structure
+        config = [
+            {
+                "method": loader_data["method"],
+                "module_path": loader_data["module_path"],
+                "parameters": loader_data["parameters"]
+            },
+            {
+                "method": "normalize",
+                "module_path": "tomopy.prep.normalize",
+                "parameters": {
+                    "cutoff": None,
+                    "averaging": "mean"
+                }
+            },
+            {
+                "method": "minus_log",
+                "module_path": "tomopy.prep.normalize",
+                "parameters": {}
+            },
+            {
+                "method": "recon",
+                "module_path": "tomopy.recon.algorithm",
+                "parameters": {
+                    "center": SweepRange(start, stop, step),
+                    "sinogram_order": False,
+                    "algorithm": algorithm,
+                    "init_recon": None
+                }
+            }
+        ]
+
+        # Save the config file
+        with open(config_path, "w") as f:
+            yaml.dump(config, f, default_flow_style=False)
+        
+        # Run the httomo command using subprocess
+        command = [
+            "httomo", "run",
+            file_path,  # Path to the data
+            config_path,  # Path to the config
+            output_dir  # Path to the output
+        ]
+        
+        # Execute the command
+        result = subprocess.run(command, capture_output=True, text=True)
+        
+        # Check if the command was successful
+        if result.returncode != 0:
+            raise HTTPException(
+                status_code=500,
+                detail=f"httomo command failed: {result.stderr}"
+            )
+        
+        return ReconstructionResponse(
+            message=f"Configuration and data stored successfully. Algorithm: {algorithm}, Range: {start}-{stop} (step {step}). httomo output: {result.stdout}",
+            output_dir=output_dir
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

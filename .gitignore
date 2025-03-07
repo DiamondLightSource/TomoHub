@@ -26,6 +26,7 @@ dist-ssr
 __pycache__
 venv
 httomo_test_runs
+reconstruction_data
 
 # Ignore .env files
 .env
