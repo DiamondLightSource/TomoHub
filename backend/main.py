@@ -140,9 +140,7 @@ async def reconstruction(
         temp_dir = os.path.join(RECONSTRUCTION_DIR, "temp_run")
         os.makedirs(temp_dir, exist_ok=True)
         
-        # Create subdirectories
-        cor_finder_dir = os.path.join(temp_dir, "cor_finder")
-        os.makedirs(cor_finder_dir, exist_ok=True)
+        # Create output directory
         output_dir = os.path.join(temp_dir, "output")
         os.makedirs(output_dir, exist_ok=True)
         
@@ -210,7 +208,7 @@ async def reconstruction(
             )
         
         return ReconstructionResponse(
-            message=f"Configuration and data stored successfully. Algorithm: {algorithm}, Range: {start}-{stop} (step {step}). httomo output: {result.stdout}",
+            message=f"Configuration and data stored successfully. Algorithm: {algorithm}, Range: {start}-{stop} (step {step})",
             output_dir=output_dir
         )
         
