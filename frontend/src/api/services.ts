@@ -59,3 +59,9 @@ export const fullpipelinesService = {
     return response.data;
   },
 }
+
+export const imageService = {
+  getImageUrl: (path: string): string => {
+    return `${apiClient.defaults.baseURL}/api/image?path=${encodeURIComponent(path)}`;
+  }
+}
