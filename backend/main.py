@@ -174,7 +174,6 @@ async def reconstruction(
                 }
             }
         ]
-
         # Save the config file
         with open(config_path, "w") as f:
             yaml.dump(config, f, default_flow_style=False)
