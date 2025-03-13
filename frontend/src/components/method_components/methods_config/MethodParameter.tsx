@@ -259,7 +259,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
                 }
                 onChange={handleInputChange}
                 variant="outlined"
-                disabled={!isEnabled || isSweepActiveForThisParam || (typeof value === 'string' && (value.startsWith('$') || paramName === "axis"))}
+                disabled={!isEnabled || isSweepActiveForThisParam || (typeof value === 'string' && (paramName === "axis"))}
                 size="small"
                 fullWidth
                 helperText={paramDetails.desc}

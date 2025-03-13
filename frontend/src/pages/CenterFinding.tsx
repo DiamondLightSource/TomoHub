@@ -27,6 +27,7 @@ import { useLoader } from "../contexts/LoaderContext";
 import apiClient from "../api/client";
 import { imageService } from "../api/services";
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
+import Loader from '../components/Loader'
 
 const CenterFinding = () => {
   // State for form inputs
@@ -130,7 +131,7 @@ const CenterFinding = () => {
         throw new Error("Loader context is not available");
       }
 
-      const response = await apiClient.post("/api/reconstruction", formData, {
+      const response = await apiClient.post("/api/reconstruction/centre", formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -161,6 +162,7 @@ const CenterFinding = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
+      
       <Button
         component={Link}
         to=".."
@@ -179,7 +181,7 @@ const CenterFinding = () => {
           Find the optimal center of rotation for your tomography data
         </Typography>
       </Box>
-      
+      <Loader/>
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
           <Card 
