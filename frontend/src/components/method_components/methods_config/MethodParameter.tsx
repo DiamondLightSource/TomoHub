@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Grid,
   TextField,
@@ -17,12 +17,15 @@ import {
   Tab,
   Typography,
   Button,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import CloseIcon from '@mui/icons-material/Close';
 import ClearIcon from '@mui/icons-material/Clear';
 import { UIParameterType } from '../uitypes';
 import { useSweep } from '../../../contexts/SweepContext';
+import { useCenter } from '../../../contexts/CenterContext';
 
 // Define the props structure for the MethodParameter component
 interface MethodParameterProps {
@@ -58,6 +61,20 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
   // Access sweep context to manage active sweeps
   const { activeSweep, setActiveSweep, clearActiveSweep } = useSweep();
 
+  // Access the center context
+  const { selectedCenter } = useCenter();
+  // Track the toggle state
+  const [centerMode, setCenterMode] = useState<'auto' | 'manual'>(
+    selectedCenter===0 ? 'auto' : 'manual'
+  ); // Track the toggle state
+
+  // Automatically trigger onChange whenever the context state updates in manual mode
+  useEffect(() => {
+    if (centerMode === 'manual') {
+      onChange(selectedCenter); // Trigger onChange with the updated context value
+    }
+  }, [selectedCenter]);
+
   // Check if a sweep is active for a different parameter
   const isSweepActiveForOtherParam = activeSweep && (activeSweep.methodId !== methodId || activeSweep.paramName !== paramName);
   // Check if a sweep is active for this specific parameter
@@ -73,6 +90,14 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
       return values.trim() !== '';
     }
   };
+
+  // Automatically trigger onChange whenever the context state updates in manual mode
+  useEffect(() => {
+    if (centerMode === 'manual') {
+      onChange(selectedCenter); // Trigger onChange with the updated context value
+    }
+  }, [selectedCenter]);
+  
 
   // Generate display text for the current sweep configuration
   const getSweepDisplayText = () => {
@@ -185,6 +210,27 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
     onChange(null);
   };
 
+   // Handle toggle button change
+   const handleCenterModeChange = (
+    event: React.MouseEvent<HTMLElement>,
+    newMode: 'auto' | 'manual'
+  ) => {
+    if (newMode) {
+      setCenterMode(newMode);
+      if (newMode === 'auto') {
+        onChange(paramDetails.value); // Use the default value from paramDetails
+      } else if (newMode === 'manual') {
+        onChange(selectedCenter); // Use the manual value
+      }
+    }
+  };
+
+  // Handle manual value change
+  const handleManualValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value === '' ? '' : Number(event.target.value); // Convert to number or empty
+    onChange(newValue); // Trigger the onChange callback with the new value
+  };
+
   // Render appropriate input based on parameter type
   const renderInput = () => {
     // Handle Optional[] type wrapping
@@ -238,6 +284,44 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
       );
     }
 
+    // Special case for "center" parameter
+    if (paramName === 'center') {
+      return (
+        <Tooltip title={paramDetails.desc} placement="top-start">
+          <Grid container direction="column" alignItems="center">
+            <Typography variant="subtitle1" gutterBottom>
+              {paramName}
+            </Typography>
+            <ToggleButtonGroup
+              value={centerMode}
+              exclusive
+              onChange={handleCenterModeChange}
+              disabled={!isEnabled}
+              size="small"
+              fullWidth
+              color="primary"
+            >
+              <ToggleButton value="auto">Auto</ToggleButton>
+              <ToggleButton value="manual">Manual</ToggleButton>
+            </ToggleButtonGroup>
+            {centerMode === 'manual' && (
+              <TextField
+                label="Manual Center"
+                type="number"
+                value={selectedCenter || ''}
+                onChange={handleManualValueChange}
+                variant="outlined"
+                size="small"
+                fullWidth
+                sx={{ mt: 2 }}
+                helperText="Enter the manual center value"
+              />
+            )}
+          </Grid>
+        </Tooltip>
+      );
+    }
+
     // Render input based on parameter type
     switch (actualType) {
       case 'int':
@@ -249,6 +333,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
               title={`${actualType} - default: ${paramDetails.value ?? 'None'}`}
               placement="top-start"
             >
+              
               <TextField
                 label={paramName}
                 type="text"
@@ -259,7 +344,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
                 }
                 onChange={handleInputChange}
                 variant="outlined"
-                disabled={!isEnabled || isSweepActiveForThisParam || (typeof value === 'string' && (value.startsWith('$') || paramName === "axis"))}
+                disabled={!isEnabled || isSweepActiveForThisParam || (typeof value === 'string' && (paramName === "axis"))}
                 size="small"
                 fullWidth
                 helperText={paramDetails.desc}

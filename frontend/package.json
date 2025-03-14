@@ -14,15 +14,19 @@
     "@dnd-kit/sortable": "^9.0.0",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
+    "@h5web/app": "^13.0.0",
     "@h5web/lib": "^13.0.0",
     "@mui/icons-material": "^6.1.6",
     "@mui/material": "^6.1.6",
+    "@react-three/fiber": "^9.0.4",
     "axios": "^1.7.9",
-    "react": "^18.3.1",
+    "ndarray": "^1.0.19",
+    "react": "^19.0.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^7.2.0"
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.2.0",
+    "three": "^0.173.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

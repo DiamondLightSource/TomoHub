@@ -11,7 +11,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Layout/>}>
           <Route index element={<Home/>}/>
-          <Route path="CORfinder" element={<Centerfinding/>}/>
+          <Route path="corfinder" element={<Centerfinding/>}/>
         </Route>
 
       </Routes>
