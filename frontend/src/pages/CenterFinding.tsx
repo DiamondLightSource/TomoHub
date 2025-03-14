@@ -28,6 +28,7 @@ import apiClient from "../api/client";
 import { imageService } from "../api/services";
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import Loader from '../components/Loader'
+import { useCenter } from "../contexts/CenterContext";
 
 const CenterFinding = () => {
   // State for form inputs
@@ -51,6 +52,7 @@ const CenterFinding = () => {
 
   // Get the loader context
   const loaderContext = useLoader();
+  const { setSelectedCenter } = useCenter(); // Access the context
 
   // Update center values when centerImages changes
   useEffect(() => {
@@ -157,6 +159,19 @@ const CenterFinding = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Handle center selection
+  const handleCenterSelection = () => {
+    if (centerValues.length > 0) {
+      const selectedCenter = Number(centerValues[currentCenterIndex]); // Convert to number
+      setSelectedCenter(selectedCenter); // Update the context state
+      setSnackbar({
+        open: true,
+        message: `Center value ${selectedCenter} selected!`,
+        severity: "success",
+      });
     }
   };
 
@@ -378,6 +393,15 @@ const CenterFinding = () => {
                     aria-labelledby="center-slider"
                   />
                 </Box>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleCenterSelection}
+                  disabled={centerValues.length === 0}
+                  sx={{ mt: 2 }}
+                >
+                  Select Center
+                </Button>
               </CardContent>
             </Card>
           ) : (

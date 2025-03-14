@@ -5,6 +5,7 @@ import { MethodsProvider } from "../contexts/MethodsContext";
 import { SweepProvider } from "../contexts/SweepContext";
 import { AccordionExpansionProvider } from "../contexts/AccordionExpansionContext";
 import { LoaderProvider } from "../contexts/LoaderContext";
+import { CenterProvider } from "../contexts/CenterContext"; 
 import { Box, CssBaseline, Paper, styled } from "@mui/material";
 import Footer from "./Footer";
 import Header from "./Header";
@@ -48,19 +49,21 @@ const Layout = () => {
         <SweepProvider>
           <AccordionExpansionProvider>
             <MethodsProvider>
-              <CssBaseline />
-              <AppContainer>
-                <MainContainer>
-                <LeftSection component="section" className="left-section">
-                <Header />
-                <Outlet/>
-                </LeftSection>
-                  <RightSection component="section" className="right-section">
-                    <Pipeline />
-                  </RightSection>
-                </MainContainer>
-                <Footer />
-              </AppContainer>
+              <CenterProvider> 
+                <CssBaseline />
+                <AppContainer>
+                  <MainContainer>
+                    <LeftSection component="section" className="left-section">
+                      <Header />
+                      <Outlet/>
+                    </LeftSection>
+                    <RightSection component="section" className="right-section">
+                      <Pipeline />
+                    </RightSection>
+                  </MainContainer>
+                  <Footer />
+                </AppContainer>
+              </CenterProvider>
             </MethodsProvider>
           </AccordionExpansionProvider>
         </SweepProvider>
