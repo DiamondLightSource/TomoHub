@@ -68,12 +68,6 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
     selectedCenter===0 ? 'auto' : 'manual'
   ); // Track the toggle state
 
-  // Automatically trigger onChange whenever the context state updates in manual mode
-  useEffect(() => {
-    if (centerMode === 'manual') {
-      onChange(selectedCenter); // Trigger onChange with the updated context value
-    }
-  }, [selectedCenter]);
 
   // Check if a sweep is active for a different parameter
   const isSweepActiveForOtherParam = activeSweep && (activeSweep.methodId !== methodId || activeSweep.paramName !== paramName);
@@ -93,7 +87,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
 
   // Automatically trigger onChange whenever the context state updates in manual mode
   useEffect(() => {
-    if (centerMode === 'manual') {
+    if (centerMode === 'manual' && paramName === 'center') {
       onChange(selectedCenter); // Trigger onChange with the updated context value
     }
   }, [selectedCenter]);
@@ -313,6 +307,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
                 variant="outlined"
                 size="small"
                 fullWidth
+                disabled={!isEnabled} 
                 sx={{ mt: 2 }}
                 helperText="Enter the manual center value"
               />
