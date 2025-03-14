@@ -53,11 +53,11 @@ const Layout = () => {
                 <CssBaseline />
                 <AppContainer>
                   <MainContainer>
-                    <LeftSection component="section" className="left-section">
+                    <LeftSection as="section" className="left-section">
                       <Header />
                       <Outlet/>
                     </LeftSection>
-                    <RightSection component="section" className="right-section">
+                    <RightSection as="section" className="right-section">
                       <Pipeline />
                     </RightSection>
                   </MainContainer>

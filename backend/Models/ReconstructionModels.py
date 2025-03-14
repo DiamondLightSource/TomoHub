@@ -5,6 +5,7 @@ class ReconstructionResponse(BaseModel):
     message: str
     output_dir: Optional[str] = None
     center_images: Dict[str, str] = {}
+    temp_dir: Optional[str] = None
 
 class SweepRange:
     def __init__(self, start, stop, step):

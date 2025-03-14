@@ -176,7 +176,8 @@ async def reconstruction(
         return ReconstructionResponse(
             message=f"Reconstruction completed successfully. Algorithm: {algorithm}, Range: {start}-{stop} (step {step})",
             output_dir=output_dir,
-            center_images=center_images
+            center_images=center_images,
+            temp_dir=temp_dir
         )
         
     except Exception as e:
@@ -204,3 +205,35 @@ async def get_image(path: str = Query(...)):
         media_type = "image/tiff"
     
     return FileResponse(path, media_type=media_type)
+
+@reconstruction_router.delete("/reconstruction/tempdir")
+async def delete_temp_dirs():
+    """
+    Deletes all temporary directories in /tmp that start with 'centre_reconstruction_'.
+    """
+    try:
+        # Path to the /tmp directory
+        tmp_dir = "/tmp"
+        
+        # Find all directories starting with 'centre_reconstruction_'
+        dirs_to_delete = [
+            os.path.join(tmp_dir, d) for d in os.listdir(tmp_dir)
+            if d.startswith("centre_reconstruction_") and os.path.isdir(os.path.join(tmp_dir, d))
+        ]
+        
+        if not dirs_to_delete:
+            return JSONResponse(content={"message": "No directories to delete."})
+        
+        # Delete each directory
+        import shutil
+        for dir_path in dirs_to_delete:
+            shutil.rmtree(dir_path)
+            print(f"Deleted temporary directory: {dir_path}")
+        
+        return JSONResponse(content={"message": f"Deleted {len(dirs_to_delete)} directories successfully."})
+    
+    except Exception as e:
+        import traceback
+        error_detail = f"Error: {str(e)}\n{traceback.format_exc()}"
+        print(error_detail)
+        raise HTTPException(status_code=500, detail=error_detail)

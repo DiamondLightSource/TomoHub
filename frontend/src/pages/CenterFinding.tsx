@@ -119,6 +119,9 @@ const CenterFinding = () => {
     setCenterValues([]);
   
     try {
+      await apiClient.delete("/reconstruction/tempdir");
+      console.log("Deleted old temporary directories.");
+      
       // Create form data to send the file and other values
       const formData = new FormData();
       formData.append("file", file);
