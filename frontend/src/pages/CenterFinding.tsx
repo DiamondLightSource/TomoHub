@@ -251,8 +251,6 @@ const CenterFinding = () => {
                     size="small"
                   >
                     <MenuItem value="fbp">FBP</MenuItem>
-                    <MenuItem value="art">ART</MenuItem>
-                    <MenuItem value="bart">BART</MenuItem>
                     <MenuItem value="gridrec">Gridrec</MenuItem>
                   </Select>
                 </FormControl>
