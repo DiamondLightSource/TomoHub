@@ -23,6 +23,10 @@ async def reconstruction(
     step: int = Form(...),
     loader_context: str = Form(...)
 ):
+    print(f"File: {file.filename}")
+    print(f"Algorithm: {algorithm}")
+    print(f"Start: {start}, Stop: {stop}, Step: {step}")
+    print(f"Loader Context: {loader_context}")
     try:
         # Parse the loader context
         loader_data = json.loads(loader_context)
@@ -173,11 +177,26 @@ async def reconstruction(
         
         print(f"Created mapping of center values to PNG files: {center_images}")
         print(center_images)
+
+        # Add this code before returning the ReconstructionResponse
+        job_data = {
+            "start": start,
+            "stop": stop,
+            "step": step,
+            "filename": file.filename,
+            "center_images": center_images,  # Store the center_images dictionary
+        }
+
+        job_data_path = os.path.join(temp_dir, "job_data.json")
+        with open(job_data_path, "w") as f:
+            json.dump(job_data, f, indent=4)
+        print(f"Saved job data to: {job_data_path}")
+
         return ReconstructionResponse(
             message=f"Reconstruction completed successfully. Algorithm: {algorithm}, Range: {start}-{stop} (step {step})",
             output_dir=output_dir,
             center_images=center_images,
-            temp_dir=temp_dir
+            temp_dir=temp_dir,
         )
         
     except Exception as e:
@@ -232,6 +251,39 @@ async def delete_temp_dirs():
         
         return JSONResponse(content={"message": f"Deleted {len(dirs_to_delete)} directories successfully."})
     
+    except Exception as e:
+        import traceback
+        error_detail = f"Error: {str(e)}\n{traceback.format_exc()}"
+        print(error_detail)
+        raise HTTPException(status_code=500, detail=error_detail)
+
+@reconstruction_router.get("/reconstruction/previous")
+async def get_previous_job():
+    """
+    Checks for any directory in /tmp starting with 'reconstruction_' and returns the job data.
+    """
+    try:
+        tmp_dir = "/tmp"
+        dirs = [
+            os.path.join(tmp_dir, d) for d in os.listdir(tmp_dir)
+            if d.startswith("centre_reconstruction_") and os.path.isdir(os.path.join(tmp_dir, d))
+        ]
+
+        if not dirs:
+            return JSONResponse(content={"message": "No previous job found."}, status_code=404)
+
+        # Use the first directory found
+        latest_dir = dirs[0]
+        job_data_path = os.path.join(latest_dir, "job_data.json")
+
+        if not os.path.exists(job_data_path):
+            return JSONResponse(content={"message": "Job data file not found."}, status_code=404)
+
+        with open(job_data_path, "r") as f:
+            job_data = json.load(f)
+
+        return JSONResponse(content=job_data)
+
     except Exception as e:
         import traceback
         error_detail = f"Error: {str(e)}\n{traceback.format_exc()}"

@@ -65,3 +65,18 @@ export const imageService = {
     return `${apiClient.defaults.baseURL}/api/reconstruction/image?path=${encodeURIComponent(path)}`;
   }
 }
+
+export const reconstructionService = {
+  getPreviousJob: async (): Promise<any> => {
+    try {
+      const response = await apiClient.get('/reconstruction/previous');
+      return response.data;
+    } catch (error) {
+      if (error.response?.status === 404) {
+        // No previous job found, not an error
+        return null;
+      }
+      throw error;
+    }
+  },
+};

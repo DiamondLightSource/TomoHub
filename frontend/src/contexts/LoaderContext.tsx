@@ -48,6 +48,7 @@ interface LoaderContextType {
   setDetectorX: (preview: PreviewType | null) => void; // Changed to accept null
   setDetectorY: (preview: PreviewType | null) => void; // Changed to accept null
   removePreview: () => void;
+  isContextValid: () => boolean; // Add this new function
 }
 
 const LoaderContext = createContext<LoaderContextType | undefined>(undefined);
@@ -152,6 +153,49 @@ export const LoaderProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     });
   };
 
+  // Add this function to validate the loader context
+  const isContextValid = (): boolean => {
+    // Check if data_path exists and is not empty
+    const hasDataPath = parameters.data_path.trim() !== '';
+    
+    // Check if rotation_angles is properly set
+    const hasRotationAnglesPath = 
+      parameters.rotation_angles?.data_path && 
+      parameters.rotation_angles.data_path.trim() !== '';
+      
+    const hasUserDefinedAngles = 
+      parameters.rotation_angles?.user_defined &&
+      parameters.rotation_angles.user_defined.start_angle.trim() !== '' &&
+      parameters.rotation_angles.user_defined.stop_angle.trim() !== '' &&
+      parameters.rotation_angles.user_defined.angles_total.trim() !== '';
+    
+    const hasRotationAngles = hasRotationAnglesPath || hasUserDefinedAngles;
+    
+    // Check if either image_key_path OR (darks AND flats) are set
+    const hasImageKeyPath = 
+      parameters.image_key_path !== undefined && 
+      parameters.image_key_path.trim() !== '';
+    
+    const hasDarks = 
+      parameters.darks !== undefined && 
+      parameters.darks.file !== undefined &&
+      parameters.darks.file.trim() !== '' &&
+      parameters.darks.data_path !== undefined &&
+      parameters.darks.data_path.trim() !== '';
+      
+    const hasFlats = 
+      parameters.flats !== undefined && 
+      parameters.flats.file !== undefined &&
+      parameters.flats.file.trim() !== '' &&
+      parameters.flats.data_path !== undefined &&
+      parameters.flats.data_path.trim() !== '';
+    
+    const hasDarksAndFlats = hasDarks && hasFlats;
+    
+    // Return true only if all minimum requirements are met
+    return !!hasDataPath && !!hasRotationAngles && (!!hasImageKeyPath || !!hasDarksAndFlats);
+  };
+
   return (
     <LoaderContext.Provider
       value={{
@@ -167,7 +211,8 @@ export const LoaderProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         removeDarksAndFlats,
         setDetectorX, // Updated from setPreviewX to setDetectorX
         setDetectorY, // Updated from setPreviewY to setDetectorY
-        removePreview
+        removePreview,
+        isContextValid // Add the validation function to the context
       }}
     >
       {children}

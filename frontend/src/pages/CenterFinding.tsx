@@ -20,12 +20,13 @@ import {
   Typography,
   SelectChangeEvent,
   Snackbar,
+  Tooltip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useLoader } from "../contexts/LoaderContext";
 import apiClient from "../api/client";
-import { imageService } from "../api/services";
+import { imageService, reconstructionService } from "../api/services";
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import Loader from '../components/Loader'
 import { useCenter } from "../contexts/CenterContext";
@@ -49,6 +50,9 @@ const CenterFinding = () => {
   const [centerValues, setCenterValues] = useState<string[]>([]);
   const [currentCenterIndex, setCurrentCenterIndex] = useState(0);
   const [currentImagePath, setCurrentImagePath] = useState("");
+
+  // Add state for previous job info
+  const [previousFileName, setPreviousFileName] = useState<string | null>(null);
 
   // Get the loader context
   const loaderContext = useLoader();
@@ -76,6 +80,39 @@ const CenterFinding = () => {
     }
   }, [currentCenterIndex, centerValues, centerImages]);
 
+  // Check for previous job data on component mount
+  useEffect(() => {
+    const checkPreviousJob = async () => {
+      try {
+        const previousJob = await reconstructionService.getPreviousJob();
+        if (previousJob) {
+          console.log("Found previous job:", previousJob);
+          
+          // Update form parameters
+          setStart(previousJob.start);
+          setStop(previousJob.stop);
+          setStep(previousJob.step);
+          
+          // Store the file name (we don't have the actual File object)
+          setPreviousFileName(previousJob.filename);
+          
+          // Load center images
+          setCenterImages(previousJob.center_images);
+          
+          setSnackbar({
+            open: true,
+            message: "Previous reconstruction results loaded successfully!",
+            severity: "info"
+          });
+        }
+      } catch (error) {
+        console.error("Error checking for previous job:", error);
+      }
+    };
+    
+    checkPreviousJob();
+  }, []); // Empty dependency array ensures this runs only once on mount
+
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -100,7 +137,7 @@ const CenterFinding = () => {
     }
     setSnackbar({ ...snackbar, open: false });
   };
-  
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -109,6 +146,16 @@ const CenterFinding = () => {
       setSnackbar({
         open: true,
         message: "Please select a file",
+        severity: "error"
+      });
+      return;
+    }
+    
+    // Add loader validation check
+    if (!loaderContext || !loaderContext.isContextValid()) {
+      setSnackbar({
+        open: true,
+        message: "Please configure the loader properly before starting your reconstruction.",
         severity: "error"
       });
       return;
@@ -233,9 +280,10 @@ const CenterFinding = () => {
                       accept=".h5,.hdf5,.nxs,.tif,.tiff"
                     />
                   </Button>
-                  {file && (
+                  {(file || previousFileName) && (
                     <Typography variant="body2" color="text.secondary">
-                      Selected: {file.name}
+                      Selected: {file ? file.name : previousFileName}
+                      {!file && previousFileName && " (previous job)"}
                     </Typography>
                   )}
                 </Box>
@@ -258,41 +306,61 @@ const CenterFinding = () => {
                 {/* Start, Stop, Step Inputs */}
                 <Grid container spacing={2} sx={{ mb: 3 }}>
                   <Grid item xs={4}>
-                    <TextField
-                      label="Start"
-                      type="number"
-                      value={start}
-                      onChange={(e) => setStart(Number(e.target.value))}
-                      fullWidth
-                      size="small"
-                      inputProps={{ min: 0 }}
-                    />
+                    <Tooltip
+                      title={start < 0 ? "Must be ≥ 0" : ""}
+                      open={start < 0}
+                      placement="bottom"
+                      arrow
+                    >
+                      <TextField
+                        label="Start"
+                        type="number"
+                        value={start}
+                        onChange={(e) => setStart(Number(e.target.value))}
+                        fullWidth
+                        size="small"
+                        inputProps={{ min: 0 }}
+                        error={start < 0}
+                      />
+                    </Tooltip>
                   </Grid>
                   <Grid item xs={4}>
-                    <TextField
-                      label="Stop"
-                      type="number"
-                      value={stop}
-                      onChange={(e) => setStop(Number(e.target.value))}
-                      fullWidth
-                      size="small"
-                      inputProps={{ min: start + step }}
-                      error={stop <= start}
-                      helperText={stop <= start ? "Must be > Start" : ""}
-                    />
+                    <Tooltip
+                      title={stop <= start ? "Must be > Start" : ""}
+                      open={stop <= start}
+                      placement="bottom"
+                      arrow
+                    >
+                      <TextField
+                        label="Stop"
+                        type="number"
+                        value={stop}
+                        onChange={(e) => setStop(Number(e.target.value))}
+                        fullWidth
+                        size="small"
+                        inputProps={{ min: start + step }}
+                        error={stop <= start}
+                      />
+                    </Tooltip>
                   </Grid>
                   <Grid item xs={4}>
-                    <TextField
-                      label="Step"
-                      type="number"
-                      value={step}
-                      onChange={(e) => setStep(Number(e.target.value))}
-                      fullWidth
-                      size="small"
-                      inputProps={{ min: 1 }}
-                      error={step <= 0}
-                      helperText={step <= 0 ? "Must be > 0" : ""}
-                    />
+                    <Tooltip
+                      title={step <= 0 ? "Must be > 0" : ""}
+                      open={step <= 0}
+                      placement="bottom"
+                      arrow
+                    >
+                      <TextField
+                        label="Step"
+                        type="number"
+                        value={step}
+                        onChange={(e) => setStep(Number(e.target.value))}
+                        fullWidth
+                        size="small"
+                        inputProps={{ min: 1 }}
+                        error={step <= 0}
+                      />
+                    </Tooltip>
                   </Grid>
                 </Grid>
 
@@ -302,7 +370,10 @@ const CenterFinding = () => {
                   variant="contained"
                   color="primary"
                   fullWidth
-                  disabled={isLoading || !file || stop <= start || step <= 0 || !loaderContext}
+                  disabled={
+                    isLoading || 
+                    ((!file && !previousFileName) || stop <= start || step <= 0 || !loaderContext)
+                  }
                   sx={{ mb: 2 }}
                 >
                   {isLoading ? (
@@ -434,7 +505,7 @@ const CenterFinding = () => {
       {/* Remove the Alert component and add Snackbar at the end */}
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={6000}
+        autoHideDuration={5000}
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       >
