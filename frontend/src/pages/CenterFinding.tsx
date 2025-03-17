@@ -26,7 +26,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { useLoader } from "../contexts/LoaderContext";
 import apiClient from "../api/client";
-import { imageService, reconstructionService } from "../api/services";
+import { reconstructionService } from "../api/services";
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import Loader from '../components/Loader'
 import { useCenter } from "../contexts/CenterContext";
@@ -422,7 +422,7 @@ const CenterFinding = () => {
                   >
                     {currentImagePath ? (
                       <img
-                        src={imageService.getImageUrl(currentImagePath)}
+                        src={reconstructionService.getImageUrl(currentImagePath)}
                         alt={`Reconstruction with center ${centerValues[currentCenterIndex]}`}
                         style={{ 
                           maxWidth: '100%', 

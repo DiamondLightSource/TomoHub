@@ -55,15 +55,9 @@ export const methodsService = {
 };
 export const fullpipelinesService = {
   getFullPipelines: async (): Promise<ApiFullPipelineSchema> => {
-    const response = await apiClient.get('/fullpipelines');
+    const response = await apiClient.get('/methods/fullpipelines');
     return response.data;
   },
-}
-
-export const imageService = {
-  getImageUrl: (path: string): string => {
-    return `${apiClient.defaults.baseURL}/api/reconstruction/image?path=${encodeURIComponent(path)}`;
-  }
 }
 
 export const reconstructionService = {
@@ -79,4 +73,18 @@ export const reconstructionService = {
       throw error;
     }
   },
+  getImageUrl: (path: string): string => {
+    return `${apiClient.defaults.baseURL}/api/reconstruction/image?path=${encodeURIComponent(path)}`;
+  }
 };
+
+
+export const yamlService = {
+  generateYaml: async (requestData: any): Promise<Blob> => {
+    const response = await apiClient.post('/yaml/generate', requestData, {
+      responseType: 'blob',
+    });
+    return response.data;
+  },
+};
+

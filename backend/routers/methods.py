@@ -5,7 +5,10 @@ from typing import Dict, List
 from Models.MethodsTemplate import AllTemplates
 from httomo_backends.scripts.json_pipelines_generator import process_all_yaml_files
 
-methods_router = APIRouter()
+methods_router = APIRouter(
+    prefix="/methods",
+    tags=["methods"],
+)
 
 def get_methods_templates(module_methods: Dict[str, List[str]]) -> Dict:
     """
@@ -40,7 +43,7 @@ def create_category_endpoint(category: str):
 # Register all category endpoints
 for category in METHOD_CATEGORIES.keys():
     endpoint = create_category_endpoint(category)
-    methods_router.get(f"/methods/{category}", response_model=AllTemplates)(endpoint)
+    methods_router.get(f"/{category}", response_model=AllTemplates)(endpoint)
 
 @methods_router.get("/fullpipelines")
 async def get_full_pipelines():
@@ -50,7 +53,7 @@ async def get_full_pipelines():
         raise HTTPException(status_code=500, detail=str(e))
 
 # Main endpoint for all methods
-@methods_router.get("/methods", response_model=AllTemplates)
+@methods_router.get("/", response_model=AllTemplates)
 async def get_all_methods():
     try:
         all_templates = {}

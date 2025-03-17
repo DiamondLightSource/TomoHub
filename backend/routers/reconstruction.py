@@ -10,11 +10,14 @@ from fastapi import UploadFile, Form, HTTPException, Query, APIRouter
 import subprocess
 from Models.ReconstructionModels import ReconstructionResponse, SweepRange, sweep_range_representer  # Import the models
 
-reconstruction_router = APIRouter()
+reconstruction_router = APIRouter(
+    prefix="/reconstruction",
+    tags=["reconstruction"],
+)
 
 yaml.add_representer(SweepRange, sweep_range_representer)
 
-@reconstruction_router.post("/reconstruction/centre", response_model=ReconstructionResponse)
+@reconstruction_router.post("/centre", response_model=ReconstructionResponse)
 async def reconstruction(
     file: UploadFile,
     algorithm: str = Form(...),
@@ -205,7 +208,7 @@ async def reconstruction(
         print(error_detail)
         raise HTTPException(status_code=500, detail=error_detail)
 
-@reconstruction_router.get("/reconstruction/image")
+@reconstruction_router.get("/image")
 async def get_image(path: str = Query(...)):
     if not os.path.exists(path):
         raise HTTPException(status_code=404, detail="Image not found")
@@ -225,7 +228,7 @@ async def get_image(path: str = Query(...)):
     
     return FileResponse(path, media_type=media_type)
 
-@reconstruction_router.delete("/reconstruction/tempdir")
+@reconstruction_router.delete("/tempdir")
 async def delete_temp_dirs():
     """
     Deletes all temporary directories in /tmp that start with 'centre_reconstruction_'.
@@ -257,7 +260,7 @@ async def delete_temp_dirs():
         print(error_detail)
         raise HTTPException(status_code=500, detail=error_detail)
 
-@reconstruction_router.get("/reconstruction/previous")
+@reconstruction_router.get("/previous")
 async def get_previous_job():
     """
     Checks for any directory in /tmp starting with 'reconstruction_' and returns the job data.
