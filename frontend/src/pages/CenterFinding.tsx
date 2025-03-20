@@ -44,7 +44,6 @@ const CenterFinding = () => {
     message: "",
     severity: "info" as "success" | "error" | "info" | "warning"
   });
-  
   // State for results
   const [centerImages, setCenterImages] = useState<Record<string, string>>({});
   const [centerValues, setCenterValues] = useState<string[]>([]);

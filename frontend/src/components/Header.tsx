@@ -1,5 +1,6 @@
-import { Typography, ButtonGroup, Button, Box } from '@mui/material';
+import { Typography, Button, Box } from '@mui/material';
 import React from 'react';
+
 
 function Header() {
 
@@ -16,6 +17,7 @@ function Header() {
       <Typography variant="h4" gutterBottom>
         TOMOHUB Demo - GUI for HTTOMO package
       </Typography>
+
     </Box>
   );
 }

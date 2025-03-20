@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 class ReconstructionResponse(BaseModel):
     message: str
@@ -20,4 +20,16 @@ def sweep_range_representer(dumper, data):
         "stop": data.stop,
         "step": data.step
     })
-    
+
+# New response models
+class MessageResponse(BaseModel):
+    """Simple message response"""
+    message: str
+
+class PreviousJobResponse(BaseModel):
+    """Response model for previous job data"""
+    start: int
+    stop: int
+    step: int
+    filename: str
+    center_images: Dict[str, str]

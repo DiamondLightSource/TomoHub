@@ -9,6 +9,8 @@ from fastapi.responses import JSONResponse
 from fastapi import UploadFile, Form, HTTPException, Query, APIRouter
 import subprocess
 from Models.ReconstructionModels import ReconstructionResponse, SweepRange, sweep_range_representer  # Import the models
+from Models.ReconstructionModels import ReconstructionResponse, MessageResponse, PreviousJobResponse
+from utils.deployment import restrict_endpoint
 
 reconstruction_router = APIRouter(
     prefix="/reconstruction",
@@ -18,6 +20,7 @@ reconstruction_router = APIRouter(
 yaml.add_representer(SweepRange, sweep_range_representer)
 
 @reconstruction_router.post("/centre", response_model=ReconstructionResponse)
+@restrict_endpoint(allow_local=True,allow_k8s=False)
 async def reconstruction(
     file: UploadFile,
     algorithm: str = Form(...),
@@ -209,6 +212,7 @@ async def reconstruction(
         raise HTTPException(status_code=500, detail=error_detail)
 
 @reconstruction_router.get("/image")
+@restrict_endpoint(allow_local=True,allow_k8s=False)
 async def get_image(path: str = Query(...)):
     if not os.path.exists(path):
         raise HTTPException(status_code=404, detail="Image not found")
@@ -228,7 +232,8 @@ async def get_image(path: str = Query(...)):
     
     return FileResponse(path, media_type=media_type)
 
-@reconstruction_router.delete("/tempdir")
+@reconstruction_router.delete("/tempdir", response_model=MessageResponse)
+@restrict_endpoint(allow_local=True,allow_k8s=False)
 async def delete_temp_dirs():
     """
     Deletes all temporary directories in /tmp that start with 'centre_reconstruction_'.
@@ -252,7 +257,7 @@ async def delete_temp_dirs():
             shutil.rmtree(dir_path)
             print(f"Deleted temporary directory: {dir_path}")
         
-        return JSONResponse(content={"message": f"Deleted {len(dirs_to_delete)} directories successfully."})
+        return MessageResponse(message=f"Deleted {len(dirs_to_delete)} directories successfully.")
     
     except Exception as e:
         import traceback
@@ -260,7 +265,8 @@ async def delete_temp_dirs():
         print(error_detail)
         raise HTTPException(status_code=500, detail=error_detail)
 
-@reconstruction_router.get("/previous")
+@reconstruction_router.get("/previous", response_model=PreviousJobResponse)
+@restrict_endpoint(allow_local=True,allow_k8s=False)
 async def get_previous_job():
     """
     Checks for any directory in /tmp starting with 'reconstruction_' and returns the job data.
@@ -285,7 +291,7 @@ async def get_previous_job():
         with open(job_data_path, "r") as f:
             job_data = json.load(f)
 
-        return JSONResponse(content=job_data)
+        return job_data
 
     except Exception as e:
         import traceback

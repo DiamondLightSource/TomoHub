@@ -1,11 +1,13 @@
 import { useMethods } from '../contexts/MethodsContext';
-import { Button, Box, Alert } from '@mui/material';
+import { Button, Box, Alert, ButtonGroup } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import React, { useState } from 'react';
 import DownloadIcon from '@mui/icons-material/Download';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { useLoader } from '../contexts/LoaderContext';
 import { useSweep } from '../contexts/SweepContext';
 import { yamlService } from '../api/services';
+import useDeployment from '../hooks/useDeployment';
 
 const YMLG = () => {
   const { methods } = useMethods();
@@ -14,7 +16,8 @@ const YMLG = () => {
   const { activeSweep } = useSweep();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const { isLocal } = useDeployment();
+  console.log(isLocal)
   const changeFileName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setYamlFileName(event.target.value);
   };
@@ -97,30 +100,56 @@ const YMLG = () => {
       setIsLoading(false);
     }
   };
+  
+  const runLocalHTTOMO = async () => {
+    // TODO: Implement local HTTOMO execution
+    alert('Running HTTOMO locally - functionality to be implemented');
+  };
+  
+  const runClusterHTTOMO = async () => {
+    // TODO: Implement cluster HTTOMO execution
+    alert('Running HTTOMO on cluster - functionality to be implemented');
+  };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 10 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 10 }}>
       {error && <Alert severity="error">{error}</Alert>}
       
-      <Box sx={{ display: 'flex', gap: 2 }}>
+      <Box sx={{ display: 'flex', gap: 1 }}>
         <TextField
           id="standard-basic"
           label="Select a name for your config file"
-          sx={{ flex: 1.5 }}
+          sx={{ flex: 2.5 }}
           variant="standard"
           value={yamlFileName}
           onChange={changeFileName}
         />
-        <Button
-          variant="contained"
-          startIcon={<DownloadIcon />}
-          onClick={generateAndDownloadYAML}
-          sx={{ flex: 1 }}
-          size="large"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Generating...' : 'Get Config'}
-        </Button>
+        <ButtonGroup variant="contained" aria-label="Basic button group">
+          <Button
+            startIcon={<DownloadIcon />}
+            onClick={generateAndDownloadYAML}
+            size="small"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Generating...' : 'Get Config'}
+          </Button>
+          <Button
+            startIcon={<PlayArrowIcon />}
+            onClick={runLocalHTTOMO}
+            size="small"
+            disabled={!isLocal} // Enable only in local mode
+          >
+            Run HTTOMO (local)
+          </Button>
+          <Button
+            startIcon={<PlayArrowIcon />}
+            onClick={runClusterHTTOMO}
+            size="small"
+            disabled={!isLocal} // Enable only in local mode
+          >
+            Run HTTOMO (cluster)
+          </Button>
+        </ButtonGroup>
       </Box>
     </Box>
   );

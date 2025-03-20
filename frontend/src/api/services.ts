@@ -74,7 +74,7 @@ export const reconstructionService = {
     }
   },
   getImageUrl: (path: string): string => {
-    return `${apiClient.defaults.baseURL}/api/reconstruction/image?path=${encodeURIComponent(path)}`;
+    return `${apiClient.defaults.baseURL}/reconstruction/image?path=${encodeURIComponent(path)}`;
   }
 };
 
@@ -84,6 +84,13 @@ export const yamlService = {
     const response = await apiClient.post('/yaml/generate', requestData, {
       responseType: 'blob',
     });
+    return response.data;
+  },
+};
+
+export const systemService = {
+  getDeploymentMode: async (): Promise<{mode: string}> => {
+    const response = await apiClient.get('/system/deployment');
     return response.data;
   },
 };

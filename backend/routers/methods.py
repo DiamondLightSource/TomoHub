@@ -4,6 +4,7 @@ from utils.generator import generate_method_template
 from typing import Dict, List
 from Models.MethodsTemplate import AllTemplates
 from httomo_backends.scripts.json_pipelines_generator import process_all_yaml_files
+from utils.deployment import restrict_endpoint
 
 methods_router = APIRouter(
     prefix="/methods",
