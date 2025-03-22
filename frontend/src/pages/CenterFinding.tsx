@@ -30,6 +30,7 @@ import { reconstructionService } from "../api/services";
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import Loader from '../components/Loader'
 import { useCenter } from "../contexts/CenterContext";
+import LogViewer from '../components/LogViewer';
 
 const CenterFinding = () => {
   // State for form inputs
@@ -56,6 +57,9 @@ const CenterFinding = () => {
   // Get the loader context
   const loaderContext = useLoader();
   const { setSelectedCenter } = useCenter(); // Access the context
+
+  // Add these new state variables with your other state
+  const [logPath, setLogPath] = useState<string | null>(null);
 
   // Update center values when centerImages changes
   useEffect(() => {
@@ -97,6 +101,12 @@ const CenterFinding = () => {
           
           // Load center images
           setCenterImages(previousJob.center_images);
+          
+          // Set the log path to display logs from previous run
+          if (previousJob.log_path) {
+            setLogPath(previousJob.log_path);
+            console.log("Restored log path from previous job:", previousJob.log_path);
+          }
           
           setSnackbar({
             open: true,
@@ -163,6 +173,7 @@ const CenterFinding = () => {
     setIsLoading(true);
     setCenterImages({});
     setCenterValues([]);
+    setLogPath(null); // Reset log path
   
     try {
       await apiClient.delete("/reconstruction/tempdir");
@@ -182,23 +193,93 @@ const CenterFinding = () => {
         throw new Error("Loader context is not available");
       }
 
+      // First, start the reconstruction process
       const response = await apiClient.post("/api/reconstruction/centre", formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      console.log("Reconstruction response:", response.data);
-      
-      setSnackbar({
-        open: true,
-        message: response.data.message || "Reconstruction completed successfully!",
-        severity: "success"
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
       
-      if (response.data.center_images) {
-        setCenterImages(response.data.center_images);
+      console.log("Reconstruction started:", response.data);
+      
+      // Save temp_dir and filename for status checking
+      const tempDir = response.data.temp_dir;
+      const jobFilename = response.data.filename || file.name; // Get filename from response or use the original file
+      
+      // Find the log file path using temp_dir
+      const findLogResponse = await apiClient.get("/api/reconstruction/find-log", {
+        params: { temp_dir: tempDir }
+      });
+      
+      if (findLogResponse.data.found || findLogResponse.data.log_path) {
+        console.log("Log path:", findLogResponse.data.log_path);
+        setLogPath(findLogResponse.data.log_path);
+      } else {
+        // If log file isn't found immediately, try again in a short while
+        const findLogInterval = setInterval(async () => {
+          try {
+            const retryLogResponse = await apiClient.get("/api/reconstruction/find-log", {
+              params: { temp_dir: tempDir }
+            });
+            
+            if (retryLogResponse.data.found || retryLogResponse.data.log_path) {
+              console.log("Found log file:", retryLogResponse.data.log_path);
+              setLogPath(retryLogResponse.data.log_path);
+              clearInterval(findLogInterval);
+            }
+          } catch (error) {
+            console.error("Error finding log:", error);
+          }
+        }, 500);
+        
+        // Auto-clear after 10 seconds to avoid leaking intervals
+        setTimeout(() => clearInterval(findLogInterval), 10000);
       }
+      
+      
+      // Start polling for completion
+      const checkInterval = setInterval(async () => {
+        try {
+          console.log("Checking job status for:", tempDir);
+          const statusResponse = await apiClient.get("/reconstruction/job-status", {
+            params: { 
+              temp_dir: tempDir,
+              start: start,     // Pass the center parameters
+              stop: stop,
+              step: step,
+              filename: jobFilename, // Add the filename parameter here
+            }
+          });
+          
+          console.log("Job status:", statusResponse.data);
+          
+          if (statusResponse.data.status === "completed") {
+            console.log("Job complete! Images:", statusResponse.data.images);
+            
+            // Update UI with results
+            setCenterImages(statusResponse.data.images);
+            if (Object.keys(statusResponse.data.images).length > 0) {
+              // Set the center values and default to first image
+              const values = Object.keys(statusResponse.data.images)
+                .sort((a, b) => Number(a) - Number(b));
+              setCenterValues(values);
+              setCurrentCenterIndex(0);
+            }
+            
+            // IMPORTANT: Only set isLoading to false when job is complete
+            setIsLoading(false);
+            
+            setSnackbar({
+              open: true,
+              message: "Reconstruction completed successfully!",
+              severity: "success"
+            });
+            
+            clearInterval(checkInterval);
+          }
+        } catch (error) {
+          console.error("Error checking job status:", error);
+        }
+      }, 2000); // Check every 2 seconds
+      
     } catch (error) {
       console.error("Error submitting form:", error);
       setSnackbar({
@@ -206,9 +287,9 @@ const CenterFinding = () => {
         message: `Error: ${error instanceof Error ? error.message : "Unknown error occurred"}`,
         severity: "error"
       });
-    } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Only set to false on error
     }
+    // REMOVE the finally block that sets isLoading to false
   };
 
   // Handle center selection
@@ -390,6 +471,35 @@ const CenterFinding = () => {
         </Grid>
 
         <Grid item xs={12} md={8}>
+          {/* Log viewer - always rendered */}
+          <Card 
+            variant="outlined" 
+            sx={{
+              border: "1px solid #89987880",
+              borderRadius: "4px",
+              boxShadow: "none",
+              mb: 3
+            }}
+          >
+            <CardContent>
+              <Typography variant="h6" component="h2" gutterBottom>
+                Reconstruction Log
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              
+              <LogViewer 
+                logPath={logPath} 
+                isRunning={isLoading} 
+              />
+              
+              {!logPath && !isLoading && (
+                <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+                  Logs will appear here when reconstruction is running
+                </Typography>
+              )}
+            </CardContent>
+          </Card>
+          
           {/* Results Section with Slider */}
           {centerValues.length > 0 ? (
             <Card 
@@ -476,27 +586,29 @@ const CenterFinding = () => {
               </CardContent>
             </Card>
           ) : (
-            <Card 
-              variant="outlined" 
-              sx={{
-                border: "1px solid #89987880",
-                borderRadius: "4px",
-                boxShadow: "none",
-                height: '100%', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center'
-              }}
-            >
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Typography variant="h6" color="text.secondary" gutterBottom>
-                  No Results Yet
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Set parameters and start reconstruction to see results here
-                </Typography>
-              </CardContent>
-            </Card>
+            !isLoading && (
+              <Card 
+                variant="outlined" 
+                sx={{
+                  border: "1px solid #89987880",
+                  borderRadius: "4px",
+                  boxShadow: "none",
+                  height: '100%', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center'
+                }}
+              >
+                <CardContent sx={{ textAlign: 'center' }}>
+                  <Typography variant="h6" color="text.secondary" gutterBottom>
+                    No Results Yet
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Set parameters and start reconstruction to see results here
+                  </Typography>
+                </CardContent>
+              </Card>
+            )
           )}
         </Grid>
       </Grid>

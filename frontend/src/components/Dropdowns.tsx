@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Tabs, Tab, Box, Typography, Button } from "@mui/material";
+import { Card, Tabs, Tab, Box, Typography, Button, Tooltip } from "@mui/material";
 import Dropdown from "./Dropdown";
 import Loader from "./Loader";
 import Guide from "./Guide";
@@ -19,21 +19,24 @@ const Dropdowns: React.FC = () => {
     <Box sx={{ display: "flex", flexDirection: "column", mt: 5 }}>
       {/* Navigation container with button and tabs */}
       <Box sx={{ display: "flex", mb: 2 }}>
-        {/* CORfinder button - only shown in local mode */}
-        {isLocal && (
-          <Button 
-            component={Link} 
-            to="/corfinder"
-            variant="contained" 
-            startIcon={<ArchitectureIcon />}
-            sx={{ 
-              height: "fit-content",
-              ml:3
-            }}
-          >
-            COR finder
-          </Button>
-        )}
+        {/* CORfinder button - disabled in non-local mode with tooltip */}
+        <Tooltip title={!isLocal ? "This feature is only available in local deployment mode" : ""}>
+          <span> {/* Wrapper for tooltip on disabled button */}
+            <Button 
+              component={Link} 
+              to="/corfinder"
+              variant="contained" 
+              startIcon={<ArchitectureIcon />}
+              disabled={!isLocal}
+              sx={{ 
+                height: "fit-content",
+                ml: 3
+              }}
+            >
+              COR finder
+            </Button>
+          </span>
+        </Tooltip>
         
       </Box>
 

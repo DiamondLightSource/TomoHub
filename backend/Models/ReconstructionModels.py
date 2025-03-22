@@ -3,9 +3,10 @@ from typing import Dict, Optional, List
 
 class ReconstructionResponse(BaseModel):
     message: str
-    output_dir: Optional[str] = None
     center_images: Dict[str, str] = {}
-    temp_dir: Optional[str] = None
+    temp_dir: str
+    status: str = "completed"  # "running" or "completed"
+    filename: Optional[str] = None  # Make sure this field is included
 
 class SweepRange:
     def __init__(self, start, stop, step):
@@ -33,3 +34,4 @@ class PreviousJobResponse(BaseModel):
     step: int
     filename: str
     center_images: Dict[str, str]
+    log_path: str

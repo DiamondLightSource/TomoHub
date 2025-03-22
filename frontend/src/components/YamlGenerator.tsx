@@ -1,9 +1,15 @@
 import { useMethods } from '../contexts/MethodsContext';
-import { Button, Box, Alert, ButtonGroup } from '@mui/material';
+import { 
+  Button, Box, Alert, ButtonGroup, Tooltip, 
+  Paper, Typography, IconButton, Snackbar
+} from '@mui/material';
 import TextField from '@mui/material/TextField';
 import React, { useState } from 'react';
 import DownloadIcon from '@mui/icons-material/Download';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CloseIcon from '@mui/icons-material/Close';
 import { useLoader } from '../contexts/LoaderContext';
 import { useSweep } from '../contexts/SweepContext';
 import { yamlService } from '../api/services';
@@ -17,7 +23,36 @@ const YMLG = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { isLocal } = useDeployment();
-  console.log(isLocal)
+  
+  // New state variables for cluster commands
+  const [showClusterCommands, setShowClusterCommands] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+  
+  // Generate cluster commands based on current configuration
+  const getClusterCommands = () => {
+    return [
+      `# Log in to the cluster`,
+      `ssh wilson`,
+      ``,
+      `# Load httomo module`,
+      `module load httomo`,
+      ``,
+      `# Run HTTOMO with your configuration`,
+      `httomo_mpi [address to your data file] ${yamlFileName}.yaml [address to your output directory]`,
+      ].join('\n');
+  };
+  
+  // Function to handle copying command to clipboard
+  const handleCopyCommand = () => {
+    navigator.clipboard.writeText(getClusterCommands());
+    setCopySuccess(true);
+  };
+  
+  // Function to run HTTOMO on cluster (display commands)
+  const runClusterHTTOMO = () => {
+    setShowClusterCommands(true);
+  };
+  
   const changeFileName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setYamlFileName(event.target.value);
   };
@@ -106,16 +141,11 @@ const YMLG = () => {
     alert('Running HTTOMO locally - functionality to be implemented');
   };
   
-  const runClusterHTTOMO = async () => {
-    // TODO: Implement cluster HTTOMO execution
-    alert('Running HTTOMO on cluster - functionality to be implemented');
-  };
-
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 10 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 10 }}>
       {error && <Alert severity="error">{error}</Alert>}
       
-      <Box sx={{ display: 'flex', gap: 1 }}>
+      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
         <TextField
           id="standard-basic"
           label="Select a name for your config file"
@@ -124,6 +154,7 @@ const YMLG = () => {
           value={yamlFileName}
           onChange={changeFileName}
         />
+        
         <ButtonGroup variant="contained" aria-label="Basic button group">
           <Button
             startIcon={<DownloadIcon />}
@@ -135,22 +166,96 @@ const YMLG = () => {
           </Button>
           <Button
             startIcon={<PlayArrowIcon />}
-            onClick={runLocalHTTOMO}
-            size="small"
-            disabled={!isLocal} // Enable only in local mode
-          >
-            Run HTTOMO (local)
-          </Button>
-          <Button
-            startIcon={<PlayArrowIcon />}
             onClick={runClusterHTTOMO}
             size="small"
-            disabled={!isLocal} // Enable only in local mode
           >
             Run HTTOMO (cluster)
           </Button>
+          <Button
+            startIcon={<PlayArrowIcon />}
+            onClick={runLocalHTTOMO}
+            size="small"
+            disabled={!isLocal}
+          >
+            Run HTTOMO (local)
+          </Button>
+        
         </ButtonGroup>
+        
+        {!isLocal && (
+          <Tooltip title="Run HTTOMO only available in local mode">
+            <HelpOutlineIcon color="disabled" sx={{ ml: 1 }} />
+          </Tooltip>
+        )}
       </Box>
+      
+      {/* Cluster commands display box */}
+      {showClusterCommands && (
+        <Paper 
+          elevation={3} 
+          sx={{ 
+            p: 2, 
+            mt: 2, 
+            bgcolor: '#2b2b2b', 
+            color: '#f8f8f8',
+            position: 'relative',
+            fontFamily: 'monospace',
+            borderRadius: 1
+          }}
+        >
+          <Typography variant="subtitle2" sx={{ mb: 1, color: '#8bc34a' }}>
+            HPC Cluster Commands
+          </Typography>
+          
+          <Box sx={{ 
+            whiteSpace: 'pre-wrap',
+            overflow: 'auto',
+            maxHeight: '300px',
+            fontSize: '0.9rem',
+            py: 1
+          }}>
+            {getClusterCommands()}
+          </Box>
+          
+          <Box sx={{ position: 'absolute', top: 8, right: 8, display: 'flex' }}>
+            <Tooltip title="Copy to clipboard">
+              <IconButton 
+                size="small" 
+                onClick={handleCopyCommand}
+                sx={{ color: '#f8f8f8' }}
+              >
+                <ContentCopyIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Close">
+              <IconButton 
+                size="small" 
+                onClick={() => setShowClusterCommands(false)}
+                sx={{ color: '#f8f8f8' }}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Paper>
+      )}
+      
+      {/* Copy success notification */}
+      <Snackbar
+        open={copySuccess}
+        autoHideDuration={3000}
+        onClose={() => setCopySuccess(false)}
+        message="Commands copied to clipboard"
+        action={
+          <IconButton
+            size="small"
+            color="inherit"
+            onClick={() => setCopySuccess(false)}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        }
+      />
     </Box>
   );
 };
