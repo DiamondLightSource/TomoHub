@@ -101,7 +101,7 @@ const LogViewer: React.FC<LogViewerProps> = ({ logPath, isRunning }) => {
       elevation={3}
       sx={{
         p: 2,
-        maxHeight: '300px',
+        maxHeight: '400px',
         overflow: 'auto',
         bgcolor: '#1e1e1e',
         color: '#e0e0e0',
@@ -131,7 +131,7 @@ const LogViewer: React.FC<LogViewerProps> = ({ logPath, isRunning }) => {
       
       {logs.length === 0 ? (
         <Box sx={{ textAlign: 'center', color: '#888', py: 2 }}>
-          {isRunning ? "Waiting for log data..." : "No log data available"}
+          {isRunning ? "Waiting for log data..." : "No log data available, start the reconstruction to see the logs"}
         </Box>
       ) : (
         <Box sx={{ whiteSpace: 'pre-wrap' }}>

@@ -31,11 +31,13 @@ import MuiAlert, { AlertProps } from '@mui/material/Alert';
 import Loader from '../components/Loader'
 import { useCenter } from "../contexts/CenterContext";
 import LogViewer from '../components/LogViewer';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import BookmarkAddedIcon from '@mui/icons-material/BookmarkAdded';
 
 const CenterFinding = () => {
   // State for form inputs
   const [file, setFile] = useState<File | null>(null);
-  const [algorithm, setAlgorithm] = useState("fbp");
+  const [algorithm, setAlgorithm] = useState("gridrec");
   const [start, setStart] = useState(30);
   const [stop, setStop] = useState(200);
   const [step, setStep] = useState(10);
@@ -326,8 +328,11 @@ const CenterFinding = () => {
           Find the optimal center of rotation for your tomography data
         </Typography>
       </Box>
-      <Loader/>
-      <Grid container spacing={3}>
+      
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={8}>
+        <Loader/>
+        </Grid>
         <Grid item xs={12} md={4}>
           <Card 
             variant="outlined" 
@@ -341,11 +346,11 @@ const CenterFinding = () => {
               <Typography variant="h6" component="h2" gutterBottom>
                 Reconstruction Parameters
               </Typography>
-              <Divider sx={{ mb: 3 }} />
+              <Divider sx={{ mb: 1 }} />
               
               <form onSubmit={handleSubmit}>
                 {/* File Input */}
-                <Box sx={{ mb: 3 }}>
+                <Box sx={{ mb: 2 }}>
                   <Button
                     component="label"
                     variant="outlined"
@@ -369,7 +374,7 @@ const CenterFinding = () => {
                 </Box>
 
                 {/* Algorithm Selection */}
-                <FormControl fullWidth sx={{ mb: 3 }}>
+                <FormControl fullWidth sx={{ mb: 1 }}>
                   <InputLabel id="algorithm-select-label">Reconstruction Algorithm</InputLabel>
                   <Select
                     labelId="algorithm-select-label"
@@ -384,7 +389,7 @@ const CenterFinding = () => {
                 </FormControl>
 
                 {/* Start, Stop, Step Inputs */}
-                <Grid container spacing={2} sx={{ mb: 3 }}>
+                <Grid container spacing={2} sx={{ mb: 1 }}>
                   <Grid item xs={4}>
                     <Tooltip
                       title={start < 0 ? "Must be ≥ 0" : ""}
@@ -450,11 +455,12 @@ const CenterFinding = () => {
                   variant="contained"
                   color="primary"
                   fullWidth
+                  startIcon={<PlayArrowIcon />}
                   disabled={
                     isLoading || 
                     ((!file && !previousFileName) || stop <= start || step <= 0 || !loaderContext)
                   }
-                  sx={{ mb: 2 }}
+                  sx={{ mb: 1 }}
                 >
                   {isLoading ? (
                     <Stack direction="row" spacing={1} alignItems="center">
@@ -462,7 +468,7 @@ const CenterFinding = () => {
                       <span>Processing...</span>
                     </Stack>
                   ) : (
-                    "Start Reconstruction"
+                    "Find Centre"
                   )}
                 </Button>
               </form>
@@ -470,44 +476,16 @@ const CenterFinding = () => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} md={8}>
-          {/* Log viewer - always rendered */}
-          <Card 
-            variant="outlined" 
-            sx={{
-              border: "1px solid #89987880",
-              borderRadius: "4px",
-              boxShadow: "none",
-              mb: 3
-            }}
-          >
-            <CardContent>
-              <Typography variant="h6" component="h2" gutterBottom>
-                Reconstruction Log
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
-              
-              <LogViewer 
-                logPath={logPath} 
-                isRunning={isLoading} 
-              />
-              
-              {!logPath && !isLoading && (
-                <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
-                  Logs will appear here when reconstruction is running
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-          
-          {/* Results Section with Slider */}
+        <Grid item xs={12} md={12}>
+
           {centerValues.length > 0 ? (
             <Card 
               variant="outlined" 
               sx={{
                 border: "1px solid #89987880",
                 borderRadius: "4px",
-                boxShadow: "none"
+                boxShadow: "none",
+                mb:2
               }}
             >
               <CardContent>
@@ -550,15 +528,12 @@ const CenterFinding = () => {
                     )}
                   </Box>
                   <Typography variant="subtitle1" fontWeight="medium">
-                    Center Value: {centerValues[currentCenterIndex]}
+                    Centre Value: {centerValues[currentCenterIndex]}
                   </Typography>
                 </Box>
                 
                 {/* Slider Control */}
                 <Box sx={{ px: 2 }}>
-                  <Typography id="center-slider" gutterBottom>
-                    Center Value
-                  </Typography>
                   <Slider
                     value={currentCenterIndex}
                     onChange={handleSliderChange}
@@ -574,42 +549,31 @@ const CenterFinding = () => {
                     aria-labelledby="center-slider"
                   />
                 </Box>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleCenterSelection}
-                  disabled={centerValues.length === 0}
-                  sx={{ mt: 2 }}
-                >
-                  Select Center
-                </Button>
+
+                {/* Center the button */}
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleCenterSelection}
+                    disabled={centerValues.length === 0}
+                    startIcon={<BookmarkAddedIcon/>}
+                  >
+                    Select Centre
+                  </Button>
+                </Box>
               </CardContent>
             </Card>
-          ) : (
-            !isLoading && (
-              <Card 
-                variant="outlined" 
-                sx={{
-                  border: "1px solid #89987880",
-                  borderRadius: "4px",
-                  boxShadow: "none",
-                  height: '100%', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center'
-                }}
-              >
-                <CardContent sx={{ textAlign: 'center' }}>
-                  <Typography variant="h6" color="text.secondary" gutterBottom>
-                    No Results Yet
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Set parameters and start reconstruction to see results here
-                  </Typography>
-                </CardContent>
-              </Card>
-            )
-          )}
+          ) : ("")}
+
+
+              
+              <LogViewer 
+                logPath={logPath} 
+                isRunning={isLoading} 
+              />
+
+
         </Grid>
       </Grid>
 
