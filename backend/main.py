@@ -4,6 +4,7 @@ from routers.reconstruction import reconstruction_router
 from routers.methods import methods_router
 from routers.yaml import yaml_router
 from routers.system import system_router
+from routers.httomo import httomo_router
 from utils.deployment import RestrictAccessMiddleware
 
 app = FastAPI(root_path="/api")
@@ -24,4 +25,5 @@ app.include_router(reconstruction_router)
 app.include_router(methods_router)
 app.include_router(yaml_router)
 app.include_router(system_router)
+app.include_router(httomo_router)
 

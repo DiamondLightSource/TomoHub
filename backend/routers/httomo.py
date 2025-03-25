@@ -1,0 +1,158 @@
+import os
+import glob
+import asyncio
+import time
+import yaml
+import uuid
+from typing import Optional
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Query, Request
+from fastapi.responses import JSONResponse, StreamingResponse
+from pydantic import BaseModel
+from utils.deployment import restrict_endpoint
+import subprocess
+from datetime import datetime
+
+# Create router
+httomo_router = APIRouter(
+    prefix="/httomo",
+    tags=["httomo"],
+)
+
+class RunResponse(BaseModel):
+    message: str
+    status: str = "running"
+    log_path: Optional[str] = None
+
+class StatusResponse(BaseModel):
+    status: str
+    message: str
+    error: Optional[str] = None
+
+# Current process tracking variables
+current_process = None
+output_directory = None
+process_start_time = None
+
+
+@httomo_router.post("/run", response_model=RunResponse)
+@restrict_endpoint(allow_local=True, allow_k8s=False)
+async def run_httomo(
+    data_path: str = Form(...),
+    output_path: str = Form(...),
+    config_file: Optional[UploadFile] = File(None)
+):
+    """Run HTTOMO with the provided configuration."""
+    global current_process, output_directory, process_start_time
+    
+    try:
+        # Check if a process is already running
+        if current_process and current_process.returncode is None:
+            return JSONResponse(
+                status_code=400,
+                content={"message": "A HTTOMO process is already running. Please wait for it to complete."}
+            )
+        
+        # Process config
+        config_path = None
+        if config_file:
+            # Save the uploaded config file with a unique name
+            unique_id = uuid.uuid4().hex[:8]
+            config_path = os.path.join("/tmp", f"httomo_config_{unique_id}.yaml")
+            with open(config_path, "wb") as f:
+                content = await config_file.read()
+                f.write(content)
+            print(f"Saved uploaded config to: {config_path}")
+        else:
+            raise HTTPException(status_code=400, detail="Config file must be provided")
+        
+        # Create output directory if it doesn't exist
+        os.makedirs(output_path, exist_ok=True)
+        
+        output_folder_name = f"{datetime.now().strftime('%d-%m-%Y_%H_%M_%S')}_output"
+        # Construct the command
+        command = [
+            "httomo", "run",
+            data_path,    # Path to the data
+            config_path,  # Path to the config
+            output_path,   # Path to the output
+             "--output-folder-name", output_folder_name  # Explicit output folder name
+        ]
+        
+        print(f"Running command: {' '.join(command)}")
+        
+        # Launch the process
+        current_process = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        
+        log_path = os.path.join(output_path, output_folder_name, "user.log")
+        
+        
+        return RunResponse(
+            message="HTTOMO run started",
+            status="running",
+            log_path=log_path
+        )
+        
+    except Exception as e:
+        import traceback
+        error_detail = f"Error: {str(e)}\n{traceback.format_exc()}"
+        print(error_detail)
+        raise HTTPException(status_code=500, detail=error_detail)
+
+@httomo_router.get("/status", response_model=StatusResponse)
+@restrict_endpoint(allow_local=True, allow_k8s=False)
+async def check_httomo_status():
+    """Check the status of the running HTTOMO task."""
+    global current_process, output_directory
+    
+    try:
+        if not current_process:
+            return JSONResponse(
+                status_code=404,
+                content={"status": "not_found", "message": "No HTTOMO task is running", "error": None}
+            )
+        
+        # Check if process has completed
+        exit_code = current_process.poll()
+        
+        if exit_code is None:
+            # Process is still running
+            # Check if there are output files that might indicate progress
+            status_message = "Process is running"
+            
+            if output_directory:
+                output_dirs = glob.glob(f"{output_directory}/*_output")
+                if output_dirs:
+                    status_message = f"Process is running with output in {output_dirs[0]}"
+            
+            return StatusResponse(
+                status="running",
+                message=status_message,
+                error=None
+            )
+        else:
+            # Process has completed
+            stderr_output = current_process.stderr.read() if current_process.stderr else ""
+            
+            if exit_code == 0:
+                return StatusResponse(
+                    status="completed",
+                    message="HTTOMO process completed successfully",
+                    error=None
+                )
+            else:
+                return StatusResponse(
+                    status="failed",
+                    message=f"HTTOMO process failed with exit code {exit_code}",
+                    error=stderr_output
+                )
+        
+    except Exception as e:
+        import traceback
+        error_detail = f"Error: {str(e)}\n{traceback.format_exc()}"
+        print(error_detail)
+        return StatusResponse(status="error", message=str(e), error=error_detail)

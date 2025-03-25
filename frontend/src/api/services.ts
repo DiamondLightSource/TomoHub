@@ -63,7 +63,7 @@ export const fullpipelinesService = {
 export const reconstructionService = {
   getPreviousJob: async (): Promise<any> => {
     try {
-      const response = await apiClient.get('/reconstruction/previous');
+      const response = await apiClient.get('/reconstruction/centre/previous');
       return response.data;
     } catch (error) {
       if (error.response?.status === 404) {
@@ -74,7 +74,7 @@ export const reconstructionService = {
     }
   },
   getImageUrl: (path: string): string => {
-    return `${apiClient.defaults.baseURL}/reconstruction/image?path=${encodeURIComponent(path)}`;
+    return `${apiClient.defaults.baseURL}/reconstruction/centre/image?path=${encodeURIComponent(path)}`;
   }
 };
 

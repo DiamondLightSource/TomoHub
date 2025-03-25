@@ -23,7 +23,7 @@ reconstruction_router = APIRouter(
 
 yaml.add_representer(SweepRange, sweep_range_representer)
 
-@reconstruction_router.post("/centre", response_model=ReconstructionResponse)
+@reconstruction_router.post("/centre/run", response_model=ReconstructionResponse)
 @restrict_endpoint(allow_local=True,allow_k8s=False)
 async def reconstruction(
     file: UploadFile,
@@ -126,7 +126,7 @@ async def reconstruction(
         print(error_detail)
         raise HTTPException(status_code=500, detail=error_detail)
 
-@reconstruction_router.get("/image")
+@reconstruction_router.get("/centre/image")
 @restrict_endpoint(allow_local=True,allow_k8s=False)
 async def get_image(path: str = Query(...)):
     if not os.path.exists(path):
@@ -147,7 +147,7 @@ async def get_image(path: str = Query(...)):
     
     return FileResponse(path, media_type=media_type)
 
-@reconstruction_router.delete("/tempdir", response_model=MessageResponse)
+@reconstruction_router.delete("/centre/tempdir", response_model=MessageResponse)
 @restrict_endpoint(allow_local=True,allow_k8s=False)
 async def delete_temp_dirs():
     """
@@ -180,7 +180,7 @@ async def delete_temp_dirs():
         print(error_detail)
         raise HTTPException(status_code=500, detail=error_detail)
 
-@reconstruction_router.get("/previous", response_model=PreviousJobResponse)
+@reconstruction_router.get("/centre/previous", response_model=PreviousJobResponse)
 @restrict_endpoint(allow_local=True,allow_k8s=False)
 async def get_previous_job():
     """
@@ -214,15 +214,11 @@ async def get_previous_job():
         print(error_detail)
         raise HTTPException(status_code=500, detail=error_detail)
 
-@reconstruction_router.get("/stream-logs")
+@reconstruction_router.get("/centre/stream-logs")
 @restrict_endpoint(allow_local=True, allow_k8s=False)
 async def stream_logs_sse(request: Request, log_path: str):
     """Stream log file as Server-Sent Events."""
     
-    # Verify the log path is within allowed directories
-    if not log_path.startswith('/tmp'):
-        raise HTTPException(status_code=403, detail="Log file must be in /tmp directory")
-        
     # Wait longer for log file to be created if it doesn't exist yet
     wait_count = 0
     while not os.path.exists(log_path) and wait_count < 20:  # Wait up to 10 seconds
@@ -294,7 +290,7 @@ async def stream_logs_sse(request: Request, log_path: str):
         }
     )
 
-@reconstruction_router.get("/find-log")
+@reconstruction_router.get("/centre/find-log")
 @restrict_endpoint(allow_local=True, allow_k8s=False)
 async def find_current_log(temp_dir: str = None):
     """Finds the log file in the specified temp directory or most recent one."""
@@ -361,7 +357,7 @@ async def find_current_log(temp_dir: str = None):
         return {"found": False, "message": str(e)}
     
 
-@reconstruction_router.get("/job-status")
+@reconstruction_router.get("/centre/job-status")
 @restrict_endpoint(allow_local=True, allow_k8s=False)
 async def check_reconstruction_outputs(
     temp_dir: str,

@@ -178,7 +178,7 @@ const CenterFinding = () => {
     setLogPath(null); // Reset log path
   
     try {
-      await apiClient.delete("/reconstruction/tempdir");
+      await apiClient.delete("/reconstruction/centre/tempdir");
       console.log("Deleted old temporary directories.");
       
       // Create form data to send the file and other values
@@ -196,7 +196,7 @@ const CenterFinding = () => {
       }
 
       // First, start the reconstruction process
-      const response = await apiClient.post("/api/reconstruction/centre", formData, {
+      const response = await apiClient.post("/api/reconstruction/centre/run", formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       
@@ -207,7 +207,7 @@ const CenterFinding = () => {
       const jobFilename = response.data.filename || file.name; // Get filename from response or use the original file
       
       // Find the log file path using temp_dir
-      const findLogResponse = await apiClient.get("/api/reconstruction/find-log", {
+      const findLogResponse = await apiClient.get("/api/reconstruction/centre/find-log", {
         params: { temp_dir: tempDir }
       });
       
@@ -218,7 +218,7 @@ const CenterFinding = () => {
         // If log file isn't found immediately, try again in a short while
         const findLogInterval = setInterval(async () => {
           try {
-            const retryLogResponse = await apiClient.get("/api/reconstruction/find-log", {
+            const retryLogResponse = await apiClient.get("/api/reconstruction/centre/find-log", {
               params: { temp_dir: tempDir }
             });
             
@@ -241,7 +241,7 @@ const CenterFinding = () => {
       const checkInterval = setInterval(async () => {
         try {
           console.log("Checking job status for:", tempDir);
-          const statusResponse = await apiClient.get("/reconstruction/job-status", {
+          const statusResponse = await apiClient.get("/reconstruction/centre/job-status", {
             params: { 
               temp_dir: tempDir,
               start: start,     // Pass the center parameters

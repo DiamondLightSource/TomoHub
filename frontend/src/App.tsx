@@ -4,6 +4,7 @@ import Home from "./pages/Home.tsx";
 import Layout from "./components/Layout";
 import Centerfinding from "./pages/CenterFinding.tsx";
 import useDeployment from "./hooks/useDeployment";
+import Run from "./pages/Run.tsx";
 
 // Protected route component that only renders in local mode
 const LocalOnlyRoute = ({ children }: { children: JSX.Element }) => {
@@ -31,10 +32,20 @@ const App: React.FC = () => {
               </LocalOnlyRoute>
             } 
           />
+          <Route 
+            path="run" 
+            element={
+              <LocalOnlyRoute>
+                <Run />
+              </LocalOnlyRoute>
+            } 
+          />
         </Route>
+        
       </Routes>
     </Router>
   );
 };
 
 export default App;
+

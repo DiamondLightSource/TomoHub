@@ -14,6 +14,7 @@ import { useLoader } from '../contexts/LoaderContext';
 import { useSweep } from '../contexts/SweepContext';
 import { yamlService } from '../api/services';
 import useDeployment from '../hooks/useDeployment';
+import {Link} from "react-router-dom"
 
 const YMLG = () => {
   const { methods } = useMethods();
@@ -136,10 +137,7 @@ const YMLG = () => {
     }
   };
   
-  const runLocalHTTOMO = async () => {
-    // TODO: Implement local HTTOMO execution
-    alert('Running HTTOMO locally - functionality to be implemented');
-  };
+
   
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 10 }}>
@@ -172,8 +170,9 @@ const YMLG = () => {
             Run HTTOMO (cluster)
           </Button>
           <Button
+            component={Link}
+            to="/run"
             startIcon={<PlayArrowIcon />}
-            onClick={runLocalHTTOMO}
             size="small"
             disabled={!isLocal}
           >
