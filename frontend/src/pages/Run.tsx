@@ -25,6 +25,8 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { useLoader } from "../contexts/LoaderContext";
 import apiClient from "../api/client";
 import LogViewer from "../components/LogViewer";
+import { useMethods } from '../contexts/MethodsContext';
+import { useSweep } from '../contexts/SweepContext';
 
 const Run = () => {
   // State for form inputs
@@ -34,6 +36,8 @@ const Run = () => {
   const [outputDirPath, setOutputDirPath] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [logPath, setLogPath] = useState<string | null>(null);
+  const { methods } = useMethods();
+  const { activeSweep } = useSweep();
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -94,6 +98,15 @@ const Run = () => {
       return;
     }
 
+    if (configSource === "app" && (!loaderContext || !loaderContext.isContextValid())) {
+      setSnackbar({
+        open: true,
+        message: "Please configure the app parameters before running HTTOMO",
+        severity: "error",
+      });
+      return;
+    }
+
     if (!dataFilePath) {
       setSnackbar({
         open: true,
@@ -119,18 +132,66 @@ const Run = () => {
       // Create form data
       const formData = new FormData();
       
-      // Only handle custom config file for now (as requested)
       if (configSource === "custom" && customConfigFile) {
+        // Use uploaded config file
         formData.append("config_file", customConfigFile);
-      } else {
-        // We only needed to implement file upload for now
-        setSnackbar({
-          open: true,
-          message: "App configuration not yet implemented",
-          severity: "error",
-        });
-        setIsRunning(false);
-        return;
+      } else if (configSource === "app" && loaderContext) {
+        // Generate config from app data
+        const { method, module_path, parameters } = loaderContext;
+        
+        // Get methods from context and transform them
+        const transformedMethods = methods.reduce((acc: any[], method) => {
+          // Base transformed method
+          const transformedMethod = {
+            method: method.method_name,
+            module_path: method.method_module,
+            parameters: { ...method.parameters },
+          };
+
+          // If we encounter rescale_to_int, add calculate_stats before it
+          if (method.method_name === 'rescale_to_int') {
+            acc.push({
+              method: 'calculate_stats',
+              module_path: 'httomo.methods',
+              parameters: {},
+              id: 'statistics',
+              side_outputs: {
+                glob_stats: 'glob_stats'
+              }
+            });
+          }
+
+          // Handle the centering methods case
+          if (method.method_name === 'find_center_vo' || method.method_name === 'find_center_pc') {
+            acc.push({
+              ...transformedMethod,
+              id: 'centering',
+              sideoutput: { cor: 'center_of_rotation' },
+            });
+          } else {
+            // Add the regular transformed method
+            acc.push(transformedMethod);
+          }
+
+          return acc;
+        }, []);
+
+        // Combine LoaderContext and MethodsContext data
+        const loaderContextObject = {
+          method,
+          module_path,
+          parameters,
+        };
+        
+        const combinedData = [loaderContextObject, ...transformedMethods];
+        
+        // Add config data to form
+        formData.append("config_data", JSON.stringify(combinedData));
+        
+        // Add sweep config if available
+        if (activeSweep) {
+          formData.append("sweep_config", JSON.stringify(activeSweep));
+        }
       }
       
       formData.append("data_path", dataFilePath);
@@ -151,7 +212,6 @@ const Run = () => {
       // Poll for execution status
       const checkInterval = setInterval(async () => {
         try {
-          // No task_id needed with our simplified backend
           const statusResponse = await apiClient.get("/api/httomo/status");
 
           if (statusResponse.data.status === "completed") {
@@ -229,7 +289,7 @@ const Run = () => {
               <form onSubmit={handleSubmit}>
                 <Box sx={{ mb: 3 }}>
                   <Typography variant="subtitle1" gutterBottom>
-                    Configuration Source
+                    Config file
                   </Typography>
                   <ToggleButtonGroup
                     color="primary"
@@ -242,10 +302,10 @@ const Run = () => {
                     size="small"
                   >
                     <ToggleButton value="app"  aria-label="app configuration">
-                      Use App Configuration
+                      Use Tomohub 
                     </ToggleButton>
                     <ToggleButton value="custom" aria-label="custom configuration">
-                      Upload Custom Config
+                      Use your own
                     </ToggleButton>
                   </ToggleButtonGroup>
 

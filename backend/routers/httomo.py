@@ -4,7 +4,8 @@ import asyncio
 import time
 import yaml
 import uuid
-from typing import Optional
+import json
+from typing import Optional, Dict, Any
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
@@ -39,7 +40,9 @@ process_start_time = None
 async def run_httomo(
     data_path: str = Form(...),
     output_path: str = Form(...),
-    config_file: Optional[UploadFile] = File(None)
+    config_file: Optional[UploadFile] = File(None),
+    config_data: Optional[str] = Form(None),
+    sweep_config: Optional[str] = Form(None)
 ):
     """Run HTTOMO with the provided configuration."""
     global current_process, output_directory, process_start_time
@@ -54,16 +57,68 @@ async def run_httomo(
         
         # Process config
         config_path = None
+        
         if config_file:
-            # Save the uploaded config file with a unique name
+            # Use uploaded config file
             unique_id = uuid.uuid4().hex[:8]
             config_path = os.path.join("/tmp", f"httomo_config_{unique_id}.yaml")
             with open(config_path, "wb") as f:
                 content = await config_file.read()
                 f.write(content)
             print(f"Saved uploaded config to: {config_path}")
+            
+        elif config_data:
+            # Generate config from provided data
+            unique_id = uuid.uuid4().hex[:8]
+            config_path = os.path.join("/tmp", f"httomo_config_{unique_id}.yaml")
+            
+            # Parse the config data
+            try:
+                config_data_obj = json.loads(config_data)
+                
+                # Convert to YAML
+                yaml_content = yaml.dump(config_data_obj, sort_keys=False, default_flow_style=False)
+                
+                # Handle sweep config if provided
+                if sweep_config:
+                    sweep_config_obj = json.loads(sweep_config)
+                    method_id = sweep_config_obj.get("methodId")
+                    param_name = sweep_config_obj.get("paramName")
+                    sweep_type = sweep_config_obj.get("sweepType")
+                    
+                    if method_id and param_name and sweep_type:
+                        tag = "!SweepRange" if sweep_type == "range" else "!Sweep"
+                        
+                        # Split YAML content into entries
+                        yaml_entries = yaml_content.split('- method:')
+                        header = yaml_entries[0]
+                        entries = ['- method:' + entry for entry in yaml_entries[1:]]
+                        
+                        # Process each entry
+                        for i, entry in enumerate(entries):
+                            # Check if this is the target method
+                            if f"method: {method_id}" in entry.split('\n')[0]:
+                                # Replace parameter in this entry only
+                                param_pattern = f"(\\s+{param_name}:)(\\s+)"
+                                import re
+                                entries[i] = re.sub(param_pattern, f"\\1 {tag}\\2", entry)
+                                break
+                        
+                        # Reconstruct the YAML content
+                        yaml_content = header + ''.join(entries)
+                
+                # Save the YAML file
+                with open(config_path, "w") as f:
+                    f.write(yaml_content)
+                
+                print(f"Generated config from app data: {config_path}")
+                
+            except json.JSONDecodeError as e:
+                raise HTTPException(status_code=400, detail=f"Invalid JSON in config_data: {str(e)}")
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=f"Failed to generate config: {str(e)}")
         else:
-            raise HTTPException(status_code=400, detail="Config file must be provided")
+            raise HTTPException(status_code=400, detail="Either config_file or config_data must be provided")
         
         # Create output directory if it doesn't exist
         os.makedirs(output_path, exist_ok=True)
@@ -89,7 +144,6 @@ async def run_httomo(
         )
         
         log_path = os.path.join(output_path, output_folder_name, "user.log")
-        
         
         return RunResponse(
             message="HTTOMO run started",
