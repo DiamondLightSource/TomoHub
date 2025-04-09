@@ -207,34 +207,15 @@ const CenterFinding = () => {
       const jobFilename = response.data.filename || file.name; // Get filename from response or use the original file
       
       // Find the log file path using temp_dir
-      const findLogResponse = await apiClient.get("/api/reconstruction/centre/find-log", {
-        params: { temp_dir: tempDir }
-      });
+      const logFilePath = response.data.log_path;
       
-      if (findLogResponse.data.found || findLogResponse.data.log_path) {
-        console.log("Log path:", findLogResponse.data.log_path);
-        setLogPath(findLogResponse.data.log_path);
+      if (logFilePath) {
+        console.log("Log path:", logFilePath);
+        setLogPath(logFilePath);
       } else {
-        // If log file isn't found immediately, try again in a short while
-        const findLogInterval = setInterval(async () => {
-          try {
-            const retryLogResponse = await apiClient.get("/api/reconstruction/centre/find-log", {
-              params: { temp_dir: tempDir }
-            });
-            
-            if (retryLogResponse.data.found || retryLogResponse.data.log_path) {
-              console.log("Found log file:", retryLogResponse.data.log_path);
-              setLogPath(retryLogResponse.data.log_path);
-              clearInterval(findLogInterval);
-            }
-          } catch (error) {
-            console.error("Error finding log:", error);
-          }
-        }, 500);
-        
-        // Auto-clear after 10 seconds to avoid leaking intervals
-        setTimeout(() => clearInterval(findLogInterval), 10000);
-      }
+        logFilePath
+        };
+
       
       
       // Start polling for completion

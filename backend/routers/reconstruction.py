@@ -6,15 +6,14 @@ import json
 import yaml
 import tempfile
 from fastapi.responses import JSONResponse
-from fastapi import UploadFile, Form, HTTPException, Query, APIRouter, WebSocket, WebSocketDisconnect
-import subprocess
-from Models.ReconstructionModels import ReconstructionResponse, SweepRange, sweep_range_representer  # Import the models
+from fastapi import UploadFile, Form, HTTPException, Query, APIRouter
+from Models.ReconstructionModels import ReconstructionResponse, SweepRange, sweep_range_representer 
 from Models.ReconstructionModels import ReconstructionResponse, MessageResponse, PreviousJobResponse
 from utils.deployment import restrict_endpoint
 import asyncio
 from fastapi import Request
 from fastapi.responses import StreamingResponse
-import re 
+from datetime import datetime
 
 reconstruction_router = APIRouter(
     prefix="/reconstruction",
@@ -24,7 +23,7 @@ reconstruction_router = APIRouter(
 yaml.add_representer(SweepRange, sweep_range_representer)
 
 @reconstruction_router.post("/centre/run", response_model=ReconstructionResponse)
-@restrict_endpoint(allow_local=True,allow_k8s=False)
+@restrict_endpoint(allow_local=True,allow_deployment=False)
 async def reconstruction(
     file: UploadFile,
     algorithm: str = Form(...),
@@ -86,14 +85,16 @@ async def reconstruction(
         with open(config_path, "w") as f:
             yaml.dump(config, f, default_flow_style=False)
         print(f"Saved config file to: {config_path}")
-
+    
+        output_folder_name = f"{datetime.now().strftime('%d-%m-%Y_%H_%M_%S')}_output"
         
         # Create the command
         command = [
             "httomo", "run",
             file_path,  # Path to the data
             config_path,  # Path to the config
-            temp_dir  # Path to the output
+            temp_dir,  # Path to the output
+            "--output-folder-name", output_folder_name  # Explicit output folder name
         ]
         
         # Launch process in background
@@ -111,13 +112,15 @@ async def reconstruction(
         # Start the process but don't wait for it
         asyncio.create_task(run_reconstruction())
         
+        log_path = os.path.join(temp_dir, output_folder_name, "user.log")
         # Return response immediately with expected log path and filename
         return ReconstructionResponse(
             message=f"Reconstruction started. Algorithm: {algorithm}, Range: {start}-{stop} (step {step})",
             center_images={},  # Will be empty initially
             temp_dir=temp_dir,
             status="running",
-            filename=file.filename  # Add the filename to the response
+            filename=file.filename,  # Add the filename to the response
+            log_path=log_path
         )
         
     except Exception as e:
@@ -127,7 +130,7 @@ async def reconstruction(
         raise HTTPException(status_code=500, detail=error_detail)
 
 @reconstruction_router.get("/centre/image")
-@restrict_endpoint(allow_local=True,allow_k8s=False)
+@restrict_endpoint(allow_local=True,allow_deployment=False)
 async def get_image(path: str = Query(...)):
     if not os.path.exists(path):
         raise HTTPException(status_code=404, detail="Image not found")
@@ -148,7 +151,7 @@ async def get_image(path: str = Query(...)):
     return FileResponse(path, media_type=media_type)
 
 @reconstruction_router.delete("/centre/tempdir", response_model=MessageResponse)
-@restrict_endpoint(allow_local=True,allow_k8s=False)
+@restrict_endpoint(allow_local=True,allow_deployment=False)
 async def delete_temp_dirs():
     """
     Deletes all temporary directories in /tmp that start with 'centre_reconstruction_'.
@@ -181,7 +184,7 @@ async def delete_temp_dirs():
         raise HTTPException(status_code=500, detail=error_detail)
 
 @reconstruction_router.get("/centre/previous", response_model=PreviousJobResponse)
-@restrict_endpoint(allow_local=True,allow_k8s=False)
+@restrict_endpoint(allow_local=True,allow_deployment=False)
 async def get_previous_job():
     """
     Checks for any directory in /tmp starting with 'reconstruction_' and returns the job data.
@@ -215,7 +218,7 @@ async def get_previous_job():
         raise HTTPException(status_code=500, detail=error_detail)
 
 @reconstruction_router.get("/centre/stream-logs")
-@restrict_endpoint(allow_local=True, allow_k8s=False)
+@restrict_endpoint(allow_local=True, allow_deployment=False)
 async def stream_logs_sse(request: Request, log_path: str):
     """Stream log file as Server-Sent Events."""
     
@@ -291,7 +294,7 @@ async def stream_logs_sse(request: Request, log_path: str):
     )
 
 @reconstruction_router.get("/centre/find-log")
-@restrict_endpoint(allow_local=True, allow_k8s=False)
+@restrict_endpoint(allow_local=True, allow_deployment=False)
 async def find_current_log(temp_dir: str = None):
     """Finds the log file in the specified temp directory or most recent one."""
     try:
@@ -358,7 +361,7 @@ async def find_current_log(temp_dir: str = None):
     
 
 @reconstruction_router.get("/centre/job-status")
-@restrict_endpoint(allow_local=True, allow_k8s=False)
+@restrict_endpoint(allow_local=True, allow_deployment=False)
 async def check_reconstruction_outputs(
     temp_dir: str,
     start: int = Query(None),

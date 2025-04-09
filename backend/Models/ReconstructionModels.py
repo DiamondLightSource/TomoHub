@@ -7,7 +7,8 @@ class ReconstructionResponse(BaseModel):
     temp_dir: str
     status: str = "completed"  # "running" or "completed"
     filename: Optional[str] = None  # Make sure this field is included
-
+    log_path: str
+    
 class SweepRange:
     def __init__(self, start, stop, step):
         self.start = start

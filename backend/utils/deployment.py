@@ -13,23 +13,23 @@ def get_deployment_mode():
     from .config import config
     return config.get(DEPLOYMENT_MODE_ENV, "local")
 
-def is_k8s_deployment():
+def is_deployment():
     """Check if running in k8s deployment mode"""
-    return get_deployment_mode() == "k8s"
+    return get_deployment_mode() == "deployment"
 
-def is_local_deployment():
+def is_local():
     """Check if running in local deployment mode"""
     return get_deployment_mode() == "local"
 
-def restrict_endpoint(allow_local=True, allow_k8s=True):
+def restrict_endpoint(allow_local=True, allow_deployment=True):
     """Decorator to restrict endpoint access based on deployment mode"""
     def decorator(func):
         @functools.wraps(func)
         async def async_wrapper(*args, **kwargs):
-            if is_local_deployment() and not allow_local:
-                raise HTTPException(403, "This endpoint is not available in local deployment mode")
-            if is_k8s_deployment() and not allow_k8s:
-                raise HTTPException(403, "This endpoint is not available in K8s deployment mode")
+            if is_local() and not allow_local:
+                raise HTTPException(403, "This endpoint is not available in local mode")
+            if is_deployment() and not allow_deployment:
+                raise HTTPException(403, "This endpoint is not available in deployment mode")
             return await func(*args, **kwargs)
         
         return async_wrapper
@@ -39,7 +39,7 @@ class RestrictAccessMiddleware(BaseHTTPMiddleware):
     """Middleware to restrict access based on deployment mode"""
     async def dispatch(self, request: Request, call_next):
         # In K8s mode, we trust the K8s ingress/service for access control
-        if is_k8s_deployment():
+        if is_deployment():
             return await call_next(request)
             
         # In local mode, restrict to localhost unless explicitly allowed

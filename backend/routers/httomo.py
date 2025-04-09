@@ -36,7 +36,7 @@ process_start_time = None
 
 
 @httomo_router.post("/run", response_model=RunResponse)
-@restrict_endpoint(allow_local=True, allow_k8s=False)
+@restrict_endpoint(allow_local=True, allow_deployment=False)
 async def run_httomo(
     data_path: str = Form(...),
     output_path: str = Form(...),
@@ -158,7 +158,7 @@ async def run_httomo(
         raise HTTPException(status_code=500, detail=error_detail)
 
 @httomo_router.get("/status", response_model=StatusResponse)
-@restrict_endpoint(allow_local=True, allow_k8s=False)
+@restrict_endpoint(allow_local=True, allow_deployment=False)
 async def check_httomo_status():
     """Check the status of the running HTTOMO task."""
     global current_process, output_directory
