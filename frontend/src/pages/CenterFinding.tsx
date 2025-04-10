@@ -178,7 +178,7 @@ const CenterFinding = () => {
     setLogPath(null); // Reset log path
   
     try {
-      await apiClient.delete("/reconstruction/centre/tempdir");
+      await apiClient.delete("/centre/tempdir");
       console.log("Deleted old temporary directories.");
       
       // Create form data to send the file and other values
@@ -196,7 +196,7 @@ const CenterFinding = () => {
       }
 
       // First, start the reconstruction process
-      const response = await apiClient.post("/api/reconstruction/centre/run", formData, {
+      const response = await apiClient.post("/centre/run", formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       
@@ -222,7 +222,7 @@ const CenterFinding = () => {
       const checkInterval = setInterval(async () => {
         try {
           console.log("Checking job status for:", tempDir);
-          const statusResponse = await apiClient.get("/reconstruction/centre/job-status", {
+          const statusResponse = await apiClient.get("/centre/status", {
             params: { 
               temp_dir: tempDir,
               start: start,     // Pass the center parameters

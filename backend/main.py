@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers.reconstruction import reconstruction_router
+from routers.centre import centre_router
 from routers.methods import methods_router
 from routers.yaml import yaml_router
 from routers.system import system_router
@@ -21,7 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(reconstruction_router)
+app.include_router(centre_router)
 app.include_router(methods_router)
 app.include_router(yaml_router)
 app.include_router(system_router)

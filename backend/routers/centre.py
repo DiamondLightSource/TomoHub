@@ -7,22 +7,19 @@ import yaml
 import tempfile
 from fastapi.responses import JSONResponse
 from fastapi import UploadFile, Form, HTTPException, Query, APIRouter
-from Models.ReconstructionModels import ReconstructionResponse, SweepRange, sweep_range_representer 
-from Models.ReconstructionModels import ReconstructionResponse, MessageResponse, PreviousJobResponse
+from Models.CentreModels import CentreResponse, SweepRange, sweep_range_representer, MessageResponse, PreviousJobResponse
 from utils.deployment import restrict_endpoint
 import asyncio
-from fastapi import Request
-from fastapi.responses import StreamingResponse
 from datetime import datetime
 
-reconstruction_router = APIRouter(
-    prefix="/reconstruction",
-    tags=["reconstruction"],
+centre_router = APIRouter(
+    prefix="/centre",
+    tags=["centre"],
 )
 
 yaml.add_representer(SweepRange, sweep_range_representer)
 
-@reconstruction_router.post("/centre/run", response_model=ReconstructionResponse)
+@centre_router.post("/run", response_model=CentreResponse)
 @restrict_endpoint(allow_local=True,allow_deployment=False)
 async def reconstruction(
     file: UploadFile,
@@ -114,7 +111,7 @@ async def reconstruction(
         
         log_path = os.path.join(temp_dir, output_folder_name, "user.log")
         # Return response immediately with expected log path and filename
-        return ReconstructionResponse(
+        return CentreResponse(
             message=f"Reconstruction started. Algorithm: {algorithm}, Range: {start}-{stop} (step {step})",
             center_images={},  # Will be empty initially
             temp_dir=temp_dir,
@@ -129,7 +126,7 @@ async def reconstruction(
         print(error_detail)
         raise HTTPException(status_code=500, detail=error_detail)
 
-@reconstruction_router.get("/centre/image")
+@centre_router.get("/image")
 @restrict_endpoint(allow_local=True,allow_deployment=False)
 async def get_image(path: str = Query(...)):
     if not os.path.exists(path):
@@ -150,7 +147,7 @@ async def get_image(path: str = Query(...)):
     
     return FileResponse(path, media_type=media_type)
 
-@reconstruction_router.delete("/centre/tempdir", response_model=MessageResponse)
+@centre_router.delete("/tempdir", response_model=MessageResponse)
 @restrict_endpoint(allow_local=True,allow_deployment=False)
 async def delete_temp_dirs():
     """
@@ -183,7 +180,7 @@ async def delete_temp_dirs():
         print(error_detail)
         raise HTTPException(status_code=500, detail=error_detail)
 
-@reconstruction_router.get("/centre/previous", response_model=PreviousJobResponse)
+@centre_router.get("/previous", response_model=PreviousJobResponse)
 @restrict_endpoint(allow_local=True,allow_deployment=False)
 async def get_previous_job():
     """
@@ -217,150 +214,7 @@ async def get_previous_job():
         print(error_detail)
         raise HTTPException(status_code=500, detail=error_detail)
 
-@reconstruction_router.get("/centre/stream-logs")
-@restrict_endpoint(allow_local=True, allow_deployment=False)
-async def stream_logs_sse(request: Request, log_path: str):
-    """Stream log file as Server-Sent Events."""
-    
-    # Wait longer for log file to be created if it doesn't exist yet
-    wait_count = 0
-    while not os.path.exists(log_path) and wait_count < 20:  # Wait up to 10 seconds
-        print(f"Waiting for log file at {log_path}, attempt {wait_count+1}/20")
-        await asyncio.sleep(0.5)  # Check more frequently
-        wait_count += 1
-        
-    if not os.path.exists(log_path):
-        raise HTTPException(status_code=404, detail=f"Log file not found at {log_path} after waiting")
-    
-    print(f"Streaming log file: {log_path}")
-    
-    async def event_generator():
-        """Generate SSE events from log file changes."""
-        # Initial file size
-        last_size = 0
-        
-        # Send headers for SSE
-        yield "retry: 1000\n\n"  # Reconnection time in milliseconds
-        
-        # Initial content
-        try:
-            with open(log_path, 'r') as f:
-                content = f.read()
-                if content:
-                    yield f"data: {content.replace(chr(10), chr(10)+'data: ')}\n\n"
-                    last_size = len(content)
-        except Exception as e:
-            yield f"data: Error reading log: {str(e)}\n\n"
-        
-        # Keep checking for updates
-        while True:
-            if await request.is_disconnected():
-                print("Client disconnected")
-                break
-                
-            try:
-                # Check if file exists
-                if not os.path.exists(log_path):
-                    yield "data: Log file no longer exists\n\n"
-                    break
-                
-                # Check for new content
-                current_size = os.path.getsize(log_path)
-                
-                if current_size > last_size:
-                    with open(log_path, 'r') as f:
-                        f.seek(last_size)
-                        new_content = f.read()
-                        if new_content:
-                            # Format for SSE: each line needs to start with "data: "
-                            # Replace newlines with "newline + data: " prefix
-                            formatted = f"data: {new_content.replace(chr(10), chr(10)+'data: ')}\n\n"
-                            yield formatted
-                    
-                    last_size = current_size
-            except Exception as e:
-                yield f"data: Error: {str(e)}\n\n"
-                
-            # Small delay between checks
-            await asyncio.sleep(0.1)
-    
-    return StreamingResponse(
-        event_generator(),
-        media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive"
-        }
-    )
-
-@reconstruction_router.get("/centre/find-log")
-@restrict_endpoint(allow_local=True, allow_deployment=False)
-async def find_current_log(temp_dir: str = None):
-    """Finds the log file in the specified temp directory or most recent one."""
-    try:
-        # If temp_dir is provided, use it (more reliable)
-        if temp_dir:
-            # Validate the path for security
-            if not temp_dir.startswith('/tmp') or not os.path.exists(temp_dir):
-                return {
-                    "found": False, 
-                    "message": f"Invalid or non-existent temp directory: {temp_dir}"
-                }
-                
-            # Find output directory within the specified temp_dir
-            output_dirs = glob.glob(f"{temp_dir}/*_output")
-            if not output_dirs:
-                return {
-                    "found": False, 
-                    "message": f"No output directory found in {temp_dir}"
-                }
-                
-            # Get the most recent output dir (should typically be only one)
-            latest_output = max(output_dirs, key=os.path.getmtime)
-            
-            # Look for user.log
-            log_path = os.path.join(latest_output, "user.log")
-            
-            return {
-                "found": os.path.exists(log_path),
-                "log_path": log_path,
-                "message": "Log file found" if os.path.exists(log_path) else "Log file path determined but file not created yet"
-            }
-        
-        # Fallback to original logic if no temp_dir provided (for backward compatibility)
-        tmp_dirs = glob.glob("/tmp/centre_reconstruction_*")
-        if not tmp_dirs:
-            return {"found": False, "message": "No reconstruction directory found"}
-            
-        # Sort by modification time (newest first)
-        latest_dir = max(tmp_dirs, key=os.path.getmtime)
-        
-        # Find the output directory (it will end with _output)
-        output_dirs = glob.glob(f"{latest_dir}/*_output")
-        if not output_dirs:
-            return {"found": False, "message": "No output directory found in reconstruction directory"}
-            
-        # Sort by modification time (newest first)
-        latest_output = max(output_dirs, key=os.path.getmtime)
-        
-        # Look for user.log
-        log_path = os.path.join(latest_output, "user.log")
-        
-        # Even if it doesn't exist yet, return the expected path
-        return {
-            "found": os.path.exists(log_path),
-            "log_path": log_path,
-            "message": "Log file found" if os.path.exists(log_path) else "Log file path determined but file not created yet"
-        }
-        
-    except Exception as e :
-        import traceback
-        error_detail = f"Error finding log file: {str(e)}\n{traceback.format_exc()}"
-        print(error_detail)
-        return {"found": False, "message": str(e)}
-    
-
-@reconstruction_router.get("/centre/job-status")
+@centre_router.get("/status")
 @restrict_endpoint(allow_local=True, allow_deployment=False)
 async def check_reconstruction_outputs(
     temp_dir: str,

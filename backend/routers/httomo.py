@@ -1,33 +1,21 @@
 import os
 import glob
-import asyncio
-import time
 import yaml
 import uuid
 import json
-from typing import Optional, Dict, Any
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Query, Request
-from fastapi.responses import JSONResponse, StreamingResponse
-from pydantic import BaseModel
+from typing import Optional
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi.responses import JSONResponse
 from utils.deployment import restrict_endpoint
 import subprocess
 from datetime import datetime
+from Models.HttomoModels import RunResponse, StatusResponse
 
 # Create router
 httomo_router = APIRouter(
     prefix="/httomo",
     tags=["httomo"],
 )
-
-class RunResponse(BaseModel):
-    message: str
-    status: str = "running"
-    log_path: Optional[str] = None
-
-class StatusResponse(BaseModel):
-    status: str
-    message: str
-    error: Optional[str] = None
 
 # Current process tracking variables
 current_process = None

@@ -1,7 +1,7 @@
 from pydantic import BaseModel
-from typing import Dict, Optional, List
+from typing import Dict, Optional
 
-class ReconstructionResponse(BaseModel):
+class CentreResponse(BaseModel):
     message: str
     center_images: Dict[str, str] = {}
     temp_dir: str

@@ -35,7 +35,7 @@ const LogViewer: React.FC<LogViewerProps> = ({ logPath, isRunning }) => {
     const baseURL = apiClient.defaults.baseURL || 'http://localhost:8000';
     
     // Create SSE connection
-    const sseUrl = `${baseURL}/reconstruction/centre/stream-logs?log_path=${encodeURIComponent(logPath)}`;
+    const sseUrl = `${baseURL}/system/stream-logs?log_path=${encodeURIComponent(logPath)}`;
     console.log(`Connecting to SSE URL: ${sseUrl}`);
     
     const eventSource = new EventSource(sseUrl);
