@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useMethods } from "../../contexts/MethodsContext";
 import { MethodAccordion } from './methods_config/MethodAccordion';
-import { useAccordionExpansion } from '../../contexts/AccordionExpansionContext';
 import { ApiMethodsSchema, Method, MethodComponentConfig } from '../../types/APIresponse';
 
 export function createMethodComponent({ methodType, fetchMethod }: MethodComponentConfig) {
   return function MethodComponent() {
     const [methods, setMethods] = useState<Method[]>([]);
+    const [expandedMethod, setExpandedMethod] = useState<string | null>(null);
+    
     useEffect(() => {
       const fetchMethods = async () => {
         try {
@@ -22,16 +23,15 @@ export function createMethodComponent({ methodType, fetchMethod }: MethodCompone
       fetchMethods();
     }, []);
     
-    const { 
-      expandedMethod, 
-      expandedParent, 
-      toggleMethodExpansion, 
-    } = useAccordionExpansion();
+    const toggleMethodExpansion = (methodName: string) => {
+      setExpandedMethod(prev => prev === methodName ? null : methodName);
+    };
+    
     const { methods: selectedMethods, addMethod, removeMethod, updateMethodParameter } = useMethods();
     const isMethodAdded = (methodName: string) =>
       selectedMethods.some((method) => method.method_name === methodName);
 
-    const handleAddMethod = (methodName: string,methodModule:string) => {
+    const handleAddMethod = (methodName: string, methodModule: string) => {
       const methodTemplate = methods.find((method) => method.method_name === methodName);
       if (methodTemplate) {
         const defaultParams = Object.fromEntries(
@@ -39,7 +39,7 @@ export function createMethodComponent({ methodType, fetchMethod }: MethodCompone
             ([key, paramDetails]) => [key, paramDetails.value]
           )
         );
-        addMethod(methodName,methodModule,defaultParams);
+        addMethod(methodName, methodModule, defaultParams);
       }
     };
 
@@ -49,18 +49,21 @@ export function createMethodComponent({ methodType, fetchMethod }: MethodCompone
           <MethodAccordion
             key={method.method_name}
             method={method}
-            isExpanded={
-              expandedMethod === method.method_name && 
-              expandedParent === methodType
-            }
+            isExpanded={expandedMethod === method.method_name}
             isMethodAdded={isMethodAdded(method.method_name)}
             currentParameters={
               selectedMethods.find((m) => m.method_name === method.method_name)?.parameters ?? {}
             }
-            onExpand={() => toggleMethodExpansion(method.method_name)}
-            onAddMethod={() => handleAddMethod(method.method_name,method.module_path)}
+            onExpand={(expanded) => {
+              if (expanded) {
+                toggleMethodExpansion(method.method_name);
+              } else {
+                setExpandedMethod(null);
+              }
+            }}
+            onAddMethod={() => handleAddMethod(method.method_name, method.module_path)}
             onRemoveMethod={() => removeMethod(method.method_name)}
-            onParameterChange={(paramName, value) =>
+            onParameterChange={(paramName, value) => 
               updateMethodParameter(method.method_name, paramName, value)
             }
           />

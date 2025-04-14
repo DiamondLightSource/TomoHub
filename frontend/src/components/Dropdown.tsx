@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import * as MethodComponents from './method_components';
-import { useAccordionExpansion } from '../contexts/AccordionExpansionContext';
 
 type DropdownProps = {
     name: string;
@@ -26,14 +25,14 @@ const methodComponents = {
 };
 
 const Dropdown: React.FC<DropdownProps> = (props) => {
-    const { expandedParent, toggleParentExpansion } = useAccordionExpansion();
+    const [expanded, setExpanded] = useState(false);
     
     const MethodComponent = methodComponents[props.name];
 
     return (
         <Accordion
-            expanded={expandedParent === props.name}
-            onChange={() => toggleParentExpansion(props.name)}
+            expanded={expanded}
+            onChange={() => setExpanded(prev => !prev)}
         >
             <AccordionSummary
                 expandIcon={<ArrowDownwardIcon />}

@@ -3,12 +3,12 @@ import { Outlet } from "react-router-dom";
 import Pipeline from "./Pipeline";
 import { MethodsProvider } from "../contexts/MethodsContext";
 import { SweepProvider } from "../contexts/SweepContext";
-import { AccordionExpansionProvider } from "../contexts/AccordionExpansionContext";
 import { LoaderProvider } from "../contexts/LoaderContext";
 import { CenterProvider } from "../contexts/CenterContext"; 
 import { Box, CssBaseline, Paper, styled } from "@mui/material";
 import Header from "./Header";
-import {Footer,Navbar} from "@diamondlightsource/sci-react-ui";
+import {Footer,Navbar,NavLink,NavLinks} from "@diamondlightsource/sci-react-ui";
+
 const LeftSection = styled(Box)({
     display: "flex",
     flexDirection: "column",
@@ -47,7 +47,6 @@ const Layout = () => {
         <>
         <LoaderProvider>
         <SweepProvider>
-          <AccordionExpansionProvider>
             <MethodsProvider>
               <CenterProvider> 
                 <CssBaseline />
@@ -73,7 +72,6 @@ const Layout = () => {
                 </AppContainer>
               </CenterProvider>
             </MethodsProvider>
-          </AccordionExpansionProvider>
         </SweepProvider>
       </LoaderProvider>
         </>
