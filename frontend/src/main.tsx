@@ -1,12 +1,15 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
-import theme from './Theme.tsx'
-import { ThemeProvider,CssBaseline } from '@mui/material'
+import { CssBaseline } from '@mui/material'
+import {
+	ThemeProvider,
+	DiamondTheme
+} from "@diamondlightsource/sci-react-ui";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={DiamondTheme}>
       <CssBaseline />
       <App />
     </ThemeProvider>

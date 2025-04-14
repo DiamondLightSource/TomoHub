@@ -7,9 +7,8 @@ import { AccordionExpansionProvider } from "../contexts/AccordionExpansionContex
 import { LoaderProvider } from "../contexts/LoaderContext";
 import { CenterProvider } from "../contexts/CenterContext"; 
 import { Box, CssBaseline, Paper, styled } from "@mui/material";
-import Footer from "./Footer";
 import Header from "./Header";
-
+import {Footer,Navbar} from "@diamondlightsource/sci-react-ui";
 const LeftSection = styled(Box)({
     display: "flex",
     flexDirection: "column",
@@ -42,6 +41,7 @@ const RightSection = styled(Paper)({
   });
 
 
+
 const Layout = () => {
     return (
         <>
@@ -52,16 +52,24 @@ const Layout = () => {
               <CenterProvider> 
                 <CssBaseline />
                 <AppContainer>
+                <Navbar logo="theme" >
+                </Navbar>
+                <Header />
                   <MainContainer>
                     <LeftSection as="section" className="left-section">
-                      <Header />
+
                       <Outlet/>
                     </LeftSection>
                     <RightSection as="section" className="right-section">
                       <Pipeline />
                     </RightSection>
                   </MainContainer>
-                  <Footer />
+                  <Footer 
+                        copyright=""
+                        logo="theme"
+                        style={{width:"100%",backgroundColor:"#4C5266",display:"flex",justifyContent:"center"}}
+                  >
+                    </Footer>
                 </AppContainer>
               </CenterProvider>
             </MethodsProvider>
