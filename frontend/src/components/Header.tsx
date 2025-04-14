@@ -65,7 +65,7 @@ function Header() {
         </Button>
         <Button 
           component={Link} 
-          to="/pipelines"
+          to="/fullpipelines"
           startIcon={<AutoFixHighIcon />}
         >
           Full pipelines

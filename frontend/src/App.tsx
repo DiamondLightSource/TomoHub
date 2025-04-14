@@ -6,6 +6,7 @@ import Centerfinding from "./pages/CenterFinding.tsx";
 import useDeployment from "./hooks/useDeployment";
 import Run from "./pages/Run.tsx";
 import Methods from "./pages/Methods.tsx";
+import FullPipelines from "./pages/FullPipelines.tsx";
 // Protected route component that only renders in local mode
 const LocalOnlyRoute = ({ children }: { children: JSX.Element }) => {
   const { isLocal, isLoading } = useDeployment();
@@ -33,6 +34,7 @@ const App: React.FC = () => {
               </LocalOnlyRoute>
             } 
           />
+          <Route path="fullpipelines" element={<FullPipelines/>}/>
           <Route 
             path="run" 
             element={

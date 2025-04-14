@@ -19,7 +19,6 @@ import {
   verticalListSortingStrategy 
 } from '@dnd-kit/sortable';
 import { useAccordionExpansion } from '../contexts/AccordionExpansionContext';
-import PipelineSelector from "./fullPipelinesSelector"
 
 const Pipeline:React.FC = () => {
   const { methods, clearMethods, removeMethod, setMethods } = useMethods();
@@ -106,7 +105,8 @@ const Pipeline:React.FC = () => {
         >
           <SortableContext items={methods.map(method => method.method_name)} strategy={verticalListSortingStrategy}>
             <Box sx={{ width: '100%' }}>
-              {methods.map((method) => (
+              {methods.filter(method => !method.method_name.startsWith("standard_tomo"))
+              .map((method) => (
                 <PipelineMethod
                   key={method.method_name}
                   method={method}
@@ -123,7 +123,6 @@ const Pipeline:React.FC = () => {
 
   return (
     <>
-    <PipelineSelector/>
     <Box
       sx={{
         width: 350,
