@@ -19,6 +19,8 @@ import {
   verticalListSortingStrategy 
 } from '@dnd-kit/sortable';
 
+
+
 const Pipeline:React.FC = () => {
   const { methods, clearMethods, removeMethod, setMethods } = useMethods();
   const sensors = useSensors(
@@ -42,7 +44,7 @@ const Pipeline:React.FC = () => {
   };
 
   const handleEditMethod = (methodName: string) => {
-
+    
   } 
   
   const methodsDisplay = () => {

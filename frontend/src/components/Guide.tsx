@@ -14,7 +14,7 @@ const Guide: React.FC = () => {
           What is tomohub ?
         </Typography>
         <Typography variant="body1" gutterBottom> 
-        Tomohub is a graphical tool to generate yaml processlists to run construction jobs with <a href="https://diamondlightsource.github.io/httomo/index.html" target="_blank">HTTOMO package</a>  
+        Tomohub is a graphical tool to generate yaml processlists (config files) to run construction jobs with <a href="https://diamondlightsource.github.io/httomo/index.html" target="_blank">HTTOMO package</a><br/>and can also run HTTOMO locally 
         </Typography>
         <Typography variant="h6">
           How to start ?

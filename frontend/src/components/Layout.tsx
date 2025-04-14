@@ -7,7 +7,7 @@ import { LoaderProvider } from "../contexts/LoaderContext";
 import { CenterProvider } from "../contexts/CenterContext"; 
 import { Box, CssBaseline, Paper, styled } from "@mui/material";
 import Header from "./Header";
-import {Footer,Navbar,NavLink,NavLinks} from "@diamondlightsource/sci-react-ui";
+import {Footer,Navbar} from "@diamondlightsource/sci-react-ui";
 
 const LeftSection = styled(Box)({
     display: "flex",
@@ -32,7 +32,7 @@ const RightSection = styled(Paper)({
   
   const MainContainer = styled(Box)({
     display: "grid",
-    gridTemplateColumns: "1.3fr 0.3fr", // Two columns
+    gridTemplateColumns: "900px auto", // Two columns
     gap: "30px", // Space between columns
     padding: "20px", // Generous padding
     flex: 1, // Take up available space
