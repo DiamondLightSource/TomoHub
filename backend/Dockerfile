@@ -21,6 +21,10 @@ RUN pip install httomolibgpu --no-deps
 # Copy the rest of the application files
 COPY . .
 
+# Set deployment environment variables
+ENV TOMOHUB_DEPLOYMENT_MODE=deployment
+ENV TOMOHUB_ALLOW_EXTERNAL_ACCESS=false
+
 # Expose the application port
 EXPOSE 8000
 
