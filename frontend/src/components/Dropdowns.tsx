@@ -1,10 +1,8 @@
 import React from "react";
-import { Card, Tabs, Tab, Box, Typography, Button, Tooltip } from "@mui/material";
+import { Card, Tabs, Tab, Box, Typography } from "@mui/material";
 import Dropdown from "./Dropdown";
 import Loader from "./Loader";
 import Guide from "./Guide";
-import { Link } from "react-router-dom";
-import ArchitectureIcon from '@mui/icons-material/Architecture';
 import useDeployment from "../hooks/useDeployment";
 
 const Dropdowns: React.FC = () => {
@@ -17,29 +15,6 @@ const Dropdowns: React.FC = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", mt: 5 }}>
-      {/* Navigation container with button and tabs */}
-      <Box sx={{ display: "flex", mb: 2 }}>
-        {/* CORfinder button - disabled in non-local mode with tooltip */}
-        <Tooltip title={!isLocal ? "This feature is only available in local deployment mode" : ""}>
-          <span> {/* Wrapper for tooltip on disabled button */}
-            <Button 
-              component={Link} 
-              to="/corfinder"
-              variant="contained" 
-              startIcon={<ArchitectureIcon />}
-              disabled={!isLocal}
-              sx={{ 
-                height: "fit-content",
-                ml: 3
-              }}
-            >
-              COR finder
-            </Button>
-          </span>
-        </Tooltip>
-        
-      </Box>
-
       {/* Main content area with tabs and panels */}
       <Box sx={{ display: "flex" }}>
         {/* Vertical Tabs */}
@@ -92,40 +67,40 @@ const Dropdowns: React.FC = () => {
           )}
   
           {value === 3 && (
-                        <Card
-                        variant="outlined"
-                        sx={{
-                          mx: "auto",
-                          mb: 2,
-                          p: 2,
-                          border: "1px solid #89987880",
-                          borderRadius: "4px",
-                          minWidth:"650px"
-                        }}
-                      >
-                        <Typography gutterBottom sx={{mb:1}} variant="h6" color="primary" component="div">
-                            <strong>Reconstruction algorithms</strong>
-                        </Typography>
+            <Card
+              variant="outlined"
+              sx={{
+                mx: "auto",
+                mb: 2,
+                p: 2,
+                border: "1px solid #89987880",
+                borderRadius: "4px",
+                minWidth:"650px"
+              }}
+            >
+              <Typography gutterBottom sx={{mb:1}} variant="h6" color="primary" component="div">
+                  <strong>Reconstruction algorithms</strong>
+              </Typography>
               <Dropdown name="Algorithms" />
-              </Card>
+            </Card>
           )}
           {value === 4 && (
-                        <Card
-                        variant="outlined"
-                        sx={{
-                          mx: "auto",
-                          mb: 2,
-                          p: 2,
-                          border: "1px solid #89987880",
-                          borderRadius: "4px",
-                                        minWidth:"650px"
-                        }}
-                      >
-                        <Typography gutterBottom sx={{mb:1}} variant="h6" color="primary" component="div">
-                                      <strong>Post-proccessing methods</strong>
-                        </Typography>
+            <Card
+              variant="outlined"
+              sx={{
+                mx: "auto",
+                mb: 2,
+                p: 2,
+                border: "1px solid #89987880",
+                borderRadius: "4px",
+                minWidth:"650px"
+              }}
+            >
+              <Typography gutterBottom sx={{mb:1}} variant="h6" color="primary" component="div">
+                <strong>Post-proccessing methods</strong>
+              </Typography>
               <Dropdown name="Image Saving" />
-              </Card>
+            </Card>
           )}
   
           {value === 5 && (
@@ -137,11 +112,11 @@ const Dropdowns: React.FC = () => {
                 p: 2,
                 border: "1px solid #89987880",
                 borderRadius: "4px",
-                              minWidth:"650px"
+                minWidth:"650px"
               }}
             >
               <Typography gutterBottom sx={{mb:1}} variant="h6" color="primary" component="div">
-                            <strong>Post-proccessing methods</strong>
+                <strong>Post-proccessing methods</strong>
               </Typography>
               <Dropdown name="Segmentation" />
               <Dropdown name="Image denoising / Aretefacts Removal" />
