@@ -5,7 +5,7 @@ import Layout from "./components/Layout";
 import Centerfinding from "./pages/CenterFinding.tsx";
 import useDeployment from "./hooks/useDeployment";
 import Run from "./pages/Run.tsx";
-
+import Methods from "./pages/Methods.tsx";
 // Protected route component that only renders in local mode
 const LocalOnlyRoute = ({ children }: { children: JSX.Element }) => {
   const { isLocal, isLoading } = useDeployment();
@@ -24,6 +24,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="methods" element={<Methods/>}></Route>
           <Route 
             path="corfinder" 
             element={

@@ -30,7 +30,6 @@ const Dropdowns: React.FC = () => {
             minWidth: "200px"
           }}
         >
-          <Tab sx={{ fontSize: "0.9rem" }} label="Start" />
           <Tab sx={{ fontSize: "0.9rem" }} label="Loader" />
           <Tab sx={{ fontSize: "0.9rem" }} label="Pre-processing" />
           <Tab sx={{ fontSize: "0.9rem" }} label="Reconstruction" />
@@ -40,9 +39,8 @@ const Dropdowns: React.FC = () => {
 
         {/* Tab Content */}
         <Box sx={{ p: 2, maxWidth: "700px" }}>
-          {value === 0 && <Guide />}
-          {value === 1 && <Loader />}
-          {value === 2 && (
+          {value === 0 && <Loader />}
+          {value === 1 && (
             <Card
               variant="outlined"
               sx={{
@@ -66,7 +64,7 @@ const Dropdowns: React.FC = () => {
             </Card>
           )}
   
-          {value === 3 && (
+          {value === 2 && (
             <Card
               variant="outlined"
               sx={{
@@ -84,7 +82,7 @@ const Dropdowns: React.FC = () => {
               <Dropdown name="Algorithms" />
             </Card>
           )}
-          {value === 4 && (
+          {value === 3 && (
             <Card
               variant="outlined"
               sx={{
@@ -103,7 +101,7 @@ const Dropdowns: React.FC = () => {
             </Card>
           )}
   
-          {value === 5 && (
+          {value === 4 && (
             <Card
               variant="outlined"
               sx={{
