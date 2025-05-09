@@ -75,8 +75,9 @@ const LocalOnlyRoute = ({ children }: { children: JSX.Element }) => {
 // Simplified ProtectedRoute using direct keycloak instance
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { isLocal } = useDeployment();
-  const { keycloak,initialized, authenticated } = useAuth();
-  console.log(keycloak.token)
+  const { initialized, authenticated } = useAuth();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  
   // Skip authentication check in local mode
   if (isLocal) {
     return children;
@@ -86,10 +87,16 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     return <div>Initializing authentication...</div>;
   }
   
-  if (!authenticated) {
+  if (!authenticated && !isRedirecting) {
     // We only want to trigger login once
     console.log("Not authenticated, redirecting to login");
-    keycloak.login();
+    setIsRedirecting(true);
+    
+    // Small delay to prevent multiple redirects
+    setTimeout(() => {
+      keycloak.login();
+    }, 100);
+    
     return <div>Redirecting to login...</div>;
   }
   
