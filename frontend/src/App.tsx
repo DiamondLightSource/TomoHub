@@ -87,26 +87,46 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     return <div>Initializing authentication...</div>;
   }
   
-  if (!authenticated && !isRedirecting) {
-    // We only want to trigger login once
+  // Check for a session flag to prevent redirect loops
+  const hasRedirected = sessionStorage.getItem('auth_redirect_attempted');
+  
+  if (!authenticated && !isRedirecting && !hasRedirected) {
+    // We only want to trigger login once per session
     console.log("Not authenticated, redirecting to login");
     setIsRedirecting(true);
     
-    // Small delay to prevent multiple redirects
-    setTimeout(() => {
-      keycloak.login();
-    }, 100);
+    // Set a session flag to prevent redirect loops
+    sessionStorage.setItem('auth_redirect_attempted', 'true');
+    
+    // Redirect to login
+    keycloak.login({
+      redirectUri: window.location.origin
+    });
     
     return <div>Redirecting to login...</div>;
+  }
+  
+  // If we've already attempted a redirect and still not authenticated
+  if (!authenticated && hasRedirected) {
+    console.error("Authentication failed after redirection");
+    return <div>Authentication failed. Please try again later or contact support.</div>;
   }
   
   return children;
 };
 
+// Update App component to clear session flag on successful auth
 const App: React.FC = () => {
   const { isLocal } = useDeployment();
-  const { initialized } = useAuth();
-    
+  const { initialized, authenticated } = useAuth();
+  
+  // Clear the session flag if we're authenticated
+  useEffect(() => {
+    if (authenticated) {
+      sessionStorage.removeItem('auth_redirect_attempted');
+    }
+  }, [authenticated]);
+  
   if (!initialized && !isLocal) {
     return <div>Loading...</div>;
   }
