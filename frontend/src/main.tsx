@@ -35,6 +35,12 @@ const AppWrapper = () => {
     <ReactKeycloakProvider 
       authClient={keycloak}
       initOptions={initOptions}
+      onEvent={(event, error) => {
+        console.log('Keycloak event:', event, error);
+        if (event === 'onTokenExpired') {
+          keycloak.updateToken(30);
+        }
+      }}
     >
       <App />
     </ReactKeycloakProvider>

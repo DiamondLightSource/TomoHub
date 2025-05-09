@@ -13,25 +13,39 @@ import { useKeycloak } from "@react-keycloak/web";
 const useAuth = () => {
   const { isLocal } = useDeployment();
   
-  // Return a mock object for local mode
   if (isLocal) {
     return {
       initialized: true,
       keycloak: {
         authenticated: true,
+        token: "mock-token",
         login: () => {},
-        logout: () => {}
+        logout: () => {},
+        updateToken: () => Promise.resolve(true)
       }
     };
   }
 
-  // Only call useKeycloak in non-local mode
   try {
-    const keycloakContext = useKeycloak();
-    return keycloakContext;
+    const { initialized, keycloak } = useKeycloak();
+    console.log("Keycloak state:", { 
+      initialized: initialized, 
+      authenticated: keycloak?.authenticated,
+      token: keycloak?.token ? "token present" : "no token"
+    });
+    
+    return {
+      initialized, 
+      keycloak: {
+        ...keycloak,
+        // Make sure token is directly accessible
+        token: keycloak.token,
+        authenticated: keycloak.authenticated,
+        updateToken: keycloak.updateToken
+      }
+    };
   } catch (error) {
     console.error("Error using Keycloak:", error);
-    // Fallback to a mock object if there's an error with Keycloak
     return {
       initialized: false,
       keycloak: {
@@ -58,17 +72,30 @@ const LocalOnlyRoute = ({ children }: { children: JSX.Element }) => {
 // Update the ProtectedRoute component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { isLocal } = useDeployment();
-  const { keycloak,initialized } = useAuth();
+  const { keycloak, initialized } = useAuth();
   
   // Skip authentication check in local mode
   if (isLocal) {
     return children;
   }
+  
   if (!initialized) {
     return <div>Initializing authentication...</div>;
   }
   
   if (!keycloak.authenticated) {
+    // Try to refresh token if available but expired
+    if (keycloak.token) {
+      keycloak.updateToken(30).catch(() => {
+        console.log("Token refresh failed, redirecting to login");
+        if (keycloak.login) {
+          keycloak.login();
+        } else {
+          console.error("Login function is not available on keycloak.");
+        }
+      });
+      return <div>Refreshing authentication...</div>;
+    }
     return <div>Please login to access this application</div>;
   }
   
