@@ -9,6 +9,40 @@ import Methods from "./pages/Methods.tsx";
 import FullPipelines from "./pages/FullPipelines.tsx";
 import { useKeycloak } from "@react-keycloak/web";
 
+// Create a custom hook that handles both modes
+const useAuth = () => {
+  const { isLocal } = useDeployment();
+  
+  // Return a mock object for local mode
+  if (isLocal) {
+    return {
+      initialized: true,
+      keycloak: {
+        authenticated: true,
+        login: () => {},
+        logout: () => {}
+      }
+    };
+  }
+
+  // Only call useKeycloak in non-local mode
+  try {
+    const keycloakContext = useKeycloak();
+    return keycloakContext;
+  } catch (error) {
+    console.error("Error using Keycloak:", error);
+    // Fallback to a mock object if there's an error with Keycloak
+    return {
+      initialized: false,
+      keycloak: {
+        authenticated: false,
+        login: () => {},
+        logout: () => {}
+      }
+    };
+  }
+};
+
 // Protected route component that only renders in local mode
 const LocalOnlyRoute = ({ children }: { children: JSX.Element }) => {
   const { isLocal, isLoading } = useDeployment();
@@ -21,31 +55,35 @@ const LocalOnlyRoute = ({ children }: { children: JSX.Element }) => {
   return children;
 };
 
-// Add a new protected route component that requires authentication
+// Update the ProtectedRoute component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-  const { keycloak } = useKeycloak();
+  const { isLocal } = useDeployment();
+  const { keycloak } = useAuth();
+  
+  // Skip authentication check in local mode
+  if (isLocal) {
+    return children;
+  }
   
   if (!keycloak.authenticated) {
     return <div>Please login to access this application</div>;
-    // Alternatively, you can force login with:
-    // keycloak.login();
-    // return <div>Redirecting to login...</div>;
   }
   
   return children;
 };
 
 const App: React.FC = () => {
-  const { keycloak, initialized } = useKeycloak();
+  const { isLocal } = useDeployment();
+  const { keycloak, initialized } = useAuth();
   
   useEffect(() => {
-    // Optional: You can automatically redirect to login when the app loads
-    if (initialized && !keycloak.authenticated) {
+    // Only redirect to login in non-local mode
+    if (!isLocal && initialized && !keycloak.authenticated) {
       keycloak.login();
     }
-  }, [initialized, keycloak]);
+  }, [initialized, keycloak, isLocal]);
   
-  if (!initialized) {
+  if (!initialized && !isLocal) {
     return <div>Loading...</div>;
   }
   
@@ -81,4 +119,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-
