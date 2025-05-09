@@ -28,22 +28,17 @@ const useAuth = () => {
 
   try {
     const { initialized, keycloak } = useKeycloak();
+    
+    // Add debug logging
     console.log("Keycloak state:", { 
-      initialized: initialized, 
+      initialized, 
       authenticated: keycloak?.authenticated,
-      token: keycloak?.token ? "token present" : "no token"
+      token: keycloak?.token ? "token present" : "no token",
+      keycloakInstance: keycloak ? "exists" : "missing"
     });
     
-    return {
-      initialized, 
-      keycloak: {
-        ...keycloak,
-        // Make sure token is directly accessible
-        token: keycloak.token,
-        authenticated: keycloak.authenticated,
-        updateToken: keycloak.updateToken
-      }
-    };
+    // Simplify this to avoid any unintended side effects
+    return { initialized, keycloak };
   } catch (error) {
     console.error("Error using Keycloak:", error);
     return {
@@ -69,7 +64,7 @@ const LocalOnlyRoute = ({ children }: { children: JSX.Element }) => {
   return children;
 };
 
-// Update the ProtectedRoute component
+// Simplify the ProtectedRoute component to reduce potential issues
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { isLocal } = useDeployment();
   const { keycloak, initialized } = useAuth();
@@ -83,20 +78,9 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     return <div>Initializing authentication...</div>;
   }
   
-  if (!keycloak.authenticated) {
-    // Try to refresh token if available but expired
-    if (keycloak.token) {
-      keycloak.updateToken(30).catch(() => {
-        console.log("Token refresh failed, redirecting to login");
-        if (keycloak.login) {
-          keycloak.login();
-        } else {
-          console.error("Login function is not available on keycloak.");
-        }
-      });
-      return <div>Refreshing authentication...</div>;
-    }
-    return <div>Please login to access this application</div>;
+  if (!keycloak?.authenticated) {
+    keycloak.login();
+    return <div>Redirecting to login...</div>;
   }
   
   return children;

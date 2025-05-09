@@ -13,8 +13,9 @@ import useDeployment from "./hooks/useDeployment";
 // Add initialization options for Keycloak
 const initOptions = {
   checkLoginIframe: false,
-  onLoad: 'login-required',
-  redirectUri: window.location.origin 
+  onLoad: 'check-sso',  // Changed from 'login-required'
+  silentCheckSsoFallback: false,
+  enableLogging: true
 }
 
 // Create a wrapper component that conditionally uses Keycloak
