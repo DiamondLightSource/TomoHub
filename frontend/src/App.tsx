@@ -58,11 +58,14 @@ const LocalOnlyRoute = ({ children }: { children: JSX.Element }) => {
 // Update the ProtectedRoute component
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { isLocal } = useDeployment();
-  const { keycloak } = useAuth();
+  const { keycloak,initialized } = useAuth();
   
   // Skip authentication check in local mode
   if (isLocal) {
     return children;
+  }
+  if (!initialized) {
+    return <div>Initializing authentication...</div>;
   }
   
   if (!keycloak.authenticated) {
@@ -75,14 +78,7 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
 const App: React.FC = () => {
   const { isLocal } = useDeployment();
   const { keycloak, initialized } = useAuth();
-  
-  useEffect(() => {
-    // Only redirect to login in non-local mode
-    if (!isLocal && initialized && !keycloak.authenticated) {
-      keycloak.login();
-    }
-  }, [initialized, keycloak, isLocal]);
-  
+    
   if (!initialized && !isLocal) {
     return <div>Loading...</div>;
   }
