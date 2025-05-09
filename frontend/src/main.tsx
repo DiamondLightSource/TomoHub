@@ -10,13 +10,37 @@ import keycloak from "./keycloak";
 import { ReactKeycloakProvider } from "@react-keycloak/web";
 import useDeployment from "./hooks/useDeployment";
 
-// Add initialization options for Keycloak
-const initOptions = {
-  checkLoginIframe: false,
-  onLoad: 'check-sso',  // Changed from 'login-required'
-  silentCheckSsoFallback: false,
-  enableLogging: true
-}
+
+// This will be accessible throughout the app as a global initialization promise
+// We'll reference it in the App.tsx for authentication checks
+export const kcinit = keycloak.init({
+  onLoad: "login-required",
+  checkLoginIframe: false
+})
+  .then(
+    authenticated => {
+      if (authenticated) {
+        console.info("Authenticated successfully");
+        // Set up token expiration handler
+        keycloak.onTokenExpired = () => {
+          console.log("Token expired");
+          keycloak.updateToken(30).then(refreshed => {
+            console.log("Token refreshed:", refreshed);
+          }).catch(err => {
+            console.error("Failed to refresh token", err);
+          });
+        };
+        return true;
+      } else {
+        console.warn("Not authenticated");
+        return false;
+      }
+    },
+    error => {
+      console.error("Authentication failed", error);
+      return false;
+    }
+  );
 
 // Create a wrapper component that conditionally uses Keycloak
 const AppWrapper = () => {
@@ -31,17 +55,11 @@ const AppWrapper = () => {
     return <App />;
   }
   
-  // For non-local deployments, wrap with Keycloak
+  // For non-local deployments, provide Keycloak context
+  // but the actual auth is already handled by kcinit
   return (
     <ReactKeycloakProvider 
       authClient={keycloak}
-      initOptions={initOptions}
-      onEvent={(event, error) => {
-        console.log('Keycloak event:', event, error);
-        if (event === 'onTokenExpired') {
-          keycloak.updateToken(30);
-        }
-      }}
     >
       <App />
     </ReactKeycloakProvider>

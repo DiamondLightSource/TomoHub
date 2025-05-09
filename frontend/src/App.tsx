@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import Home from "./pages/Home.tsx";
 import Layout from "./components/Layout";
@@ -7,49 +7,57 @@ import useDeployment from "./hooks/useDeployment";
 import Run from "./pages/Run.tsx";
 import Methods from "./pages/Methods.tsx";
 import FullPipelines from "./pages/FullPipelines.tsx";
-import { useKeycloak } from "@react-keycloak/web";
+import keycloak from "./keycloak"; // Import directly from keycloak.ts
+import { kcinit } from "./main.tsx"; // Import the initialization promise
 
 // Create a custom hook that handles both modes
 const useAuth = () => {
   const { isLocal } = useDeployment();
-  
-  if (isLocal) {
-    return {
-      initialized: true,
-      keycloak: {
-        authenticated: true,
-        token: "mock-token",
-        login: () => {},
-        logout: () => {},
-        updateToken: () => Promise.resolve(true)
-      }
-    };
-  }
+  const [authState, setAuthState] = useState({
+    initialized: false,
+    authenticated: false
+  });
 
-  try {
-    const { initialized, keycloak } = useKeycloak();
-    
-    // Add debug logging
-    console.log("Keycloak state:", { 
-      initialized, 
-      authenticated: keycloak?.authenticated,
-      token: keycloak?.token ? "token present" : "no token",
-      keycloakInstance: keycloak ? "exists" : "missing"
-    });
-    
-    // Simplify this to avoid any unintended side effects
-    return { initialized, keycloak };
-  } catch (error) {
-    console.error("Error using Keycloak:", error);
-    return {
-      initialized: false,
-      keycloak: {
-        authenticated: false,
-        login: () => {},
-        logout: () => {}
+  useEffect(() => {
+    if (isLocal) {
+      setAuthState({
+        initialized: true,
+        authenticated: true
+      });
+      return;
+    }
+
+    // Use the global keycloak instance and initialization
+    const checkAuth = async () => {
+      try {
+        await kcinit; // Wait for the initialization to complete
+        setAuthState({
+          initialized: true,
+          authenticated: keycloak.authenticated || false
+        });
+        
+        console.log("Auth state set to:", {
+          initialized: true,
+          authenticated: keycloak.authenticated || false,
+          token: keycloak.token ? "token present" : "no token"
+        });
+      } catch (error) {
+        console.error("Error checking auth:", error);
+        setAuthState({
+          initialized: true,
+          authenticated: false
+        });
       }
     };
-  }
+
+    checkAuth();
+  }, [isLocal]);
+  
+  return {
+    initialized: authState.initialized,
+    authenticated: authState.authenticated,
+    keycloak
+  };
 };
 
 // Protected route component that only renders in local mode
@@ -64,11 +72,11 @@ const LocalOnlyRoute = ({ children }: { children: JSX.Element }) => {
   return children;
 };
 
-// Simplify the ProtectedRoute component to reduce potential issues
+// Simplified ProtectedRoute using direct keycloak instance
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { isLocal } = useDeployment();
-  const { keycloak, initialized } = useAuth();
-  
+  const { keycloak,initialized, authenticated } = useAuth();
+  console.log(keycloak.token)
   // Skip authentication check in local mode
   if (isLocal) {
     return children;
@@ -78,7 +86,9 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     return <div>Initializing authentication...</div>;
   }
   
-  if (!keycloak?.authenticated) {
+  if (!authenticated) {
+    // We only want to trigger login once
+    console.log("Not authenticated, redirecting to login");
     keycloak.login();
     return <div>Redirecting to login...</div>;
   }
@@ -88,7 +98,7 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
 
 const App: React.FC = () => {
   const { isLocal } = useDeployment();
-  const { keycloak, initialized } = useAuth();
+  const { initialized } = useAuth();
     
   if (!initialized && !isLocal) {
     return <div>Loading...</div>;
