@@ -43,23 +43,13 @@ export const kcinit = keycloak.init({
   }
 );
 
-// Create a wrapper component that conditionally uses Keycloak
-const AppWrapper = () => {
-  const { isLocal, isLoading } = useDeployment();
-  
-  if (isLoading) {
-    return <div>Loading deployment info...</div>;
-  }
-  
-  // For both local and non-local, just render App - don't use the ReactKeycloakProvider
-  return <App />;
-};
+
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider theme={DiamondTheme}>
       <CssBaseline />
-      <AppWrapper />
+      <App />
     </ThemeProvider>
   </StrictMode>
 )
