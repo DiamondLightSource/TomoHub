@@ -31,10 +31,18 @@ const App: React.FC = () => {
       return;
     }
 
-    // Add a session storage check to prevent loops
+    // IMPORTANT: Check URL for authentication callback
+    const hasAuthCallback = window.location.href.includes('state=') && window.location.href.includes('code=');
+    
+    if (hasAuthCallback) {
+      console.log("Detected Keycloak callback in URL - clearing session flag to allow reinitialization");
+      sessionStorage.removeItem('keycloak_initialized');
+    }
+
+    // Only prevent initialization on non-callback page loads
     const didInit = sessionStorage.getItem('keycloak_initialized');
-    if (didInit === 'true') {
-      console.log("Keycloak already initialized in this session");
+    if (didInit === 'true' && !hasAuthCallback) {
+      console.log("Keycloak already initialized in this session and not a callback");
       setLoading(false);
       return;
     }
@@ -44,15 +52,22 @@ const App: React.FC = () => {
       try {
         console.log("Initializing Keycloak...");
         
-        // Set flag first to prevent loops
-        sessionStorage.setItem('keycloak_initialized', 'true');
+        // Only set flag if not handling a callback - important!
+        if (!hasAuthCallback) {
+          sessionStorage.setItem('keycloak_initialized', 'true');
+        }
         
+        // More thorough initialization options
         const auth = await keycloak.init({
           onLoad: 'login-required',
-          checkLoginIframe: false
+          checkLoginIframe: false,
+          enableLogging: true,
+          pkceMethod: 'S256',
+          silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html'
         });
         
         console.log("Keycloak initialization complete - authenticated:", auth);
+        console.log("Keycloak token:", keycloak.token);
         
         if (auth && keycloak.token) {
           // Successfully authenticated
@@ -67,6 +82,12 @@ const App: React.FC = () => {
           };
           
           setAuthenticated(true);
+        } else {
+          console.warn("Keycloak initialized but no authentication detected");
+          // Force token refresh to make sure we have the latest token
+          if (keycloak.authenticated) {
+            await keycloak.updateToken(30);
+          }
         }
         
         setLoading(false);
@@ -77,7 +98,7 @@ const App: React.FC = () => {
     };
 
     initKeycloak();
-  }, [isLocal, isLoading]); // Depend on both isLocal AND isLoading
+  }, [isLocal, isLoading]);
 
   // Debug check - log keycloak status periodically
   useEffect(() => {
