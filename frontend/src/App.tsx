@@ -37,30 +37,27 @@ const AuthProvider = ({ children }) => {
       return;
     }
 
+    // Helper to track initialization attempts
+    const initAttempted = sessionStorage.getItem('keycloak_init_attempted');
+    
     // Initialize Keycloak
     const initKeycloak = async () => {
       try {
-        // Use 'login-required' to force immediate authentication check
+        console.log('Initializing Keycloak...');
+        
+        // Set init attempted flag to prevent multiple attempts
+        sessionStorage.setItem('keycloak_init_attempted', 'true');
+        
         const authenticated = await keycloak.init({
-          onLoad: 'login-required', // This forces immediate redirect to login if not authenticated
-          silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
-          pkceMethod: 'S256', // Using PKCE for better security
-          checkLoginIframe: false, // Disable iframe checking which can cause issues
-          redirectUri: window.location.origin // Ensure redirect back to app root
+          onLoad: 'login-required',  // Force immediate login if not authenticated
+          pkceMethod: 'S256',        // Using PKCE for better security
+          checkLoginIframe: false,   // Disable iframe checking which can cause issues
+          silentCheckSsoRedirectUri: `${window.location.origin}/silent-check-sso.html`,
         });
 
-        // Setup token refresh - only needed if authenticated
-        if (authenticated) {
-          // Refresh token before it expires
-          setInterval(() => {
-            keycloak.updateToken(70).catch(() => {
-              console.warn('Token refresh failed');
-              // Force re-login if token refresh fails
-              keycloak.login();
-            });
-          }, 60000); // Check every minute
-        }
-
+        console.log('Keycloak initialization result:', authenticated);
+        
+        // Successfully initialized
         setAuthState({
           initialized: true,
           authenticated,
@@ -68,9 +65,34 @@ const AuthProvider = ({ children }) => {
           error: null
         });
 
-        console.log(`Authentication state: ${authenticated ? 'Authenticated' : 'Not authenticated'}`);
+        // Setup token refresh if authenticated
+        if (authenticated) {
+          // Clear init flag on successful auth
+          sessionStorage.removeItem('keycloak_init_attempted');
+          
+          // Set up token refresh on a timer
+          const refreshInterval = setInterval(() => {
+            if (keycloak.token) {
+              keycloak.updateToken(70).catch(() => {
+                console.warn('Token refresh failed');
+                clearInterval(refreshInterval);
+                // Only force re-login if the app is being actively used
+                if (document.visibilityState === 'visible') {
+                  keycloak.login();
+                }
+              });
+            }
+          }, 60000);
+          
+          // Clean up interval on unmount
+          return () => clearInterval(refreshInterval);
+        }
       } catch (error) {
         console.error('Failed to initialize Keycloak', error);
+        
+        // Clear init flag on error to allow retry
+        sessionStorage.removeItem('keycloak_init_attempted');
+        
         setAuthState({
           initialized: true,
           authenticated: false,
@@ -80,7 +102,27 @@ const AuthProvider = ({ children }) => {
       }
     };
 
-    initKeycloak();
+    // Only attempt init if not already attempted in this session
+    if (!initAttempted) {
+      initKeycloak();
+    } else {
+      // We're probably in a post-redirect state,
+      // check if we have a valid token already
+      if (keycloak.authenticated) {
+        setAuthState({
+          initialized: true,
+          authenticated: true,
+          loading: false,
+          error: null
+        });
+        // Clear the flag since we're successfully authenticated
+        sessionStorage.removeItem('keycloak_init_attempted');
+      } else {
+        // Something went wrong, clear flag and retry
+        sessionStorage.removeItem('keycloak_init_attempted');
+        initKeycloak();
+      }
+    }
   }, [isLocal]);
 
   // Still loading
@@ -90,7 +132,21 @@ const AuthProvider = ({ children }) => {
 
   // Authentication failed
   if (authState.error) {
-    return <div>Authentication error: {authState.error}</div>;
+    return (
+      <div className="auth-error">
+        <h2>Authentication Error</h2>
+        <p>{authState.error}</p>
+        <button 
+          onClick={() => {
+            // Clear flags and reload
+            sessionStorage.removeItem('keycloak_init_attempted');
+            window.location.reload();
+          }}
+        >
+          Retry
+        </button>
+      </div>
+    );
   }
 
   // Initialized but not authenticated (and not in local mode)
