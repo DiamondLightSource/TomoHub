@@ -50,7 +50,7 @@ const App: React.FC = () => {
     };
 
     initKeycloak();
-  }, [isLocal]);
+  }, []);
 
   if (loading) {
     return <div>Loading authentication...</div>;
