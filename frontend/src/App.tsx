@@ -7,137 +7,137 @@ import useDeployment from "./hooks/useDeployment";
 import Run from "./pages/Run.tsx";
 import Methods from "./pages/Methods.tsx";
 import FullPipelines from "./pages/FullPipelines.tsx";
-import keycloak from "./keycloak"; // Import directly from keycloak.ts
-import { kcinit } from "./main.tsx"; // Import the initialization promise
+import keycloak from "./keycloak";
+import { AuthContextProvider } from "./contexts/AuthContext";
 
-// Create a custom hook that handles both modes
-const useAuth = () => {
+// Auth provider component to handle Keycloak initialization
+const AuthProvider = ({ children }) => {
   const { isLocal } = useDeployment();
-  const [authState, setAuthState] = useState({
+  const [authState, setAuthState] = useState<{
+    initialized: boolean;
+    authenticated: boolean;
+    loading: boolean;
+    error: string | null;
+  }>({
     initialized: false,
-    authenticated: false
+    authenticated: false,
+    loading: true,
+    error: null
   });
 
   useEffect(() => {
+    // In local development, bypass authentication
     if (isLocal) {
       setAuthState({
         initialized: true,
-        authenticated: true
+        authenticated: true,
+        loading: false,
+        error: null
       });
       return;
     }
 
-    // Use the global keycloak instance and initialization
-    const checkAuth = async () => {
+    // Initialize Keycloak
+    const initKeycloak = async () => {
       try {
-        await kcinit; // Wait for the initialization to complete
+        // Use 'login-required' to force immediate authentication check
+        const authenticated = await keycloak.init({
+          onLoad: 'login-required', // This forces immediate redirect to login if not authenticated
+          silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+          pkceMethod: 'S256', // Using PKCE for better security
+          checkLoginIframe: false, // Disable iframe checking which can cause issues
+          redirectUri: window.location.origin // Ensure redirect back to app root
+        });
+
+        // Setup token refresh - only needed if authenticated
+        if (authenticated) {
+          // Refresh token before it expires
+          setInterval(() => {
+            keycloak.updateToken(70).catch(() => {
+              console.warn('Token refresh failed');
+              // Force re-login if token refresh fails
+              keycloak.login();
+            });
+          }, 60000); // Check every minute
+        }
+
         setAuthState({
           initialized: true,
-          authenticated: keycloak.authenticated || false
+          authenticated,
+          loading: false,
+          error: null
         });
-        
-        console.log("Auth state set to:", {
-          initialized: true,
-          authenticated: keycloak.authenticated || false,
-          token: keycloak.token ? "token present" : "no token"
-        });
+
+        console.log(`Authentication state: ${authenticated ? 'Authenticated' : 'Not authenticated'}`);
       } catch (error) {
-        console.error("Error checking auth:", error);
+        console.error('Failed to initialize Keycloak', error);
         setAuthState({
           initialized: true,
-          authenticated: false
+          authenticated: false,
+          loading: false,
+          error: 'Failed to initialize authentication'
         });
       }
     };
 
-    checkAuth();
+    initKeycloak();
   }, [isLocal]);
-  
-  return {
-    initialized: authState.initialized,
-    authenticated: authState.authenticated,
-    keycloak
-  };
+
+  // Still loading
+  if (authState.loading) {
+    return <div>Loading authentication...</div>;
+  }
+
+  // Authentication failed
+  if (authState.error) {
+    return <div>Authentication error: {authState.error}</div>;
+  }
+
+  // Initialized but not authenticated (and not in local mode)
+  // This is a fallback - should rarely happen with onLoad: 'login-required'
+  if (authState.initialized && !authState.authenticated && !isLocal) {
+    console.log('Not authenticated, redirecting to login (fallback)');
+    keycloak.login({ 
+      redirectUri: window.location.href, // Preserve the current URL including path
+    });
+    return <div>Redirecting to login...</div>;
+  }
+
+  // Authentication successful or local mode
+  return (
+    <AuthContextProvider 
+      authenticated={authState.authenticated} 
+      loading={authState.loading}
+    >
+      {children}
+    </AuthContextProvider>
+  );
 };
 
-// Protected route component that only renders in local mode
-const LocalOnlyRoute = ({ children }: { children: JSX.Element }) => {
+// Protected route for local-only features
+const LocalOnlyRoute = ({ children }) => {
   const { isLocal, isLoading } = useDeployment();
+  
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div>Loading deployment information...</div>;
   }
+  
   if (!isLocal) {
     return <Navigate to="/" replace />;
   }
-  return children;
-};
-
-// Simplified ProtectedRoute using direct keycloak instance
-const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
-  const { isLocal } = useDeployment();
-  const { initialized, authenticated } = useAuth();
-  const [isRedirecting, setIsRedirecting] = useState(false);
-  
-  // Skip authentication check in local mode
-  if (isLocal) {
-    return children;
-  }
-  
-  if (!initialized) {
-    return <div>Initializing authentication...</div>;
-  }
-  
-  // Check for a session flag to prevent redirect loops
-  const hasRedirected = sessionStorage.getItem('auth_redirect_attempted');
-  
-  if (!authenticated && !isRedirecting && !hasRedirected) {
-    // We only want to trigger login once per session
-    console.log("Not authenticated, redirecting to login");
-    setIsRedirecting(true);
-    
-    // Set a session flag to prevent redirect loops
-    sessionStorage.setItem('auth_redirect_attempted', 'true');
-    
-    // Redirect to login
-    keycloak.login({
-      redirectUri: window.location.origin
-    });
-    
-    return <div>Redirecting to login...</div>;
-  }
-  
-  // If we've already attempted a redirect and still not authenticated
-  if (!authenticated && hasRedirected) {
-    console.error("Authentication failed after redirection");
-    return <div>Authentication failed. Please try again later or contact support.</div>;
-  }
   
   return children;
 };
 
-// Update App component to clear session flag on successful auth
-const App: React.FC = () => {
-  const { isLocal } = useDeployment();
-  const { initialized, authenticated } = useAuth();
-  
-  // Clear the session flag if we're authenticated
-  useEffect(() => {
-    if (authenticated) {
-      sessionStorage.removeItem('auth_redirect_attempted');
-    }
-  }, [authenticated]);
-  
-  if (!initialized && !isLocal) {
-    return <div>Loading...</div>;
-  }
-  
+// Main App component
+const App = () => {
   return (
     <Router>
-      <ProtectedRoute>
+      <AuthProvider>
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
-            <Route path="methods" element={<Methods/>}></Route>
+            <Route path="methods" element={<Methods />} />
             <Route 
               path="corfinder" 
               element={
@@ -146,7 +146,7 @@ const App: React.FC = () => {
                 </LocalOnlyRoute>
               } 
             />
-            <Route path="fullpipelines" element={<FullPipelines/>}/>
+            <Route path="fullpipelines" element={<FullPipelines />} />
             <Route 
               path="run" 
               element={
@@ -157,7 +157,7 @@ const App: React.FC = () => {
             />
           </Route>
         </Routes>
-      </ProtectedRoute>
+      </AuthProvider>
     </Router>
   );
 };
