@@ -31,12 +31,22 @@ const App: React.FC = () => {
       return;
     }
 
+    // Add a session storage check to prevent loops
+    const didInit = sessionStorage.getItem('keycloak_initialized');
+    if (didInit === 'true') {
+      console.log("Keycloak already initialized in this session");
+      setLoading(false);
+      return;
+    }
+
     // Simple initialization with no complex attempt tracking
     const initKeycloak = async () => {
       try {
         console.log("Initializing Keycloak...");
         
-        // We'll use check-sso which is less aggressive
+        // Set flag first to prevent loops
+        sessionStorage.setItem('keycloak_initialized', 'true');
+        
         const auth = await keycloak.init({
           onLoad: 'login-required',
           checkLoginIframe: false
@@ -57,13 +67,6 @@ const App: React.FC = () => {
           };
           
           setAuthenticated(true);
-        } else {
-          console.log("Not authenticated, redirecting to login");
-          // Using the silentCheckSsoRedirectUri to help with the redirect back
-          keycloak.login({
-            redirectUri: window.location.origin
-          });
-          return; // Stop here as we're redirecting
         }
         
         setLoading(false);
