@@ -24,24 +24,41 @@ const App: React.FC = () => {
       return;
     }
 
-    // Simple initialization to test login flow
+    // Simple initialization with no complex attempt tracking
     const initKeycloak = async () => {
       try {
         console.log("Initializing Keycloak...");
         
-        // Initialize with login-required to force authentication
+        // We'll use check-sso which is less aggressive
         const auth = await keycloak.init({
-          onLoad: 'login-required',
+          onLoad: 'check-sso',
           checkLoginIframe: false
         });
         
-        console.log("Keycloak initialized - authenticated:", auth);
+        console.log("Keycloak initialization complete - authenticated:", auth);
         
         if (auth && keycloak.token) {
-          console.log("Bearer token:", keycloak.token);
+          // Successfully authenticated
+          console.log("------------------------------------");
+          console.log("BEARER TOKEN:", keycloak.token);
+          console.log("------------------------------------");
+          
+          // Set up token refresh
+          keycloak.onTokenExpired = () => {
+            console.log("Token expired, refreshing...");
+            keycloak.updateToken(30);
+          };
+          
+          setAuthenticated(true);
+        } else {
+          console.log("Not authenticated, redirecting to login");
+          // Using the silentCheckSsoRedirectUri to help with the redirect back
+          keycloak.login({
+            redirectUri: window.location.origin
+          });
+          return; // Stop here as we're redirecting
         }
         
-        setAuthenticated(auth);
         setLoading(false);
       } catch (error) {
         console.error("Failed to initialize Keycloak:", error);
@@ -50,7 +67,7 @@ const App: React.FC = () => {
     };
 
     initKeycloak();
-  }, []);
+  }, []); // Empty dependency array - run once on mount
 
   if (loading) {
     return <div>Loading authentication...</div>;
