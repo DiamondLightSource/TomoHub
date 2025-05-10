@@ -11,65 +11,72 @@ import useDeployment from "./hooks/useDeployment";
 import AuthStatus from "./components/AuthStatus.tsx";
 
 const App: React.FC = () => {
-  const { isLocal, isLoading } = useDeployment();
+  const { isLocal, isLoading: deploymentLoading } = useDeployment();
   const [authenticated, setAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
 
+  // Add debugging to see loading states
   useEffect(() => {
-    // Don't do anything until deployment state is loaded
-    if (isLoading) {
+    console.log("Loading States:", { deploymentLoading, authLoading, isLocal });
+  }, [deploymentLoading, authLoading, isLocal]);
+
+  // Handle authentication flow
+  useEffect(() => {
+    // Skip if deployment info is still loading
+    if (deploymentLoading) {
+      console.log("Waiting for deployment info to load...");
       return;
     }
 
     console.log("Deployment status loaded, isLocal:", isLocal);
 
-    // Skip authentication in local development
+    // For local development, bypass auth
     if (isLocal) {
       console.log("Local development mode - bypassing authentication");
       setAuthenticated(true);
-      setLoading(false);
+      setAuthLoading(false);
       return;
     }
 
-    // SIMPLIFIED APPROACH - NO SESSION STORAGE OR COMPLEX LOGIC
+    // For deployment, initialize Keycloak
     const initKeycloak = async () => {
       try {
         console.log("Initializing Keycloak...");
         
-        // Basic initialization - matching your working example
         const auth = await keycloak.init({
-          onLoad: 'check-sso', // Changed to check-sso to avoid immediate redirect
+          onLoad: 'login-required',
           checkLoginIframe: false
         });
         
         console.log("Keycloak initialization complete - authenticated:", auth);
-        console.log("Keycloak token:", keycloak.token)
+        
         if (auth) {
           console.log("Already authenticated, token:", keycloak.token ? "present" : "missing");
+          setAuthenticated(true);
           
           // Set up token refresh
           keycloak.onTokenExpired = () => {
             console.log("Token expired, refreshing...");
             keycloak.updateToken(30);
           };
-          
-          setAuthenticated(true);
-          setLoading(false);
         } else {
           console.log("Not authenticated, redirecting to login");
-          // Manual login call with specific redirect
           keycloak.login({
             redirectUri: window.location.origin
           });
+          // Don't set authLoading=false here since we're redirecting
+          return;
         }
       } catch (error) {
         console.error("Failed to initialize Keycloak:", error);
-        setLoading(false);
+      } finally {
+        // Always set authLoading to false unless we're redirecting
+        setAuthLoading(false);
       }
     };
 
     initKeycloak();
-  }, []); // ← IMPORTANT: Empty dependency array - only run once on mount
+  }, [deploymentLoading, isLocal]); // Run when deployment info changes
 
   // Debug check remains the same
   useEffect(() => {
@@ -79,16 +86,25 @@ const App: React.FC = () => {
       console.log("App: Periodic keycloak check:");
       console.log("App: - authenticated:", keycloak.authenticated);
       console.log("App: - token exists:", !!keycloak.token);
+      
+      // IMPORTANT: If we detect authentication but our state doesn't reflect it,
+      // update the state
+      if (keycloak.authenticated && !authenticated) {
+        console.log("Detected authentication from periodic check!");
+        setAuthenticated(true);
+        setAuthLoading(false);
+      }
+      
       if (keycloak.token) {
         console.log("App: - token start:", keycloak.token.substring(0, 10));
       }
     }, 2000);
     
     return () => clearInterval(checkInterval);
-  }, [isLocal]);
+  }, [isLocal, authenticated]);
 
-  if (isLoading || loading) {
-    return <div>Loading application...</div>;
+  if (deploymentLoading || authLoading) {
+    return <div>Loading application... (Deployment: {deploymentLoading ? 'Loading' : 'Ready'}, Auth: {authLoading ? 'Loading' : 'Ready'})</div>;
   }
 
   return (
