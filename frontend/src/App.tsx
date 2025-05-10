@@ -11,11 +11,18 @@ import useDeployment from "./hooks/useDeployment";
 import AuthStatus from "./components/AuthStatus.tsx";
 
 const App: React.FC = () => {
-  const { isLocal } = useDeployment();
+  const { isLocal, isLoading } = useDeployment();
   const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Don't do anything until deployment state is loaded
+    if (isLoading) {
+      return;
+    }
+
+    console.log("Deployment status loaded, isLocal:", isLocal);
+
     // Skip authentication in local development
     if (isLocal) {
       console.log("Local development mode - bypassing authentication");
@@ -31,7 +38,7 @@ const App: React.FC = () => {
         
         // We'll use check-sso which is less aggressive
         const auth = await keycloak.init({
-          onLoad: 'check-sso',
+          onLoad: 'login-required',
           checkLoginIframe: false
         });
         
@@ -67,10 +74,10 @@ const App: React.FC = () => {
     };
 
     initKeycloak();
-  }, []); // Empty dependency array - run once on mount
+  }, [isLocal, isLoading]); // Depend on both isLocal AND isLoading
 
-  if (loading) {
-    return <div>Loading authentication...</div>;
+  if (isLoading || loading) {
+    return <div>Loading application...</div>;
   }
 
   return (
