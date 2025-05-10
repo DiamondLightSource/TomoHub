@@ -79,6 +79,22 @@ const App: React.FC = () => {
     initKeycloak();
   }, [isLocal, isLoading]); // Depend on both isLocal AND isLoading
 
+  // Debug check - log keycloak status periodically
+  useEffect(() => {
+    if (isLocal) return;
+    
+    const checkInterval = setInterval(() => {
+      console.log("App: Periodic keycloak check:");
+      console.log("App: - authenticated:", keycloak.authenticated);
+      console.log("App: - token exists:", !!keycloak.token);
+      if (keycloak.token) {
+        console.log("App: - token start:", keycloak.token.substring(0, 10));
+      }
+    }, 2000);
+    
+    return () => clearInterval(checkInterval);
+  }, [isLocal]);
+
   if (isLoading || loading) {
     return <div>Loading application...</div>;
   }
