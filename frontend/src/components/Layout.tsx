@@ -7,7 +7,9 @@ import { LoaderProvider } from "../contexts/LoaderContext";
 import { CenterProvider } from "../contexts/CenterContext"; 
 import { Box, CssBaseline, Paper, styled } from "@mui/material";
 import Header from "./Header";
-import {Footer,Navbar} from "@diamondlightsource/sci-react-ui";
+import {Footer, Navbar, User} from "@diamondlightsource/sci-react-ui";
+import keycloak from "../keycloak";
+import useDeployment from "../hooks/useDeployment";
 
 const LeftSection = styled(Box)({
     display: "flex",
@@ -21,28 +23,47 @@ const RightSection = styled(Paper)({
     boxShadow:"none",
   });
 
-  const AppContainer = styled(Box)({
-    display: "flex",
-    flexDirection: "column",
-    minHeight: "100vh",
-    alignItems: "center", // Center the app horizontally
-    backgroundColor: "#fff", // Optional: Add a background color
-    overflowX:"hidden"
-  });
+const AppContainer = styled(Box)({
+  display: "flex",
+  flexDirection: "column",
+  minHeight: "100vh",
+  alignItems: "center",
+  backgroundColor: "#fff",
+  overflowX:"hidden"
+});
   
-  const MainContainer = styled(Box)({
-    display: "grid",
-    gridTemplateColumns: "900px auto", // Two columns
-    gap: "30px", // Space between columns
-    padding: "20px", // Generous padding
-    flex: 1, // Take up available space
-    alignItems: "flex-start",
-    margin:"30px auto",
-  });
-
-
+const MainContainer = styled(Box)({
+  display: "grid",
+  gridTemplateColumns: "900px auto",
+  gap: "30px",
+  padding: "20px",
+  flex: 1,
+  alignItems: "flex-start",
+  margin:"30px auto",
+});
 
 const Layout = () => {
+    const { isLocal } = useDeployment();
+    
+    // Determine the username to display
+    let username = 'Guest User';
+    
+    if (isLocal) {
+      username = 'Local Development User';
+    } else if (keycloak.authenticated && keycloak.tokenParsed) {
+      username = keycloak.tokenParsed.preferred_username || 
+                 keycloak.tokenParsed.name || 
+                 keycloak.tokenParsed.email || 
+                 'Authenticated User';
+    }
+    
+    // Handle logout
+    const handleLogout = () => {
+      if (!isLocal && keycloak.authenticated) {
+        keycloak.logout();
+      }
+    };
+    
     return (
         <>
         <LoaderProvider>
@@ -52,11 +73,17 @@ const Layout = () => {
                 <CssBaseline />
                 <AppContainer>
                 <Navbar logo="theme" >
+                <User
+                  color="white"
+                  onLogout={handleLogout}
+                  user={{
+                    fedid: username,
+                  }}
+                />
                 </Navbar>
                 <Header />
                   <MainContainer>
                     <LeftSection as="section" className="left-section">
-
                       <Outlet/>
                     </LeftSection>
                     <RightSection as="section" className="right-section">
