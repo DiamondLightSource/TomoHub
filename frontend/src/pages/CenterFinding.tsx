@@ -38,7 +38,7 @@ const CenterFinding = () => {
   // State for form inputs
   const [file, setFile] = useState<File | null>(null);
   const [algorithm, setAlgorithm] = useState("gridrec");
-  const [start, setStart] = useState(30);
+  const [start, setStart] = useState(0);
   const [stop, setStop] = useState(200);
   const [step, setStep] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
@@ -166,7 +166,7 @@ const CenterFinding = () => {
     if (!loaderContext || !loaderContext.isContextValid()) {
       setSnackbar({
         open: true,
-        message: "Please configure the loader properly before starting your reconstruction.",
+        message: "Please configure the loader before starting your reconstruction.",
         severity: "error"
       });
       return;
@@ -295,7 +295,7 @@ const CenterFinding = () => {
         component={Link}
         to=".."
         startIcon={<ArrowBackIcon />}
-        sx={{ mb: 2, color: "#899878" }}
+        sx={{ mb: 2}}
       >
         Back
       </Button>

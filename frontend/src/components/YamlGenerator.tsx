@@ -19,15 +19,20 @@ import {Link} from "react-router-dom"
 const YMLG = () => {
   const { methods } = useMethods();
   const [yamlFileName, setYamlFileName] = React.useState<string>('config');
-  const { method, module_path, parameters } = useLoader();
+  const { method, module_path, parameters, isContextValid } = useLoader();
   const { activeSweep } = useSweep();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { isLocal } = useDeployment();
-  
   // New state variables for cluster commands
   const [showClusterCommands, setShowClusterCommands] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  // Add snackbar state for loader validation
+  const [snackbarState, setSnackbarState] = useState({
+    open: false,
+    message: "",
+    severity: "error" as "success" | "error" | "info" | "warning"
+  });
   
   // Generate cluster commands based on current configuration
   const getClusterCommands = () => {
@@ -59,6 +64,16 @@ const YMLG = () => {
   };
 
   const generateAndDownloadYAML = async () => {
+    // Check if loader context is valid before proceeding
+    if (!isContextValid()) {
+      setSnackbarState({
+        open: true,
+        message: "Please configure the loader before generating the config file.",
+        severity: "error"
+      });
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError(null);
@@ -137,7 +152,13 @@ const YMLG = () => {
     }
   };
   
-
+  // Handle snackbar close
+  const handleSnackbarClose = () => {
+    setSnackbarState({
+      ...snackbarState,
+      open: false
+    });
+  };
   
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 10 }}>
@@ -158,7 +179,7 @@ const YMLG = () => {
             startIcon={<DownloadIcon />}
             onClick={generateAndDownloadYAML}
             size="small"
-            disabled={isLoading}
+            disabled={isLoading} // Only disable during loading, not for validation
           >
             {isLoading ? 'Generating...' : 'Get Config'}
           </Button>
@@ -178,7 +199,6 @@ const YMLG = () => {
           >
             Run HTTOMO (local)
           </Button>
-        
         </ButtonGroup>
         
         {!isLocal && (
@@ -255,6 +275,24 @@ const YMLG = () => {
           </IconButton>
         }
       />
+
+      {/* Loader validation error snackbar */}
+      <Snackbar
+        open={snackbarState.open}
+        autoHideDuration={5000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      >
+        <Alert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity={snackbarState.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbarState.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
