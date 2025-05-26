@@ -6,9 +6,6 @@ import { Card, Typography } from "@mui/material";
 const Guide: React.FC = () => {
   return (
        <>
-          <Typography variant="h4" sx={{mb:3}} gutterBottom>
-               TOMOHUB Demo - GUI for HTTOMO package
-          </Typography>
        <Card variant="outlined" sx={{ mx: "auto", mb: 2, p: 2, border: "1px solid #89987880", borderRadius: "4px" }}>
         <Typography variant="h6">
           What is tomohub ?
