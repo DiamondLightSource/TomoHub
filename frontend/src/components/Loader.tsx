@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // Added useEffect
 import {
   ToggleButton,
   ToggleButtonGroup,
@@ -9,7 +9,8 @@ import {
   Grid,
   Card,
   Modal,
-  Tooltip
+  Tooltip,
+  InputAdornment // Added InputAdornment
 } from "@mui/material";
 import ContrastIcon from "@mui/icons-material/Contrast";
 import PreviewIcon from "@mui/icons-material/Visibility"; // Icon for the preview button
@@ -33,17 +34,47 @@ const Loader: React.FC = () => {
 
   const [mode, setMode] = useState("setAddress");
   const [showExtraFields, setShowExtraFields] = useState(false);
-  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // State for modal visibility
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
-  const handleModeChange = (event, newMode) => {
+  // State for auto toggles
+  const [autoToggles, setAutoToggles] = useState({
+    dataPath: parameters.data_path === "auto",
+    imagePath: parameters.image_key_path === "auto",
+    rotationAnglePath: parameters.rotation_angles?.data_path === "auto",
+  });
+
+  // Effect to sync autoToggles if parameters change from elsewhere (e.g. context reset)
+  useEffect(() => {
+    setAutoToggles({
+      dataPath: parameters.data_path === "auto",
+      imagePath: parameters.image_key_path === "auto",
+      rotationAnglePath: parameters.rotation_angles?.data_path === "auto",
+    });
+  }, [parameters.data_path, parameters.image_key_path, parameters.rotation_angles?.data_path]);
+
+  const handleModeChange = (event: React.MouseEvent<HTMLElement>, newMode: string | null) => {
     if (newMode !== null) {
       setMode(newMode);
+      // If switching away from "setAddress" and rotationAnglePath was "auto", clear it
+      if (newMode === "defineCustom" && autoToggles.rotationAnglePath) {
+        handleAutoToggle("rotationAnglePath"); // This will set it to ""
+      }
     }
   };
 
   const toggleExtraFields = () => {
     if (showExtraFields) {
-      removeDarksAndFlats(); // Remove darks and flats when the option is deselected
+      removeDarksAndFlats();
+      // If hiding extra fields and imagePath was "auto", clear it
+      // This case might be complex if imagePath is mandatory when !showExtraFields
+      // For now, let's assume if user hides it, they might re-enable "auto" or fill it.
+    } else {
+      // If showing extra fields (meaning image_key_path will be hidden)
+      // and imagePath was "auto", we should clear it from context and toggle.
+      if (autoToggles.imagePath) {
+        setImageKeyPath(""); // Clear from context
+        setAutoToggles((prev) => ({ ...prev, imagePath: false })); // Update local toggle
+      }
     }
     setShowExtraFields(!showExtraFields);
   };
@@ -56,18 +87,51 @@ const Loader: React.FC = () => {
     setIsPreviewModalOpen(false); // Close the modal
   };
 
+  // Handler for the "auto" button toggle
+  const handleAutoToggle = (field: "dataPath" | "imagePath" | "rotationAnglePath") => {
+    setAutoToggles((prevToggles) => {
+      const newAutoState = !prevToggles[field];
+      const newValue = newAutoState ? "auto" : "";
+
+      if (field === "dataPath") {
+        setDataPath(newValue);
+      } else if (field === "imagePath") {
+        // Only update imageKeyPath if extra fields are not shown (where imageKeyPath is visible)
+        if (!showExtraFields) {
+          setImageKeyPath(newValue);
+        } else {
+          // If extra fields are shown, imageKeyPath is conceptually not used with "auto"
+          // but we still toggle the button state if user clicks it.
+          // The context value for imageKeyPath should remain empty or undefined.
+          if (newAutoState) setImageKeyPath("auto"); // set to auto if toggled on
+          else setImageKeyPath(""); // clear if toggled off
+        }
+      } else if (field === "rotationAnglePath") {
+        // Only update rotationAnglesDataPath if mode is "setAddress"
+        if (mode === "setAddress") {
+          setRotationAnglesDataPath(newValue);
+        } else {
+          // If mode is not "setAddress", rotation_angles.data_path is not used with "auto"
+          // but we still toggle the button state.
+          // The context value for rotation_angles.data_path should remain empty or undefined.
+          if (newAutoState) setRotationAnglesDataPath("auto");
+          else setRotationAnglesDataPath("");
+        }
+      }
+
+      return { ...prevToggles, [field]: newAutoState };
+    });
+  };
+
   return (
     <Card variant="outlined" sx={{ mx: "auto", mb: 2, p: 2, border: "1px solid #89987880", borderRadius: "4px" }}>
       {/* Title and Buttons */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-        <Typography gutterBottom variant="h6" color="primary" component="div" sx={{display:"flex",alignItems:"center"}}>
+        <Typography gutterBottom variant="h6" color="primary" component="div" sx={{ display: "flex", alignItems: "center" }}>
           <strong>Loader</strong>
-          <Tooltip
-                        title="Select to load predefined pipelines"
-                        placement="top-start"
-                        >
-                            <InfoIcon sx={{ml:0.5}} fontSize="small"/>
-                </Tooltip>
+          <Tooltip title="Select to load predefined pipelines" placement="top-start">
+            <InfoIcon sx={{ ml: 0.5 }} fontSize="small" />
+          </Tooltip>
         </Typography>
         <Box>
           <Button
@@ -95,10 +159,27 @@ const Loader: React.FC = () => {
         variant="outlined"
         fullWidth
         size="small"
-        value={parameters.data_path}
-        onChange={(e) => setDataPath(e.target.value)}
+        value={autoToggles.dataPath ? "auto" : parameters.data_path || ""}
+        disabled={autoToggles.dataPath}
+        onChange={(e) => {
+          if (!autoToggles.dataPath) setDataPath(e.target.value);
+        }}
         placeholder="path to the dataset in the input hdf5/NeXuS file containing image data"
         sx={{ mb: 1 }}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <Button
+                onClick={() => handleAutoToggle("dataPath")}
+                variant={autoToggles.dataPath ? "contained" : "outlined"}
+                size="small"
+                sx={{ mr: -1}} 
+              >
+                auto
+              </Button>
+            </InputAdornment>
+          ),
+        }}
       />
 
       {/* Conditionally render the image_key_path text field */}
@@ -108,10 +189,27 @@ const Loader: React.FC = () => {
           variant="outlined"
           fullWidth
           size="small"
-          value={parameters.image_key_path || ""}
-          onChange={(e) => setImageKeyPath(e.target.value)}
+          value={autoToggles.imagePath ? "auto" : parameters.image_key_path || ""}
+          disabled={autoToggles.imagePath}
+          onChange={(e) => {
+            if (!autoToggles.imagePath) setImageKeyPath(e.target.value);
+          }}
           placeholder="path to the image key in your data"
           sx={{ mb: 1 }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <Button
+                  onClick={() => handleAutoToggle("imagePath")}
+                  variant={autoToggles.imagePath ? "contained" : "outlined"}
+                  size="small"
+                  sx={{ mr: -1 }}
+                >
+                  auto
+                </Button>
+              </InputAdornment>
+            ),
+          }}
         />
       )}
 
@@ -141,10 +239,27 @@ const Loader: React.FC = () => {
           variant="outlined"
           fullWidth
           size="small"
-          value={parameters.rotation_angles.data_path || ""}
-          onChange={(e) => setRotationAnglesDataPath(e.target.value)}
+          value={autoToggles.rotationAnglePath ? "auto" : parameters.rotation_angles.data_path || ""}
+          disabled={autoToggles.rotationAnglePath}
+          onChange={(e) => {
+            if (!autoToggles.rotationAnglePath) setRotationAnglesDataPath(e.target.value);
+          }}
           placeholder="Path to rotation angle dataset in your data"
           sx={{ mb: 1 }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <Button
+                  onClick={() => handleAutoToggle("rotationAnglePath")}
+                  variant={autoToggles.rotationAnglePath ? "contained" : "outlined"}
+                  size="small"
+                  sx={{ mr: -1 }}
+                >
+                  auto
+                </Button>
+              </InputAdornment>
+            ),
+          }}
         />
       ) : (
         <Grid container spacing={2} sx={{ mb: 1 }}>
@@ -227,7 +342,7 @@ const Loader: React.FC = () => {
               value={parameters.darks?.data_path || ""}
               onChange={(e) => setDarks(parameters.darks?.file || "", e.target.value)}
               sx={{ mb: 1 }}
-               placeholder="dataset that contains the darks data"
+              placeholder="dataset that contains the darks data"
             />
           </Grid>
           <Grid item xs={6}>

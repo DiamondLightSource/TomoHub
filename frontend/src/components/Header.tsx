@@ -11,7 +11,6 @@ import yaml from 'js-yaml';
 import { useLoader, PreviewType } from '../contexts/LoaderContext';
 import { useMethods, Method as MethodType } from '../contexts/MethodsContext';
 
-// Forward ref for MuiAlert
 const Alert = React.forwardRef<HTMLDivElement, import('@mui/material').AlertProps>(function Alert(
   props,
   ref,
