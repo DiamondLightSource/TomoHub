@@ -123,6 +123,10 @@ const YMLG = () => {
 
       // Combine LoaderContext and MethodsContext data
       const combinedData = [loaderContextObject, ...transformedMethods];
+      
+      // Process the data for JSON logging (add double braces)
+      const processedJsonData = processDataForJson(combinedData);
+      console.log("Processed JSON data:", processedJsonData);
 
       // Prepare data for the backend
       const requestData = {
@@ -131,7 +135,7 @@ const YMLG = () => {
         sweepConfig: activeSweep || null,
       };
 
-      // Use the YAML service instead of directly using axios
+      // Use the YAML service to get the YAML file
       const blobData = await yamlService.generateYaml(requestData);
 
       // Create a download from the response blob
@@ -158,6 +162,53 @@ const YMLG = () => {
       ...snackbarState,
       open: false
     });
+  };
+
+
+  const processDataForJson = (data: any): any => {
+    // Create a deep copy to avoid modifying the original
+    const processedData = JSON.parse(JSON.stringify(data));
+    
+    // Helper function to recursively process objects
+    const processObject = (obj: any): void => {
+      for (const key in obj) {
+        if (typeof obj[key] === 'object' && obj[key] !== null) {
+          if (Array.isArray(obj[key])) {
+            processArray(obj[key]);
+          } else {
+            processObject(obj[key]);
+          }
+        } else if (typeof obj[key] === 'string' && obj[key].includes('${') && !obj[key].includes('${{')) {
+          // Replace ${something} with ${{something}}
+          obj[key] = obj[key].replace(/\$\{([^}]+)\}/g, '${{$1}}');
+        }
+      }
+    };
+    
+    // Helper function to process arrays
+    const processArray = (arr: any[]): void => {
+      for (let i = 0; i < arr.length; i++) {
+        if (typeof arr[i] === 'object' && arr[i] !== null) {
+          if (Array.isArray(arr[i])) {
+            processArray(arr[i]);
+          } else {
+            processObject(arr[i]);
+          }
+        } else if (typeof arr[i] === 'string' && arr[i].includes('${') && !arr[i].includes('${{')) {
+          // Replace ${something} with ${{something}}
+          arr[i] = arr[i].replace(/\$\{([^}]+)\}/g, '${{$1}}');
+        }
+      }
+    };
+    
+    // Start processing
+    if (Array.isArray(processedData)) {
+      processArray(processedData);
+    } else if (typeof processedData === 'object' && processedData !== null) {
+      processObject(processedData);
+    }
+    
+    return processedData;
   };
   
   return (
