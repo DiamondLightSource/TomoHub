@@ -2,9 +2,9 @@ import React, { createContext, useState, ReactNode, useContext } from "react";
 
 // Define the type for the parameters object
 export interface PreviewType {
-  start?: number | "begin" | "mid" | "end";
+  start?: number | "begin" | "mid" | "end" |null;
   start_offset?: number;
-  stop?: number | "begin" | "mid" | "end";
+  stop?: number | "begin" | "mid" | "end" |null;
   stop_offset?: number;
   mid?: "begin" | "mid" | "end"; // Only these values are allowed for mid
 }
@@ -13,24 +13,24 @@ interface ParametersType {
   data_path: string;
   image_key_path?: string;
   rotation_angles: {
-    data_path?: string;
+    data_path?: string | "auto";
     user_defined?: {
       start_angle: string;
       stop_angle: string;
       angles_total: string;
     };
-  };
+  }  | "auto";
   darks?: {
     file: string;
     data_path: string;
-  };
+  } | null;
   flats?: {
     file: string;
     data_path: string;
-  };
+  } | null;
   preview?: {
-    detector_x?: PreviewType; // Renamed from preview_x to detector_x
-    detector_y?: PreviewType; // Renamed from preview_y to detector_y
+    detector_x?: PreviewType | null; // Renamed from preview_x to detector_x
+    detector_y?: PreviewType | null; // Renamed from preview_y to detector_y
   };
 }
 
@@ -160,10 +160,12 @@ export const LoaderProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     
     // Check if rotation_angles is properly set
     const hasRotationAnglesPath = 
-      parameters.rotation_angles?.data_path && 
+      typeof parameters.rotation_angles === 'object' &&
+      parameters.rotation_angles?.data_path &&
       parameters.rotation_angles.data_path.trim() !== '';
       
     const hasUserDefinedAngles = 
+      typeof parameters.rotation_angles === 'object' &&
       parameters.rotation_angles?.user_defined &&
       parameters.rotation_angles.user_defined.start_angle.trim() !== '' &&
       parameters.rotation_angles.user_defined.stop_angle.trim() !== '' &&
@@ -178,13 +180,15 @@ export const LoaderProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     
     const hasDarks = 
       parameters.darks !== undefined && 
+      parameters.darks !== null &&
       parameters.darks.file !== undefined &&
       parameters.darks.file.trim() !== '' &&
       parameters.darks.data_path !== undefined &&
       parameters.darks.data_path.trim() !== '';
       
     const hasFlats = 
-      parameters.flats !== undefined && 
+    parameters.flats !== undefined &&
+      parameters.flats !== null &&
       parameters.flats.file !== undefined &&
       parameters.flats.file.trim() !== '' &&
       parameters.flats.data_path !== undefined &&

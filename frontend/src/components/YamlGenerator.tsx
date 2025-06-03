@@ -22,6 +22,7 @@ import { useSweep } from "../contexts/SweepContext";
 import { yamlService } from "../api/services";
 import useDeployment from "../hooks/useDeployment";
 import { Link } from "react-router-dom";
+import Loader from "./Loader";
 
 const YMLG = () => {
   const { methods } = useMethods();
@@ -79,36 +80,65 @@ const YMLG = () => {
   };
 
   const generateAndDownloadYAML = async () => {
+    // Create a local copy of the parameters object
+    let updatedParameters = { ...parameters };
+  
     // Check if loader context is valid
     if (!isContextValid()) {
       // Automatically set required fields to "auto"
-      if (!parameters.data_path || parameters.data_path.trim() === "") {
+      if (!updatedParameters.data_path || updatedParameters.data_path.trim() === "") {
+        updatedParameters.data_path = "auto";
         setDataPath("auto");
       }
       if (
-        !parameters.rotation_angles?.data_path ||
-        parameters.rotation_angles.data_path.trim() === ""
+        typeof updatedParameters.rotation_angles === "string" ||
+        !updatedParameters.rotation_angles ||
+        !updatedParameters.rotation_angles.data_path ||
+        updatedParameters.rotation_angles.data_path.trim() === ""
       ) {
+        updatedParameters.rotation_angles = "auto";
+        // Also update in the context (this is optional)
         setRotationAnglesDataPath("auto");
       }
-      if (
-        !parameters.image_key_path ||
-        parameters.image_key_path.trim() === ""
-      ) {
+      
+      // Check if we have darks and flats
+      const hasDarks = updatedParameters.darks && updatedParameters.darks.file && updatedParameters.darks.file.trim() !== "";
+      const hasFlats = updatedParameters.flats && updatedParameters.flats.file && updatedParameters.flats.file.trim() !== "";
+      
+      // If we have both darks and flats, remove image_key_path
+      if (hasDarks && hasFlats) {
+        delete updatedParameters.image_key_path;
+      }
+      // Otherwise, set it to "auto" if it's empty
+      else if (!updatedParameters.image_key_path || updatedParameters.image_key_path.trim() === "") {
+        updatedParameters.image_key_path = "auto";
         setImageKeyPath("auto");
       }
     }
-
+  
+    // Ensure preview is always set with null start and stop for both detector_x and detector_y
+    // This happens regardless of the context validation
+    updatedParameters.preview = {
+      detector_x: {
+        start: null,
+        stop: null,
+      },
+      detector_y: {
+        start: null,
+        stop: null,
+      },
+    };
+  
     try {
       setIsLoading(true);
       setError(null);
-
+  
       const loaderContextObject = {
         method,
         module_path,
-        parameters,
+        parameters: updatedParameters, // Use the updated parameters object
       };
-
+  
       // Transform methods and inject calculate_stats where needed
       const transformedMethods = methods.reduce((acc: any[], method) => {
         const transformedMethod = {
@@ -116,7 +146,7 @@ const YMLG = () => {
           module_path: method.method_module,
           parameters: { ...method.parameters },
         };
-
+  
         if (method.method_name === "rescale_to_int") {
           acc.push({
             method: "calculate_stats",
@@ -128,7 +158,7 @@ const YMLG = () => {
             },
           });
         }
-
+  
         if (
           method.method_name === "find_center_vo" ||
           method.method_name === "find_center_pc"
@@ -141,20 +171,20 @@ const YMLG = () => {
         } else {
           acc.push(transformedMethod);
         }
-
+  
         return acc;
       }, []);
-
+  
       const combinedData = [loaderContextObject, ...transformedMethods];
-
+  
       const requestData = {
         data: combinedData,
         fileName: yamlFileName,
         sweepConfig: activeSweep || null,
       };
-
+  
       const blobData = await yamlService.generateYaml(requestData);
-
+  
       const url = window.URL.createObjectURL(new Blob([blobData]));
       const link = document.createElement("a");
       link.href = url;
@@ -169,14 +199,14 @@ const YMLG = () => {
     } finally {
       setIsLoading(false);
     }
-    
+  
     setSnackbarState({
       open: true,
       message: "Configuration file generated successfully",
       severity: "info",
     });
   };
-
+  
   // Handle snackbar close
   const handleSnackbarClose = () => {
     setSnackbarState({
