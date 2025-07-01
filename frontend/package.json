@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "relay" : "relay-compiler",
+    "relay:watch": "relay-compiler --watch"
   },
   "dependencies": {
     "@diamondlightsource/sci-react-ui": "^0.1.0",
@@ -25,7 +27,9 @@
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.3.1",
+    "react-relay": "^20.0.0",
     "react-router-dom": "^6.23.0",
+    "relay-runtime": "^20.0.0",
     "three": "^0.173.0"
   },
   "devDependencies": {

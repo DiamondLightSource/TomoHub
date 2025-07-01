@@ -8,7 +8,7 @@ const keycloakConfig = {
 };
 
 // Create Keycloak instance
-const keycloak = new Keycloak(keycloakConfig);
+const keycloak = new Keycloak(keycloakConfig); 
 
 // Add basic event handlers for logging
 keycloak.onAuthSuccess = () => {

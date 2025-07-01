@@ -6,13 +6,16 @@ import {
   ThemeProvider,
   DiamondTheme
 } from "@diamondlightsource/sci-react-ui";
-
+import { RelayEnvironmentProvider } from 'react-relay';
+import { RelayEnvironment } from './RelayEnviornment';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider theme={DiamondTheme}>
       <CssBaseline />
-      <App />
+      <RelayEnvironmentProvider environment={RelayEnvironment}>
+        <App />
+      </RelayEnvironmentProvider>
     </ThemeProvider>
   </StrictMode>
 )
