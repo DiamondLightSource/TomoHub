@@ -10,6 +10,7 @@ import {
   SubmittedMessagesList,
   Visit,
 } from "workflows-lib";
+import { visitToText } from "@diamondlightsource/sci-react-ui";
 import SubmissionForm from "./SubmissionForm";
 import { SubmissionQuery as SubmissionQueryType } from "./__generated__/SubmissionQuery.graphql";
 import { SubmissionMutation as SubmissionMutationType } from "./__generated__/SubmissionMutation.graphql";
@@ -86,7 +87,7 @@ export default function Submission({
           setSubmissionResults((prev) => [
             {
               type: "success",
-              message: `successfully submitted workflow: ${submittedName}`,
+              message: `${visitToText(visit)}/${submittedName}`,
             },
             ...prev,
           ]);

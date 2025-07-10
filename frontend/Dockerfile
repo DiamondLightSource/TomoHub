@@ -1,7 +1,7 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --force 
+RUN npm install --force --legacy-peer-deps
 COPY . .
 RUN npm run build 
 
