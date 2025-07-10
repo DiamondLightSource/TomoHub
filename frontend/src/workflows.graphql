@@ -394,11 +394,3 @@ input WorkflowTemplatesFilter {
 	"""
 	scienceGroup: String
 }
-
-directive @include(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
-directive @skip(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
-directive @specifiedBy(url: String!) on SCALAR
-extend schema @link(
-	url: "https://specs.apollo.dev/federation/v2.3",
-	import: ["@key", "@tag", "@shareable", "@inaccessible", "@override", "@external", "@provides", "@requires", "@composeDirective", "@interfaceObject"]
-)
