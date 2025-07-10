@@ -1,8 +1,10 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --force --legacy-peer-deps
-RUN npm run relay
+# Clear npm cache and install with no-cache
+RUN npm cache clean --force
+RUN npm install --force --legacy-peer-deps --no-cache
+
 COPY . .
 RUN npm run build 
 
