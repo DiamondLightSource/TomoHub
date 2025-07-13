@@ -15,7 +15,7 @@ import {
   .then(
     auth => {
       if (!auth) {
-        // window.location.reload();
+        window.location.reload();
       } else {
         console.info("Authenticated");
         console.log("auth", auth);

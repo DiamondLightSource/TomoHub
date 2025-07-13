@@ -19,4 +19,5 @@ keycloak.onAuthError = (error) => {
   console.error('Auth error:', error);
 };
 
+
 export default keycloak;
