@@ -9,31 +9,11 @@ import {
   
   const HTTP_ENDPOINT = "https://workflows.diamond.ac.uk/graphql";
   
-  const kcinit = keycloak.init({
-    onLoad: "login-required"
-  })
-  .then(
-    auth => {
-      if (!auth) {
-        window.location.reload();
-      } else {
-        console.info("Authenticated");
-        console.log("auth", auth);
-        keycloak.onTokenExpired = () => {
-          console.log("token expired");
-        };
-      }
-    },
-    () => {
-      console.error("Authentication failed");
-    }
-  );
-  
-  
   const fetchFn: FetchFunction = async (request, variables) => {
-    if (!keycloak.authenticated) {
-      await kcinit;
-    }
+    // Refresh token if needed (minValidity in seconds)
+    await keycloak.updateToken(10).catch(() => {
+      keycloak.login();
+    });
   
     if (keycloak.token) {
       const resp = await fetch(HTTP_ENDPOINT, {
@@ -45,7 +25,7 @@ import {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          query: request.text, // <-- The GraphQL document composed by Relay
+          query: request.text,
           variables,
         }),
       });
@@ -54,7 +34,7 @@ import {
     } else {
       console.log("Not authenticated yet");
       return {};
-    }
+    } 
   };
   
   function createRelayEnvironment() {
