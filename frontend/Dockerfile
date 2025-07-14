@@ -6,6 +6,9 @@ RUN npm cache clean --force
 RUN npm install --force --legacy-peer-deps --no-cache
 
 COPY . .
+
+RUN npm run relay
+
 RUN npm run build 
 
 FROM nginx:stable-alpine
