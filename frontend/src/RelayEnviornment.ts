@@ -7,7 +7,7 @@ import {
   } from "relay-runtime";
   import keycloak from "./keycloak";
   
-  const HTTP_ENDPOINT = "https://workflows.diamond.ac.uk/graphql";
+  const HTTP_ENDPOINT = "https://graph.diamond.ac.uk/";
   
   const fetchFn: FetchFunction = async (request, variables) => {
     // Refresh token if needed (minValidity in seconds)
