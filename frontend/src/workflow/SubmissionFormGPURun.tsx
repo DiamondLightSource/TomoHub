@@ -13,6 +13,7 @@ import { VisitInput } from "@diamondlightsource/sci-react-ui";
 import { SubmissionFormFragment$key } from "./__generated__/SubmissionFormFragment.graphql";
 import Loader from "../components/Loader";
 import { useLoader } from "../contexts/LoaderContext";
+import { useMethods } from "../contexts/MethodsContext";
 
 const submissionFormFragment = graphql`
   fragment SubmissionFormFragment on WorkflowTemplate {
@@ -34,34 +35,31 @@ const SubmissionFormGPURun = (props: {
   const data = useFragment(submissionFormFragment, props.template);
   const theme = useTheme();
   const validator = createAjv({ useDefaults: true, coerceTypes: true });
-  const { method, module_path, parameters: loaderParams, isContextValid } = useLoader();
+  const {
+    method,
+    module_path,
+    parameters: loaderParams,
+    isContextValid,
+    setDataPath,
+    setImageKeyPath,
+    setRotationAnglesDataPath,
+  } = useLoader();
+  const { methods } = useMethods();
 
   const customSchema = {
     type: "object",
     properties: {
-      start: { type: "number", default: 300, title: "Start" },
-      stop: { type: "number", default: 350, title: "Stop" },
-      step: { type: "number", default: 10, title: "Step" },
       input: { type: "string", title: "Input Path" },
       output: { type: "string", title: "Output Path" },
       nprocs: { type: "string", default: "1", title: "Number of Processes" },
       memory: { type: "string", default: "20Gi", title: "Memory" },
-      httomo_outdir_name: { type: "string", default: "sweep-run", title: "HTTomo Output Directory" },
     },
-    required: ["start", "stop", "step", "input", "output", "nprocs", "memory"],
+    required: ["input", "output", "nprocs", "memory"],
   };
 
   const customUISchema: UISchemaElement = {
     type: "VerticalLayout",
     elements: [
-      {
-        type: "HorizontalLayout",
-        elements: [
-          { type: "Control", scope: "#/properties/start" },
-          { type: "Control", scope: "#/properties/stop" },
-          { type: "Control", scope: "#/properties/step" }
-        ]
-      },
       {
         type: "HorizontalLayout",
         elements: [
@@ -73,8 +71,7 @@ const SubmissionFormGPURun = (props: {
         type: "HorizontalLayout",
         elements: [
           { type: "Control", scope: "#/properties/nprocs" },
-          { type: "Control", scope: "#/properties/memory" },
-          { type: "Control", scope: "#/properties/httomo_outdir_name" }
+          { type: "Control", scope: "#/properties/memory" }
         ]
       }
     ]
@@ -84,89 +81,111 @@ const SubmissionFormGPURun = (props: {
   const [errors, setErrors] = useState<ErrorObject[]>([]);
   const [submitted, setSubmitted] = useState(false);
 
-  const generateConfigJSON = (formParams: any) => {
-    // Create a local copy of the loader parameters and handle auto-filling similar to YAML generator
-    let updatedLoaderParams = { ...loaderParams };
+  const generateConfigJSON = () => {
+    // Create a local copy of the parameters object (exactly like YAML generator)
+    let updatedParameters = { ...loaderParams };
 
-    // Auto-fill missing required fields if context is invalid (similar to YAML generator logic)
+    // Check if loader context is valid (exactly like YAML generator)
     if (!isContextValid()) {
-      if (!updatedLoaderParams.data_path || updatedLoaderParams.data_path.trim() === "") {
-        updatedLoaderParams.data_path = "auto";
+      // Automatically set required fields to "auto"
+      if (!updatedParameters.data_path || updatedParameters.data_path.trim() === "") {
+        updatedParameters.data_path = "auto";
+        setDataPath("auto");
       }
-      
       if (
-        typeof updatedLoaderParams.rotation_angles === "string" ||
-        !updatedLoaderParams.rotation_angles ||
-        !updatedLoaderParams.rotation_angles.data_path ||
-        updatedLoaderParams.rotation_angles.data_path.trim() === ""
+        typeof updatedParameters.rotation_angles === "string" ||
+        !updatedParameters.rotation_angles ||
+        !updatedParameters.rotation_angles.data_path ||
+        updatedParameters.rotation_angles.data_path.trim() === ""
       ) {
-        updatedLoaderParams.rotation_angles = "auto";
+        updatedParameters.rotation_angles = "auto";
+        // Also update in the context (this is optional)
+        setRotationAnglesDataPath("auto");
       }
       
       // Check if we have darks and flats
-      const hasDarks = updatedLoaderParams.darks && updatedLoaderParams.darks.file && updatedLoaderParams.darks.file.trim() !== "";
-      const hasFlats = updatedLoaderParams.flats && updatedLoaderParams.flats.file && updatedLoaderParams.flats.file.trim() !== "";
+      const hasDarks = updatedParameters.darks && updatedParameters.darks.file && updatedParameters.darks.file.trim() !== "";
+      const hasFlats = updatedParameters.flats && updatedParameters.flats.file && updatedParameters.flats.file.trim() !== "";
       
       // If we have both darks and flats, remove image_key_path
       if (hasDarks && hasFlats) {
-        delete updatedLoaderParams.image_key_path;
+        delete updatedParameters.image_key_path;
       }
       // Otherwise, set it to "auto" if it's empty
-      else if (!updatedLoaderParams.image_key_path || updatedLoaderParams.image_key_path.trim() === "") {
-        updatedLoaderParams.image_key_path = "auto";
+      else if (!updatedParameters.image_key_path || updatedParameters.image_key_path.trim() === "") {
+        updatedParameters.image_key_path = "auto";
+        setImageKeyPath("auto");
       }
     }
 
-    const config = [
-      {
-        method: method,
-        module_path: module_path,
-        parameters: updatedLoaderParams
+    // Ensure preview is always set with null start and stop for both detector_x and detector_y
+    // This happens regardless of the context validation (exactly like YAML generator)
+    updatedParameters.preview = {
+      detector_x: {
+        start: null,
+        stop: null,
       },
-      {
-        method: "normalize",
-        module_path: "tomopy.prep.normalize",
-        parameters: {
-          cutoff: null,
-          averaging: "mean"
-        }
+      detector_y: {
+        start: null,
+        stop: null,
       },
-      {
-        method: "minus_log",
-        module_path: "tomopy.prep.normalize",
-        parameters: {}
-      },
-      {
-        method: "recon",
-        module_path: "tomopy.recon.algorithm",
-        parameters: {
-          center: {
-            start: formParams.start,
-            stop: formParams.stop,
-            step: formParams.step
+    };
+
+    const loaderContextObject = {
+      method,
+      module_path,
+      parameters: updatedParameters, // Use the updated parameters object
+    };
+
+    // Transform methods and inject calculate_stats where needed (exactly like YAML generator)
+    const transformedMethods = methods.reduce((acc: any[], method) => {
+      const transformedMethod = {
+        method: method.method_name,
+        module_path: method.method_module,
+        parameters: { ...method.parameters },
+      };
+
+      if (method.method_name === "rescale_to_int") {
+        acc.push({
+          method: "calculate_stats",
+          module_path: "httomo.methods",
+          parameters: {},
+          id: "statistics",
+          side_outputs: {
+            glob_stats: "glob_stats",
           },
-          sinogram_order: false,
-          algorithm: "gridrec",
-          init_recon: null
-        }
+        });
       }
-    ];
-    
-    return JSON.stringify(config);
+
+      if (
+        method.method_name === "find_center_vo" ||
+        method.method_name === "find_center_pc"
+      ) {
+        acc.push({
+          ...transformedMethod,
+          id: "centering",
+          sideoutput: { cor: "center_of_rotation" },
+        });
+      } else {
+        acc.push(transformedMethod);
+      }
+
+      return acc;
+    }, []);
+
+    const combinedData = [loaderContextObject, ...transformedMethods];
+
+    return JSON.stringify(combinedData);
   };
 
   const onClick = (visit: Visit, submitParams?: object) => {
-    // Check if loader context is valid (allow auto-filling like YAML generator)
-    if (!isContextValid()) {
-      console.warn("Loader configuration is incomplete, but proceeding with auto-filled values");
-    }
-
     if (errors.length === 0) {
-      const configJSON = generateConfigJSON(parameters);
+      const configJSON = generateConfigJSON();
       
       // Debug logging
-      console.log("Generated config JSON:", configJSON);
+      console.log("Generated config JSON for httomo-gpu-job:", configJSON);
       console.log("Loader parameters:", loaderParams);
+      console.log("Methods:", methods);
       console.log("Form parameters:", parameters);
 
       // Create final parameters object for mutation
@@ -175,8 +194,7 @@ const SubmissionFormGPURun = (props: {
         input: parameters.input,
         output: parameters.output,
         nprocs: parameters.nprocs,
-        memory: parameters.memory,
-        "httomo-outdir-name": parameters.httomo_outdir_name // Note the hyphen in the key name to match Argo template
+        memory: parameters.memory
       };
 
       props.onSubmit(visit, finalParams);
@@ -191,27 +209,36 @@ const SubmissionFormGPURun = (props: {
   const formWidth = 
     (data.uiSchema?.options?.formWidth as string | undefined) ?? "100%";
 
+  const hasLoaderData = isContextValid();
+  const hasMethodsData = methods && methods.length > 0;
+
   return (
     <Stack
       direction="column"
       spacing={theme.spacing(2)}
       sx={{ width: formWidth }}
     >
-    <Typography variant="h4" align="center">
-      Workflow: {data.title ? data.title : data.name}
-    </Typography>
-    <Typography variant="body1" align="center">
-      {data.description}
-    </Typography>
+      <Typography variant="h4" align="center">
+        Workflow: {data.title ? data.title : data.name}
+      </Typography>
+      <Typography variant="body1" align="center">
+        {data.description}
+      </Typography>
       
-      
+      <Divider />
       
       {/* Loader Component */}
       <Loader />
       
-      {!isContextValid() && (
+      {!hasLoaderData && (
         <Alert severity="info">
           Some Loader fields are empty. They will be auto-filled with default values during submission.
+        </Alert>
+      )}
+      
+      {!hasMethodsData && (
+        <Alert severity="info">
+          No methods configured. Please add methods in the Methods section to create a complete pipeline.
         </Alert>
       )}
       

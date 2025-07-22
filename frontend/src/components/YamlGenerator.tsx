@@ -303,7 +303,7 @@ const YMLG = () => {
             startIcon={<PlayArrowIcon />}
             size="small"
           >
-            Run HTTOMO (local)
+            Run HTTOMO (Workflow Run)
           </Button>
         </ButtonGroup>
       </Box>
