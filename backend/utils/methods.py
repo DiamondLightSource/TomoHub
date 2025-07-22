@@ -40,6 +40,6 @@ METHOD_CATEGORIES = {
         ]
     },
     "reconstruction": {
-        "httomolibgpu.recon.algorithm": ["FBP", "LPRec", "SIRT", "CGLS"]
+        "httomolibgpu.recon.algorithm": ["FBP3d_tomobar", "SIRT3d_tomobar", "CGLS3d_tomobar", "LPRec3d_tomobar","FBP2d_astra"]
     },
 }
