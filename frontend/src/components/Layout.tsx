@@ -69,14 +69,13 @@ const Layout = () => {
               <CenterProvider> 
                 <CssBaseline />
                 <AppContainer>
-                <Navbar logo="theme" >
-                <User
+                <Navbar logo="theme" rightSlot={<User
                   color="white"
                   onLogout={handleLogout}
                   user={{
                     fedid: username,
                   }}
-                />
+                />}>
                 </Navbar>
                 <Header />
                   <MainContainer>
