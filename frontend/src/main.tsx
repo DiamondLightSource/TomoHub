@@ -11,8 +11,8 @@ import { RelayEnvironment } from './RelayEnviornment';
 import keycloak from './keycloak';
 
 // Wait for Keycloak before rendering
-keycloak.init({ onLoad: "login-required" }).then(authenticated => {
-  if (authenticated) {
+// keycloak.init({ onLoad: "login-required" }).then(authenticated => {
+//   if (authenticated) {
     createRoot(document.getElementById('root')!).render(
       <StrictMode>
         <ThemeProvider theme={DiamondTheme}>
@@ -23,7 +23,7 @@ keycloak.init({ onLoad: "login-required" }).then(authenticated => {
         </ThemeProvider>
       </StrictMode>
     );
-  } else {
-    window.location.reload();
-  }
-}); 
+//   } else {
+//     window.location.reload();
+//   }
+// }); 

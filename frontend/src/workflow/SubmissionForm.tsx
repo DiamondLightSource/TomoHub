@@ -27,6 +27,15 @@ const SubmissionForm = (props: {
   onSubmit: (visit: Visit, parameters: object) => void;
 }) => {
   const data = useFragment(submissionFormFragment, props.template);
+  const customSchema = {
+    type: "object",
+    properties: {
+      start: { type: "number", default: 0},
+      stop: { type: "number" },
+      step:{ type: "number" , default: 5}
+    },
+    required: ["start","stop","step"]
+  };
   
   return (
     <SubmissionFormBase

@@ -9,7 +9,7 @@ import { Box, CssBaseline, Paper, styled } from "@mui/material";
 import Header from "./Header";
 import {Footer, Navbar, User} from "@diamondlightsource/sci-react-ui";
 import keycloak from "../keycloak";
-import useDeployment from "../hooks/useDeployment";
+
 
 const LeftSection = styled(Box)({
     display: "flex",
@@ -43,14 +43,11 @@ const MainContainer = styled(Box)({
 });
 
 const Layout = () => {
-    const { isLocal } = useDeployment();
-    
+
     // Determine the username to display
     let username = 'Guest User';
     
-    if (isLocal) {
-      username = 'Local Development User';
-    } else if (keycloak.authenticated && keycloak.tokenParsed) {
+   if (keycloak.authenticated && keycloak.tokenParsed) {
       username = keycloak.tokenParsed.preferred_username || 
                  keycloak.tokenParsed.name || 
                  keycloak.tokenParsed.email || 
@@ -59,7 +56,7 @@ const Layout = () => {
     
     // Handle logout
     const handleLogout = () => {
-      if (!isLocal && keycloak.authenticated) {
+      if (keycloak.authenticated) {
         keycloak.logout();
       }
     };

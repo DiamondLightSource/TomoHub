@@ -60,25 +60,6 @@ export const fullpipelinesService = {
   },
 }
 
-export const reconstructionService = {
-  getPreviousJob: async (): Promise<any> => {
-    try {
-      const response = await apiClient.get('/centre/previous');
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 404) {
-        // No previous job found, not an error
-        return null;
-      }
-      throw error;
-    }
-  },
-  getImageUrl: (path: string): string => {
-    return `${apiClient.defaults.baseURL}/centre/image?path=${encodeURIComponent(path)}`;
-  }
-};
-
-
 export const yamlService = {
   generateYaml: async (requestData: any): Promise<Blob> => {
     const response = await apiClient.post('/yaml/generate', requestData, {
@@ -88,10 +69,4 @@ export const yamlService = {
   },
 };
 
-export const systemService = {
-  getDeploymentMode: async (): Promise<{mode: string}> => {
-    const response = await apiClient.get('/system/deployment');
-    return response.data;
-  },
-};
 
