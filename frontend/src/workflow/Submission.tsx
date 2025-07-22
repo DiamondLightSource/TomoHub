@@ -11,7 +11,8 @@ import {
   Visit,
 } from "workflows-lib";
 import { visitToText } from "@diamondlightsource/sci-react-ui";
-import SubmissionForm from "./SubmissionForm";
+import SubmissionFormGPURun from "./SubmissionFormGPURun";
+import SubmissionFormCOR from "./SubmissionFormCOR";
 import { SubmissionQuery as SubmissionQueryType } from "./__generated__/SubmissionQuery.graphql";
 import { SubmissionMutation as SubmissionMutationType } from "./__generated__/SubmissionMutation.graphql";
 import React from "react";
@@ -106,16 +107,30 @@ export default function Submission({
     });
   }
 
+  // Conditionally render the appropriate form component
+  const renderSubmissionForm = () => {
+    const commonProps = {
+      template: data.workflowTemplate,
+      prepopulatedParameters,
+      visit,
+      onSubmit: submitWorkflow,
+    };
+
+    switch (workflowName) {
+      case "httomo-cor-sweep":
+        return <SubmissionFormCOR {...commonProps} />;
+      case "httomo-gpu-job":
+        return <SubmissionFormGPURun {...commonProps} />;
+      default:
+        return <SubmissionFormGPURun {...commonProps} />; // Default fallback
+    }
+  };
+
   return (
     <>
       {workflowName ? (
         <Box>
-          <SubmissionForm
-            template={data.workflowTemplate}
-            prepopulatedParameters={prepopulatedParameters}
-            visit={visit}
-            onSubmit={submitWorkflow}
-          />
+          {renderSubmissionForm()}
           <SubmittedMessagesList submissionResults={submissionResults} />
         </Box>
       ) : (

@@ -197,17 +197,14 @@ const SubmissionForm = (props: {
       spacing={theme.spacing(2)}
       sx={{ width: formWidth }}
     >
-      <Typography variant="h4" align="center">
-        {data.title ? data.title : data.name}
-      </Typography>
-      <Typography variant="body1" align="center">
-        {data.description}
-      </Typography>
-      <Typography variant="body1" align="center">
-        Maintainer: {data.maintainer}
-      </Typography>
+    <Typography variant="h4" align="center">
+      Workflow: {data.title ? data.title : data.name}
+    </Typography>
+    <Typography variant="body1" align="center">
+      {data.description}
+    </Typography>
       
-      <Divider />
+      
       
       {/* Loader Component */}
       <Loader />
