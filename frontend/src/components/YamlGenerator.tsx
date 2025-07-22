@@ -20,7 +20,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useLoader } from "../contexts/LoaderContext";
 import { useSweep } from "../contexts/SweepContext";
 import { yamlService } from "../api/services";
-import useDeployment from "../hooks/useDeployment";
 import { Link } from "react-router-dom";
 import Loader from "./Loader";
 
@@ -39,7 +38,6 @@ const YMLG = () => {
   const { activeSweep } = useSweep();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { isLocal } = useDeployment();
   // New state variables for cluster commands
   const [showClusterCommands, setShowClusterCommands] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
@@ -301,20 +299,13 @@ const YMLG = () => {
           </Button>
           <Button
             component={Link}
-            to="/run"
+            to="/workflow-run"
             startIcon={<PlayArrowIcon />}
             size="small"
-            disabled={!isLocal}
           >
             Run HTTOMO (local)
           </Button>
         </ButtonGroup>
-
-        {!isLocal && (
-          <Tooltip title="Run HTTOMO only available in local mode">
-            <HelpOutlineIcon color="disabled" sx={{ ml: 1 }} />
-          </Tooltip>
-        )}
       </Box>
 
       {/* Cluster commands display box */}

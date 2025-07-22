@@ -3,7 +3,7 @@ from fastapi.responses import Response
 import yaml
 import re
 from Models.YamlModels import YamlGenerateRequest
-from utils.deployment import restrict_endpoint
+
 
 yaml_router = APIRouter(
     prefix="/yaml",
@@ -11,7 +11,6 @@ yaml_router = APIRouter(
 )
 
 @yaml_router.post("/generate")
-@restrict_endpoint(allow_local=True, allow_deployment=True)
 async def generate_yaml(request: YamlGenerateRequest):
     try:
         # Convert data to YAML

@@ -3,11 +3,9 @@ import { Card, Tabs, Tab, Box, Typography } from "@mui/material";
 import Dropdown from "./Dropdown";
 import Loader from "./Loader";
 import Guide from "./Guide";
-import useDeployment from "../hooks/useDeployment";
 
 const Dropdowns: React.FC = () => {
   const [value, setValue] = React.useState(0); // State to manage the active tab
-  const { isLocal } = useDeployment(); // Get deployment status
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue); // Update the active tab

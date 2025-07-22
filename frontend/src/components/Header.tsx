@@ -6,7 +6,6 @@ import ScienceIcon from '@mui/icons-material/Science';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import useDeployment from "../hooks/useDeployment";
 import yaml from 'js-yaml';
 import { useLoader, PreviewType } from '../contexts/LoaderContext';
 import { useMethods, Method as MethodType } from '../contexts/MethodsContext';
@@ -19,7 +18,6 @@ const Alert = React.forwardRef<HTMLDivElement, import('@mui/material').AlertProp
 });
 
 function Header() {
-  const { isLocal } = useDeployment();
   const location = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -210,20 +208,16 @@ function Header() {
         </Button>
         <Button 
           component={Link} 
-          to={isLocal ? "/corfinder" : "#"}
+          to={"/workflow-cor"}
           startIcon={<CenterFocusStrongIcon />}
-          onClick={(e) => !isLocal && e.preventDefault()}
           sx={{ 
             backgroundColor: isActive('/corfinder') ? 'primary.main' : 'transparent',
             color: isActive('/corfinder') ? 'white' : 'primary.main',
-            opacity: isLocal ? 1 : 0.7,
-            pointerEvents: isLocal ? 'auto' : 'auto', // Keep pointer events for tooltip
             "&:hover": {
               backgroundColor: isActive('/corfinder') ? 'primary.dark' : 'rgba(25, 118, 210, 0.04)',
-              cursor: isLocal ? 'pointer' : 'not-allowed'
+              cursor: 'pointer'
             }
           }}
-          title={!isLocal ? "This feature is only available in local deployment mode" : ""}
         >
           Centre finder
         </Button>
