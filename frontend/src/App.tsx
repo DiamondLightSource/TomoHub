@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React,{useState,Suspense} from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home.tsx";
 import Layout from "./components/Layout";
@@ -9,9 +9,9 @@ import {Visit} from "workflows-lib"
 
 const App: React.FC = () => {
   const [userVisit, setUserVisit] = useState<Visit>();
-
   return (
     <Router>
+      <Suspense fallback={<div>Loading workflow...</div>}>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
@@ -37,6 +37,7 @@ const App: React.FC = () => {
           />
         </Route>
       </Routes>
+      </Suspense>
     </Router>
   );
 };
