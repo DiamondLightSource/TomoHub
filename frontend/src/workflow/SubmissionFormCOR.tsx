@@ -137,7 +137,7 @@ const SubmissionFormCOR = (props: {
           },
           filter_freq_cutoff: 0.35,
           recon_size: null,
-          recon_mask_radius: 0.95,
+          recon_mask_radius: 0.95, 
           neglog: false
         }
       }
