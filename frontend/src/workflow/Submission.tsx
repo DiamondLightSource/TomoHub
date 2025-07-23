@@ -20,8 +20,20 @@ import React from "react";
 const submissionQuery = graphql`
   query SubmissionQuery($name: String!) {
     workflowTemplate(name: $name) {
-      ...SubmissionFormFragment
+      ...SubmissionFormSharedFragment
     }
+  }
+`;
+
+// Add this shared fragment
+const sharedFragment = graphql`
+  fragment SubmissionFormSharedFragment on WorkflowTemplate {
+    name
+    maintainer
+    title
+    description
+    arguments
+    uiSchema
   }
 `;
 
@@ -139,3 +151,4 @@ export default function Submission({
     </>
   );
 }
+export {sharedFragment};

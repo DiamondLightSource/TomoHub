@@ -10,28 +10,18 @@ import { Divider, Snackbar, Stack, Typography, useTheme, Alert } from "@mui/mate
 import { ErrorObject } from "ajv";
 import { JSONObject, Visit } from "workflows-lib";
 import { VisitInput } from "@diamondlightsource/sci-react-ui";
-import { SubmissionFormFragment$key } from "./__generated__/SubmissionFormFragment.graphql";
+import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionFormSharedFragment.graphql";
 import Loader from "../components/Loader";
 import { useLoader } from "../contexts/LoaderContext";
+import { sharedFragment } from "./Submission";
 
-const submissionFormFragment = graphql`
-  fragment SubmissionFormFragment on WorkflowTemplate {
-    name
-    maintainer
-    title
-    description
-    arguments
-    uiSchema
-  }
-`;
-
-const SubmissionForm = (props: {
-  template: SubmissionFormFragment$key;
+const SubmissionFormCOR = (props: {
+  template: SubmissionFormSharedFragment$key;
   prepopulatedParameters?: JSONObject;
   visit?: Visit;
   onSubmit: (visit: Visit, parameters: object) => void;
 }) => {
-  const data = useFragment(submissionFormFragment, props.template);
+  const data = useFragment(sharedFragment, props.template);
   const theme = useTheme();
   const validator = createAjv({ useDefaults: true, coerceTypes: true });
   const { method, module_path, parameters: loaderParams, isContextValid } = useLoader();
@@ -251,4 +241,4 @@ const SubmissionForm = (props: {
   );
 };
 
-export default SubmissionForm;
+export default SubmissionFormCOR;
