@@ -127,17 +127,18 @@ const SubmissionFormCOR = (props: {
         parameters: {}
       },
       {
-        method: "recon",
-        module_path: "tomopy.recon.algorithm",
+        method: "FBP3d_tomobar",
+        module_path: "httomolibgpu.recon.algorithm",
         parameters: {
           center: {
             start: formParams.start,
             stop: formParams.stop,
             step: formParams.step
           },
-          sinogram_order: false,
-          algorithm: "gridrec",
-          init_recon: null
+          filter_freq_cutoff: 0.35,
+          recon_size: null,
+          recon_mask_radius: 0.95,
+          neglog: false
         }
       }
     ];
