@@ -69,6 +69,34 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit }) => {
     }
   );
 
+  // Add this debugging immediately after the query
+  console.log('=== DETAILED DEBUG ===');
+  console.log('Raw data object:', data);
+  console.log('data.workflow:', data?.workflow);
+  console.log('data.workflow.status:', data?.workflow?.status);
+  console.log('data.workflow.status.__typename:', data?.workflow?.status?.__typename);
+  console.log('Type of __typename:', typeof data?.workflow?.status?.__typename);
+  console.log('=== END DEBUG ===');
+
+  const statusType = data?.workflow?.status?.__typename ?? 'Unknown';
+  console.log('Final statusType:', statusType);
+
+  const message = data?.workflow?.status && 'message' in data.workflow.status 
+    ? data.workflow.status.message 
+    : undefined;
+
+  // Add debugging
+  console.log('WorkflowStatus Debug:', {
+    workflow,
+    visit,
+    parsedVisit,
+    dataExists: !!data,
+    workflowExists: !!data?.workflow,
+    statusExists: !!data?.workflow?.status,
+    statusType,
+    fullData: data
+  });
+
   // Check if status is final (no need to keep polling)
   const isFinalStatus = (status: string) => {
     return ['WorkflowSucceededStatus', 'WorkflowFailedStatus', 'WorkflowErroredStatus'].includes(status);
@@ -106,23 +134,6 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit }) => {
         return 'Unknown';
     }
   };
-
-  const statusType = data?.workflow?.status?.__typename ?? 'Unknown';
-  const message = data?.workflow?.status && 'message' in data.workflow.status 
-    ? data.workflow.status.message 
-    : undefined;
-
-  // Add debugging
-  console.log('WorkflowStatus Debug:', {
-    workflow,
-    visit,
-    parsedVisit,
-    dataExists: !!data,
-    workflowExists: !!data?.workflow,
-    statusExists: !!data?.workflow?.status,
-    statusType,
-    fullData: data
-  });
 
   // Polling effect
   useEffect(() => {
