@@ -9,18 +9,19 @@ import React, { useState } from "react";
 import { Divider, Snackbar, Stack, Typography, useTheme, Alert } from "@mui/material";
 import { ErrorObject } from "ajv";
 import { JSONObject, Visit } from "workflows-lib";
-import { VisitInput } from "@diamondlightsource/sci-react-ui";
+import { VisitInput,visitToText } from "@diamondlightsource/sci-react-ui";
 import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionFormSharedFragment.graphql";
 import Loader from "../components/Loader";
 import { useLoader } from "../contexts/LoaderContext";
 import { useMethods } from "../contexts/MethodsContext";
 import { sharedFragment } from "./Submission";
+import WorkflowStatus from "./WorkflowStatus";
 
 const SubmissionFormGPURun = (props: {
   template: SubmissionFormSharedFragment$key;
   prepopulatedParameters?: JSONObject;
   visit?: Visit;
-  onSubmit: (visit: Visit, parameters: object) => void;
+  onSubmit: (visit: Visit, parameters: object, onSuccess?: (workflowName: string) => void) => void;
 }) => {
   const data = useFragment(sharedFragment, props.template);
   const theme = useTheme();
@@ -70,12 +71,11 @@ const SubmissionFormGPURun = (props: {
   const [parameters, setParameters] = useState(props.prepopulatedParameters ?? {});
   const [errors, setErrors] = useState<ErrorObject[]>([]);
   const [submitted, setSubmitted] = useState(false);
+  const [submittedWorkflowName, setSubmittedWorkflowName] = useState<string | null>(null);
 
   const generateConfigJSON = () => {
-    // Create a local copy of the parameters object (exactly like YAML generator)
     let updatedParameters = { ...loaderParams };
 
-    // Check if loader context is valid (exactly like YAML generator)
     if (!isContextValid()) {
       // Automatically set required fields to "auto"
       if (!updatedParameters.data_path || updatedParameters.data_path.trim() === "") {
@@ -174,11 +174,7 @@ const SubmissionFormGPURun = (props: {
       
       // Debug logging
       console.log("Generated config JSON for httomo-gpu-job:", configJSON);
-      console.log("Loader parameters:", loaderParams);
-      console.log("Methods:", methods);
-      console.log("Form parameters:", parameters);
-
-      // Create final parameters object for mutation
+      
       const finalParams = {
         config: configJSON,
         input: parameters.input,
@@ -187,7 +183,11 @@ const SubmissionFormGPURun = (props: {
         memory: parameters.memory
       };
 
-      props.onSubmit(visit, finalParams);
+      // Pass success callback to get workflow name back
+      props.onSubmit(visit, finalParams, (workflowName: string) => {
+        setSubmittedWorkflowName(workflowName);
+      });
+      
       setSubmitted(true);
     }
   };
@@ -217,7 +217,6 @@ const SubmissionFormGPURun = (props: {
       
       <Divider />
       
-      {/* Loader Component */}
       <Loader />
       
       {!hasLoaderData && (
@@ -233,8 +232,7 @@ const SubmissionFormGPURun = (props: {
       )}
       
       <Divider />
-      
-      {/* JSON Form */}
+
       <JsonForms
         schema={customSchema}
         uischema={customUISchema}
@@ -257,6 +255,13 @@ const SubmissionFormGPURun = (props: {
         parameters={parameters}
         submitOnReturn={false}
       />
+
+      {submittedWorkflowName && props.visit && (
+        <WorkflowStatus 
+          workflow={submittedWorkflowName} 
+          visit={visitToText(props.visit)}  // Convert Visit object to string
+        />
+      )}
       
       <Snackbar
         open={submitted}

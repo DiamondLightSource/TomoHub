@@ -76,7 +76,7 @@ export default function Submission({
 
   const [commitMutation] = useMutation<SubmissionMutationType>(submissionMutation);
 
-  function submitWorkflow(visit: Visit, parameters: object) {
+  function submitWorkflow(visit: Visit, parameters: object, onSuccess?: (workflowName: string) => void) {
     commitMutation({
       variables: {
         name: workflowName,
@@ -104,6 +104,11 @@ export default function Submission({
             },
             ...prev,
           ]);
+          
+          // NEW: Call the success callback with workflow name
+          if (onSuccess) {
+            onSuccess(submittedName);
+          }
         }
       },
       onError: (err) => {
@@ -125,7 +130,7 @@ export default function Submission({
       template: data.workflowTemplate,
       prepopulatedParameters,
       visit,
-      onSubmit: submitWorkflow,
+      onSubmit: submitWorkflow, // This now supports the callback parameter
     };
 
     switch (workflowName) {
