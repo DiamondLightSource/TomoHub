@@ -219,6 +219,13 @@ const SubmissionFormGPURun = (props: {
       <Divider />
       
       <Loader />
+
+      {submittedWorkflowName  && (
+        <WorkflowStatus 
+          workflow={submittedWorkflowName} 
+          visit={visitToText(props.visit)}  // Convert Visit object to string
+        />
+      )}
       
       {!hasLoaderData && (
         <Alert severity="info">
@@ -257,12 +264,7 @@ const SubmissionFormGPURun = (props: {
         submitOnReturn={false}
       />
 
-      {submittedWorkflowName && props.visit && (
-        <WorkflowStatus 
-          workflow={submittedWorkflowName} 
-          visit={visitToText(props.visit)}  // Convert Visit object to string
-        />
-      )}
+
       
       <Snackbar
         open={submitted}
