@@ -45,31 +45,29 @@ interface WorkflowStatusProps {
 const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit }) => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [isPolling, setIsPolling] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [parsedVisit, setParsedVisit] = useState<Visit | null>(null);
 
   // Parse visit string using existing utility functions
   const parseVisit = (visitStr: string): Visit => {
     const match = visitRegex.exec(visitStr);
-    
     if (!match) {
       throw new Error(`Invalid visit format: ${visitStr}. Expected format: xx12345-1`);
     }
-
     return regexToVisit(match);
   };
 
-  // Parse visit on mount and when visit changes
-  useEffect(() => {
-    try {
-      const parsed = parseVisit(visit);
-      setParsedVisit(parsed);
-      setError(null);
-    } catch (err) {
-      setError(err.message);
-      setParsedVisit(null);
+  const parsedVisit = parseVisit(visit);
+
+  // GraphQL query - always called at top level
+  const data = useLazyLoadQuery<WorkflowStatusQueryType>(
+    workflowStatusQuery, 
+    {
+      visit: parsedVisit,
+      name: workflow,
+    },
+    {
+      fetchKey: refreshKey,
     }
-  }, [visit]);
+  );
 
   // Check if status is final (no need to keep polling)
   const isFinalStatus = (status: string) => {
@@ -109,64 +107,12 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit }) => {
     }
   };
 
-  // Handle error case
-  if (error) {
-    return (
-      <Box
-        sx={{
-          border: 1,
-          borderColor: 'error.main',
-          borderRadius: 1,
-          p: 2,
-          mt: 2,
-          backgroundColor: 'error.light',
-        }}
-      >
-        <Typography variant="body2" color="error">
-          Error parsing visit format: {error}
-        </Typography>
-      </Box>
-    );
-  }
-
-  // Handle loading case
-  if (!parsedVisit) {
-    return (
-      <Box
-        sx={{
-          border: 1,
-          borderColor: 'grey.300',
-          borderRadius: 1,
-          p: 2,
-          mt: 2,
-          backgroundColor: 'grey.50',
-        }}
-      >
-        <Typography variant="body2">
-          Loading workflow status...
-        </Typography>
-      </Box>
-    );
-  }
-
-  // Main component logic
-  const data = useLazyLoadQuery<WorkflowStatusQueryType>(
-    workflowStatusQuery, 
-    {
-      visit: parsedVisit,
-      name: workflow,
-    },
-    {
-      fetchKey: refreshKey, // Force re-fetch when this changes
-    }
-  );
-
-  const statusType = data.workflow.status?.__typename ?? 'Unknown';
-  const message = data.workflow.status && 'message' in data.workflow.status 
+  const statusType = data?.workflow?.status?.__typename ?? 'Unknown';
+  const message = data?.workflow?.status && 'message' in data.workflow.status 
     ? data.workflow.status.message 
     : undefined;
 
-  // Set up polling effect - NOW AT TOP LEVEL
+  // Polling effect
   useEffect(() => {
     if (!isPolling || isFinalStatus(statusType)) {
       setIsPolling(false);
@@ -175,19 +121,19 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit }) => {
 
     const interval = setInterval(() => {
       console.log(`Polling workflow status for: ${workflow}`);
-      setRefreshKey(prev => prev + 1); // Trigger re-fetch
-    }, 5000); // Poll every 5 seconds
+      setRefreshKey(prev => prev + 1);
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, [workflow, statusType, isPolling]);
+  }, [statusType, isPolling]);
 
-  // Stop polling when status becomes final - NOW AT TOP LEVEL
+  // Stop polling when status becomes final
   useEffect(() => {
     if (isFinalStatus(statusType)) {
       console.log(`Workflow ${workflow} reached final status: ${statusType}`);
       setIsPolling(false);
     }
-  }, [statusType, workflow]);
+  }, [statusType]);
 
   return (
     <Box
