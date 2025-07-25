@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { graphql, useLazyLoadQuery } from 'react-relay';
-import { Box, Typography, Chip, CircularProgress } from '@mui/material';
+import { Box, Typography, Chip, CircularProgress, Button, ButtonGroup } from '@mui/material';
+import { OpenInNew, Article } from '@mui/icons-material';
 import { Visit, visitRegex, regexToVisit } from '@diamondlightsource/sci-react-ui';
 import { WorkflowStatusQuery as WorkflowStatusQueryType } from './__generated__/WorkflowStatusQuery.graphql';
 
@@ -193,6 +194,39 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit }) => {
     }
   };
 
+  // New function to extract log artifacts
+  const getLogArtifacts = () => {
+    // Only show artifacts for final status workflows with tasks
+    if (!data?.workflow?.status || !('tasks' in data.workflow.status)) {
+      return [];
+    }
+
+    const finalStatuses = ['WorkflowSucceededStatus', 'WorkflowFailedStatus', 'WorkflowErroredStatus'];
+    if (!finalStatuses.includes(statusType)) {
+      return [];
+    }
+
+    const tasks = (data.workflow.status as any).tasks || [];
+    
+    return tasks
+      .filter((task: any) => task.stepType === 'Pod') // Only Pod tasks
+      .map((task: any) => {
+        // Find main.log artifact
+        const logArtifact = task.artifacts?.find((artifact: any) => 
+          artifact.name === 'main.log' && artifact.mimeType === 'text/plain'
+        );
+        
+        return logArtifact ? {
+          taskName: task.name,
+          url: logArtifact.url,
+          name: logArtifact.name
+        } : null;
+      })
+      .filter(Boolean); // Remove null entries
+  };
+
+  const logArtifacts = getLogArtifacts();
+
   // Polling effect
   useEffect(() => {
     if (!isPolling || isFinalStatus(statusType)) {
@@ -245,15 +279,44 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit }) => {
         </Typography>
       </Box>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-        <Typography variant="body2" color="text.secondary">
-          Status:
-        </Typography>
-        <Chip
-          label={getStatusText(statusType)}
-          color={getStatusColor(statusType)}
-          size="small"
-        />
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            Status:
+          </Typography>
+          <Chip
+            label={getStatusText(statusType)}
+            color={getStatusColor(statusType)}
+            size="small"
+          />
+        </Box>
+
+        {/* Log Artifacts Section */}
+        {logArtifacts.length > 0 && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Logs:
+            </Typography>
+            <ButtonGroup size="small" variant="outlined">
+              {logArtifacts.map((artifact, index) => (
+                <Button
+                  key={index}
+                  startIcon={<Article />}
+                  endIcon={<OpenInNew />}
+                  onClick={() => window.open(artifact.url, '_blank')}
+                  sx={{ 
+                    textTransform: 'none',
+                    fontSize: '0.75rem',
+                    minWidth: 'auto',
+                    px: 1
+                  }}
+                >
+                  {artifact.taskName} log
+                </Button>
+              ))}
+            </ButtonGroup>
+          </Box>
+        )}
       </Box>
 
       {message && (
