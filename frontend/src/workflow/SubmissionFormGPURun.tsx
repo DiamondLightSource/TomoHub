@@ -72,6 +72,7 @@ const SubmissionFormGPURun = (props: {
   const [errors, setErrors] = useState<ErrorObject[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [submittedWorkflowName, setSubmittedWorkflowName] = useState<string | null>(null);
+  const [submittedVisit, setSubmittedVisit] = useState<Visit | null>(null); // Add this
 
   const generateConfigJSON = () => {
     let updatedParameters = { ...loaderParams };
@@ -172,8 +173,8 @@ const SubmissionFormGPURun = (props: {
     if (errors.length === 0) {
       const configJSON = generateConfigJSON();
       
-      // Debug logging
       console.log("Generated config JSON for httomo-gpu-job:", configJSON);
+      console.log("Visit from form:", visit); // Debug the visit
       
       const finalParams = {
         config: configJSON,
@@ -182,11 +183,11 @@ const SubmissionFormGPURun = (props: {
         nprocs: parameters.nprocs,
         memory: parameters.memory
       };
-      console.log("About to call onSubmit with callback");
-    
+
       props.onSubmit(visit, finalParams, (workflowName: string) => {
         console.log("SUCCESS CALLBACK RECEIVED:", workflowName);
         setSubmittedWorkflowName(workflowName);
+        setSubmittedVisit(visit); // Capture the visit from the form
       });
       
       setSubmitted(true);
@@ -220,10 +221,10 @@ const SubmissionFormGPURun = (props: {
       
       <Loader />
 
-      {submittedWorkflowName  && (
+      {submittedWorkflowName && submittedVisit && (
         <WorkflowStatus 
           workflow={submittedWorkflowName} 
-          visit={visitToText(props.visit)}  // Convert Visit object to string
+          visit={visitToText(submittedVisit)}  // Use the captured visit
         />
       )}
       
