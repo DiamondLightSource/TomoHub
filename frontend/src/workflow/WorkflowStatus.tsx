@@ -215,4 +215,4 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit }) => {
   }
 };
 
-export default WorkflowStatus;
+export default WorkflowStatus; 
