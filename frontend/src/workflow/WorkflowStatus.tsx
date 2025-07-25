@@ -112,6 +112,18 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit }) => {
     ? data.workflow.status.message 
     : undefined;
 
+  // Add debugging
+  console.log('WorkflowStatus Debug:', {
+    workflow,
+    visit,
+    parsedVisit,
+    dataExists: !!data,
+    workflowExists: !!data?.workflow,
+    statusExists: !!data?.workflow?.status,
+    statusType,
+    fullData: data
+  });
+
   // Polling effect
   useEffect(() => {
     if (!isPolling || isFinalStatus(statusType)) {
