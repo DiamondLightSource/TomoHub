@@ -8,6 +8,11 @@ const workflowStatusQuery = graphql`
   query WorkflowStatusQuery($visit: VisitInput!, $name: String!) {
     workflow(visit: $visit, name: $name) {
       name
+      visit {
+        proposalCode
+        proposalNumber
+        number
+      }
       status {
         __typename
         ... on WorkflowPendingStatus {
@@ -16,21 +21,73 @@ const workflowStatusQuery = graphql`
         ... on WorkflowRunningStatus {
           startTime
           message
+          tasks {
+            id
+            name
+            status
+            depends
+            dependencies
+            stepType
+            artifacts {
+              name
+              url
+              mimeType
+            }
+          }
         }
         ... on WorkflowSucceededStatus {
           startTime
           endTime
           message
+          tasks {
+            id
+            name
+            status
+            depends
+            dependencies
+            stepType
+            artifacts {
+              name
+              url
+              mimeType
+            }
+          }
         }
         ... on WorkflowFailedStatus {
           startTime
           endTime
           message
+          tasks {
+            id
+            name
+            status
+            depends
+            dependencies
+            stepType
+            artifacts {
+              name
+              url
+              mimeType
+            }
+          }
         }
         ... on WorkflowErroredStatus {
           startTime
           endTime
           message
+          tasks {
+            id
+            name
+            status
+            depends
+            dependencies
+            stepType
+            artifacts {
+              name
+              url
+              mimeType
+            }
+          }
         }
       }
     }
@@ -146,7 +203,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit }) => {
     const interval = setInterval(() => {
       console.log(`Polling workflow status for: ${workflow}`);
       setRefreshKey(prev => prev + 1);
-    }, 5000);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [statusType, isPolling]);

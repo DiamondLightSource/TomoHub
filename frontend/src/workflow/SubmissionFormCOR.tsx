@@ -9,17 +9,18 @@ import React, { useState } from "react";
 import { Divider, Snackbar, Stack, Typography, useTheme, Alert } from "@mui/material";
 import { ErrorObject } from "ajv";
 import { JSONObject, Visit } from "workflows-lib";
-import { VisitInput } from "@diamondlightsource/sci-react-ui";
+import { VisitInput, visitToText } from "@diamondlightsource/sci-react-ui"; // Add visitToText import
 import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionFormSharedFragment.graphql";
 import Loader from "../components/Loader";
 import { useLoader } from "../contexts/LoaderContext";
 import { sharedFragment } from "./Submission";
+import WorkflowStatus from "./WorkflowStatus"; // Add WorkflowStatus import
 
 const SubmissionFormCOR = (props: {
   template: SubmissionFormSharedFragment$key;
   prepopulatedParameters?: JSONObject;
   visit?: Visit;
-  onSubmit: (visit: Visit, parameters: object) => void;
+  onSubmit: (visit: Visit, parameters: object, onSuccess?: (workflowName: string) => void) => void; // Update signature to match GPURun
 }) => {
   const data = useFragment(sharedFragment, props.template);
   const theme = useTheme();
@@ -73,6 +74,9 @@ const SubmissionFormCOR = (props: {
   const [parameters, setParameters] = useState(props.prepopulatedParameters ?? {});
   const [errors, setErrors] = useState<ErrorObject[]>([]);
   const [submitted, setSubmitted] = useState(false);
+  // Add these state variables for WorkflowStatus
+  const [submittedWorkflowName, setSubmittedWorkflowName] = useState<string | null>(null);
+  const [submittedVisit, setSubmittedVisit] = useState<Visit | null>(null);
 
   const generateConfigJSON = (formParams: any) => {
     // Create a local copy of the loader parameters and handle auto-filling similar to YAML generator
@@ -170,7 +174,13 @@ const SubmissionFormCOR = (props: {
         "httomo-outdir-name": parameters.httomo_outdir_name // Note the hyphen in the key name to match Argo template
       };
 
-      props.onSubmit(visit, finalParams);
+      // Update to use callback pattern like GPURun
+      props.onSubmit(visit, finalParams, (workflowName: string) => {
+        console.log("COR SUCCESS CALLBACK RECEIVED:", workflowName);
+        setSubmittedWorkflowName(workflowName);
+        setSubmittedVisit(visit);
+      });
+      
       setSubmitted(true);
     }
   };
@@ -188,17 +198,25 @@ const SubmissionFormCOR = (props: {
       spacing={theme.spacing(2)}
       sx={{ width: formWidth }}
     >
-    <Typography variant="h4" align="center">
-      Workflow: {data.title ? data.title : data.name}
-    </Typography>
-    <Typography variant="body1" align="center">
-      {data.description}
-    </Typography>
+      <Typography variant="h4" align="center">
+        Workflow: {data.title ? data.title : data.name}
+      </Typography>
+      <Typography variant="body1" align="center">
+        {data.description}
+      </Typography>
       
-      
+      <Divider />
       
       {/* Loader Component */}
       <Loader />
+
+      {/* Add WorkflowStatus component */}
+      {submittedWorkflowName && submittedVisit && (
+        <WorkflowStatus 
+          workflow={submittedWorkflowName} 
+          visit={visitToText(submittedVisit)}
+        />
+      )}
       
       {!isContextValid() && (
         <Alert severity="info">
