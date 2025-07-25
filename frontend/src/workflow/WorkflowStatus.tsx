@@ -66,6 +66,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit }) => {
     },
     {
       fetchKey: refreshKey,
+      fetchPolicy: 'network-only', // Force fresh fetch from server
     }
   );
 
