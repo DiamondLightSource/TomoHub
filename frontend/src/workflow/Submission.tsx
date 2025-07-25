@@ -107,7 +107,10 @@ export default function Submission({
           
           // NEW: Call the success callback with workflow name
           if (onSuccess) {
+            console.log("Calling onSuccess callback with:", submittedName);
             onSuccess(submittedName);
+          } else {
+            console.log("No onSuccess callback provided");
           }
         }
       },

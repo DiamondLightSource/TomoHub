@@ -182,9 +182,10 @@ const SubmissionFormGPURun = (props: {
         nprocs: parameters.nprocs,
         memory: parameters.memory
       };
-
-      // Pass success callback to get workflow name back
+      console.log("About to call onSubmit with callback");
+    
       props.onSubmit(visit, finalParams, (workflowName: string) => {
+        console.log("SUCCESS CALLBACK RECEIVED:", workflowName);
         setSubmittedWorkflowName(workflowName);
       });
       
