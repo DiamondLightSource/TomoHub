@@ -297,7 +297,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit }) => {
             <Typography variant="body2" color="text.secondary">
               Logs:
             </Typography>
-            <ButtonGroup size="small" variant="outlined">
+            <ButtonGroup size="small" variant="outlined" orientation="vertical">
               {logArtifacts.map((artifact, index) => (
                 <Button
                   key={index}
@@ -332,7 +332,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit }) => {
 
       {isPolling && (
         <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-          Refreshing every 5 seconds...
+          Refreshing every 2 seconds...
         </Typography>
       )}
     </Box>
