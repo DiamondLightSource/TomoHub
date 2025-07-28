@@ -225,7 +225,7 @@ const SubmissionFormCOR = (props: {
           workflow={submittedWorkflowName} 
           visit={visitToText(submittedVisit)}
         />
-      )}
+      )} 
       
       {!isContextValid() && (
         <Alert severity="info">

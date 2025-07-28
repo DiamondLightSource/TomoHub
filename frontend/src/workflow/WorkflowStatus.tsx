@@ -337,6 +337,6 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit }) => {
       )}
     </Box>
   );
-};
+}; 
 
 export default WorkflowStatus;

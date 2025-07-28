@@ -99,7 +99,7 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
               }
             }, 'image/png');
           });
-
+ 
           images[centerVals[i]] = pngUrl;
         }
       }

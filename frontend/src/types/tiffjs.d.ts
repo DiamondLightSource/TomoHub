@@ -13,4 +13,4 @@ declare module "tiff.js" {
     }
   
     export default Tiff;
-  }
+  } 
