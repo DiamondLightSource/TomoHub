@@ -80,7 +80,7 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
       // Note: Sharp doesn't work directly in browser, we need a different approach
       // Using TIFF.js for frontend TIFF processing instead
       const TIFF = await import('tiff.js');
-      const tiff = new TIFF({ buffer: tiffBuffer });
+      const tiff = new TIFF.default({ buffer: tiffBuffer });
       
       const centerVals = generateCenterValues();
       const images: CenterImages = {};
