@@ -38,6 +38,7 @@
     "react-router-dom": "^6.23.0",
     "relay-runtime": "^20.0.0",
     "three": "^0.173.0",
+    "tiff.js": "^1.0.0",
     "workflows-lib": "https://gitpkg.vercel.app/DiamondLightSource/workflows/frontend/workflows-lib?d9aadabf2b063482e5d897c954b09497550d6c14"
   },
   "devDependencies": {

@@ -15,6 +15,7 @@ import Loader from "../components/Loader";
 import { useLoader } from "../contexts/LoaderContext";
 import { sharedFragment } from "./Submission";
 import WorkflowStatus from "./WorkflowStatus"; // Add WorkflowStatus import
+import SweepResultViewer from "./SweepResultViewer"
 
 const SubmissionFormCOR = (props: {
   template: SubmissionFormSharedFragment$key;
@@ -26,7 +27,7 @@ const SubmissionFormCOR = (props: {
   const theme = useTheme();
   const validator = createAjv({ useDefaults: true, coerceTypes: true });
   const { method, module_path, parameters: loaderParams, isContextValid } = useLoader();
-
+  const [workflowData, setWorkflowData] = useState<any>(null);
   const customSchema = {
     type: "object",
     properties: {
@@ -207,10 +208,18 @@ const SubmissionFormCOR = (props: {
       
       <Divider />
       
-      {/* Loader Component */}
+      
       <Loader />
-
-      {/* Add WorkflowStatus component */}
+      
+      {submittedWorkflowName && submittedVisit && (
+      <SweepResultViewer
+        workflowData={workflowData}
+        start={parameters.start as number}
+        stop={parameters.stop as number}
+        step={parameters.step as number}
+      />
+      )}
+      
       {submittedWorkflowName && submittedVisit && (
         <WorkflowStatus 
           workflow={submittedWorkflowName} 
