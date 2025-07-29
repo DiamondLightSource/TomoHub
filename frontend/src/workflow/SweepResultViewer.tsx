@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Tiff from 'tiff.js'; // Add this top-level import
 import { 
   Box, 
   Typography, 
@@ -99,35 +100,55 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
       const tiffBuffer = await proxyService.getTiffFile(tiffUrl);
       console.log('SweepResultViewer: Received TIFF buffer, size:', tiffBuffer.byteLength);
       
-      // Using TIFF.js for frontend TIFF processing
-      const TIFF = await import('tiff.js');
-      const tiff = new TIFF.default({ buffer: tiffBuffer });
+      // Use the imported TIFF class directly (no dynamic import needed)
+      console.log('SweepResultViewer: Creating TIFF instance');
+      const tiff = new Tiff({ buffer: tiffBuffer });
+      console.log('SweepResultViewer: TIFF instance created successfully');
       
       const centerVals = generateCenterValues();
       const images: CenterImages = {};
 
-      console.log('SweepResultViewer: Processing', tiff.countDirectory(), 'pages for center values:', centerVals);
+      const pageCount = tiff.countDirectory();
+      console.log('SweepResultViewer: Processing', pageCount, 'pages for center values:', centerVals);
 
       // Process each page of the multi-page TIFF
-      for (let i = 0; i < tiff.countDirectory(); i++) {
+      for (let i = 0; i < pageCount; i++) {
         if (i < centerVals.length) {
           console.log(`SweepResultViewer: Processing page ${i} for center value ${centerVals[i]}`);
           
-          tiff.setDirectory(i);
-          const canvas = tiff.toCanvas();
-          
-          // Convert canvas to PNG blob URL
-          const blob = await new Promise<Blob>((resolve) => {
-            canvas.toBlob((blob) => {
-              resolve(blob!);
-            }, 'image/png');
-          });
-          
-          const imageUrl = URL.createObjectURL(blob);
-          images[centerVals[i]] = imageUrl;
-          
-          console.log(`SweepResultViewer: Created image URL for center ${centerVals[i]}:`, imageUrl);
+          try {
+            tiff.setDirectory(i);
+            const canvas = tiff.toCanvas();
+            
+            if (!canvas) {
+              console.warn(`SweepResultViewer: Failed to create canvas for page ${i}`);
+              continue;
+            }
+            
+            // Convert canvas to PNG blob URL
+            const blob = await new Promise<Blob>((resolve, reject) => {
+              canvas.toBlob((blob) => {
+                if (blob) {
+                  resolve(blob);
+                } else {
+                  reject(new Error(`Failed to create blob for page ${i}`));
+                }
+              }, 'image/png');
+            });
+            
+            const imageUrl = URL.createObjectURL(blob);
+            images[centerVals[i]] = imageUrl;
+            
+            console.log(`SweepResultViewer: Created image URL for center ${centerVals[i]}:`, imageUrl);
+          } catch (pageError) {
+            console.error(`SweepResultViewer: Error processing page ${i}:`, pageError);
+            // Continue with next page instead of failing completely
+          }
         }
+      }
+
+      if (Object.keys(images).length === 0) {
+        throw new Error('No images were successfully processed from the TIFF file');
       }
 
       setCenterImages(images);
