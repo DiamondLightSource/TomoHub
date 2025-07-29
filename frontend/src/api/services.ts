@@ -69,4 +69,12 @@ export const yamlService = {
   },
 };
 
+export const proxyService = {
+  getTiffFile: async (tiffUrl: string): Promise<ArrayBuffer> => {
+    const response = await apiClient.get(`/proxy/tiff?url=${encodeURIComponent(tiffUrl)}`, {
+      responseType: 'arraybuffer',
+    });
+    return response.data;
+  },
+};
 

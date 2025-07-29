@@ -9,6 +9,7 @@ import {
   CardContent,
   Divider 
 } from '@mui/material';
+import { proxyService } from '../api/services';
 
 interface SweepResultViewerProps {
   workflowData: any; // The workflow data from WorkflowStatus
@@ -84,44 +85,48 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
     return tiffArtifact;
   };
 
-  // Process multi-page TIFF using Sharp library (frontend processing)
+  // Process multi-page TIFF using proxy service to avoid CORS
   const processTiffFile = async (tiffUrl: string) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Fetch the TIFF file
-      const response = await fetch(tiffUrl);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch TIFF file: ${response.statusText}`);
-      }
-
-      const tiffBuffer = await response.arrayBuffer();
+      console.log('SweepResultViewer: Starting TIFF processing for URL:', tiffUrl);
       
-      // Note: Sharp doesn't work directly in browser, we need a different approach
-      // Using TIFF.js for frontend TIFF processing instead
+      // Use the proxy service to fetch the TIFF file and avoid CORS issues
+      console.log('SweepResultViewer: Fetching TIFF file via proxy service');
+      
+      const tiffBuffer = await proxyService.getTiffFile(tiffUrl);
+      console.log('SweepResultViewer: Received TIFF buffer, size:', tiffBuffer.byteLength);
+      
+      // Using TIFF.js for frontend TIFF processing
       const TIFF = await import('tiff.js');
       const tiff = new TIFF.default({ buffer: tiffBuffer });
       
       const centerVals = generateCenterValues();
       const images: CenterImages = {};
 
+      console.log('SweepResultViewer: Processing', tiff.countDirectory(), 'pages for center values:', centerVals);
+
       // Process each page of the multi-page TIFF
       for (let i = 0; i < tiff.countDirectory(); i++) {
         if (i < centerVals.length) {
+          console.log(`SweepResultViewer: Processing page ${i} for center value ${centerVals[i]}`);
+          
           tiff.setDirectory(i);
           const canvas = tiff.toCanvas();
           
           // Convert canvas to PNG blob URL
-          const pngUrl = await new Promise<string>((resolve) => {
+          const blob = await new Promise<Blob>((resolve) => {
             canvas.toBlob((blob) => {
-              if (blob) {
-                resolve(URL.createObjectURL(blob));
-              }
+              resolve(blob!);
             }, 'image/png');
           });
- 
-          images[centerVals[i]] = pngUrl;
+          
+          const imageUrl = URL.createObjectURL(blob);
+          images[centerVals[i]] = imageUrl;
+          
+          console.log(`SweepResultViewer: Created image URL for center ${centerVals[i]}:`, imageUrl);
         }
       }
 
@@ -132,10 +137,11 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
       if (centerVals.length > 0) {
         setCurrentCenterIndex(0);
         setCurrentImageUrl(images[centerVals[0]]);
+        console.log('SweepResultViewer: Set initial image for center:', centerVals[0]);
       }
 
     } catch (err) {
-      console.error('Error processing TIFF file:', err);
+      console.error('SweepResultViewer: Error processing TIFF file:', err);
       setError(`Failed to process TIFF file: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);
@@ -155,7 +161,10 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
   useEffect(() => {
     const tiffArtifact = getTiffArtifact();
     if (tiffArtifact) {
+      console.log('SweepResultViewer: Found TIFF artifact, processing:', tiffArtifact);
       processTiffFile(tiffArtifact.url);
+    } else {
+      console.log('SweepResultViewer: No TIFF artifact found');
     }
   }, [workflowData]);
 
