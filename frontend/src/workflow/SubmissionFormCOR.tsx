@@ -212,20 +212,24 @@ const SubmissionFormCOR = (props: {
       <Loader />
       
       {submittedWorkflowName && submittedVisit && (
-      <SweepResultViewer
-        workflowData={workflowData}
-        start={parameters.start as number}
-        stop={parameters.stop as number}
-        step={parameters.step as number}
-      />
-      )}
-      
-      {submittedWorkflowName && submittedVisit && (
         <WorkflowStatus 
           workflow={submittedWorkflowName} 
           visit={visitToText(submittedVisit)}
+          onWorkflowDataChange={(data) => {
+            console.log('SubmissionFormCOR: Received workflow data:', data);
+            setWorkflowData(data);
+          }}
         />
-      )} 
+      )}
+
+      {submittedWorkflowName && submittedVisit && (
+        <SweepResultViewer
+          workflowData={workflowData}
+          start={parameters.start as number}
+          stop={parameters.stop as number}
+          step={parameters.step as number}
+        />
+      )}
       
       {!isContextValid() && (
         <Alert severity="info">

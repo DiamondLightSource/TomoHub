@@ -27,6 +27,13 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
   stop, 
   step 
 }) => {
+  console.log('SweepResultViewer: Received props:', {
+    workflowData,
+    start,
+    stop,
+    step
+  });
+
   const [centerImages, setCenterImages] = useState<CenterImages>({});
   const [centerValues, setCenterValues] = useState<string[]>([]);
   const [currentCenterIndex, setCurrentCenterIndex] = useState(0);
@@ -45,20 +52,34 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
 
   // Extract multi-page TIFF artifact from workflow data
   const getTiffArtifact = () => {
-    if (!workflowData?.workflow?.status || workflowData.workflow.status.__typename !== 'WorkflowSucceededStatus') {
+    console.log('SweepResultViewer: getTiffArtifact called with workflowData:', workflowData);
+    
+    if (!workflowData?.workflow?.status) {
+      console.log('SweepResultViewer: No workflow status found');
+      return null;
+    }
+
+    if (workflowData.workflow.status.__typename !== 'WorkflowSucceededStatus') {
+      console.log('SweepResultViewer: Workflow not in succeeded status:', workflowData.workflow.status.__typename);
       return null;
     }
 
     const tasks = workflowData.workflow.status.tasks || [];
+    console.log('SweepResultViewer: Found tasks:', tasks);
+
     const generateSweepTask = tasks.find((task: any) => 
       task.name === 'generate-sweep-artifact' && task.stepType === 'Pod'
     );
+
+    console.log('SweepResultViewer: Found generate-sweep-artifact task:', generateSweepTask);
 
     if (!generateSweepTask) return null;
 
     const tiffArtifact = generateSweepTask.artifacts?.find((artifact: any) => 
       artifact.name === 'multi-page-tiff.tif' && artifact.mimeType === 'image/tiff'
     );
+
+    console.log('SweepResultViewer: Found TIFF artifact:', tiffArtifact);
 
     return tiffArtifact;
   };
@@ -151,9 +172,14 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
 
   // Don't render if not a successful COR workflow
   const tiffArtifact = getTiffArtifact();
+  console.log('SweepResultViewer: Final tiffArtifact result:', tiffArtifact);
+  
   if (!tiffArtifact) {
+    console.log('SweepResultViewer: No TIFF artifact found, not rendering component');
     return null;
   }
+
+  console.log('SweepResultViewer: Rendering component with TIFF artifact');
 
   return (
     <Box

@@ -98,9 +98,10 @@ const workflowStatusQuery = graphql`
 interface WorkflowStatusProps {
   workflow: string;
   visit: string;
+  onWorkflowDataChange?: (data: any) => void; // Add this prop
 }
 
-const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit }) => {
+const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit, onWorkflowDataChange }) => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [isPolling, setIsPolling] = useState(true);
 
@@ -249,6 +250,14 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit }) => {
       setIsPolling(false);
     }
   }, [statusType]);
+
+  // Add this useEffect to pass data back to parent
+  useEffect(() => {
+    console.log('WorkflowStatus: Data changed, calling onWorkflowDataChange:', data);
+    if (onWorkflowDataChange && data) {
+      onWorkflowDataChange(data);
+    }
+  }, [data, onWorkflowDataChange]);
 
   return (
     <Box
