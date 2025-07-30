@@ -5,8 +5,6 @@ import {
   Slider, 
   CircularProgress, 
   Alert,
-  Card,
-  CardContent,
   Divider 
 } from '@mui/material';
 import { proxyService } from '../api/services';
@@ -120,7 +118,7 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
       console.log(`SweepResultViewer: Loaded page ${pageIndex} for center ${centerValue}`);
     } catch (err) {
       console.error(`SweepResultViewer: Error loading page ${pageIndex}:`, err);
-      // Don't set error for individual page failures, just log them
+
     } finally {
       setLoadingStates(prev => ({ ...prev, [centerValue]: false }));
     }
@@ -380,10 +378,6 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
             />
           </Box>
 
-          <Typography variant="caption" color="text.secondary">
-            {centerValues.length} images from center range {start} to {stop} with step {step}
-            {tiffMetadata && ` • TIFF: ${tiffMetadata.page_count} pages`}
-          </Typography>
         </>
       )}
     </Box>
