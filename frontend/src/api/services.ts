@@ -2,6 +2,15 @@
 import apiClient from './client'
 import type { ApiMethodsSchema,ApiFullPipelineSchema } from '../types/APIresponse';
 
+// Add interface for TIFF metadata
+interface TiffMetadata {
+  page_count: number;
+  width: number;
+  height: number;
+  format: string;
+  mode: string;
+}
+
 export const methodsService = {
   getAllMethods: async (): Promise<ApiMethodsSchema> => {
     const response = await apiClient.get('/methods');
@@ -53,6 +62,7 @@ export const methodsService = {
   },
 
 };
+
 export const fullpipelinesService = {
   getFullPipelines: async (): Promise<ApiFullPipelineSchema> => {
     const response = await apiClient.get('/methods/fullpipelines');
@@ -75,6 +85,21 @@ export const proxyService = {
       responseType: 'arraybuffer',
     });
     return response.data;
+  },
+
+  getTiffMetadata: async (tiffUrl: string): Promise<TiffMetadata> => {
+    const response = await apiClient.get(`/proxy/tiff-pages?url=${encodeURIComponent(tiffUrl)}`);
+    return response.data;
+  },
+
+  getTiffPage: async (tiffUrl: string, page: number): Promise<string> => {
+    const response = await apiClient.get(
+      `/proxy/tiff-pages?url=${encodeURIComponent(tiffUrl)}&page=${page}`,
+      {
+        responseType: 'blob',
+      }
+    );
+    return URL.createObjectURL(response.data);
   },
 };
 

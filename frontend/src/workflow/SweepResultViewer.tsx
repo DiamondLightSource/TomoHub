@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import Tiff from 'tiff.js'; // Add this top-level import
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Box, 
   Typography, 
@@ -23,6 +22,18 @@ interface CenterImages {
   [centerValue: string]: string; // center value -> image URL
 }
 
+interface LoadingStates {
+  [centerValue: string]: boolean; // center value -> loading state
+}
+
+interface TiffMetadata {
+  page_count: number;
+  width: number;
+  height: number;
+  format: string;
+  mode: string;
+}
+
 const SweepResultViewer: React.FC<SweepResultViewerProps> = ({ 
   workflowData, 
   start, 
@@ -40,8 +51,10 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
   const [centerValues, setCenterValues] = useState<string[]>([]);
   const [currentCenterIndex, setCurrentCenterIndex] = useState(0);
   const [currentImageUrl, setCurrentImageUrl] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(false);
+  const [loadingStates, setLoadingStates] = useState<LoadingStates>({});
   const [error, setError] = useState<string | null>(null);
+  const [tiffMetadata, setTiffMetadata] = useState<TiffMetadata | null>(null);
 
   // Generate center values based on start, stop, step
   const generateCenterValues = (): string[] => {
@@ -86,95 +99,117 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
     return tiffArtifact;
   };
 
-  // Process multi-page TIFF using proxy service to avoid CORS
-  const processTiffFile = async (tiffUrl: string) => {
-    setIsLoading(true);
+  // Load individual page from server
+  const loadPage = useCallback(async (tiffUrl: string, pageIndex: number, centerValue: string) => {
+    if (centerImages[centerValue] || loadingStates[centerValue]) {
+      return; // Already loaded or loading
+    }
+
+    console.log(`SweepResultViewer: Loading page ${pageIndex} for center ${centerValue}`);
+    
+    setLoadingStates(prev => ({ ...prev, [centerValue]: true }));
+
+    try {
+      const imageUrl = await proxyService.getTiffPage(tiffUrl, pageIndex);
+      
+      setCenterImages(prev => ({
+        ...prev,
+        [centerValue]: imageUrl
+      }));
+
+      console.log(`SweepResultViewer: Loaded page ${pageIndex} for center ${centerValue}`);
+    } catch (err) {
+      console.error(`SweepResultViewer: Error loading page ${pageIndex}:`, err);
+      // Don't set error for individual page failures, just log them
+    } finally {
+      setLoadingStates(prev => ({ ...prev, [centerValue]: false }));
+    }
+  }, [centerImages, loadingStates]);
+
+  // Preload adjacent pages for smooth slider experience
+  const preloadAdjacentPages = useCallback(async (tiffUrl: string, currentIndex: number, centerVals: string[]) => {
+    const preloadPromises: Promise<void>[] = [];
+    
+    // Preload current, previous, and next pages
+    for (let offset = -1; offset <= 1; offset++) {
+      const index = currentIndex + offset;
+      if (index >= 0 && index < centerVals.length) {
+        const centerValue = centerVals[index];
+        if (!centerImages[centerValue] && !loadingStates[centerValue]) {
+          preloadPromises.push(loadPage(tiffUrl, index, centerValue));
+        }
+      }
+    }
+
+    await Promise.all(preloadPromises);
+  }, [centerImages, loadingStates, loadPage]);
+
+  // Initialize TIFF processing
+  const initializeTiffProcessing = async (tiffUrl: string) => {
+    setIsInitialLoading(true);
     setError(null);
 
     try {
-      console.log('SweepResultViewer: Starting TIFF processing for URL:', tiffUrl);
+      console.log('SweepResultViewer: Getting TIFF metadata for URL:', tiffUrl);
       
-      // Use the proxy service to fetch the TIFF file and avoid CORS issues
-      console.log('SweepResultViewer: Fetching TIFF file via proxy service');
+      // Get TIFF metadata
+      const metadata = await proxyService.getTiffMetadata(tiffUrl);
+      console.log('SweepResultViewer: Received TIFF metadata:', metadata);
       
-      const tiffBuffer = await proxyService.getTiffFile(tiffUrl);
-      console.log('SweepResultViewer: Received TIFF buffer, size:', tiffBuffer.byteLength);
-      
-      // Use the imported TIFF class directly (no dynamic import needed)
-      console.log('SweepResultViewer: Creating TIFF instance');
-      const tiff = new Tiff({ buffer: tiffBuffer });
-      console.log('SweepResultViewer: TIFF instance created successfully');
-      
+      setTiffMetadata(metadata);
+
+      // Generate center values
       const centerVals = generateCenterValues();
-      const images: CenterImages = {};
+      console.log('SweepResultViewer: Generated center values:', centerVals);
 
-      const pageCount = tiff.countDirectory();
-      console.log('SweepResultViewer: Processing', pageCount, 'pages for center values:', centerVals);
-
-      // Process each page of the multi-page TIFF
-      for (let i = 0; i < pageCount; i++) {
-        if (i < centerVals.length) {
-          console.log(`SweepResultViewer: Processing page ${i} for center value ${centerVals[i]}`);
-          
-          try {
-            tiff.setDirectory(i);
-            const canvas = tiff.toCanvas();
-            
-            if (!canvas) {
-              console.warn(`SweepResultViewer: Failed to create canvas for page ${i}`);
-              continue;
-            }
-            
-            // Convert canvas to PNG blob URL
-            const blob = await new Promise<Blob>((resolve, reject) => {
-              canvas.toBlob((blob) => {
-                if (blob) {
-                  resolve(blob);
-                } else {
-                  reject(new Error(`Failed to create blob for page ${i}`));
-                }
-              }, 'image/png');
-            });
-            
-            const imageUrl = URL.createObjectURL(blob);
-            images[centerVals[i]] = imageUrl;
-            
-            console.log(`SweepResultViewer: Created image URL for center ${centerVals[i]}:`, imageUrl);
-          } catch (pageError) {
-            console.error(`SweepResultViewer: Error processing page ${i}:`, pageError);
-            // Continue with next page instead of failing completely
-          }
-        }
+      // Validate page count matches expected center values
+      if (metadata.page_count < centerVals.length) {
+        console.warn(`SweepResultViewer: TIFF has ${metadata.page_count} pages but expected ${centerVals.length}`);
       }
 
-      if (Object.keys(images).length === 0) {
-        throw new Error('No images were successfully processed from the TIFF file');
-      }
-
-      setCenterImages(images);
       setCenterValues(centerVals);
       
-      // Set initial image
+      // Load first page immediately
       if (centerVals.length > 0) {
         setCurrentCenterIndex(0);
-        setCurrentImageUrl(images[centerVals[0]]);
-        console.log('SweepResultViewer: Set initial image for center:', centerVals[0]);
+        await loadPage(tiffUrl, 0, centerVals[0]);
+        setCurrentImageUrl(centerImages[centerVals[0]] || '');
+        
+        // Preload adjacent pages
+        preloadAdjacentPages(tiffUrl, 0, centerVals);
       }
 
     } catch (err) {
-      console.error('SweepResultViewer: Error processing TIFF file:', err);
+      console.error('SweepResultViewer: Error initializing TIFF processing:', err);
       setError(`Failed to process TIFF file: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
-      setIsLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
   // Handle slider change
-  const handleSliderChange = (_: Event, newValue: number | number[]) => {
+  const handleSliderChange = async (_: Event, newValue: number | number[]) => {
     const index = newValue as number;
+    const centerValue = centerValues[index];
+    
     setCurrentCenterIndex(index);
-    if (centerValues.length > 0 && centerValues[index]) {
-      setCurrentImageUrl(centerImages[centerValues[index]]);
+
+    if (centerImages[centerValue]) {
+      // Image already loaded
+      setCurrentImageUrl(centerImages[centerValue]);
+    } else {
+      // Load image if not already loaded
+      const tiffArtifact = getTiffArtifact();
+      if (tiffArtifact) {
+        await loadPage(tiffArtifact.url, index, centerValue);
+        setCurrentImageUrl(centerImages[centerValue] || '');
+      }
+    }
+
+    // Preload adjacent pages
+    const tiffArtifact = getTiffArtifact();
+    if (tiffArtifact) {
+      preloadAdjacentPages(tiffArtifact.url, index, centerValues);
     }
   };
 
@@ -182,12 +217,22 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
   useEffect(() => {
     const tiffArtifact = getTiffArtifact();
     if (tiffArtifact) {
-      console.log('SweepResultViewer: Found TIFF artifact, processing:', tiffArtifact);
-      processTiffFile(tiffArtifact.url);
+      console.log('SweepResultViewer: Found TIFF artifact, initializing:', tiffArtifact);
+      initializeTiffProcessing(tiffArtifact.url);
     } else {
       console.log('SweepResultViewer: No TIFF artifact found');
     }
   }, [workflowData]);
+
+  // Update current image URL when centerImages changes
+  useEffect(() => {
+    if (centerValues.length > 0 && currentCenterIndex < centerValues.length) {
+      const currentCenterValue = centerValues[currentCenterIndex];
+      if (centerImages[currentCenterValue]) {
+        setCurrentImageUrl(centerImages[currentCenterValue]);
+      }
+    }
+  }, [centerImages, currentCenterIndex, centerValues]);
 
   // Clean up blob URLs on unmount
   useEffect(() => {
@@ -211,6 +256,9 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
 
   console.log('SweepResultViewer: Rendering component with TIFF artifact');
 
+  const currentCenterValue = centerValues[currentCenterIndex];
+  const isCurrentImageLoading = loadingStates[currentCenterValue];
+
   return (
     <Box
       sx={{
@@ -226,7 +274,7 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
         <Typography variant="h6">
           Sweep Results
         </Typography>
-        {isLoading && (
+        {(isInitialLoading || isCurrentImageLoading) && (
           <CircularProgress size={16} />
         )}
       </Box>
@@ -237,16 +285,16 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
         </Alert>
       )}
 
-      {isLoading && (
+      {isInitialLoading && (
         <Box sx={{ textAlign: 'center', py: 4 }}>
           <CircularProgress size={40} />
           <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-            Processing multi-page TIFF file...
+            Loading TIFF metadata and first image...
           </Typography>
         </Box>
       )}
 
-      {!isLoading && !error && centerValues.length > 0 && (
+      {!isInitialLoading && !error && centerValues.length > 0 && (
         <>
           <Divider sx={{ mb: 3 }} />
           
@@ -264,17 +312,32 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
                 border: 1,
                 borderColor: 'grey.300',
                 borderRadius: 1,
-                backgroundColor: 'white'
+                backgroundColor: 'white',
+                position: 'relative'
               }}
             >
+              {isCurrentImageLoading && (
+                <Box sx={{ 
+                  position: 'absolute', 
+                  top: '50%', 
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 2
+                }}>
+                  <CircularProgress size={24} />
+                </Box>
+              )}
+              
               {currentImageUrl ? (
                 <img
                   src={currentImageUrl}
-                  alt={`Reconstruction with center ${centerValues[currentCenterIndex]}`}
+                  alt={`Reconstruction with center ${currentCenterValue}`}
                   style={{ 
                     maxWidth: '100%', 
                     maxHeight: '100%', 
-                    objectFit: 'contain' 
+                    objectFit: 'contain',
+                    opacity: isCurrentImageLoading ? 0.5 : 1,
+                    transition: 'opacity 0.2s ease-in-out'
                   }}
                   onError={(e) => {
                     console.error("Error loading image:", e);
@@ -283,13 +346,18 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
                 />
               ) : (
                 <Typography variant="body2" color="text.secondary">
-                  Image not available
+                  {isCurrentImageLoading ? 'Loading image...' : 'Image not available'}
                 </Typography>
               )}
             </Box>
             
             <Typography variant="subtitle1" fontWeight="medium">
-              Centre Value: {centerValues[currentCenterIndex]}
+              Centre Value: {currentCenterValue}
+              {tiffMetadata && (
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                  {tiffMetadata.width} × {tiffMetadata.height}
+                </Typography>
+              )}
             </Typography>
           </Box>
           
@@ -313,7 +381,8 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
           </Box>
 
           <Typography variant="caption" color="text.secondary">
-            {centerValues.length} images processed from center range {start} to {stop} with step {step}
+            {centerValues.length} images from center range {start} to {stop} with step {step}
+            {tiffMetadata && ` • TIFF: ${tiffMetadata.page_count} pages`}
           </Typography>
         </>
       )}
