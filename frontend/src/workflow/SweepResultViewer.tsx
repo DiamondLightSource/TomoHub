@@ -232,17 +232,6 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
     }
   }, [centerImages, currentCenterIndex, centerValues]);
 
-  // Clean up blob URLs on unmount
-  useEffect(() => {
-    return () => {
-      Object.values(centerImages).forEach(url => {
-        if (url.startsWith('blob:')) {
-          URL.revokeObjectURL(url);
-        }
-      });
-    };
-  }, [centerImages]);
-
   // Don't render if not a successful COR workflow
   const tiffArtifact = getTiffArtifact();
   console.log('SweepResultViewer: Final tiffArtifact result:', tiffArtifact);
