@@ -16,6 +16,7 @@ import { useLoader } from "../contexts/LoaderContext";
 import { useMethods } from "../contexts/MethodsContext";
 import { sharedFragment } from "./Submission";
 import WorkflowStatus from "./WorkflowStatus";
+import { useHTTOMOConfig } from "../hooks/useHTTOMOConfig";
 
 const SubmissionFormGPURun = (props: {
   template: SubmissionFormSharedFragment$key;
@@ -36,6 +37,7 @@ const SubmissionFormGPURun = (props: {
     setRotationAnglesDataPath,
   } = useLoader();
   const { methods } = useMethods();
+  const { generateHTTOMOConfig, hasLoaderData, hasMethodsData } = useHTTOMOConfig();
 
   const customSchema = {
     type: "object",
@@ -75,97 +77,7 @@ const SubmissionFormGPURun = (props: {
   const [submittedVisit, setSubmittedVisit] = useState<Visit | null>(null); // Add this
 
   const generateConfigJSON = () => {
-    let updatedParameters = { ...loaderParams };
-
-    if (!isContextValid()) {
-      // Automatically set required fields to "auto"
-      if (!updatedParameters.data_path || updatedParameters.data_path.trim() === "") {
-        updatedParameters.data_path = "auto";
-        setDataPath("auto");
-      }
-      if (
-        typeof updatedParameters.rotation_angles === "string" ||
-        !updatedParameters.rotation_angles ||
-        !updatedParameters.rotation_angles.data_path ||
-        updatedParameters.rotation_angles.data_path.trim() === ""
-      ) {
-        updatedParameters.rotation_angles = "auto";
-        // Also update in the context (this is optional)
-        setRotationAnglesDataPath("auto");
-      }
-      
-      // Check if we have darks and flats
-      const hasDarks = updatedParameters.darks && updatedParameters.darks.file && updatedParameters.darks.file.trim() !== "";
-      const hasFlats = updatedParameters.flats && updatedParameters.flats.file && updatedParameters.flats.file.trim() !== "";
-      
-      // If we have both darks and flats, remove image_key_path
-      if (hasDarks && hasFlats) {
-        delete updatedParameters.image_key_path;
-      }
-      // Otherwise, set it to "auto" if it's empty
-      else if (!updatedParameters.image_key_path || updatedParameters.image_key_path.trim() === "") {
-        updatedParameters.image_key_path = "auto";
-        setImageKeyPath("auto");
-      }
-    }
-
-    // Ensure preview is always set with null start and stop for both detector_x and detector_y
-    // This happens regardless of the context validation (exactly like YAML generator)
-    updatedParameters.preview = {
-      detector_x: {
-        start: null,
-        stop: null,
-      },
-      detector_y: {
-        start: null,
-        stop: null,
-      },
-    };
-
-    const loaderContextObject = {
-      method,
-      module_path,
-      parameters: updatedParameters, // Use the updated parameters object
-    };
-
-    // Transform methods and inject calculate_stats where needed (exactly like YAML generator)
-    const transformedMethods = methods.reduce((acc: any[], method) => {
-      const transformedMethod = {
-        method: method.method_name,
-        module_path: method.method_module,
-        parameters: { ...method.parameters },
-      };
-
-      if (method.method_name === "rescale_to_int") {
-        acc.push({
-          method: "calculate_stats",
-          module_path: "httomo.methods",
-          parameters: {},
-          id: "statistics",
-          side_outputs: {
-            glob_stats: "glob_stats",
-          },
-        });
-      }
-
-      if (
-        method.method_name === "find_center_vo" ||
-        method.method_name === "find_center_pc"
-      ) {
-        acc.push({
-          ...transformedMethod,
-          id: "centering",
-          sideoutput: { cor: "center_of_rotation" },
-        });
-      } else {
-        acc.push(transformedMethod);
-      }
-
-      return acc;
-    }, []);
-
-    const combinedData = [loaderContextObject, ...transformedMethods];
-
+    const combinedData = generateHTTOMOConfig(); 
     return JSON.stringify(combinedData);
   };
 
@@ -174,7 +86,7 @@ const SubmissionFormGPURun = (props: {
       const configJSON = generateConfigJSON();
       
       console.log("Generated config JSON for httomo-gpu-job:", configJSON);
-      console.log("Visit from form:", visit); // Debug the visit
+
       
       const finalParams = {
         config: configJSON,
@@ -200,9 +112,6 @@ const SubmissionFormGPURun = (props: {
 
   const formWidth = 
     (data.uiSchema?.options?.formWidth as string | undefined) ?? "100%";
-
-  const hasLoaderData = isContextValid();
-  const hasMethodsData = methods && methods.length > 0;
 
   return (
     <Stack
