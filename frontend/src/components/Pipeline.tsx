@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Box, Typography } from '@mui/material';
 import { useMethods } from '../contexts/MethodsContext';
 import { ClearAll } from '@mui/icons-material';
@@ -18,11 +17,11 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy 
 } from '@dnd-kit/sortable';
-
-
+import { useCenter } from '../contexts/CenterContext';
 
 const Pipeline:React.FC = () => {
   const { methods, clearMethods, removeMethod, setMethods } = useMethods();
+  const { selectedCenter } = useCenter(); 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -79,6 +78,9 @@ const Pipeline:React.FC = () => {
     }
   };
 
+
+  const centerDisplayText = selectedCenter !== 0 ? selectedCenter.toString() : 'auto';
+
   return (
     <>
     <Box
@@ -92,6 +94,32 @@ const Pipeline:React.FC = () => {
         mt:2
       }}
     >
+      
+      <Typography 
+        gutterBottom 
+        sx={{ 
+          fontWeight: 'bold',
+          marginBottom: 1, 
+          fontSize: '13px', 
+          textAlign: 'center',
+          color: selectedCenter !== 0 ? '#4caf50' : '#fff' // Green when selected, white when auto
+        }}
+      >
+        Pipeline Center of Rotation : {centerDisplayText}
+        {selectedCenter !== 0 && (
+          <Typography 
+            component="span" 
+            sx={{ 
+              fontSize: '10px', 
+              color: '#4caf50', 
+              ml: 0.5 
+            }}
+          >
+            ✓
+          </Typography>
+        )}
+      </Typography>
+
       <Box
         sx={{
           backgroundColor: '#646464',

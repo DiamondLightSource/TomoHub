@@ -1,14 +1,14 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 interface CenterContextProps {
-  selectedCenter: number; // Change type to number
-  setSelectedCenter: (center: number) => void; // Update setter to accept a number
+  selectedCenter: number; 
+  setSelectedCenter: (center: number) => void; 
 }
 
 const CenterContext = createContext<CenterContextProps | undefined>(undefined);
 
 export const CenterProvider = ({ children }: { children: ReactNode }) => {
-  const [selectedCenter, setSelectedCenter] = useState<number>(0); // Default value is 0
+  const [selectedCenter, setSelectedCenter] = useState<number>(0);
 
   return (
     <CenterContext.Provider value={{ selectedCenter, setSelectedCenter }}>
