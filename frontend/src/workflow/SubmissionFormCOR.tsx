@@ -9,12 +9,12 @@ import React, { useState } from "react";
 import { Divider, Snackbar, Stack, Typography, useTheme, Alert } from "@mui/material";
 import { ErrorObject } from "ajv";
 import { JSONObject, Visit } from "workflows-lib";
-import { VisitInput, visitToText } from "@diamondlightsource/sci-react-ui"; // Add visitToText import
+import { VisitInput, visitToText } from "@diamondlightsource/sci-react-ui"; 
 import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionFormSharedFragment.graphql";
 import Loader from "../components/Loader";
 import { useLoader } from "../contexts/LoaderContext";
 import { sharedFragment } from "./Submission";
-import WorkflowStatus from "./WorkflowStatus"; // Add WorkflowStatus import
+import WorkflowStatus from "./WorkflowStatus"; 
 import SweepResultViewer from "./SweepResultViewer"
 
 const SubmissionFormCOR = (props: {

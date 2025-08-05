@@ -1,13 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   Box, 
   Typography, 
   Slider, 
   CircularProgress, 
   Alert,
-  Divider 
+  Divider,
+  Button 
 } from '@mui/material';
+import { CheckCircle } from '@mui/icons-material'; // Add this import
 import { proxyService } from '../api/services';
+import { useCenter } from '../contexts/CenterContext'; // Add this import
 
 interface SweepResultViewerProps {
   workflowData: any; // The workflow data from WorkflowStatus
@@ -44,6 +47,9 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
     stop,
     step
   });
+
+  // Add center context
+  const { selectedCenter, setSelectedCenter } = useCenter();
 
   const [centerImages, setCenterImages] = useState<CenterImages>({});
   const [centerValues, setCenterValues] = useState<string[]>([]);
@@ -211,6 +217,23 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
     }
   };
 
+  // Handle center selection
+  const handleSelectCenter = () => {
+    if (centerValues.length > 0 && currentCenterIndex < centerValues.length) {
+      const currentCenterValue = parseFloat(centerValues[currentCenterIndex]);
+      setSelectedCenter(currentCenterValue);
+      console.log('SweepResultViewer: Selected center value:', currentCenterValue);
+    }
+  };
+
+  // Check if current center is the selected one
+  const isCurrentCenterSelected = useMemo(() => {
+    if (centerValues.length > 0 && currentCenterIndex < centerValues.length) {
+      return selectedCenter === parseFloat(centerValues[currentCenterIndex]);
+    }
+    return false;
+  }, [selectedCenter, centerValues, currentCenterIndex]);
+
   // Initialize component
   useEffect(() => {
     const tiffArtifact = getTiffArtifact();
@@ -363,8 +386,30 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
               valueLabelDisplay="auto"
               valueLabelFormat={(index) => centerValues[index] || ""}
               aria-labelledby="center-slider"
-              sx={{ mb: 2 }}
+              sx={{ mb: 3 }}
             />
+
+            {/* Select Center Button */}
+            <Box sx={{ textAlign: 'center', mb: 2 }}>
+              <Button
+                variant={isCurrentCenterSelected ? "contained" : "outlined"}
+                color={isCurrentCenterSelected ? "success" : "primary"}
+                onClick={handleSelectCenter}
+                startIcon={isCurrentCenterSelected ? <CheckCircle /> : null}
+                sx={{ minWidth: 180 }}
+              >
+                {isCurrentCenterSelected 
+                  ? `Selected (${centerValues[currentCenterIndex]})` 
+                  : `Select Center ${centerValues[currentCenterIndex]}`
+                }
+              </Button>
+              
+              {selectedCenter !== 0 && !isCurrentCenterSelected && (
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                  Currently selected: {selectedCenter}
+                </Typography>
+              )}
+            </Box>
           </Box>
 
         </>
