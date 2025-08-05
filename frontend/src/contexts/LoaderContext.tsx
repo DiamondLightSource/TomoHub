@@ -15,11 +15,11 @@ interface ParametersType {
   rotation_angles: {
     data_path?: string | "auto";
     user_defined?: {
-      start_angle: string;
-      stop_angle: string;
-      angles_total: string;
+      start_angle: number;
+      stop_angle: number;
+      angles_total: number;
     };
-  }  | "auto";
+  } ;
   darks?: {
     file: string;
     data_path: string;
@@ -41,7 +41,7 @@ interface LoaderContextType {
   setDataPath: (path: string) => void;
   setImageKeyPath: (path: string) => void;
   setRotationAnglesDataPath: (path: string) => void;
-  setUserDefinedRotationAngles: (start: string, stop: string, total: string) => void;
+  setUserDefinedRotationAngles: (start: number, stop: number, total: number) => void;
   setDarks: (file: string, dataPath: string) => void;
   setFlats: (file: string, dataPath: string) => void;
   removeDarksAndFlats: () => void;
@@ -74,7 +74,7 @@ export const LoaderProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     }));
   };
 
-  const setUserDefinedRotationAngles = (start: string, stop: string, total: string) => {
+  const setUserDefinedRotationAngles = (start: number, stop: number, total: number) => {
     setParameters((prev) => ({
       ...prev,
       rotation_angles: {
@@ -167,9 +167,9 @@ export const LoaderProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const hasUserDefinedAngles = 
       typeof parameters.rotation_angles === 'object' &&
       parameters.rotation_angles?.user_defined &&
-      parameters.rotation_angles.user_defined.start_angle.trim() !== '' &&
-      parameters.rotation_angles.user_defined.stop_angle.trim() !== '' &&
-      parameters.rotation_angles.user_defined.angles_total.trim() !== '';
+      parameters.rotation_angles.user_defined.start_angle !== null &&
+      parameters.rotation_angles.user_defined.stop_angle !== null &&
+      parameters.rotation_angles.user_defined.angles_total !== null;
     
     const hasRotationAngles = hasRotationAnglesPath || hasUserDefinedAngles;
     

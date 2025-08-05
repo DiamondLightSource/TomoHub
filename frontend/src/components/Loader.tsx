@@ -268,47 +268,50 @@ const Loader: React.FC = () => {
               label="Start angle"
               variant="outlined"
               fullWidth
+              type="number"
               size="small"
-              value={parameters.rotation_angles.user_defined?.start_angle || ""}
+              value={parameters.rotation_angles.user_defined?.start_angle || null}
               onChange={(e) =>
                 setUserDefinedRotationAngles(
-                  e.target.value,
-                  parameters.rotation_angles.user_defined?.stop_angle || "",
-                  parameters.rotation_angles.user_defined?.angles_total || ""
+                  Number(e.target.value),
+                  parameters.rotation_angles.user_defined?.stop_angle || 0,
+                  parameters.rotation_angles.user_defined?.angles_total || 0
                 )
               }
               placeholder="First angle"
             />
           </Grid>
-          <Grid item xs={4}>
+            <Grid item xs={4}>
             <TextField
               label="Stop angle"
               variant="outlined"
               fullWidth
+              type="number"
               size="small"
-              value={parameters.rotation_angles.user_defined?.stop_angle || ""}
+              value={parameters.rotation_angles.user_defined?.stop_angle || null}
               onChange={(e) =>
-                setUserDefinedRotationAngles(
-                  parameters.rotation_angles.user_defined?.start_angle || "",
-                  e.target.value,
-                  parameters.rotation_angles.user_defined?.angles_total || ""
-                )
+              setUserDefinedRotationAngles(
+                parameters.rotation_angles.user_defined?.start_angle || 0,
+                Number(e.target.value),
+                parameters.rotation_angles.user_defined?.angles_total || 0
+              )
               }
               placeholder="Last angle"
             />
-          </Grid>
+            </Grid>
           <Grid item xs={4}>
             <TextField
               label="Total angle"
               variant="outlined"
               fullWidth
+              type="number"
               size="small"
-              value={parameters.rotation_angles.user_defined?.angles_total || ""}
+              value={parameters.rotation_angles.user_defined?.angles_total || null}
               onChange={(e) =>
                 setUserDefinedRotationAngles(
-                  parameters.rotation_angles.user_defined?.start_angle || "",
-                  parameters.rotation_angles.user_defined?.stop_angle || "",
-                  e.target.value
+                  parameters.rotation_angles.user_defined?.start_angle || 0,
+                  parameters.rotation_angles.user_defined?.stop_angle || 0,
+                  Number(e.target.value)
                 )
               }
               placeholder="Total angles between"
@@ -328,6 +331,7 @@ const Loader: React.FC = () => {
               label="Path to darks file"
               variant="outlined"
               fullWidth
+              type="text"
               size="small"
               value={parameters.darks?.file || ""}
               onChange={(e) => setDarks(e.target.value, parameters.darks?.data_path || "")}
@@ -339,6 +343,7 @@ const Loader: React.FC = () => {
               variant="outlined"
               fullWidth
               size="small"
+              type="text"
               value={parameters.darks?.data_path || ""}
               onChange={(e) => setDarks(parameters.darks?.file || "", e.target.value)}
               sx={{ mb: 1 }}
@@ -354,6 +359,7 @@ const Loader: React.FC = () => {
               variant="outlined"
               fullWidth
               size="small"
+              type="text"
               value={parameters.flats?.file || ""}
               onChange={(e) => setFlats(e.target.value, parameters.flats?.data_path || "")}
               sx={{ mb: 1 }}
@@ -361,6 +367,7 @@ const Loader: React.FC = () => {
             />
             <TextField
               label="Data path"
+              type="text"
               variant="outlined"
               fullWidth
               size="small"
