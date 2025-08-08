@@ -129,7 +129,22 @@ const Loader: React.FC = () => {
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
         <Typography gutterBottom variant="h6" color="primary" component="div" sx={{ display: "flex", alignItems: "center" }}>
           <strong>Loader</strong>
-          <Tooltip title="Select to load predefined pipelines" placement="top-start">
+          <Tooltip
+            title={
+              <span>
+                HTTOMO loader, used to load tomography data collected at DLS beamlines..{' '}
+                <a
+                  href="https://diamondlightsource.github.io/httomo/reference/loaders.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: '#90caf9', textDecoration: 'underline' }}
+                >
+                  Learn more
+                </a>
+              </span>
+            }
+            placement="top-start"
+          >
             <InfoIcon sx={{ ml: 0.5 }} fontSize="small" />
           </Tooltip>
         </Typography>
@@ -173,7 +188,7 @@ const Loader: React.FC = () => {
                 onClick={() => handleAutoToggle("dataPath")}
                 variant={autoToggles.dataPath ? "contained" : "outlined"}
                 size="small"
-                sx={{ mr: -1}} 
+                sx={{ mr: -1 }}
               >
                 auto
               </Button>
@@ -281,7 +296,7 @@ const Loader: React.FC = () => {
               placeholder="First angle"
             />
           </Grid>
-            <Grid item xs={4}>
+          <Grid item xs={4}>
             <TextField
               label="Stop angle"
               variant="outlined"
@@ -290,15 +305,15 @@ const Loader: React.FC = () => {
               size="small"
               value={parameters.rotation_angles.user_defined?.stop_angle || null}
               onChange={(e) =>
-              setUserDefinedRotationAngles(
-                parameters.rotation_angles.user_defined?.start_angle || 0,
-                Number(e.target.value),
-                parameters.rotation_angles.user_defined?.angles_total || 0
-              )
+                setUserDefinedRotationAngles(
+                  parameters.rotation_angles.user_defined?.start_angle || 0,
+                  Number(e.target.value),
+                  parameters.rotation_angles.user_defined?.angles_total || 0
+                )
               }
               placeholder="Last angle"
             />
-            </Grid>
+          </Grid>
           <Grid item xs={4}>
             <TextField
               label="Total angle"
