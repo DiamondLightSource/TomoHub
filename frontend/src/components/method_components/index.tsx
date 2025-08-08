@@ -4,48 +4,48 @@ import { methodsService } from '../../api/services';
 
 export const Normalisation = createMethodComponent({
   methodType: 'Normalisation',
-  fetchMethod: methodsService.getNormalizationMethods
+  fetchMethod: methodsService.getNormalizationMethods,
 });
 
-export const PhaseRetrieval  = createMethodComponent({
-    methodType: 'Phase Retrieval',
-    fetchMethod: methodsService.getPhaseRetrievalMethods
-  });
+export const PhaseRetrieval = createMethodComponent({
+  methodType: 'Phase Retrieval',
+  fetchMethod: methodsService.getPhaseRetrievalMethods,
+});
 export const ImageDenoiseArtefactRemoval = createMethodComponent({
-    methodType: 'Image denoising / Aretefacts Removal',
-    fetchMethod: methodsService.getImageDenoiseArtifactRemoval
-});  
+  methodType: 'Image denoising / Aretefacts Removal',
+  fetchMethod: methodsService.getImageDenoiseArtifactRemoval,
+});
 export const RotationCenterFinding = createMethodComponent({
   methodType: 'Rotation Center Finding',
-  fetchMethod: methodsService.getCORmethods
+  fetchMethod: methodsService.getCORmethods,
 });
 
 export const ImageSaving = createMethodComponent({
   methodType: 'Image Saving',
-  fetchMethod: methodsService.getImageSavingMethods
+  fetchMethod: methodsService.getImageSavingMethods,
 });
 
 export const Segmentation = createMethodComponent({
   methodType: 'Segmentation',
-  fetchMethod: methodsService.getSegmentationMethods
+  fetchMethod: methodsService.getSegmentationMethods,
 });
 
 export const Morphological = createMethodComponent({
   methodType: 'Morphological Operations',
-  fetchMethod: methodsService.getMorphologicalMethods
+  fetchMethod: methodsService.getMorphologicalMethods,
 });
 
 export const StripeRemoval = createMethodComponent({
   methodType: 'Stripe Removal',
-  fetchMethod: methodsService.getStripeRemovalMethods
+  fetchMethod: methodsService.getStripeRemovalMethods,
 });
 
 export const DistortionCorrection = createMethodComponent({
   methodType: 'Distortion Correction',
-  fetchMethod: methodsService.getDistortionCorrectionMethods
+  fetchMethod: methodsService.getDistortionCorrectionMethods,
 });
 
 export const Reconstruction = createMethodComponent({
   methodType: 'Algorithms',
-  fetchMethod: methodsService.getReconstructionMethods
+  fetchMethod: methodsService.getReconstructionMethods,
 });

@@ -1,82 +1,106 @@
-import { useFragment, graphql } from "react-relay";
+import { useFragment, graphql } from 'react-relay';
 import {
   materialCells,
   materialRenderers,
-} from "@jsonforms/material-renderers";
-import { JsonSchema, UISchemaElement, createAjv } from "@jsonforms/core";
-import { JsonForms } from "@jsonforms/react";
-import React, { useState } from "react";
-import { Divider, Snackbar, Stack, Typography, useTheme, Alert } from "@mui/material";
-import { ErrorObject } from "ajv";
-import { JSONObject, Visit } from "workflows-lib";
-import { VisitInput, visitToText } from "@diamondlightsource/sci-react-ui"; 
-import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionFormSharedFragment.graphql";
-import Loader from "../components/Loader";
-import { useLoader } from "../contexts/LoaderContext";
-import { sharedFragment } from "./Submission";
-import WorkflowStatus from "./WorkflowStatus"; 
-import SweepResultViewer from "./SweepResultViewer"
+} from '@jsonforms/material-renderers';
+import { JsonSchema, UISchemaElement, createAjv } from '@jsonforms/core';
+import { JsonForms } from '@jsonforms/react';
+import React, { useState } from 'react';
+import {
+  Divider,
+  Snackbar,
+  Stack,
+  Typography,
+  useTheme,
+  Alert,
+} from '@mui/material';
+import { ErrorObject } from 'ajv';
+import { JSONObject, Visit } from 'workflows-lib';
+import { VisitInput, visitToText } from '@diamondlightsource/sci-react-ui';
+import { SubmissionFormSharedFragment$key } from './__generated__/SubmissionFormSharedFragment.graphql';
+import Loader from '../components/Loader';
+import { useLoader } from '../contexts/LoaderContext';
+import { sharedFragment } from './Submission';
+import WorkflowStatus from './WorkflowStatus';
+import SweepResultViewer from './SweepResultViewer';
 
 const SubmissionFormCOR = (props: {
   template: SubmissionFormSharedFragment$key;
   prepopulatedParameters?: JSONObject;
   visit?: Visit;
-  onSubmit: (visit: Visit, parameters: object, onSuccess?: (workflowName: string) => void) => void; // Update signature to match GPURun
+  onSubmit: (
+    visit: Visit,
+    parameters: object,
+    onSuccess?: (workflowName: string) => void
+  ) => void; // Update signature to match GPURun
 }) => {
   const data = useFragment(sharedFragment, props.template);
   const theme = useTheme();
   const validator = createAjv({ useDefaults: true, coerceTypes: true });
-  const { method, module_path, parameters: loaderParams, isContextValid } = useLoader();
+  const {
+    method,
+    module_path,
+    parameters: loaderParams,
+    isContextValid,
+  } = useLoader();
   const [workflowData, setWorkflowData] = useState<any>(null);
   const customSchema = {
-    type: "object",
+    type: 'object',
     properties: {
-      start: { type: "number", default: 300, title: "Start" },
-      stop: { type: "number", default: 350, title: "Stop" },
-      step: { type: "number", default: 10, title: "Step" },
-      input: { type: "string", title: "Input Path" },
-      output: { type: "string", title: "Output Path" },
-      nprocs: { type: "string", default: "1", title: "Number of Processes" },
-      memory: { type: "string", default: "20Gi", title: "Memory" },
-      httomo_outdir_name: { type: "string", default: "sweep-run", title: "HTTomo Output Directory" },
+      start: { type: 'number', default: 300, title: 'Start' },
+      stop: { type: 'number', default: 350, title: 'Stop' },
+      step: { type: 'number', default: 10, title: 'Step' },
+      input: { type: 'string', title: 'Input Path' },
+      output: { type: 'string', title: 'Output Path' },
+      nprocs: { type: 'string', default: '1', title: 'Number of Processes' },
+      memory: { type: 'string', default: '20Gi', title: 'Memory' },
+      httomo_outdir_name: {
+        type: 'string',
+        default: 'sweep-run',
+        title: 'HTTomo Output Directory',
+      },
     },
-    required: ["start", "stop", "step", "input", "output", "nprocs", "memory"],
+    required: ['start', 'stop', 'step', 'input', 'output', 'nprocs', 'memory'],
   };
 
   const customUISchema: UISchemaElement = {
-    type: "VerticalLayout",
+    type: 'VerticalLayout',
     elements: [
       {
-        type: "HorizontalLayout",
+        type: 'HorizontalLayout',
         elements: [
-          { type: "Control", scope: "#/properties/start" },
-          { type: "Control", scope: "#/properties/stop" },
-          { type: "Control", scope: "#/properties/step" }
-        ]
+          { type: 'Control', scope: '#/properties/start' },
+          { type: 'Control', scope: '#/properties/stop' },
+          { type: 'Control', scope: '#/properties/step' },
+        ],
       },
       {
-        type: "HorizontalLayout",
+        type: 'HorizontalLayout',
         elements: [
-          { type: "Control", scope: "#/properties/input" },
-          { type: "Control", scope: "#/properties/output" }
-        ]
+          { type: 'Control', scope: '#/properties/input' },
+          { type: 'Control', scope: '#/properties/output' },
+        ],
       },
       {
-        type: "HorizontalLayout",
+        type: 'HorizontalLayout',
         elements: [
-          { type: "Control", scope: "#/properties/nprocs" },
-          { type: "Control", scope: "#/properties/memory" },
-          { type: "Control", scope: "#/properties/httomo_outdir_name" }
-        ]
-      }
-    ]
+          { type: 'Control', scope: '#/properties/nprocs' },
+          { type: 'Control', scope: '#/properties/memory' },
+          { type: 'Control', scope: '#/properties/httomo_outdir_name' },
+        ],
+      },
+    ],
   };
 
-  const [parameters, setParameters] = useState(props.prepopulatedParameters ?? {});
+  const [parameters, setParameters] = useState(
+    props.prepopulatedParameters ?? {}
+  );
   const [errors, setErrors] = useState<ErrorObject[]>([]);
   const [submitted, setSubmitted] = useState(false);
   // Add these state variables for WorkflowStatus
-  const [submittedWorkflowName, setSubmittedWorkflowName] = useState<string | null>(null);
+  const [submittedWorkflowName, setSubmittedWorkflowName] = useState<
+    string | null
+  >(null);
   const [submittedVisit, setSubmittedVisit] = useState<Visit | null>(null);
 
   const generateConfigJSON = (formParams: any) => {
@@ -85,30 +109,42 @@ const SubmissionFormCOR = (props: {
 
     // Auto-fill missing required fields if context is invalid (similar to YAML generator logic)
     if (!isContextValid()) {
-      if (!updatedLoaderParams.data_path || updatedLoaderParams.data_path.trim() === "") {
-        updatedLoaderParams.data_path = "auto";
-      }
-      
       if (
-        typeof updatedLoaderParams.rotation_angles === "string" ||
+        !updatedLoaderParams.data_path ||
+        updatedLoaderParams.data_path.trim() === ''
+      ) {
+        updatedLoaderParams.data_path = 'auto';
+      }
+
+      if (
+        typeof updatedLoaderParams.rotation_angles === 'string' ||
         !updatedLoaderParams.rotation_angles ||
         !updatedLoaderParams.rotation_angles.data_path ||
-        updatedLoaderParams.rotation_angles.data_path.trim() === ""
+        updatedLoaderParams.rotation_angles.data_path.trim() === ''
       ) {
-        updatedLoaderParams.rotation_angles = "auto";
+        updatedLoaderParams.rotation_angles = 'auto';
       }
-      
+
       // Check if we have darks and flats
-      const hasDarks = updatedLoaderParams.darks && updatedLoaderParams.darks.file && updatedLoaderParams.darks.file.trim() !== "";
-      const hasFlats = updatedLoaderParams.flats && updatedLoaderParams.flats.file && updatedLoaderParams.flats.file.trim() !== "";
-      
+      const hasDarks =
+        updatedLoaderParams.darks &&
+        updatedLoaderParams.darks.file &&
+        updatedLoaderParams.darks.file.trim() !== '';
+      const hasFlats =
+        updatedLoaderParams.flats &&
+        updatedLoaderParams.flats.file &&
+        updatedLoaderParams.flats.file.trim() !== '';
+
       // If we have both darks and flats, remove image_key_path
       if (hasDarks && hasFlats) {
         delete updatedLoaderParams.image_key_path;
       }
       // Otherwise, set it to "auto" if it's empty
-      else if (!updatedLoaderParams.image_key_path || updatedLoaderParams.image_key_path.trim() === "") {
-        updatedLoaderParams.image_key_path = "auto";
+      else if (
+        !updatedLoaderParams.image_key_path ||
+        updatedLoaderParams.image_key_path.trim() === ''
+      ) {
+        updatedLoaderParams.image_key_path = 'auto';
       }
     }
 
@@ -116,54 +152,56 @@ const SubmissionFormCOR = (props: {
       {
         method: method,
         module_path: module_path,
-        parameters: updatedLoaderParams
+        parameters: updatedLoaderParams,
       },
       {
-        method: "normalize",
-        module_path: "tomopy.prep.normalize",
+        method: 'normalize',
+        module_path: 'tomopy.prep.normalize',
         parameters: {
           cutoff: null,
-          averaging: "mean"
-        }
+          averaging: 'mean',
+        },
       },
       {
-        method: "minus_log",
-        module_path: "tomopy.prep.normalize",
-        parameters: {}
+        method: 'minus_log',
+        module_path: 'tomopy.prep.normalize',
+        parameters: {},
       },
       {
-        method: "FBP3d_tomobar",
-        module_path: "httomolibgpu.recon.algorithm",
+        method: 'FBP3d_tomobar',
+        module_path: 'httomolibgpu.recon.algorithm',
         parameters: {
           center: {
             start: formParams.start,
             stop: formParams.stop,
-            step: formParams.step
+            step: formParams.step,
           },
           filter_freq_cutoff: 0.35,
           recon_size: null,
-          recon_mask_radius: 0.95, 
-          neglog: false
-        }
-      }
+          recon_mask_radius: 0.95,
+          neglog: false,
+        },
+      },
     ];
-    
+
     return JSON.stringify(config);
   };
 
   const onClick = (visit: Visit, submitParams?: object) => {
     // Check if loader context is valid (allow auto-filling like YAML generator)
     if (!isContextValid()) {
-      console.warn("Loader configuration is incomplete, but proceeding with auto-filled values");
+      console.warn(
+        'Loader configuration is incomplete, but proceeding with auto-filled values'
+      );
     }
 
     if (errors.length === 0) {
       const configJSON = generateConfigJSON(parameters);
-      
+
       // Debug logging
-      console.log("Generated config JSON:", configJSON);
-      console.log("Loader parameters:", loaderParams);
-      console.log("Form parameters:", parameters);
+      console.log('Generated config JSON:', configJSON);
+      console.log('Loader parameters:', loaderParams);
+      console.log('Form parameters:', parameters);
 
       // Create final parameters object for mutation
       const finalParams = {
@@ -172,16 +210,16 @@ const SubmissionFormCOR = (props: {
         output: parameters.output,
         nprocs: parameters.nprocs,
         memory: parameters.memory,
-        "httomo-outdir-name": parameters.httomo_outdir_name // Note the hyphen in the key name to match Argo template
+        'httomo-outdir-name': parameters.httomo_outdir_name, // Note the hyphen in the key name to match Argo template
       };
 
       // Update to use callback pattern like GPURun
       props.onSubmit(visit, finalParams, (workflowName: string) => {
-        console.log("COR SUCCESS CALLBACK RECEIVED:", workflowName);
+        console.log('COR SUCCESS CALLBACK RECEIVED:', workflowName);
         setSubmittedWorkflowName(workflowName);
         setSubmittedVisit(visit);
       });
-      
+
       setSubmitted(true);
     }
   };
@@ -190,8 +228,8 @@ const SubmissionFormCOR = (props: {
     setSubmitted(false);
   };
 
-  const formWidth = 
-    (data.uiSchema?.options?.formWidth as string | undefined) ?? "100%";
+  const formWidth =
+    (data.uiSchema?.options?.formWidth as string | undefined) ?? '100%';
 
   return (
     <Stack
@@ -205,17 +243,16 @@ const SubmissionFormCOR = (props: {
       <Typography variant="body1" align="center">
         {data.description}
       </Typography>
-      
+
       <Divider />
-      
-      
+
       <Loader />
-      
+
       {submittedWorkflowName && submittedVisit && (
-        <WorkflowStatus 
-          workflow={submittedWorkflowName} 
+        <WorkflowStatus
+          workflow={submittedWorkflowName}
           visit={visitToText(submittedVisit)}
-          onWorkflowDataChange={(data) => {
+          onWorkflowDataChange={data => {
             console.log('SubmissionFormCOR: Received workflow data:', data);
             setWorkflowData(data);
           }}
@@ -230,15 +267,16 @@ const SubmissionFormCOR = (props: {
           step={parameters.step as number}
         />
       )}
-      
+
       {!isContextValid() && (
         <Alert severity="info">
-          Some Loader fields are empty. They will be auto-filled with default values during submission.
+          Some Loader fields are empty. They will be auto-filled with default
+          values during submission.
         </Alert>
       )}
-      
+
       <Divider />
-      
+
       {/* JSON Form */}
       <JsonForms
         schema={customSchema}
@@ -253,16 +291,16 @@ const SubmissionFormCOR = (props: {
         }}
         data-testid="parameters-form"
       />
-      
+
       <Divider />
-      
+
       <VisitInput
         visit={props.visit}
         onSubmit={onClick}
         parameters={parameters}
         submitOnReturn={false}
       />
-      
+
       <Snackbar
         open={submitted}
         autoHideDuration={6000}

@@ -1,6 +1,9 @@
 // src/api/services/someService.ts
-import apiClient from './client'
-import type { ApiMethodsSchema,ApiFullPipelineSchema } from '../types/APIresponse';
+import apiClient from './client';
+import type {
+  ApiMethodsSchema,
+  ApiFullPipelineSchema,
+} from '../types/APIresponse';
 
 // Add interface for TIFF metadata
 interface TiffMetadata {
@@ -60,7 +63,6 @@ export const methodsService = {
     const response = await apiClient.get('/methods/reconstruction');
     return response.data;
   },
-
 };
 
 export const fullpipelinesService = {
@@ -68,7 +70,7 @@ export const fullpipelinesService = {
     const response = await apiClient.get('/methods/fullpipelines');
     return response.data;
   },
-}
+};
 
 export const yamlService = {
   generateYaml: async (requestData: any): Promise<Blob> => {
@@ -81,14 +83,19 @@ export const yamlService = {
 
 export const proxyService = {
   getTiffFile: async (tiffUrl: string): Promise<ArrayBuffer> => {
-    const response = await apiClient.get(`/proxy/tiff?url=${encodeURIComponent(tiffUrl)}`, {
-      responseType: 'arraybuffer',
-    });
+    const response = await apiClient.get(
+      `/proxy/tiff?url=${encodeURIComponent(tiffUrl)}`,
+      {
+        responseType: 'arraybuffer',
+      }
+    );
     return response.data;
   },
 
   getTiffMetadata: async (tiffUrl: string): Promise<TiffMetadata> => {
-    const response = await apiClient.get(`/proxy/tiff-pages?url=${encodeURIComponent(tiffUrl)}`);
+    const response = await apiClient.get(
+      `/proxy/tiff-pages?url=${encodeURIComponent(tiffUrl)}`
+    );
     return response.data;
   },
 
@@ -99,16 +106,15 @@ export const proxyService = {
         responseType: 'arraybuffer',
       }
     );
-    
+
     // Convert ArrayBuffer to base64 data URL instead of blob URL
     const base64 = btoa(
       new Uint8Array(response.data).reduce(
-        (data, byte) => data + String.fromCharCode(byte), 
+        (data, byte) => data + String.fromCharCode(byte),
         ''
       )
     );
-    
-    return `data:image/png;base64,${base64}`; 
+
+    return `data:image/png;base64,${base64}`;
   },
 };
-

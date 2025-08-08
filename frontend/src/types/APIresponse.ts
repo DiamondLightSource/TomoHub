@@ -1,4 +1,3 @@
-
 export type ApiMethodsSchema = {
   [modulePath: string]: {
     [methodName: string]: {
@@ -17,7 +16,6 @@ export type ApiMethodsSchema = {
   };
 };
 
-
 export type Method = ApiMethodsSchema[string][string];
 
 export type MethodComponentConfig = {
@@ -30,7 +28,7 @@ export type ApiFullPipelineSchema = {
     [methodName: string]: {
       module_path: string;
       parameters: {
-        [key: string]:any;
+        [key: string]: any;
       };
     };
   };

@@ -27,11 +27,11 @@ const theme = createTheme({
   // Add custom breakpoints
   breakpoints: {
     values: {
-      xs: 0,      // Extra small devices (phones)
-      sm: 300,    // Small devices (tablets)
-      md: 500,    // Medium devices (small laptops)
-      lg: 1000,   // Large devices (desktops)
-      xl: 1536,   // Extra large devices (large desktops)
+      xs: 0, // Extra small devices (phones)
+      sm: 300, // Small devices (tablets)
+      md: 500, // Medium devices (small laptops)
+      lg: 1000, // Large devices (desktops)
+      xl: 1536, // Extra large devices (large desktops)
     },
   },
 });

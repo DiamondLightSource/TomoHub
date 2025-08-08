@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Typography, ToggleButtonGroup, ToggleButton, TextField, Tooltip } from '@mui/material';
+import {
+  Grid,
+  Typography,
+  ToggleButtonGroup,
+  ToggleButton,
+  TextField,
+  Tooltip,
+} from '@mui/material';
 import { useCenter } from '../../../../contexts/CenterContext';
 
 interface CenterInputProps {
@@ -42,7 +49,9 @@ export const CenterInput: React.FC<CenterInputProps> = ({
     }
   };
 
-  const handleManualValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleManualValueChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const newValue = event.target.value === '' ? 0 : Number(event.target.value);
     setSelectedCenter(newValue); // Update context
     onChange(newValue); // Update component value

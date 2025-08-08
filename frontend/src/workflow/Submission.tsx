@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { useLazyLoadQuery, useMutation } from "react-relay/hooks";
-import { graphql } from "relay-runtime";
-import { Box } from "@mui/material";
+import { useState } from 'react';
+import { useLazyLoadQuery, useMutation } from 'react-relay/hooks';
+import { graphql } from 'relay-runtime';
+import { Box } from '@mui/material';
 import {
   JSONObject,
   SubmissionGraphQLErrorMessage,
@@ -9,13 +9,13 @@ import {
   SubmissionSuccessMessage,
   SubmittedMessagesList,
   Visit,
-} from "workflows-lib";
-import { visitToText } from "@diamondlightsource/sci-react-ui";
-import SubmissionFormGPURun from "./SubmissionFormGPURun";
-import SubmissionFormCOR from "./SubmissionFormCOR";
-import { SubmissionQuery as SubmissionQueryType } from "./__generated__/SubmissionQuery.graphql";
-import { SubmissionMutation as SubmissionMutationType } from "./__generated__/SubmissionMutation.graphql";
-import React from "react";
+} from 'workflows-lib';
+import { visitToText } from '@diamondlightsource/sci-react-ui';
+import SubmissionFormGPURun from './SubmissionFormGPURun';
+import SubmissionFormCOR from './SubmissionFormCOR';
+import { SubmissionQuery as SubmissionQueryType } from './__generated__/SubmissionQuery.graphql';
+import { SubmissionMutation as SubmissionMutationType } from './__generated__/SubmissionMutation.graphql';
+import React from 'react';
 
 const submissionQuery = graphql`
   query SubmissionQuery($name: String!) {
@@ -38,8 +38,16 @@ const sharedFragment = graphql`
 `;
 
 const submissionMutation = graphql`
-  mutation SubmissionMutation($name: String!, $visit: VisitInput!, $parameters: JSON!) {
-    submitWorkflowTemplate(name: $name, visit: $visit, parameters: $parameters) {
+  mutation SubmissionMutation(
+    $name: String!
+    $visit: VisitInput!
+    $parameters: JSON!
+  ) {
+    submitWorkflowTemplate(
+      name: $name
+      visit: $visit
+      parameters: $parameters
+    ) {
       name
     }
   }
@@ -49,18 +57,23 @@ interface SubmissionProps {
   /** The name of the workflow template, i.e. numpy-benchmark */
   workflowName: string;
   /** The set function for a user visit */
-  setVisit: (value: Visit | undefined | ((prevState: Visit | undefined) => Visit | undefined)) => void;
+  setVisit: (
+    value:
+      | Visit
+      | undefined
+      | ((prevState: Visit | undefined) => Visit | undefined)
+  ) => void;
   /** Optional prepopulated parameters */
   prepopulatedParameters?: JSONObject;
   /** Optional visit information */
   visit?: Visit;
 }
 
-export default function Submission({ 
-  workflowName, 
-  setVisit, 
+export default function Submission({
+  workflowName,
+  setVisit,
   prepopulatedParameters,
-  visit 
+  visit,
 }: SubmissionProps) {
   const data = useLazyLoadQuery<SubmissionQueryType>(submissionQuery, {
     name: workflowName,
@@ -74,9 +87,14 @@ export default function Submission({
     )[]
   >([]);
 
-  const [commitMutation] = useMutation<SubmissionMutationType>(submissionMutation);
+  const [commitMutation] =
+    useMutation<SubmissionMutationType>(submissionMutation);
 
-  function submitWorkflow(visit: Visit, parameters: object, onSuccess?: (workflowName: string) => void) {
+  function submitWorkflow(
+    visit: Visit,
+    parameters: object,
+    onSuccess?: (workflowName: string) => void
+  ) {
     commitMutation({
       variables: {
         name: workflowName,
@@ -85,40 +103,40 @@ export default function Submission({
       },
       onCompleted: (response, errors) => {
         if (errors?.length) {
-          console.error("GraphQL errors:", errors);
-          setSubmissionResults((prev) => [
+          console.error('GraphQL errors:', errors);
+          setSubmissionResults(prev => [
             {
-              type: "graphQLError",
+              type: 'graphQLError',
               errors: errors,
             },
             ...prev,
           ]);
         } else {
           const submittedName = response.submitWorkflowTemplate.name;
-          console.log("Successfully submitted:", submittedName);
+          console.log('Successfully submitted:', submittedName);
           setVisit(visit);
-          setSubmissionResults((prev) => [
+          setSubmissionResults(prev => [
             {
-              type: "success",
+              type: 'success',
               message: `${visitToText(visit)}/${submittedName}`,
             },
             ...prev,
           ]);
-          
+
           // NEW: Call the success callback with workflow name
           if (onSuccess) {
-            console.log("Calling onSuccess callback with:", submittedName);
+            console.log('Calling onSuccess callback with:', submittedName);
             onSuccess(submittedName);
           } else {
-            console.log("No onSuccess callback provided");
+            console.log('No onSuccess callback provided');
           }
         }
       },
-      onError: (err) => {
-        console.error("Submission failed:", err);
-        setSubmissionResults((prev) => [
+      onError: err => {
+        console.error('Submission failed:', err);
+        setSubmissionResults(prev => [
           {
-            type: "networkError",
+            type: 'networkError',
             error: err,
           },
           ...prev,
@@ -137,9 +155,9 @@ export default function Submission({
     };
 
     switch (workflowName) {
-      case "httomo-cor-sweep":
+      case 'httomo-cor-sweep':
         return <SubmissionFormCOR {...commonProps} />;
-      case "httomo-gpu-job":
+      case 'httomo-gpu-job':
         return <SubmissionFormGPURun {...commonProps} />;
       default:
         return <SubmissionFormGPURun {...commonProps} />; // Default fallback
@@ -159,4 +177,4 @@ export default function Submission({
     </>
   );
 }
-export {sharedFragment};
+export { sharedFragment };

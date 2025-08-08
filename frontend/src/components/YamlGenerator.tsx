@@ -8,20 +8,20 @@ import {
   Typography,
   IconButton,
   Snackbar,
-} from "@mui/material";
-import TextField from "@mui/material/TextField";
-import React, { useState } from "react";
-import DownloadIcon from "@mui/icons-material/Download";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import CloseIcon from "@mui/icons-material/Close";
-import { useSweep } from "../contexts/SweepContext";
-import { yamlService } from "../api/services";
-import { Link } from "react-router-dom";
-import { useHTTOMOConfig } from "../hooks/useHTTOMOConfig";
+} from '@mui/material';
+import TextField from '@mui/material/TextField';
+import React, { useState } from 'react';
+import DownloadIcon from '@mui/icons-material/Download';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CloseIcon from '@mui/icons-material/Close';
+import { useSweep } from '../contexts/SweepContext';
+import { yamlService } from '../api/services';
+import { Link } from 'react-router-dom';
+import { useHTTOMOConfig } from '../hooks/useHTTOMOConfig';
 
 const YMLG = () => {
-  const [yamlFileName, setYamlFileName] = React.useState<string>("config");
+  const [yamlFileName, setYamlFileName] = React.useState<string>('config');
   const { activeSweep } = useSweep();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,8 +29,8 @@ const YMLG = () => {
   const [copySuccess, setCopySuccess] = useState(false);
   const [snackbarState, setSnackbarState] = useState({
     open: false,
-    message: "",
-    severity: "error" as "success" | "error" | "info" | "warning",
+    message: '',
+    severity: 'error' as 'success' | 'error' | 'info' | 'warning',
   });
 
   const { generateHTTOMOConfig } = useHTTOMOConfig();
@@ -44,7 +44,7 @@ const YMLG = () => {
       ``,
       `# Run HTTOMO with your configuration`,
       `httomo_mpi [address to your data file] ${yamlFileName}.yaml [address to your output directory]`,
-    ].join("\n");
+    ].join('\n');
   };
 
   // Function to handle copying command to clipboard
@@ -64,7 +64,7 @@ const YMLG = () => {
 
   const generateAndDownloadYAML = async () => {
     try {
-      const combinedData = generateHTTOMOConfig(); 
+      const combinedData = generateHTTOMOConfig();
       console.log(combinedData);
       const requestData = {
         data: combinedData,
@@ -74,24 +74,24 @@ const YMLG = () => {
 
       const blobData = await yamlService.generateYaml(requestData);
       const url = window.URL.createObjectURL(new Blob([blobData]));
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = url;
-      link.setAttribute("download", `${yamlFileName}.yaml`);
+      link.setAttribute('download', `${yamlFileName}.yaml`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error("Error generating YAML:", err);
-      setError("Failed to generate YAML file. Please try again.");
+      console.error('Error generating YAML:', err);
+      setError('Failed to generate YAML file. Please try again.');
     } finally {
       setIsLoading(false);
     }
 
     setSnackbarState({
       open: true,
-      message: "Configuration file generated successfully",
-      severity: "info",
+      message: 'Configuration file generated successfully',
+      severity: 'info',
     });
   };
 
@@ -103,13 +103,11 @@ const YMLG = () => {
     });
   };
 
-
-
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 10 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 10 }}>
       {error && <Alert severity="error">{error}</Alert>}
 
-      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
         <TextField
           id="standard-basic"
           label="Select a name for your config file"
@@ -126,7 +124,7 @@ const YMLG = () => {
             size="small"
             disabled={isLoading}
           >
-            {isLoading ? "Generating..." : "Get Config"}
+            {isLoading ? 'Generating...' : 'Get Config'}
           </Button>
           <Button
             startIcon={<PlayArrowIcon />}
@@ -146,42 +144,41 @@ const YMLG = () => {
         </ButtonGroup>
       </Box>
 
-
       {showClusterCommands && (
         <Paper
           elevation={3}
           sx={{
             p: 2,
             mt: 2,
-            bgcolor: "#2b2b2b",
-            color: "#f8f8f8",
-            position: "relative",
-            fontFamily: "monospace",
+            bgcolor: '#2b2b2b',
+            color: '#f8f8f8',
+            position: 'relative',
+            fontFamily: 'monospace',
             borderRadius: 1,
           }}
         >
-          <Typography variant="subtitle2" sx={{ mb: 1, color: "#8bc34a" }}>
+          <Typography variant="subtitle2" sx={{ mb: 1, color: '#8bc34a' }}>
             HPC Cluster Commands
           </Typography>
 
           <Box
             sx={{
-              whiteSpace: "pre-wrap",
-              overflow: "auto",
-              maxHeight: "300px",
-              fontSize: "0.9rem",
+              whiteSpace: 'pre-wrap',
+              overflow: 'auto',
+              maxHeight: '300px',
+              fontSize: '0.9rem',
               py: 1,
             }}
           >
             {getClusterCommands()}
           </Box>
 
-          <Box sx={{ position: "absolute", top: 8, right: 8, display: "flex" }}>
+          <Box sx={{ position: 'absolute', top: 8, right: 8, display: 'flex' }}>
             <Tooltip title="Copy to clipboard">
               <IconButton
                 size="small"
                 onClick={handleCopyCommand}
-                sx={{ color: "#f8f8f8" }}
+                sx={{ color: '#f8f8f8' }}
               >
                 <ContentCopyIcon fontSize="small" />
               </IconButton>
@@ -190,7 +187,7 @@ const YMLG = () => {
               <IconButton
                 size="small"
                 onClick={() => setShowClusterCommands(false)}
-                sx={{ color: "#f8f8f8" }}
+                sx={{ color: '#f8f8f8' }}
               >
                 <CloseIcon fontSize="small" />
               </IconButton>
@@ -219,14 +216,14 @@ const YMLG = () => {
         open={snackbarState.open}
         autoHideDuration={5000}
         onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       >
         <Alert
           elevation={6}
           variant="filled"
           onClose={handleSnackbarClose}
           severity={snackbarState.severity}
-          sx={{ width: "100%" }}
+          sx={{ width: '100%' }}
         >
           {snackbarState.message}
         </Alert>

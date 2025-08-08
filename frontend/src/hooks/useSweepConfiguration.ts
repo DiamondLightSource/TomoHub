@@ -11,9 +11,10 @@ export const useSweepConfiguration = (methodId: string, paramName: string) => {
 
   const { activeSweep, setActiveSweep, clearActiveSweep } = useSweep();
 
-  const isSweepActiveForOtherParam = activeSweep && 
+  const isSweepActiveForOtherParam =
+    activeSweep &&
     (activeSweep.methodId !== methodId || activeSweep.paramName !== paramName);
-  const isSweepActiveForThisParam = 
+  const isSweepActiveForThisParam =
     activeSweep?.methodId === methodId && activeSweep?.paramName === paramName;
 
   const isFormValid = () => {
@@ -37,13 +38,13 @@ export const useSweepConfiguration = (methodId: string, paramName: string) => {
     return values
       .split(',')
       .map(val => val.trim())
-      .map(val => val.includes('.') ? parseFloat(val) : parseInt(val, 10));
+      .map(val => (val.includes('.') ? parseFloat(val) : parseInt(val, 10)));
   };
 
   const handleSweepDone = (onChange: (value: any) => void) => {
     const sweepValue = getSweepValue();
     const sweepType = activeTab === 0 ? 'range' : 'values';
-    
+
     onChange(sweepValue);
     setActiveSweep(methodId, paramName, sweepType);
     setIsModalOpen(false);

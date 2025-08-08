@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -11,10 +11,10 @@ import {
   IconButton,
   ToggleButton,
   ToggleButtonGroup,
-} from "@mui/material";
+} from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import CloseIcon from '@mui/icons-material/Close';
-import { useLoader, PreviewType } from "../contexts/LoaderContext";
+import { useLoader, PreviewType } from '../contexts/LoaderContext';
 
 interface LoaderPreviewProps {
   onClose: () => void;
@@ -89,19 +89,19 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
   };
 
   const handlePresetChange = (
-    detector: "x" | "y",
-    field: "start" | "stop",
+    detector: 'x' | 'y',
+    field: 'start' | 'stop',
     value: string | null
   ) => {
-    const setState = detector === "x" ? setDetectorXState : setDetectorYState;
-    setState((prev) => ({
+    const setState = detector === 'x' ? setDetectorXState : setDetectorYState;
+    setState(prev => ({
       ...prev,
-      [field]: value || undefined
+      [field]: value || undefined,
     }));
   };
 
   const renderDetectorControls = (
-    detector: "x" | "y",
+    detector: 'x' | 'y',
     state: PreviewType,
     setState: React.Dispatch<React.SetStateAction<PreviewType>>,
     showStartOffset: boolean,
@@ -125,12 +125,16 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
                 fullWidth
                 type="number"
                 size="small"
-                value={typeof state.start === "number" ? state.start : ""}
-                onChange={(e) => setState({ ...state, start: Number(e.target.value) })}
-                disabled={typeof state.start === "string"}
+                value={typeof state.start === 'number' ? state.start : ''}
+                onChange={e =>
+                  setState({ ...state, start: Number(e.target.value) })
+                }
+                disabled={typeof state.start === 'string'}
                 error={error && !state.start}
-                helperText={error && !state.start ? "Start position is required" : ""}
-                sx={{paddingRight:-14}}
+                helperText={
+                  error && !state.start ? 'Start position is required' : ''
+                }
+                sx={{ paddingRight: -14 }}
                 InputProps={{
                   startAdornment: state.start && (
                     <InputAdornment position="start">
@@ -148,9 +152,11 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
                       <ToggleButtonGroup
                         value={state.start?.toString() || null}
                         exclusive
-                        onChange={(_, value) => handlePresetChange(detector, "start", value)}
+                        onChange={(_, value) =>
+                          handlePresetChange(detector, 'start', value)
+                        }
                         size="small"
-                        sx={{marginRight:"-14px"}}
+                        sx={{ marginRight: '-14px' }}
                       >
                         <ToggleButton value="begin">Begin</ToggleButton>
                         <ToggleButton value="mid">Mid</ToggleButton>
@@ -166,9 +172,9 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
                 variant="outlined"
                 onClick={() => setShowStartOffset(!showStartOffset)}
                 size="small"
-                sx={{padding:0.7}}
+                sx={{ padding: 0.7 }}
               >
-                {showStartOffset ? "Remove Offset" : "Add Offset"}
+                {showStartOffset ? 'Remove Offset' : 'Add Offset'}
               </Button>
             </Grid>
           </Grid>
@@ -182,8 +188,10 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
             fullWidth
             type="number"
             size="small"
-            value={state.start_offset || ""}
-            onChange={(e) => setState({ ...state, start_offset: Number(e.target.value) })}
+            value={state.start_offset || ''}
+            onChange={e =>
+              setState({ ...state, start_offset: Number(e.target.value) })
+            }
             sx={{ mb: 1 }}
           />
         )}
@@ -201,11 +209,15 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
                 fullWidth
                 type="number"
                 size="small"
-                value={typeof state.stop === "number" ? state.stop : ""}
-                onChange={(e) => setState({ ...state, stop: Number(e.target.value) })}
-                disabled={typeof state.stop === "string"}
+                value={typeof state.stop === 'number' ? state.stop : ''}
+                onChange={e =>
+                  setState({ ...state, stop: Number(e.target.value) })
+                }
+                disabled={typeof state.stop === 'string'}
                 error={error && !state.stop}
-                helperText={error && !state.stop ? "Stop position is required" : ""}
+                helperText={
+                  error && !state.stop ? 'Stop position is required' : ''
+                }
                 InputProps={{
                   startAdornment: state.stop && (
                     <InputAdornment position="start">
@@ -223,9 +235,11 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
                       <ToggleButtonGroup
                         value={state.stop?.toString() || null}
                         exclusive
-                        onChange={(_, value) => handlePresetChange(detector, "stop", value)}
+                        onChange={(_, value) =>
+                          handlePresetChange(detector, 'stop', value)
+                        }
                         size="small"
-                        sx={{marginRight:"-14px"}}
+                        sx={{ marginRight: '-14px' }}
                       >
                         <ToggleButton value="begin">Begin</ToggleButton>
                         <ToggleButton value="mid">Mid</ToggleButton>
@@ -241,9 +255,9 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
                 variant="outlined"
                 onClick={() => setShowStopOffset(!showStopOffset)}
                 size="small"
-                sx={{padding:0.7}}
+                sx={{ padding: 0.7 }}
               >
-                {showStopOffset ? "Remove Offset" : "Add Offset"}
+                {showStopOffset ? 'Remove Offset' : 'Add Offset'}
               </Button>
             </Grid>
           </Grid>
@@ -257,8 +271,10 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
             fullWidth
             type="number"
             size="small"
-            value={state.stop_offset || ""}
-            onChange={(e) => setState({ ...state, stop_offset: Number(e.target.value) })}
+            value={state.stop_offset || ''}
+            onChange={e =>
+              setState({ ...state, stop_offset: Number(e.target.value) })
+            }
             sx={{ mb: 1 }}
           />
         )}
@@ -281,61 +297,63 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
       </Typography>
 
       {/* Detector X Section */}
-      <Box sx={{ mb: 1, p: 1, border: "1px solid #ccc", borderRadius: 1 }}>
+      <Box sx={{ mb: 1, p: 1, border: '1px solid #ccc', borderRadius: 1 }}>
         <FormControlLabel
           control={
             <Checkbox
               checked={enableDetectorX}
-              onChange={(e) => {
+              onChange={e => {
                 setEnableDetectorX(e.target.checked);
                 if (!e.target.checked) {
                   setDetectorXState({});
                 }
-                setErrors((prev) => ({ ...prev, detectorX: false }));
+                setErrors(prev => ({ ...prev, detectorX: false }));
               }}
             />
           }
           label="Enable Detector X"
         />
-        {enableDetectorX && renderDetectorControls(
-          "x",
-          detectorX,
-          setDetectorXState,
-          showStartOffsetX,
-          setShowStartOffsetX,
-          showStopOffsetX,
-          setShowStopOffsetX,
-          errors.detectorX
-        )}
+        {enableDetectorX &&
+          renderDetectorControls(
+            'x',
+            detectorX,
+            setDetectorXState,
+            showStartOffsetX,
+            setShowStartOffsetX,
+            showStopOffsetX,
+            setShowStopOffsetX,
+            errors.detectorX
+          )}
       </Box>
 
       {/* Detector Y Section */}
-      <Box sx={{ mb: 1, p: 1, border: "1px solid #ccc", borderRadius: 1 }}>
+      <Box sx={{ mb: 1, p: 1, border: '1px solid #ccc', borderRadius: 1 }}>
         <FormControlLabel
           control={
             <Checkbox
               checked={enableDetectorY}
-              onChange={(e) => {
+              onChange={e => {
                 setEnableDetectorY(e.target.checked);
                 if (!e.target.checked) {
                   setDetectorYState({});
                 }
-                setErrors((prev) => ({ ...prev, detectorY: false }));
+                setErrors(prev => ({ ...prev, detectorY: false }));
               }}
             />
           }
           label="Enable Detector Y"
         />
-        {enableDetectorY && renderDetectorControls(
-          "y",
-          detectorY,
-          setDetectorYState,
-          showStartOffsetY,
-          setShowStartOffsetY,
-          showStopOffsetY,
-          setShowStopOffsetY,
-          errors.detectorY
-        )}
+        {enableDetectorY &&
+          renderDetectorControls(
+            'y',
+            detectorY,
+            setDetectorYState,
+            showStartOffsetY,
+            setShowStartOffsetY,
+            showStopOffsetY,
+            setShowStopOffsetY,
+            errors.detectorY
+          )}
       </Box>
 
       {/* Save Button */}

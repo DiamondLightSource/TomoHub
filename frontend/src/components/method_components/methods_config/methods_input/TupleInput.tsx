@@ -22,14 +22,17 @@ export const TupleInput: React.FC<TupleInputProps> = ({
   };
 
   return (
-    <Tooltip 
-      title={paramDetails.desc + "DO NOT CHANGE IF YOU DON'T WANT TO CALCULATE MIN/MAX FROM GIVEN DATA"} 
+    <Tooltip
+      title={
+        paramDetails.desc +
+        "DO NOT CHANGE IF YOU DON'T WANT TO CALCULATE MIN/MAX FROM GIVEN DATA"
+      }
       placement="top-start"
     >
-      <FormControl sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Typography gutterBottom>
-          {paramName}
-        </Typography>
+      <FormControl
+        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      >
+        <Typography gutterBottom>{paramName}</Typography>
         <Button
           variant="contained"
           onClick={handleToggle}

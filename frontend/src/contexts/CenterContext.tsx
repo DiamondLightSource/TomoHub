@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface CenterContextProps {
-  selectedCenter: number; 
-  setSelectedCenter: (center: number) => void; 
+  selectedCenter: number;
+  setSelectedCenter: (center: number) => void;
 }
 
 const CenterContext = createContext<CenterContextProps | undefined>(undefined);
@@ -20,7 +20,7 @@ export const CenterProvider = ({ children }: { children: ReactNode }) => {
 export const useCenter = () => {
   const context = useContext(CenterContext);
   if (!context) {
-    throw new Error("useCenter must be used within a CenterProvider");
+    throw new Error('useCenter must be used within a CenterProvider');
   }
   return context;
 };

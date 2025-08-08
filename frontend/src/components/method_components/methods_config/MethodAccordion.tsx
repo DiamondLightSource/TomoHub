@@ -1,6 +1,10 @@
 import React from 'react';
-import { Grid, Typography } from "@mui/material";
-import { Accordion, AccordionSummary, AccordionDetails } from './StyledAccordion';
+import { Grid, Typography } from '@mui/material';
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from './StyledAccordion';
 import { MethodHeader } from './MethodHeader';
 import { MethodParameter } from './MethodParameter';
 import Method from '../uitypes';
@@ -53,7 +57,7 @@ export const MethodAccordion: React.FC<MethodAccordionProps> = ({
             paramDetails={paramDetails}
             value={currentParameters?.[paramName]}
             isEnabled={isMethodAdded}
-            onChange={(value) => onParameterChange(paramName, value)}
+            onChange={value => onParameterChange(paramName, value)}
           />
         ))}
       </Grid>

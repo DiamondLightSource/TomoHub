@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { graphql, useLazyLoadQuery } from 'react-relay';
-import { Box, Typography, Chip, CircularProgress, Button, ButtonGroup } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Chip,
+  CircularProgress,
+  Button,
+  ButtonGroup,
+} from '@mui/material';
 import { OpenInNew, Article } from '@mui/icons-material';
-import { Visit, visitRegex, regexToVisit } from '@diamondlightsource/sci-react-ui';
+import {
+  Visit,
+  visitRegex,
+  regexToVisit,
+} from '@diamondlightsource/sci-react-ui';
 import { WorkflowStatusQuery as WorkflowStatusQueryType } from './__generated__/WorkflowStatusQuery.graphql';
 
 const workflowStatusQuery = graphql`
@@ -101,7 +112,11 @@ interface WorkflowStatusProps {
   onWorkflowDataChange?: (data: any) => void; // Add this prop
 }
 
-const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit, onWorkflowDataChange }) => {
+const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
+  workflow,
+  visit,
+  onWorkflowDataChange,
+}) => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [isPolling, setIsPolling] = useState(true);
 
@@ -109,7 +124,9 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit, onWork
   const parseVisit = (visitStr: string): Visit => {
     const match = visitRegex.exec(visitStr);
     if (!match) {
-      throw new Error(`Invalid visit format: ${visitStr}. Expected format: xx12345-1`);
+      throw new Error(
+        `Invalid visit format: ${visitStr}. Expected format: xx12345-1`
+      );
     }
     return regexToVisit(match);
   };
@@ -118,7 +135,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit, onWork
 
   // GraphQL query - always called at top level
   const data = useLazyLoadQuery<WorkflowStatusQueryType>(
-    workflowStatusQuery, 
+    workflowStatusQuery,
     {
       visit: parsedVisit,
       name: workflow,
@@ -134,16 +151,20 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit, onWork
   console.log('Raw data object:', data);
   console.log('data.workflow:', data?.workflow);
   console.log('data.workflow.status:', data?.workflow?.status);
-  console.log('data.workflow.status.__typename:', data?.workflow?.status?.__typename);
+  console.log(
+    'data.workflow.status.__typename:',
+    data?.workflow?.status?.__typename
+  );
   console.log('Type of __typename:', typeof data?.workflow?.status?.__typename);
   console.log('=== END DEBUG ===');
 
   const statusType = data?.workflow?.status?.__typename ?? 'Unknown';
   console.log('Final statusType:', statusType);
 
-  const message = data?.workflow?.status && 'message' in data.workflow.status 
-    ? data.workflow.status.message 
-    : undefined;
+  const message =
+    data?.workflow?.status && 'message' in data.workflow.status
+      ? data.workflow.status.message
+      : undefined;
 
   // Add debugging
   console.log('WorkflowStatus Debug:', {
@@ -154,12 +175,16 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit, onWork
     workflowExists: !!data?.workflow,
     statusExists: !!data?.workflow?.status,
     statusType,
-    fullData: data
+    fullData: data,
   });
 
   // Check if status is final (no need to keep polling)
   const isFinalStatus = (status: string) => {
-    return ['WorkflowSucceededStatus', 'WorkflowFailedStatus', 'WorkflowErroredStatus'].includes(status);
+    return [
+      'WorkflowSucceededStatus',
+      'WorkflowFailedStatus',
+      'WorkflowErroredStatus',
+    ].includes(status);
   };
 
   const getStatusColor = (status: string) => {
@@ -202,26 +227,33 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit, onWork
       return [];
     }
 
-    const finalStatuses = ['WorkflowSucceededStatus', 'WorkflowFailedStatus', 'WorkflowErroredStatus'];
+    const finalStatuses = [
+      'WorkflowSucceededStatus',
+      'WorkflowFailedStatus',
+      'WorkflowErroredStatus',
+    ];
     if (!finalStatuses.includes(statusType)) {
       return [];
     }
 
     const tasks = (data.workflow.status as any).tasks || [];
-    
+
     return tasks
       .filter((task: any) => task.stepType === 'Pod') // Only Pod tasks
       .map((task: any) => {
         // Find main.log artifact
-        const logArtifact = task.artifacts?.find((artifact: any) => 
-          artifact.name === 'main.log' && artifact.mimeType === 'text/plain'
+        const logArtifact = task.artifacts?.find(
+          (artifact: any) =>
+            artifact.name === 'main.log' && artifact.mimeType === 'text/plain'
         );
-        
-        return logArtifact ? {
-          taskName: task.name,
-          url: logArtifact.url,
-          name: logArtifact.name
-        } : null;
+
+        return logArtifact
+          ? {
+              taskName: task.name,
+              url: logArtifact.url,
+              name: logArtifact.name,
+            }
+          : null;
       })
       .filter(Boolean); // Remove null entries
   };
@@ -253,7 +285,10 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit, onWork
 
   // Add this useEffect to pass data back to parent
   useEffect(() => {
-    console.log('WorkflowStatus: Data changed, calling onWorkflowDataChange:', data);
+    console.log(
+      'WorkflowStatus: Data changed, calling onWorkflowDataChange:',
+      data
+    );
     if (onWorkflowDataChange && data) {
       onWorkflowDataChange(data);
     }
@@ -271,14 +306,10 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit, onWork
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-        <Typography variant="h6">
-          Workflow Status
-        </Typography>
-        {isPolling && (
-          <CircularProgress size={16} />
-        )}
+        <Typography variant="h6">Workflow Status</Typography>
+        {isPolling && <CircularProgress size={16} />}
       </Box>
-      
+
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
         <Typography variant="body2" color="text.secondary">
           Workflow:
@@ -288,7 +319,14 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit, onWork
         </Typography>
       </Box>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          mb: 1,
+        }}
+      >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Typography variant="body2" color="text.secondary">
             Status:
@@ -313,11 +351,11 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit, onWork
                   startIcon={<Article />}
                   endIcon={<OpenInNew />}
                   onClick={() => window.open(artifact.url, '_blank')}
-                  sx={{ 
+                  sx={{
                     textTransform: 'none',
                     fontSize: '0.75rem',
                     minWidth: 'auto',
-                    px: 1
+                    px: 1,
                   }}
                 >
                   {artifact.taskName} log
@@ -333,19 +371,21 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({ workflow, visit, onWork
           <Typography variant="body2" color="text.secondary">
             Message:
           </Typography>
-          <Typography variant="body2">
-            {message}
-          </Typography>
+          <Typography variant="body2">{message}</Typography>
         </Box>
       )}
 
       {isPolling && (
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mt: 1, display: 'block' }}
+        >
           Refreshing every 2 seconds...
         </Typography>
       )}
     </Box>
   );
-}; 
+};
 
 export default WorkflowStatus;

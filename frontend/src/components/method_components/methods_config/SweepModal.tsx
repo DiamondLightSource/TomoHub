@@ -66,7 +66,14 @@ export const SweepModal: React.FC<SweepModalProps> = ({
           borderRadius: 1,
         }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 2,
+          }}
+        >
           <Typography id="modal-title" sx={{ fontSize: 15 }}>
             <strong>Sweep {paramName} Parameter</strong>
           </Typography>
@@ -75,11 +82,7 @@ export const SweepModal: React.FC<SweepModalProps> = ({
           </IconButton>
         </Box>
 
-        <Tabs
-          value={activeTab}
-          onChange={onTabChange}
-          aria-label="tabs"
-        >
+        <Tabs value={activeTab} onChange={onTabChange} aria-label="tabs">
           <Tab sx={{ width: '50%' }} label="Range" />
           <Tab sx={{ width: '50%' }} label="Values" />
         </Tabs>
@@ -93,7 +96,7 @@ export const SweepModal: React.FC<SweepModalProps> = ({
               required
               size="small"
               value={start ?? ''}
-              onChange={(e) => onStartChange(parseFloat(e.target.value))}
+              onChange={e => onStartChange(parseFloat(e.target.value))}
               sx={{ mb: 1 }}
             />
             <TextField
@@ -103,7 +106,7 @@ export const SweepModal: React.FC<SweepModalProps> = ({
               required
               size="small"
               value={stop ?? ''}
-              onChange={(e) => onStopChange(parseFloat(e.target.value))}
+              onChange={e => onStopChange(parseFloat(e.target.value))}
               sx={{ mb: 1 }}
             />
             <TextField
@@ -113,7 +116,7 @@ export const SweepModal: React.FC<SweepModalProps> = ({
               required
               size="small"
               value={step ?? ''}
-              onChange={(e) => onStepChange(parseFloat(e.target.value))}
+              onChange={e => onStepChange(parseFloat(e.target.value))}
               sx={{ mb: 1 }}
             />
           </Box>
@@ -128,7 +131,7 @@ export const SweepModal: React.FC<SweepModalProps> = ({
               size="small"
               required
               value={values}
-              onChange={(e) => onValuesChange(e.target.value)}
+              onChange={e => onValuesChange(e.target.value)}
               sx={{ mb: 1 }}
               placeholder="Enter comma-separated numbers (e.g., 1, 2, 3)"
             />

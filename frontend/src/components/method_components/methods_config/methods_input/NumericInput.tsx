@@ -34,7 +34,7 @@ export const NumericInput: React.FC<NumericInputProps> = ({
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
     const parsedValue = parseValue(inputValue, paramDetails.type);
-    
+
     if (parsedValue !== undefined) {
       onChange(parsedValue);
     }
@@ -51,26 +51,34 @@ export const NumericInput: React.FC<NumericInputProps> = ({
       <TextField
         label={paramName}
         type="text"
-        value={isSweepActive ? sweepDisplayText : value ?? ''}
+        value={isSweepActive ? sweepDisplayText : (value ?? '')}
         onChange={handleInputChange}
         variant="outlined"
-        disabled={!isEnabled || isSweepActive || (typeof value === 'string' && paramName === "axis")}
+        disabled={
+          !isEnabled ||
+          isSweepActive ||
+          (typeof value === 'string' && paramName === 'axis')
+        }
         size="small"
         fullWidth
         helperText={paramDetails.desc}
-        InputProps={showSweepControls ? {
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                onClick={isSweepActive ? onSweepCancel : onSweepOpen}
-                edge="end"
-                disabled={!isEnabled || isSweepDisabled}
-              >
-                {isSweepActive ? <ClearIcon /> : <SettingsIcon />}
-              </IconButton>
-            </InputAdornment>
-          ),
-        } : undefined}
+        InputProps={
+          showSweepControls
+            ? {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={isSweepActive ? onSweepCancel : onSweepOpen}
+                      edge="end"
+                      disabled={!isEnabled || isSweepDisabled}
+                    >
+                      {isSweepActive ? <ClearIcon /> : <SettingsIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }
+            : undefined
+        }
       />
     </Tooltip>
   );

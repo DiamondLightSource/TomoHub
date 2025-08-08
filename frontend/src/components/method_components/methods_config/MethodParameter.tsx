@@ -14,18 +14,20 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
   onChange,
 }) => {
   const sweepConfig = useSweepConfiguration(methodId, paramName);
-  
-  const canHaveSweep = ['int', 'float'].some(type => 
+
+  const canHaveSweep = ['int', 'float'].some(type =>
     paramDetails.type.includes(type)
   );
 
-  const sweepProps = canHaveSweep ? {
-    onSweepOpen: () => sweepConfig.setIsModalOpen(true),
-    onSweepCancel: () => sweepConfig.handleCancelSweep(onChange),
-    sweepDisplayText: sweepConfig.getSweepDisplayText(),
-    isSweepActive: sweepConfig.isSweepActiveForThisParam,
-    isSweepDisabled: !!sweepConfig.isSweepActiveForOtherParam, // Convert to boolean
-  } : undefined;
+  const sweepProps = canHaveSweep
+    ? {
+        onSweepOpen: () => sweepConfig.setIsModalOpen(true),
+        onSweepCancel: () => sweepConfig.handleCancelSweep(onChange),
+        sweepDisplayText: sweepConfig.getSweepDisplayText(),
+        isSweepActive: sweepConfig.isSweepActiveForThisParam,
+        isSweepDisabled: !!sweepConfig.isSweepActiveForOtherParam, // Convert to boolean
+      }
+    : undefined;
 
   return (
     <Grid item xs={6}>
@@ -37,7 +39,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
         onChange={onChange}
         sweepProps={sweepProps}
       />
-      
+
       {canHaveSweep && (
         <SweepModal
           isOpen={sweepConfig.isModalOpen}

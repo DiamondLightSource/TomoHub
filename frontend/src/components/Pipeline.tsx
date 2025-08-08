@@ -3,25 +3,25 @@ import { Button, Box, Typography } from '@mui/material';
 import { useMethods } from '../contexts/MethodsContext';
 import { ClearAll } from '@mui/icons-material';
 import PipelineMethod from './PipelineMethod';
-import { 
-  DndContext, 
+import {
+  DndContext,
   closestCenter,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { 
-  arrayMove, 
-  SortableContext, 
+import {
+  arrayMove,
+  SortableContext,
   sortableKeyboardCoordinates,
-  verticalListSortingStrategy 
+  verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useCenter } from '../contexts/CenterContext';
 
-const Pipeline:React.FC = () => {
+const Pipeline: React.FC = () => {
   const { methods, clearMethods, removeMethod, setMethods } = useMethods();
-  const { selectedCenter } = useCenter(); 
+  const { selectedCenter } = useCenter();
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -31,21 +31,23 @@ const Pipeline:React.FC = () => {
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
-    
+
     if (active.name !== over.id) {
-      setMethods((methods) => {
-        const oldIndex = methods.findIndex((method) => method.method_name === active.id);
-        const newIndex = methods.findIndex((method) => method.method_name === over.id);
-        
+      setMethods(methods => {
+        const oldIndex = methods.findIndex(
+          method => method.method_name === active.id
+        );
+        const newIndex = methods.findIndex(
+          method => method.method_name === over.id
+        );
+
         return arrayMove(methods, oldIndex, newIndex);
       });
     }
   };
 
-  const handleEditMethod = (methodName: string) => {
-    
-  } 
-  
+  const handleEditMethod = (methodName: string) => {};
+
   const methodsDisplay = () => {
     if (methods.length === 0) {
       return (
@@ -55,22 +57,28 @@ const Pipeline:React.FC = () => {
       );
     } else {
       return (
-        <DndContext 
+        <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          <SortableContext items={methods.map(method => method.method_name)} strategy={verticalListSortingStrategy}>
+          <SortableContext
+            items={methods.map(method => method.method_name)}
+            strategy={verticalListSortingStrategy}
+          >
             <Box sx={{ width: '100%' }}>
-              {methods.filter(method => !method.method_name.startsWith("standard_tomo"))
-              .map((method) => (
-                <PipelineMethod
-                  key={method.method_name}
-                  method={method}
-                  removeMethod={removeMethod}
-                  editMethod={handleEditMethod}
-                />
-              ))}
+              {methods
+                .filter(
+                  method => !method.method_name.startsWith('standard_tomo')
+                )
+                .map(method => (
+                  <PipelineMethod
+                    key={method.method_name}
+                    method={method}
+                    removeMethod={removeMethod}
+                    editMethod={handleEditMethod}
+                  />
+                ))}
             </Box>
           </SortableContext>
         </DndContext>
@@ -78,76 +86,75 @@ const Pipeline:React.FC = () => {
     }
   };
 
-
-  const centerDisplayText = selectedCenter !== 0 ? selectedCenter.toString() : 'auto';
+  const centerDisplayText =
+    selectedCenter !== 0 ? selectedCenter.toString() : 'auto';
 
   return (
     <>
-    <Box
-      sx={{
-        width: 350,
-        backgroundColor: '#222725',
-        color: '#fff',
-        padding: 2,
-        borderRadius: 2,
-        height: 'max-content',
-        mt:2
-      }}
-    >
-      
-      <Typography 
-        gutterBottom 
-        sx={{ 
-          fontWeight: 'bold',
-          marginBottom: 1, 
-          fontSize: '13px', 
-          textAlign: 'center',
-          color: selectedCenter !== 0 ? '#4caf50' : '#fff' // Green when selected, white when auto
-        }}
-      >
-        Pipeline Center of Rotation : {centerDisplayText}
-        {selectedCenter !== 0 && (
-          <Typography 
-            component="span" 
-            sx={{ 
-              fontSize: '10px', 
-              color: '#4caf50', 
-              ml: 0.5 
-            }}
-          >
-            ✓
-          </Typography>
-        )}
-      </Typography>
-
       <Box
         sx={{
-          backgroundColor: '#646464',
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          p: 2,
+          width: 350,
+          backgroundColor: '#222725',
+          color: '#fff',
+          padding: 2,
           borderRadius: 2,
-          height: 500,
-          overflowY: 'scroll',
+          height: 'max-content',
+          mt: 2,
         }}
       >
-        {methodsDisplay()}
+        <Typography
+          gutterBottom
+          sx={{
+            fontWeight: 'bold',
+            marginBottom: 1,
+            fontSize: '13px',
+            textAlign: 'center',
+            color: selectedCenter !== 0 ? '#4caf50' : '#fff', // Green when selected, white when auto
+          }}
+        >
+          Pipeline Center of Rotation : {centerDisplayText}
+          {selectedCenter !== 0 && (
+            <Typography
+              component="span"
+              sx={{
+                fontSize: '10px',
+                color: '#4caf50',
+                ml: 0.5,
+              }}
+            >
+              ✓
+            </Typography>
+          )}
+        </Typography>
+
+        <Box
+          sx={{
+            backgroundColor: '#646464',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            p: 2,
+            borderRadius: 2,
+            height: 500,
+            overflowY: 'scroll',
+          }}
+        >
+          {methodsDisplay()}
+        </Box>
+        <Button
+          variant="contained"
+          size="medium"
+          sx={{ marginTop: 1 }}
+          color="error"
+          fullWidth
+          startIcon={<ClearAll />}
+          onClick={() => clearMethods()}
+        >
+          Clear all methods
+        </Button>
       </Box>
-      <Button
-        variant="contained"
-        size="medium"
-        sx={{ marginTop: 1 }}
-        color="error"
-        fullWidth
-        startIcon={<ClearAll />}
-        onClick={() => clearMethods()}
-      >
-        Clear all methods
-      </Button>
-    </Box>
     </>
   );
-}
+};
 
 export default Pipeline;
