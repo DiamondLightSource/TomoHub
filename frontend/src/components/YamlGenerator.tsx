@@ -65,7 +65,7 @@ const YMLG = () => {
   const generateAndDownloadYAML = async () => {
     try {
       const combinedData = generateHTTOMOConfig();
-      console.log(combinedData);
+      
       const requestData = {
         data: combinedData,
         fileName: yamlFileName,

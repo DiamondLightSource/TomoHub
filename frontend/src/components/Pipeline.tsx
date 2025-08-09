@@ -18,10 +18,15 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useCenter } from '../contexts/CenterContext';
+import { EditMethodModal } from './EditMethodModal';
+import { Method } from '../contexts/MethodsContext';
 
 const Pipeline: React.FC = () => {
-  const { methods, clearMethods, removeMethod, setMethods } = useMethods();
+  const { methods, clearMethods, removeMethod, setMethods, updateMethodParameter } = useMethods();
   const { selectedCenter } = useCenter();
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedMethod, setSelectedMethod] = useState<Method | null>(null);
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -46,7 +51,25 @@ const Pipeline: React.FC = () => {
     }
   };
 
-  const handleEditMethod = (methodName: string) => {};
+  const handleEditMethod = (methodName: string) => {
+    const method = methods.find(m => m.method_name === methodName);
+    if (method) {
+      setSelectedMethod(method);
+      setEditModalOpen(true);
+    }
+  };
+
+  const handleSaveEditedMethod = (methodName: string, updatedParameters: Record<string, any>) => {
+    // Update all parameters for the method
+    Object.entries(updatedParameters).forEach(([paramName, value]) => {
+      updateMethodParameter(methodName, paramName, value);
+    });
+  };
+
+  const handleCloseEditModal = () => {
+    setEditModalOpen(false);
+    setSelectedMethod(null);
+  };
 
   const methodsDisplay = () => {
     if (methods.length === 0) {
@@ -153,6 +176,13 @@ const Pipeline: React.FC = () => {
           Clear all methods
         </Button>
       </Box>
+
+      <EditMethodModal
+        open={editModalOpen}
+        onClose={handleCloseEditModal}
+        method={selectedMethod}
+        onSave={handleSaveEditedMethod}
+      />
     </>
   );
 };

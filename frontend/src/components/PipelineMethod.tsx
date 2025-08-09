@@ -100,7 +100,6 @@ const PipelineMethod: React.FC<PipelineMethodProps> = ({
             aria-label="edit"
             size="small"
             onClick={() => editMethod(method.method_name)}
-            disabled
           >
             <EditIcon />
           </IconButton>
