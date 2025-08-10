@@ -89,7 +89,7 @@ const PipelineMethod: React.FC<PipelineMethodProps> = ({
       >
         <DragIndicatorIcon />
         <Typography
-          fontSize={method.method_name.length > 25 ? 11 : 15}
+          fontSize={method.method_name.length > 25 ? 10 : 15}
           fontWeight="bold"
         >
           {method.method_name}
