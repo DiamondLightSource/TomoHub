@@ -150,7 +150,11 @@ const PipelineMethod: React.FC<PipelineMethodProps> = ({
                     sx={{ py: 0, pl: 1, pr: 1 }}
                   >
                     <ListItemText
-                      primary={`${key}: ${value}`}
+                      primary={`${key}: ${
+                        typeof value === 'string' && value.startsWith('${{') 
+                          ? 'auto' 
+                          : value
+                      }`}
                       primaryTypographyProps={{
                         variant: 'body2',
                         fontSize: 'small',
