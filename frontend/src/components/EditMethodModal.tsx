@@ -10,10 +10,12 @@ import {
   CircularProgress,
   Box,
   Alert,
+  IconButton,
 } from '@mui/material';
 import { methodsService } from '../api/services';
 import { ParameterInputFactory } from './method_components/methods_config/ParameterInputFactory';
 import { Method } from '../contexts/MethodsContext';
+import InfoIcon from '@mui/icons-material/Info';
 
 interface EditMethodModalProps {
   open: boolean;
@@ -63,7 +65,7 @@ export const EditMethodModal: React.FC<EditMethodModalProps> = ({
       // Find the method schema by matching module_path and method_name
       let foundSchema: MethodSchema | null = null as MethodSchema | null;
       
-      // Type assertion to handle the response structure
+        // Type assertion to handle the response structure
       const methodsData = allMethodsResponse as Record<string, Record<string, any>>;
       
       Object.entries(methodsData).forEach(([modulePath, methods]) => {
@@ -76,7 +78,7 @@ export const EditMethodModal: React.FC<EditMethodModalProps> = ({
               foundSchema = schema as MethodSchema;
             }
           });
-        }
+        } 
       });
 
       if (!foundSchema) {
@@ -158,6 +160,16 @@ export const EditMethodModal: React.FC<EditMethodModalProps> = ({
       <DialogTitle>
         <Typography variant="h6" component="div">
           Edit Method: {method.method_name}
+          {methodSchema && methodSchema.method_doc && (
+            <IconButton 
+              size="small" 
+              href={methodSchema.method_doc} 
+              target="_blank"
+              sx={{ ml: 1 }}
+            >
+              <InfoIcon fontSize="small" />
+            </IconButton>
+          )}
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Module: {method.method_module}
