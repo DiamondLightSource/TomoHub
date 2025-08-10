@@ -60,8 +60,45 @@ export const EditMethodModal: React.FC<EditMethodModalProps> = ({
     setError(null);
 
     try {
-      const allMethodsResponse = await methodsService.getAllMethods();
-      
+        const [
+          denoise,
+          saving,
+          segmentation,
+          morphological,
+          stripe,
+          distortion,
+          normalization,
+          phaseRetrieval,
+          rotation,
+          reconstruction
+        ] = await Promise.all([
+          methodsService.getImageDenoiseArtifactRemoval(),
+          methodsService.getImageSavingMethods(),
+          methodsService.getSegmentationMethods(),
+          methodsService.getMorphologicalMethods(),
+          methodsService.getStripeRemovalMethods(),
+          methodsService.getDistortionCorrectionMethods(),
+          methodsService.getNormalizationMethods(),
+          methodsService.getPhaseRetrievalMethods(),
+          methodsService.getCORmethods(),
+          methodsService.getReconstructionMethods(),
+        ]);
+  
+        // Combine all responses
+        const allMethodsResponse = {
+          ...denoise,
+          ...saving,
+          ...segmentation,
+          ...morphological,
+          ...stripe,
+          ...distortion,
+          ...normalization,
+          ...phaseRetrieval,
+          ...rotation,
+          
+          ...reconstruction,
+        };
+  
       // Find the method schema by matching module_path and method_name
       let foundSchema: MethodSchema | null = null as MethodSchema | null;
       
