@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package*.json ./
 # Clear npm cache and install with no-cache
 RUN npm cache clean --force
-RUN npm install --force --legacy-peer-deps --no-cache
+RUN npm install 
 
 COPY . .
 
