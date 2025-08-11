@@ -46,10 +46,6 @@ const App: React.FC = () => {
                 />
               }
             />
-            <Route
-              path="workflow-sweep-run"
-              element={<SweepRUNForm/>}
-            />
           </Route>
         </Routes>
       </Suspense>

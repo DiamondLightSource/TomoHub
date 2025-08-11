@@ -1,121 +1,66 @@
-import { useFragment, graphql } from 'react-relay';
-import {
-  materialCells,
-  materialRenderers,
-} from '@jsonforms/material-renderers';
-import { JsonSchema, UISchemaElement, createAjv } from '@jsonforms/core';
-import { JsonForms } from '@jsonforms/react';
 import React, { useState } from 'react';
-import {
-  Divider,
-  Snackbar,
-  Stack,
-  Typography,
-  useTheme,
-  Alert,
-} from '@mui/material';
-import { ErrorObject } from 'ajv';
-import { JSONObject, Visit } from 'workflows-lib';
-import { VisitInput, visitToText } from '@diamondlightsource/sci-react-ui';
+import { useFragment } from 'react-relay';
+import { Box, Divider, Snackbar, Stack, Typography, Alert } from '@mui/material';
+import { VisitInput, visitToText,Visit } from '@diamondlightsource/sci-react-ui';
 import { SubmissionFormSharedFragment$key } from './__generated__/SubmissionFormSharedFragment.graphql';
+import SweepRUNForm from '../pages/SweepRUNForm';
 import Loader from '../components/Loader';
 import { useLoader } from '../contexts/LoaderContext';
-import { sharedFragment } from './Submission';
 import WorkflowStatus from './WorkflowStatus';
 import SweepResultViewer from './SweepResultViewer';
+import { graphql } from 'relay-runtime';
+
+interface Parameters {
+  input: string;
+  output: string;
+  nprocs: string;
+  memory: string;
+  httomo_outdir_name: string;
+  start?: number;
+  stop?: number;
+  step?: number;
+}
 
 const SubmissionFormCOR = (props: {
   template: SubmissionFormSharedFragment$key;
-  prepopulatedParameters?: JSONObject;
+  prepopulatedParameters?: object;
   visit?: Visit;
   onSubmit: (
     visit: Visit,
     parameters: object,
     onSuccess?: (workflowName: string) => void
-  ) => void; // Update signature to match GPURun
+  ) => void;
 }) => {
-  const data = useFragment(sharedFragment, props.template);
-  const theme = useTheme();
-  const validator = createAjv({ useDefaults: true, coerceTypes: true });
-  const {
-    method,
-    module_path,
-    parameters: loaderParams,
-    isContextValid,
-  } = useLoader();
-  const [workflowData, setWorkflowData] = useState<any>(null);
-  const customSchema = {
-    type: 'object',
-    properties: {
-      start: { type: 'number', default: 300, title: 'Start' },
-      stop: { type: 'number', default: 350, title: 'Stop' },
-      step: { type: 'number', default: 10, title: 'Step' },
-      input: { type: 'string', title: 'Input Path' },
-      output: { type: 'string', title: 'Output Path' },
-      nprocs: { type: 'string', default: '1', title: 'Number of Processes' },
-      memory: { type: 'string', default: '20Gi', title: 'Memory' },
-      httomo_outdir_name: {
-        type: 'string',
-        default: 'sweep-run',
-        title: 'HTTomo Output Directory',
-      },
-    },
-    required: ['start', 'stop', 'step', 'input', 'output', 'nprocs', 'memory'],
-  };
-
-  const customUISchema: UISchemaElement = {
-    type: 'VerticalLayout',
-    elements: [
-      {
-        type: 'HorizontalLayout',
-        elements: [
-          { type: 'Control', scope: '#/properties/start' },
-          { type: 'Control', scope: '#/properties/stop' },
-          { type: 'Control', scope: '#/properties/step' },
-        ],
-      },
-      {
-        type: 'HorizontalLayout',
-        elements: [
-          { type: 'Control', scope: '#/properties/input' },
-          { type: 'Control', scope: '#/properties/output' },
-        ],
-      },
-      {
-        type: 'HorizontalLayout',
-        elements: [
-          { type: 'Control', scope: '#/properties/nprocs' },
-          { type: 'Control', scope: '#/properties/memory' },
-          { type: 'Control', scope: '#/properties/httomo_outdir_name' },
-        ],
-      },
-    ],
-  };
-
-  const [parameters, setParameters] = useState(
-    props.prepopulatedParameters ?? {}
+  const data = useFragment(
+    graphql`
+      fragment SubmissionFormSharedFragment on WorkflowTemplate {
+        name
+        title
+        description
+        arguments
+        uiSchema
+      }
+    `,
+    props.template
   );
-  const [errors, setErrors] = useState<ErrorObject[]>([]);
-  const [submitted, setSubmitted] = useState(false);
-  // Add these state variables for WorkflowStatus
-  const [submittedWorkflowName, setSubmittedWorkflowName] = useState<
-    string | null
-  >(null);
+
+  const { method, module_path, parameters: loaderParams, isContextValid } = useLoader();
+  const [parameters, setParameters] = useState<Parameters>(
+    props.prepopulatedParameters as Parameters ?? {}
+  );
+  const [errors, setErrors] = useState<any[]>([]);
+  const [submittedWorkflowName, setSubmittedWorkflowName] = useState<string | null>(null);
   const [submittedVisit, setSubmittedVisit] = useState<Visit | null>(null);
+  const [workflowData, setWorkflowData] = useState<any>(null);
+  const [submitted, setSubmitted] = useState(false);
 
   const generateConfigJSON = (formParams: any) => {
-    // Create a local copy of the loader parameters and handle auto-filling similar to YAML generator
     let updatedLoaderParams = { ...loaderParams };
 
-    // Auto-fill missing required fields if context is invalid (similar to YAML generator logic)
     if (!isContextValid()) {
-      if (
-        !updatedLoaderParams.data_path ||
-        updatedLoaderParams.data_path.trim() === ''
-      ) {
+      if (!updatedLoaderParams.data_path || updatedLoaderParams.data_path.trim() === '') {
         updatedLoaderParams.data_path = 'auto';
       }
-
       if (
         typeof updatedLoaderParams.rotation_angles === 'string' ||
         !updatedLoaderParams.rotation_angles ||
@@ -124,23 +69,7 @@ const SubmissionFormCOR = (props: {
       ) {
         updatedLoaderParams.rotation_angles = 'auto';
       }
-
-      // Check if we have darks and flats
-      const hasDarks =
-        updatedLoaderParams.darks &&
-        updatedLoaderParams.darks.file &&
-        updatedLoaderParams.darks.file.trim() !== '';
-      const hasFlats =
-        updatedLoaderParams.flats &&
-        updatedLoaderParams.flats.file &&
-        updatedLoaderParams.flats.file.trim() !== '';
-
-      // If we have both darks and flats, remove image_key_path
-      if (hasDarks && hasFlats) {
-        delete updatedLoaderParams.image_key_path;
-      }
-      // Otherwise, set it to "auto" if it's empty
-      else if (
+      if (
         !updatedLoaderParams.image_key_path ||
         updatedLoaderParams.image_key_path.trim() === ''
       ) {
@@ -187,35 +116,24 @@ const SubmissionFormCOR = (props: {
     return JSON.stringify(config);
   };
 
-  const onClick = (visit: Visit, submitParams?: object) => {
-    // Check if loader context is valid (allow auto-filling like YAML generator)
-    if (!isContextValid()) {
-      console.warn(
-        'Loader configuration is incomplete, but proceeding with auto-filled values'
-      );
-    }
+  const handleFormSubmit = (formData: object) => {
+    setParameters(formData as Parameters);
+  };
 
+  const handleVisitSubmit = (visit: Visit) => {
     if (errors.length === 0) {
       const configJSON = generateConfigJSON(parameters);
 
-      // Debug logging
-      console.log('Generated config JSON:', configJSON);
-      console.log('Loader parameters:', loaderParams);
-      console.log('Form parameters:', parameters);
-
-      // Create final parameters object for mutation
       const finalParams = {
         config: configJSON,
         input: parameters.input,
         output: parameters.output,
         nprocs: parameters.nprocs,
         memory: parameters.memory,
-        'httomo-outdir-name': parameters.httomo_outdir_name, // Note the hyphen in the key name to match Argo template
+        'httomo-outdir-name': parameters.httomo_outdir_name,
       };
 
-      // Update to use callback pattern like GPURun
       props.onSubmit(visit, finalParams, (workflowName: string) => {
-        console.log('COR SUCCESS CALLBACK RECEIVED:', workflowName);
         setSubmittedWorkflowName(workflowName);
         setSubmittedVisit(visit);
       });
@@ -228,79 +146,47 @@ const SubmissionFormCOR = (props: {
     setSubmitted(false);
   };
 
-  const formWidth =
-    (data.uiSchema?.options?.formWidth as string | undefined) ?? '100%';
-
   return (
-    <Stack
-      direction="column"
-      spacing={theme.spacing(2)}
-      sx={{ width: formWidth }}
-    >
+    <Stack spacing={2}>
       <Typography variant="h4" align="center">
-        Workflow: {data.title ? data.title : data.name}
+        Workflow: {data.title || data.name}
       </Typography>
       <Typography variant="body1" align="center">
-        {data.description}
+        {data.description || 'No description available'}
       </Typography>
-
       <Divider />
-
       <Loader />
-
-      {submittedWorkflowName && submittedVisit && (
-        <WorkflowStatus
-          workflow={submittedWorkflowName}
-          visit={visitToText(submittedVisit)}
-          onWorkflowDataChange={data => {
-            console.log('SubmissionFormCOR: Received workflow data:', data);
-            setWorkflowData(data);
-          }}
-        />
-      )}
-
-      {submittedWorkflowName && submittedVisit && (
-        <SweepResultViewer
-          workflowData={workflowData}
-          start={parameters.start as number}
-          stop={parameters.stop as number}
-          step={parameters.step as number}
-        />
-      )}
-
-      {!isContextValid() && (
-        <Alert severity="info">
-          Some Loader fields are empty. They will be auto-filled with default
-          values during submission.
-        </Alert>
-      )}
-
-      <Divider />
-
-      {/* JSON Form */}
-      <JsonForms
-        schema={customSchema}
-        uischema={customUISchema}
-        data={parameters}
-        renderers={materialRenderers}
-        cells={materialCells}
-        ajv={validator}
-        onChange={({ data, errors }) => {
-          setParameters(data as JSONObject);
-          setErrors(errors ? errors : []);
-        }}
-        data-testid="parameters-form"
+      <SweepRUNForm
+        schema={data.arguments}
+        uiSchema={data.uiSchema}
+        onSubmit={handleFormSubmit}
       />
-
-      <Divider />
-
       <VisitInput
         visit={props.visit}
-        onSubmit={onClick}
+        onSubmit={handleVisitSubmit}
         parameters={parameters}
         submitOnReturn={false}
       />
-
+      {submittedWorkflowName && submittedVisit && (
+        <>
+          <WorkflowStatus
+            workflow={submittedWorkflowName}
+            visit={visitToText(submittedVisit)}
+            onWorkflowDataChange={setWorkflowData}
+          />
+          <SweepResultViewer
+            workflowData={workflowData}
+            start={parameters.start as number}
+            stop={parameters.stop as number}
+            step={parameters.step as number}
+          />
+        </>
+      )}
+      {!isContextValid() && (
+        <Alert severity="info">
+          Some Loader fields are empty. They will be auto-filled with default values during submission.
+        </Alert>
+      )}
       <Snackbar
         open={submitted}
         autoHideDuration={6000}

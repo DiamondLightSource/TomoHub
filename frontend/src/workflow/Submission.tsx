@@ -149,18 +149,15 @@ export default function Submission({
   const renderSubmissionForm = () => {
     const commonProps = {
       template: data.workflowTemplate,
-      prepopulatedParameters,
       visit,
-      onSubmit: submitWorkflow, // This now supports the callback parameter
+      onSubmit: submitWorkflow,
     };
 
     switch (workflowName) {
       case 'httomo-cor-sweep':
         return <SubmissionFormCOR {...commonProps} />;
-      case 'httomo-gpu-job':
-        return <SubmissionFormGPURun {...commonProps} />;
       default:
-        return <SubmissionFormGPURun {...commonProps} />; // Default fallback
+        return <SubmissionFormGPURun {...commonProps} />;
     }
   };
 
