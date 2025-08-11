@@ -12,7 +12,7 @@ keycloak.init({ onLoad: "login-required" }).then(authenticated => {
   if (authenticated) {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider theme={DiamondTheme}>
+    <ThemeProvider theme={DiamondTheme} defaultMode='light'>
       <CssBaseline />
       <RelayEnvironmentProvider environment={RelayEnvironment}>
         <App />
