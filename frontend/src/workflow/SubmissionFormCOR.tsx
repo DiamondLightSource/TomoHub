@@ -8,7 +8,7 @@ import Loader from '../components/Loader';
 import { useLoader } from '../contexts/LoaderContext';
 import WorkflowStatus from './WorkflowStatus';
 import SweepResultViewer from './SweepResultViewer';
-import { graphql } from 'relay-runtime';
+import { sharedFragment } from './Submission'; // Import the shared fragment
 
 interface Parameters {
   input: string;
@@ -31,18 +31,7 @@ const SubmissionFormCOR = (props: {
     onSuccess?: (workflowName: string) => void
   ) => void;
 }) => {
-  const data = useFragment(
-    graphql`
-      fragment SubmissionFormSharedFragment on WorkflowTemplate {
-        name
-        title
-        description
-        arguments
-        uiSchema
-      }
-    `,
-    props.template
-  );
+  const data = useFragment(sharedFragment, props.template); // Use the imported fragment
 
   const { method, module_path, parameters: loaderParams, isContextValid } = useLoader();
   const [parameters, setParameters] = useState<Parameters>(
