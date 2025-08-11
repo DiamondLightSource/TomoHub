@@ -5,6 +5,8 @@ import Layout from './components/Layout';
 import Methods from './pages/Methods.tsx';
 import FullPipelines from './pages/FullPipelines.tsx';
 import Submission from './workflow/Submission.tsx';
+import SweepRUNForm from './pages/SweepRUNForm.tsx';
+
 import { Visit } from 'workflows-lib';
 
 const App: React.FC = () => {
@@ -34,6 +36,19 @@ const App: React.FC = () => {
                   setVisit={setUserVisit}
                 />
               }
+            />
+            <Route
+              path="workflow-cor"
+              element={
+                <Submission
+                  workflowName="httomo-cor-sweep"
+                  setVisit={setUserVisit}
+                />
+              }
+            />
+            <Route
+              path="workflow-sweep-run"
+              element={<SweepRUNForm/>}
             />
           </Route>
         </Routes>

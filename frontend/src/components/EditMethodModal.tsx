@@ -95,7 +95,6 @@ export const EditMethodModal: React.FC<EditMethodModalProps> = ({
           ...normalization,
           ...phaseRetrieval,
           ...rotation,
-          
           ...reconstruction,
         };
   
