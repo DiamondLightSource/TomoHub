@@ -221,11 +221,6 @@ const SubmissionFormCOR = (props: {
       <Divider />
       <Loader />
 
-      {console.log('submittedWorkflowName:', submittedWorkflowName)}
-      {console.log('submittedVisit:', submittedVisit)}
-      {console.log('workflowData:', workflowData)}
-
-
       {submittedWorkflowName && submittedVisit && (
         <WorkflowStatus
           workflow={submittedWorkflowName}
@@ -245,7 +240,6 @@ const SubmissionFormCOR = (props: {
           step={parameters.step as number}
         />
       )}
-
       
 
       {!isContextValid() && (
