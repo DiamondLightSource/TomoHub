@@ -1,74 +1,59 @@
 import React from 'react';
-import { Box, Card, Grid2, TextField, Typography } from '@mui/material';
+import { Stack, TextField } from '@mui/material';
 
-interface ParameterSweepFormProps {
-  start: number;
-  startSetter: (_: number) => void;
-  stop: number;
-  stopSetter: (_: number) => void;
-  step: number;
-  stepSetter: (_: number) => void;
+export interface SweepValues {
+  start: number | '';
+  stop: number | '';
+  step: number | '';
 }
 
-type LabelHandlerTuple = [string, number, (_: number) => void];
-
-const ParameterSweepForm = ({
-  start,
-  startSetter,
-  stop,
-  stopSetter,
-  step,
-  stepSetter,
-}: ParameterSweepFormProps) => {
-  const tupleHelper: [LabelHandlerTuple, LabelHandlerTuple, LabelHandlerTuple] =
-    [
-      ['start', start, startSetter],
-      ['stop', stop, stopSetter],
-      ['step', step, stepSetter],
-    ];
+export default function ParameterSweepForm({
+  values,
+  onChange,
+  disabled,
+}: {
+  values: SweepValues;
+  onChange: (next: SweepValues) => void;
+  disabled?: boolean;
+}) {
+  const handleNum =
+    (key: keyof SweepValues) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const raw = e.target.value;
+      // allow empty string while typing, coerce later via AJV
+      const parsed = raw === '' ? '' : Number(raw);
+      onChange({ ...values, [key]: Number.isNaN(parsed) ? '' : parsed });
+    };
 
   return (
-    <Card
-      variant="outlined"
-      sx={{
-        mx: 'auto',
-        mb: 2,
-        p: 2,
-        border: '1px solid #89987880',
-        borderRadius: '4px',
-      }}
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          mb: 2,
-        }}
-      >
-        <Typography variant="h6" gutterBottom>
-          <strong>Parameter Sweep</strong>
-        </Typography>
-      </Box>
-      <Grid2 container spacing={2}>
-        {tupleHelper.map(([label, val, handler]) => {
-          return (
-            <TextField
-              key={label}
-              label={label}
-              type="number"
-              variant="outlined"
-              size="small"
-              value={val}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                handler(Number(event.target.value))
-              }
-            />
-          );
-        })}
-      </Grid2>
-    </Card>
+    <Stack direction="row" spacing={2}>
+      <TextField
+        label="Start"
+        type="number"
+        value={values.start}
+        onChange={handleNum('start')}
+        disabled={disabled}
+        fullWidth
+        inputProps={{ 'data-testid': 'sweep-start' }}
+      />
+      <TextField
+        label="Stop"
+        type="number"
+        value={values.stop}
+        onChange={handleNum('stop')}
+        disabled={disabled}
+        fullWidth
+        inputProps={{ 'data-testid': 'sweep-stop' }}
+      />
+      <TextField
+        label="Step"
+        type="number"
+        value={values.step}
+        onChange={handleNum('step')}
+        disabled={disabled}
+        fullWidth
+        inputProps={{ 'data-testid': 'sweep-step' }}
+      />
+    </Stack>
   );
-};
-
-export default ParameterSweepForm;
+}

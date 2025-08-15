@@ -5,12 +5,13 @@ import Layout from './components/Layout';
 import Methods from './pages/Methods.tsx';
 import FullPipelines from './pages/FullPipelines.tsx';
 import Submission from './workflow/Submission.tsx';
-import SweepRUNForm from './pages/SweepRUNForm.tsx';
-
 import { Visit } from 'workflows-lib';
 
 const App: React.FC = () => {
   const [userVisit, setUserVisit] = useState<Visit>();
+  const [start,setStart] = useState<number>(0);
+  const [stop,setStop] = useState<number>(0);
+  const [step,setStep] = useState<number>(0);
   return (
     <Router>
       <Suspense fallback={<div>Loading workflow...</div>}>
@@ -36,15 +37,7 @@ const App: React.FC = () => {
                   setVisit={setUserVisit}
                 />
               }
-            />
-            <Route
-              path="workflow-cor"
-              element={
-                <Submission
-                  workflowName="httomo-cor-sweep"
-                  setVisit={setUserVisit}
-                />
-              }
+              
             />
           </Route>
         </Routes>

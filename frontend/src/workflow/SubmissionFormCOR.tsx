@@ -1,29 +1,34 @@
-import React, { useState } from 'react';
 import { useFragment } from 'react-relay';
-import { Box, Divider, Snackbar, Stack, Typography, Alert } from '@mui/material';
-import { VisitInput, visitToText,Visit } from '@diamondlightsource/sci-react-ui';
-import { SubmissionFormSharedFragment$key } from './__generated__/SubmissionFormSharedFragment.graphql';
-import SweepRUNForm from '../pages/SweepRUNForm';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import {
+  Alert,
+  Button,
+  Divider,
+  Snackbar,
+  Stack,
+  Typography,
+  useTheme,
+} from '@mui/material';
+import { JSONObject, Visit } from 'workflows-lib';
+import { VisitInput, visitToText } from '@diamondlightsource/sci-react-ui';
 import Loader from '../components/Loader';
 import { useLoader } from '../contexts/LoaderContext';
+import { SubmissionFormSharedFragment$key } from './__generated__/SubmissionFormSharedFragment.graphql';
+import { sharedFragment } from './Submission';
 import WorkflowStatus from './WorkflowStatus';
 import SweepResultViewer from './SweepResultViewer';
-import { sharedFragment } from './Submission'; // Import the shared fragment
-
-interface Parameters {
-  input: string;
-  output: string;
-  nprocs: string;
-  memory: string;
-  httomo_outdir_name: string;
-  start?: number;
-  stop?: number;
-  step?: number;
-}
+import ParameterSweepForm, {
+  SweepValues,
+} from './ParameterSweepForm';
+import WorkflowParametersForm, {
+  WorkflowParamsValues,
+} from './WorkflowParametersForm';
+import { buildAjv, validateWithDefaults, formatAjvErrors } from './utils/schemaValidation';
+import { ErrorObject } from 'ajv';
 
 const SubmissionFormCOR = (props: {
   template: SubmissionFormSharedFragment$key;
-  prepopulatedParameters?: object;
+  prepopulatedParameters?: JSONObject;
   visit?: Visit;
   onSubmit: (
     visit: Visit,
@@ -31,18 +36,81 @@ const SubmissionFormCOR = (props: {
     onSuccess?: (workflowName: string) => void
   ) => void;
 }) => {
-  const data = useFragment(sharedFragment, props.template); // Use the imported fragment
+  const data = useFragment(sharedFragment, props.template);
+  const theme = useTheme();
 
-  const { method, module_path, parameters: loaderParams, isContextValid } = useLoader();
-  const [parameters, setParameters] = useState<Parameters>(
-    props.prepopulatedParameters as Parameters ?? {}
+  // ---- Loader context (unchanged) ----
+  const {
+    method,
+    module_path,
+    parameters: loaderParams,
+    isContextValid,
+  } = useLoader();
+
+  // ---- AJV and schema from GraphQL ----
+  const schema = data.arguments as unknown as object; // the real JSON schema
+  const ajv = useMemo(() => buildAjv(), [schema]);
+
+  // ---- Local state (parent holds everything) ----
+  const [parameters, setParameters] = useState<JSONObject>(() => {
+    // seed with any prepopulated values
+    return (props.prepopulatedParameters as JSONObject) ?? ({} as JSONObject);
+  });
+
+  // Derived child slices
+  const sweepValues = useMemo<SweepValues>(() => {
+    // keep empty-string while typing; numbers are coerced by AJV at submit
+    return {
+      start: (parameters as any)?.start ?? '',
+      stop: (parameters as any)?.stop ?? '',
+      step: (parameters as any)?.step ?? '',
+    };
+  }, [parameters]);
+
+  const wfValues = useMemo<WorkflowParamsValues>(() => {
+    return {
+      input: (parameters as any)?.input ?? '',
+      output: (parameters as any)?.output ?? '',
+      nprocs: (parameters as any)?.nprocs ?? 1,
+      memory: (parameters as any)?.memory ?? '20Gi',
+      httomo_outdir_name:
+        (parameters as any)?.httomo_outdir_name ?? 'sweep-run',
+    };
+  }, [parameters]);
+
+  const setSweepValues = useCallback(
+    (next: SweepValues) =>
+      setParameters(prev => ({ ...prev, ...next }) as JSONObject),
+    []
   );
-  const [errors, setErrors] = useState<any[]>([]);
-  const [submittedWorkflowName, setSubmittedWorkflowName] = useState<string | null>(null);
-  const [submittedVisit, setSubmittedVisit] = useState<Visit | null>(null);
-  const [workflowData, setWorkflowData] = useState<any>(null);
-  const [submitted, setSubmitted] = useState(false);
+  const setWfValues = useCallback(
+    (next: WorkflowParamsValues) =>
+      setParameters(prev => ({ ...prev, ...next }) as JSONObject),
+    []
+  );
 
+  // ---- Apply schema defaults once (and on schema change) using AJV ----
+  useEffect(() => {
+    const { data: withDefaults } = validateWithDefaults(ajv, schema, {
+      ...parameters,
+    });
+    setParameters(withDefaults as JSONObject);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ajv]);
+
+  // ---- Submission UI feedback ----
+  const [submitted, setSubmitted] = useState(false);
+  const [errors, setErrors] = useState<ErrorObject[]>([]);
+  const [errorMessages, setErrorMessages] = useState<string[]>([]);
+
+  // For WorkflowStatus & SweepResultViewer
+  const [workflowData, setWorkflowData] = useState<any>(null);
+  const [submittedWorkflowName, setSubmittedWorkflowName] = useState<
+    string | null
+  >(null);
+  const [submittedVisit, setSubmittedVisit] = useState<Visit | null>(null);
+
+  // ---- Pipeline JSON (unchanged from your current version) ----
   const generateConfigJSON = (formParams: any) => {
     let updatedLoaderParams = { ...loaderParams };
 
@@ -58,7 +126,19 @@ const SubmissionFormCOR = (props: {
       ) {
         updatedLoaderParams.rotation_angles = 'auto';
       }
-      if (
+
+      const hasDarks =
+        updatedLoaderParams.darks &&
+        updatedLoaderParams.darks.file &&
+        updatedLoaderParams.darks.file.trim() !== '';
+      const hasFlats =
+        updatedLoaderParams.flats &&
+        updatedLoaderParams.flats.file &&
+        updatedLoaderParams.flats.file.trim() !== '';
+
+      if (hasDarks && hasFlats) {
+        delete updatedLoaderParams.image_key_path;
+      } else if (
         !updatedLoaderParams.image_key_path ||
         updatedLoaderParams.image_key_path.trim() === ''
       ) {
@@ -75,10 +155,7 @@ const SubmissionFormCOR = (props: {
       {
         method: 'normalize',
         module_path: 'tomopy.prep.normalize',
-        parameters: {
-          cutoff: null,
-          averaging: 'mean',
-        },
+        parameters: { cutoff: null, averaging: 'mean' },
       },
       {
         method: 'minus_log',
@@ -105,77 +182,132 @@ const SubmissionFormCOR = (props: {
     return JSON.stringify(config);
   };
 
-  const handleFormSubmit = (formData: object) => {
-    setParameters(formData as Parameters);
-  };
+  // ---- Submit handler (validate just before submit) ----
+  const doSubmit = (visit: Visit) => {
+    // Make a working copy that AJV can mutate (defaults/coercions)
+    const { ok, data: coerced, errors } = validateWithDefaults(ajv, schema, {
+      ...parameters,
+      // ensure we keep our current form slices merged in
+      start: sweepValues.start,
+      stop: sweepValues.stop,
+      step: sweepValues.step,
+      input: wfValues.input,
+      output: wfValues.output,
+      nprocs: wfValues.nprocs,
+      memory: wfValues.memory,
+      httomo_outdir_name: wfValues.httomo_outdir_name,
+    });
 
-  const handleVisitSubmit = (visit: Visit) => {
-    if (errors.length === 0) {
-      const configJSON = generateConfigJSON(parameters);
-
-      const finalParams = {
-        config: configJSON,
-        input: parameters.input,
-        output: parameters.output,
-        nprocs: parameters.nprocs,
-        memory: parameters.memory,
-        'httomo-outdir-name': parameters.httomo_outdir_name,
-      };
-
-      props.onSubmit(visit, finalParams, (workflowName: string) => {
-        setSubmittedWorkflowName(workflowName);
-        setSubmittedVisit(visit);
-      });
-
-      setSubmitted(true);
+    if (!ok) {
+      setErrors(errors ?? []);
+      setErrorMessages(formatAjvErrors(errors, coerced));
+      setSubmitted(false);
+      return;
     }
+
+    // Successful schema validation — clear errors and continue
+    setErrors([]);
+    setErrorMessages([]);
+
+    const configJSON = generateConfigJSON(coerced);
+
+    const finalParams = {
+      config: configJSON,
+      input: (coerced as any).input,
+      output: (coerced as any).output,
+      nprocs: (coerced as any).nprocs,
+      memory: (coerced as any).memory,
+      'httomo-outdir-name': (coerced as any).httomo_outdir_name, // mapping required by backend
+    };
+
+    props.onSubmit(visit, finalParams, (workflowName: string) => {
+      setSubmittedWorkflowName(workflowName);
+      setSubmittedVisit(visit);
+    });
+
+    setSubmitted(true);
   };
 
-  const handleCloseSnackbar = () => {
-    setSubmitted(false);
-  };
+  const handleCloseSnackbar = () => setSubmitted(false);
+
+  const formWidth =
+    (data.uiSchema?.options?.formWidth as string | undefined) ?? '100%';
 
   return (
-    <Stack spacing={2}>
+    <Stack direction="column" spacing={theme.spacing(2)} sx={{ width: formWidth }}>
       <Typography variant="h4" align="center">
-        Workflow: {data.title || data.name}
+        Workflow: {data.title ? data.title : data.name}
       </Typography>
       <Typography variant="body1" align="center">
-        {data.description || 'No description available'}
+        {data.description}
       </Typography>
+
       <Divider />
       <Loader />
-      <SweepRUNForm
-        schema={data.arguments}
-        uiSchema={data.uiSchema}
-        onSubmit={handleFormSubmit}
-      />
-      <VisitInput
-        visit={props.visit}
-        onSubmit={handleVisitSubmit}
-        parameters={parameters}
-        submitOnReturn={false}
-      />
+
       {submittedWorkflowName && submittedVisit && (
-        <>
-          <WorkflowStatus
-            workflow={submittedWorkflowName}
-            visit={visitToText(submittedVisit)}
-            onWorkflowDataChange={setWorkflowData}
-          />
-          <SweepResultViewer
-            workflowData={workflowData}
-            start={parameters.start as number}
-            stop={parameters.stop as number}
-            step={parameters.step as number}
-          />
-        </>
+        <WorkflowStatus
+          workflow={submittedWorkflowName}
+          visit={visitToText(submittedVisit)}
+          onWorkflowDataChange={d => setWorkflowData(d)}
+        />
       )}
+
+      {submittedWorkflowName && submittedVisit && (
+        <SweepResultViewer
+          workflowData={workflowData}
+          start={Number(sweepValues.start)}
+          stop={Number(sweepValues.stop)}
+          step={Number(sweepValues.step)}
+        />
+      )}
+
       {!isContextValid() && (
         <Alert severity="info">
           Some Loader fields are empty. They will be auto-filled with default values during submission.
         </Alert>
       )}
+
+      <Divider />
+
+      {/* Custom forms */}
+      <Typography variant="h6">Parameter Sweep Configuration</Typography>
+      <ParameterSweepForm
+        values={sweepValues}
+        onChange={setSweepValues}
+      />
+
+      <Typography variant="h6" sx={{ mt: 2 }}>
+        Workflow Parameters
+      </Typography>
+      <WorkflowParametersForm
+        values={wfValues}
+        onChange={setWfValues}
+      />
+
+      {/* Validation errors (shown only if submit fails) */}
+      {errorMessages.length > 0 && (
+        <Alert severity="error">
+          <strong>Validation failed:</strong>
+          <ul style={{ marginTop: 8 }}>
+            {errorMessages.map((m, i) => (
+              <li key={i} style={{ marginLeft: 16 }}>{m}</li>
+            ))}
+          </ul>
+        </Alert>
+      )}
+
+      <Divider />
+
+      {/* Visit & Submit */}
+      <VisitInput
+      visit={props.visit}
+      onSubmit={doSubmit}
+      parameters={parameters}
+      submitOnReturn={false}
+      submitButton={true}
+      />
+
       <Snackbar
         open={submitted}
         autoHideDuration={6000}
