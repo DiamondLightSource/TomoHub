@@ -9,9 +9,6 @@ import { Visit } from 'workflows-lib';
 
 const App: React.FC = () => {
   const [userVisit, setUserVisit] = useState<Visit>();
-  const [start,setStart] = useState<number>(0);
-  const [stop,setStop] = useState<number>(0);
-  const [step,setStep] = useState<number>(0);
   return (
     <Router>
       <Suspense fallback={<div>Loading workflow...</div>}>

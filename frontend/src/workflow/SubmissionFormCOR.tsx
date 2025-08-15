@@ -278,7 +278,7 @@ const SubmissionFormCOR = (props: {
       />
 
       <Typography variant="h6" sx={{ mt: 2 }}>
-        Workflow Parameters
+        Workflow Parameterss
       </Typography>
       <WorkflowParametersForm
         values={wfValues}
