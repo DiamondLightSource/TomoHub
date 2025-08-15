@@ -184,19 +184,38 @@ const SubmissionFormCOR = (props: {
 
   // ---- Submit handler (validate just before submit) ----
   const doSubmit = (visit: Visit) => {
+    // Clone and modify the schema for validation
+        const modifiedSchema = structuredClone(schema) as {
+      required?: string[];
+      [key: string]: any;
+    };
+    if (modifiedSchema.required) {
+      modifiedSchema.required = modifiedSchema.required.filter(
+        (key: string) => key !== 'config'
+      );
+      const index = modifiedSchema.required.indexOf('httomo-outdir-name');
+      if (index !== -1) {
+        modifiedSchema.required[index] = 'httomo_outdir_name';
+      }
+    }
+
     // Make a working copy that AJV can mutate (defaults/coercions)
-    const { ok, data: coerced, errors } = validateWithDefaults(ajv, schema, {
-      ...parameters,
-      // ensure we keep our current form slices merged in
-      start: sweepValues.start,
-      stop: sweepValues.stop,
-      step: sweepValues.step,
-      input: wfValues.input,
-      output: wfValues.output,
-      nprocs: wfValues.nprocs,
-      memory: wfValues.memory,
-      httomo_outdir_name: wfValues.httomo_outdir_name,
-    });
+    const { ok, data: coerced, errors } = validateWithDefaults(
+      ajv,
+      modifiedSchema,
+      {
+        ...parameters,
+        // ensure we keep our current form slices merged in
+        start: sweepValues.start,
+        stop: sweepValues.stop,
+        step: sweepValues.step,
+        input: wfValues.input,
+        output: wfValues.output,
+        nprocs: wfValues.nprocs,
+        memory: wfValues.memory,
+        httomo_outdir_name: wfValues.httomo_outdir_name,
+      }
+    );
 
     if (!ok) {
       setErrors(errors ?? []);
@@ -220,12 +239,8 @@ const SubmissionFormCOR = (props: {
       'httomo-outdir-name': (coerced as any).httomo_outdir_name, // mapping required by backend
     };
 
-    props.onSubmit(visit, finalParams, (workflowName: string) => {
-      setSubmittedWorkflowName(workflowName);
-      setSubmittedVisit(visit);
-    });
-
-    setSubmitted(true);
+    // Submit the workflow
+    props.onSubmit(visit, finalParams, setSubmittedWorkflowName);
   };
 
   const handleCloseSnackbar = () => setSubmitted(false);
