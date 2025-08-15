@@ -196,7 +196,12 @@ const SubmissionFormCOR = (props: {
       'httomo-outdir-name': wfValues.httomo_outdir_name, // mapping required by backend
     };
     // Submit the workflow
-    props.onSubmit(visit, finalParams, setSubmittedWorkflowName);
+    props.onSubmit(visit, finalParams, (workflowName: string) => {
+      console.log('COR SUCCESS CALLBACK RECEIVED:', workflowName);
+      setSubmittedWorkflowName(workflowName);
+      setSubmittedVisit(visit); 
+    });
+
   };
 
   const handleCloseSnackbar = () => setSubmitted(false);
@@ -217,8 +222,10 @@ const SubmissionFormCOR = (props: {
       <Loader />
 
       {console.log('submittedWorkflowName:', submittedWorkflowName)}
-    {console.log('submittedVisit:', submittedVisit)}
-    {console.log('workflowData:', workflowData)}
+      {console.log('submittedVisit:', submittedVisit)}
+      {console.log('workflowData:', workflowData)}
+
+
       {submittedWorkflowName && submittedVisit && (
         <WorkflowStatus
           workflow={submittedWorkflowName}
