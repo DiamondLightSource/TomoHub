@@ -193,11 +193,10 @@ const SubmissionFormCOR = (props: {
       output: wfValues.output,
       nprocs: wfValues.nprocs,
       memory: wfValues.memory,
-      'httomo-outdir-name': wfValues.httomo_outdir_name, // mapping required by backend
+      'httomo-outdir-name': wfValues.httomo_outdir_name, 
     };
     // Submit the workflow
     props.onSubmit(visit, finalParams, (workflowName: string) => {
-      console.log('COR SUCCESS CALLBACK RECEIVED:', workflowName);
       setSubmittedWorkflowName(workflowName);
       setSubmittedVisit(visit); 
     });
@@ -226,7 +225,6 @@ const SubmissionFormCOR = (props: {
           workflow={submittedWorkflowName}
           visit={visitToText(submittedVisit)}
           onWorkflowDataChange={data => {
-            console.log('SubmissionFormCOR: Received workflow data:', data);
             setWorkflowData(data);
           }}
         />
@@ -250,7 +248,6 @@ const SubmissionFormCOR = (props: {
 
       <Divider />
 
-      {/* Custom forms */}
       <Typography variant="h6">Parameter Sweep Configuration</Typography>
       <ParameterSweepForm
         values={sweepValues}
