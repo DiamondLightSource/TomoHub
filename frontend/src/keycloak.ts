@@ -4,7 +4,7 @@ import Keycloak from 'keycloak-js';
 const keycloakConfig = {
   url: 'https://authn.diamond.ac.uk/',
   realm: 'master',
-  clientId: 'workflows-ui-dev',
+  clientId: 'tomohub',
 };
 
 // Create Keycloak instance
