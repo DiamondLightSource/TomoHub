@@ -10,10 +10,10 @@ export interface PreviewType {
 }
 
 interface ParametersType {
-  data_path: string;
-  image_key_path?: string;
+  data_path: string | null; // Allow null
+  image_key_path?: string | null; // Allow null
   rotation_angles: {
-    data_path?: string | 'auto';
+    data_path?: string | 'auto' | null; // Allow null and 'auto'
     user_defined?: {
       start_angle: number;
       stop_angle: number;
@@ -29,8 +29,8 @@ interface ParametersType {
     data_path: string;
   } | null;
   preview?: {
-    detector_x?: PreviewType | null; // Renamed from preview_x to detector_x
-    detector_y?: PreviewType | null; // Renamed from preview_y to detector_y
+    detector_x?: PreviewType | null;
+    detector_y?: PreviewType | null;
   };
 }
 
@@ -165,29 +165,33 @@ export const LoaderProvider: React.FC<{ children: ReactNode }> = ({
 
   // Add this function to validate the loader context
   const isContextValid = (): boolean => {
-    // Check if data_path exists and is not empty
-    const hasDataPath = parameters.data_path.trim() !== '';
-
-    // Check if rotation_angles is properly set
+    // Replace 'auto' with null for validation
+    const hasDataPath =
+      parameters.data_path !== null &&
+      parameters.data_path.trim() !== '' &&
+      parameters.data_path !== 'auto';
+  
     const hasRotationAnglesPath =
       typeof parameters.rotation_angles === 'object' &&
       parameters.rotation_angles?.data_path &&
-      parameters.rotation_angles.data_path.trim() !== '';
-
+      parameters.rotation_angles.data_path.trim() !== '' &&
+      parameters.rotation_angles.data_path !== 'auto';
+  
     const hasUserDefinedAngles =
       typeof parameters.rotation_angles === 'object' &&
       parameters.rotation_angles?.user_defined &&
       parameters.rotation_angles.user_defined.start_angle !== null &&
       parameters.rotation_angles.user_defined.stop_angle !== null &&
       parameters.rotation_angles.user_defined.angles_total !== null;
-
+  
     const hasRotationAngles = hasRotationAnglesPath || hasUserDefinedAngles;
-
-    // Check if either image_key_path OR (darks AND flats) are set
+  
     const hasImageKeyPath =
       parameters.image_key_path !== undefined &&
-      parameters.image_key_path.trim() !== '';
-
+      parameters.image_key_path !== null &&
+      parameters.image_key_path.trim() !== '' &&
+      parameters.image_key_path !== 'auto';
+  
     const hasDarks =
       parameters.darks !== undefined &&
       parameters.darks !== null &&
@@ -195,7 +199,7 @@ export const LoaderProvider: React.FC<{ children: ReactNode }> = ({
       parameters.darks.file.trim() !== '' &&
       parameters.darks.data_path !== undefined &&
       parameters.darks.data_path.trim() !== '';
-
+  
     const hasFlats =
       parameters.flats !== undefined &&
       parameters.flats !== null &&
@@ -203,10 +207,9 @@ export const LoaderProvider: React.FC<{ children: ReactNode }> = ({
       parameters.flats.file.trim() !== '' &&
       parameters.flats.data_path !== undefined &&
       parameters.flats.data_path.trim() !== '';
-
+  
     const hasDarksAndFlats = hasDarks && hasFlats;
-
-    // Return true only if all minimum requirements are met
+  
     return (
       !!hasDataPath &&
       !!hasRotationAngles &&

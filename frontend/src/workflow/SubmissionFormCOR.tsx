@@ -116,15 +116,16 @@ const SubmissionFormCOR = (props: {
   
     if (!isContextValid()) {
       if (!updatedLoaderParams.data_path || updatedLoaderParams.data_path.trim() === '') {
-        updatedLoaderParams.data_path = 'auto';
+        updatedLoaderParams.data_path = null; 
       }
       if (
         typeof updatedLoaderParams.rotation_angles === 'string' ||
         !updatedLoaderParams.rotation_angles ||
         !updatedLoaderParams.rotation_angles.data_path ||
-        updatedLoaderParams.rotation_angles.data_path.trim() === ''
+        updatedLoaderParams.rotation_angles.data_path.trim() === '' ||
+        updatedLoaderParams.rotation_angles.data_path === 'auto'
       ) {
-        updatedLoaderParams.rotation_angles = 'auto';
+        updatedLoaderParams.rotation_angles = { data_path: null }; 
       }
   
       const hasDarks =
@@ -140,9 +141,10 @@ const SubmissionFormCOR = (props: {
         delete updatedLoaderParams.image_key_path;
       } else if (
         !updatedLoaderParams.image_key_path ||
-        updatedLoaderParams.image_key_path.trim() === ''
+        updatedLoaderParams.image_key_path.trim() === '' ||
+        updatedLoaderParams.image_key_path === 'auto'
       ) {
-        updatedLoaderParams.image_key_path = 'auto';
+        updatedLoaderParams.image_key_path = null; 
       }
     }
   
@@ -171,10 +173,9 @@ const SubmissionFormCOR = (props: {
             stop: formParams.stop,
             step: formParams.step,
           },
-          sinogram_order:false,
-          algorithm: "gridrec",
-          init_recon: null
-
+          sinogram_order: false,
+          algorithm: 'gridrec',
+          init_recon: null,
         },
       },
     ];
@@ -188,11 +189,6 @@ const SubmissionFormCOR = (props: {
       start: sweepValues.start,
       stop: sweepValues.stop,
       step: sweepValues.step,
-      input: wfValues.input,
-      output: wfValues.output,
-      nprocs: wfValues.nprocs,
-      memory: wfValues.memory,
-      httomo_outdir_name: wfValues.httomo_outdir_name
     };
   
     // Generate config as array (for validation)
@@ -201,11 +197,11 @@ const SubmissionFormCOR = (props: {
     // Build validation object with correct backend key names
     const validationObject = {
       config: configArray,
-      input: wfValues.input,
-      output: wfValues.output,
+      input: wfValues.input === "" ? null : wfValues.input,
+      output: wfValues.output === "" ? null : wfValues.output,
       nprocs: wfValues.nprocs,
       memory: wfValues.memory,
-      "httomo-outdir-name": wfValues.httomo_outdir_name
+      "httomo-outdir-name" : wfValues.httomo_outdir_name === "" ? null : wfValues.httomo_outdir_name,
     };
   
     // Validate against schema
