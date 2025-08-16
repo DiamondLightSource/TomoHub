@@ -111,9 +111,9 @@ const SubmissionFormCOR = (props: {
   const [submittedVisit, setSubmittedVisit] = useState<Visit | null>(null);
 
   // ---- Pipeline JSON (unchanged from your current version) ----
-  const generateConfigJSON = (formParams: any) => {
+  const generateConfigArray = (formParams: any) => {
     let updatedLoaderParams = { ...loaderParams };
-
+  
     if (!isContextValid()) {
       if (!updatedLoaderParams.data_path || updatedLoaderParams.data_path.trim() === '') {
         updatedLoaderParams.data_path = 'auto';
@@ -126,7 +126,7 @@ const SubmissionFormCOR = (props: {
       ) {
         updatedLoaderParams.rotation_angles = 'auto';
       }
-
+  
       const hasDarks =
         updatedLoaderParams.darks &&
         updatedLoaderParams.darks.file &&
@@ -135,7 +135,7 @@ const SubmissionFormCOR = (props: {
         updatedLoaderParams.flats &&
         updatedLoaderParams.flats.file &&
         updatedLoaderParams.flats.file.trim() !== '';
-
+  
       if (hasDarks && hasFlats) {
         delete updatedLoaderParams.image_key_path;
       } else if (
@@ -145,8 +145,8 @@ const SubmissionFormCOR = (props: {
         updatedLoaderParams.image_key_path = 'auto';
       }
     }
-
-    const config = [
+  
+    return [
       {
         method: method,
         module_path: module_path,
@@ -178,30 +178,58 @@ const SubmissionFormCOR = (props: {
         },
       },
     ];
-
-    return JSON.stringify(config);
   };
 
   // ---- Submit handler (validate just before submit) ----
   const doSubmit = (visit: Visit) => {
-    // Directly prepare the parameters without schema validation
-    const configJSON = generateConfigJSON(parameters);
-
-    const finalParams = {
-      config: configJSON,
+    // Merge form slices
+    const mergedParams = {
+      ...parameters,
+      start: sweepValues.start,
+      stop: sweepValues.stop,
+      step: sweepValues.step,
       input: wfValues.input,
       output: wfValues.output,
       nprocs: wfValues.nprocs,
       memory: wfValues.memory,
-      'httomo-outdir-name': wfValues.httomo_outdir_name, 
+      httomo_outdir_name: wfValues.httomo_outdir_name
     };
-    // Submit the workflow
+  
+    // Generate config as array (for validation)
+    const configArray = generateConfigArray(mergedParams);
+  
+    // Build validation object with correct backend key names
+    const validationObject = {
+      config: configArray,
+      input: wfValues.input,
+      output: wfValues.output,
+      nprocs: wfValues.nprocs,
+      memory: wfValues.memory,
+      "httomo-outdir-name": wfValues.httomo_outdir_name
+    };
+  
+    // Validate against schema
+    const validate = ajv.compile(schema);
+    const ok = validate(validationObject);
+  
+    if (!ok) {
+      setErrorMessages(formatAjvErrors(validate.errors, validationObject));
+      return; // Stop submission
+    }
+  
+    // Build final submission payload (config as string)
+    const finalParams = {
+      ...validationObject,
+      config: JSON.stringify(configArray)
+    };
+  
+    // Step 6: Submit
     props.onSubmit(visit, finalParams, (workflowName: string) => {
       setSubmittedWorkflowName(workflowName);
-      setSubmittedVisit(visit); 
+      setSubmittedVisit(visit);
     });
-
   };
+  
 
   const handleCloseSnackbar = () => setSubmitted(false);
 
