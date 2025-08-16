@@ -39,7 +39,7 @@ export function formatAjvErrors(
   if (!errors?.length) return [];
   return errors.map(err => {
     const path = err.instancePath || '';
-    const where = path ? path : '(root)';
+    const where = path.split('/').filter(Boolean).pop() || '(root)'; 
     const val = getByPath(data, path);
     const valStr =
       typeof val === 'object' ? JSON.stringify(val) : String(val ?? 'undefined');
