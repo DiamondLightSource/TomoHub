@@ -20,7 +20,6 @@ export default function ParameterSweepForm({
     (key: keyof SweepValues) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const raw = e.target.value;
-      // allow empty string while typing, coerce later via AJV
       const parsed = raw === '' ? '' : Number(raw);
       onChange({ ...values, [key]: Number.isNaN(parsed) ? '' : parsed });
     };
@@ -34,7 +33,7 @@ export default function ParameterSweepForm({
         onChange={handleNum('start')}
         disabled={disabled}
         fullWidth
-        inputProps={{ 'data-testid': 'sweep-start' }}
+        size='small'
       />
       <TextField
         label="Stop"
@@ -43,7 +42,7 @@ export default function ParameterSweepForm({
         onChange={handleNum('stop')}
         disabled={disabled}
         fullWidth
-        inputProps={{ 'data-testid': 'sweep-stop' }}
+        size='small'
       />
       <TextField
         label="Step"
@@ -52,7 +51,7 @@ export default function ParameterSweepForm({
         onChange={handleNum('step')}
         disabled={disabled}
         fullWidth
-        inputProps={{ 'data-testid': 'sweep-step' }}
+        size='small'
       />
     </Stack>
   );

@@ -224,6 +224,7 @@ const SubmissionFormCOR = (props: {
     props.onSubmit(visit, finalParams, (workflowName: string) => {
       setSubmittedWorkflowName(workflowName);
       setSubmittedVisit(visit);
+      setErrorMessages([]);
     });
   };
   
@@ -244,6 +245,17 @@ const SubmissionFormCOR = (props: {
 
       <Divider />
       <Loader />
+      
+      {errorMessages.length > 0 && (
+        <Alert severity="error">
+          <strong>Validation failed:</strong>
+          <ul style={{ marginTop: 8 }}>
+            {errorMessages.map((m, i) => (
+              <li key={i} style={{ marginLeft: 16 }}>{m}</li>
+            ))}
+          </ul>
+        </Alert>
+      )}
 
       {submittedWorkflowName && submittedVisit && (
         <WorkflowStatus
@@ -287,21 +299,12 @@ const SubmissionFormCOR = (props: {
         onChange={setWfValues}
       />
 
-      {/* Validation errors (shown only if submit fails) */}
-      {errorMessages.length > 0 && (
-        <Alert severity="error">
-          <strong>Validation failed:</strong>
-          <ul style={{ marginTop: 8 }}>
-            {errorMessages.map((m, i) => (
-              <li key={i} style={{ marginLeft: 16 }}>{m}</li>
-            ))}
-          </ul>
-        </Alert>
-      )}
+      
+      
 
       <Divider />
 
-      {/* Visit & Submit */}
+      
       <VisitInput
       visit={props.visit}
       onSubmit={doSubmit}
