@@ -5,8 +5,8 @@ import addFormats from 'ajv-formats';
 export function buildAjv() {
   const ajv = new Ajv({
     allErrors: true,
-    useDefaults: true, // apply defaults from schema
-    coerceTypes: true, // coerce "1" -> 1, etc.
+    useDefaults: true, 
+    coerceTypes: false, 
     strict: false,
   });
   addFormats(ajv);
