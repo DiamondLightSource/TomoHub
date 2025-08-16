@@ -1,5 +1,5 @@
-import Ajv, { ErrorObject } from 'ajv';
 import addFormats from 'ajv-formats';
+import Ajv,{ ErrorObject } from 'ajv/dist/2020.js'
 
 // Build one AJV per schema instance so defaults/coercions are accurate per template
 export function buildAjv() {
@@ -7,7 +7,7 @@ export function buildAjv() {
     allErrors: true,
     useDefaults: true, 
     coerceTypes: false, 
-    strict: false,
+    strict: true,
   });
   addFormats(ajv);
   return ajv;

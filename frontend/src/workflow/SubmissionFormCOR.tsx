@@ -163,18 +163,18 @@ const SubmissionFormCOR = (props: {
         parameters: {},
       },
       {
-        method: 'FBP3d_tomobar',
-        module_path: 'httomolibgpu.recon.algorithm',
+        method: 'recon',
+        module_path: 'tomopy.recon.algorithm',
         parameters: {
           center: {
             start: formParams.start,
             stop: formParams.stop,
             step: formParams.step,
           },
-          filter_freq_cutoff: 0.35,
-          recon_size: null,
-          recon_mask_radius: 0.95,
-          neglog: false,
+          sinogram_order:false,
+          algorithm: "gridrec",
+          init_recon: null
+
         },
       },
     ];
@@ -210,9 +210,10 @@ const SubmissionFormCOR = (props: {
   
     // Validate against schema
     const validate = ajv.compile(schema);
-    const ok = validate(validationObject);
-  
-    if (!ok) {
+    if(validate(validationObject)){
+      console.log("AJV validation succussful");
+    }
+    else{
       setErrorMessages(formatAjvErrors(validate.errors, validationObject));
       return; // Stop submission
     }
@@ -223,7 +224,7 @@ const SubmissionFormCOR = (props: {
       config: JSON.stringify(configArray)
     };
   
-    // Step 6: Submit
+    // Submit
     props.onSubmit(visit, finalParams, (workflowName: string) => {
       setSubmittedWorkflowName(workflowName);
       setSubmittedVisit(visit);
