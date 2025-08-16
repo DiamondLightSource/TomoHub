@@ -46,10 +46,32 @@ for category in METHOD_CATEGORIES.keys():
     endpoint = create_category_endpoint(category)
     methods_router.get(f"/{category}", response_model=AllTemplates)(endpoint)
 
+def filter_pipelines_with_tomopy(pipelines: dict) -> dict:
+    """
+    Filters out pipelines where any method has a module_path starting with 'tomopy.'.
+
+    Args:
+        pipelines (dict): The dictionary of pipelines to filter.
+
+    Returns:
+        dict: The filtered pipelines.
+    """
+    filtered_pipelines = {}
+    for pipeline_name, methods in pipelines.items():
+        # Check if any method in the pipeline has a module_path starting with 'tomopy.'
+        has_tomopy = any(
+            method.get("module_path", "").startswith("tomopy.")
+            for method in methods.values()
+        )
+        if not has_tomopy:
+            filtered_pipelines[pipeline_name] = methods
+
+    return filtered_pipelines
+
 @methods_router.get("/fullpipelines")
 async def get_full_pipelines():
     try:
-        return process_all_yaml_files()
+        return filter_pipelines_with_tomopy(process_all_yaml_files())
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
