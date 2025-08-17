@@ -1,9 +1,9 @@
 import React from 'react';
 import { Grid } from '@mui/material';
-import { MethodParameterProps } from '../../../types';
-import { useSweepConfiguration } from '../../../hooks/useSweepConfiguration';
-import { ParameterInputFactory } from './ParameterInputFactory';
-import { SweepModal } from './SweepModal';
+import { MethodParameterProps } from '@/types';
+import { useSweepConfiguration } from '@/hooks/useSweepConfiguration';
+import { ParameterInputFactory } from '@/components/method_components/methods_config/ParameterInputFactory';
+import { SweepModal } from '@/components/method_components/methods_config/SweepModal';
 
 export const MethodParameter: React.FC<MethodParameterProps> = ({
   methodId,

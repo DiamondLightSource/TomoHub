@@ -9,7 +9,7 @@ interface TupleInputProps {
   onChange: (value: any) => void;
 }
 
-export const TupleInput: React.FC<TupleInputProps> = ({
+const TupleInput: React.FC<TupleInputProps> = ({
   paramName,
   paramDetails,
   value,
@@ -51,3 +51,5 @@ export const TupleInput: React.FC<TupleInputProps> = ({
     </Tooltip>
   );
 };
+
+export default TupleInput;

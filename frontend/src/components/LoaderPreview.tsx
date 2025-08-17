@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import CloseIcon from '@mui/icons-material/Close';
-import { useLoader, PreviewType } from '../contexts/LoaderContext';
+import { useLoader, PreviewType } from '@/contexts/LoaderContext';
 
 interface LoaderPreviewProps {
   onClose: () => void;

@@ -1,5 +1,5 @@
 import React, { createContext, useState, ReactNode, useContext } from 'react';
-import { useSweep } from './SweepContext'; // Import the useSweep hook
+import { useSweep } from '@/contexts/SweepContext'; // Import the useSweep hook
 
 export type Method = {
   method_name: string; // The name of the method

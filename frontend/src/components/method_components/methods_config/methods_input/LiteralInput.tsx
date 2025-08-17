@@ -16,7 +16,7 @@ interface LiteralInputProps {
   onChange: (value: any) => void;
 }
 
-export const LiteralInput: React.FC<LiteralInputProps> = ({
+const LiteralInput: React.FC<LiteralInputProps> = ({
   paramName,
   paramDetails,
   value,
@@ -73,3 +73,5 @@ export const LiteralInput: React.FC<LiteralInputProps> = ({
     </Tooltip>
   );
 };
+
+export default LiteralInput;

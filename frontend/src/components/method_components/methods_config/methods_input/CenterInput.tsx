@@ -17,7 +17,7 @@ interface CenterInputProps {
   onChange: (value: any) => void;
 }
 
-export const CenterInput: React.FC<CenterInputProps> = ({
+const CenterInput: React.FC<CenterInputProps> = ({
   paramName,
   paramDetails,
   value,
@@ -93,3 +93,5 @@ export const CenterInput: React.FC<CenterInputProps> = ({
     </Tooltip>
   );
 };
+
+export default CenterInput;

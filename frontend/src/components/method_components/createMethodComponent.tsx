@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useMethods } from '../../contexts/MethodsContext';
-import { MethodAccordion } from './methods_config/MethodAccordion';
+import { useMethods } from '@/contexts/MethodsContext';
+import { MethodAccordion } from '@/components/method_components/methods_config/MethodAccordion';
 import {
   ApiMethodsSchema,
   Method,
   MethodComponentConfig,
-} from '../../types/APIresponse';
+} from '@/types/APIresponse';
 
 export function createMethodComponent({
   methodType,

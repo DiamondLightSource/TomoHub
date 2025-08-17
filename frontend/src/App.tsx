@@ -1,10 +1,10 @@
 import React, { useState, Suspense } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './pages/Home.tsx';
-import Layout from './components/Layout';
-import Methods from './pages/Methods.tsx';
-import FullPipelines from './pages/FullPipelines.tsx';
-import Submission from './workflow/Submission.tsx';
+import Home from '@/pages/Home';
+import Layout from '@/components/Layout';
+import Methods from '@/pages/Methods';
+import FullPipelines from '@/pages/FullPipelines';
+import Submission from '@/workflow/Submission';
 import { Visit } from 'workflows-lib';
 
 const App: React.FC = () => {

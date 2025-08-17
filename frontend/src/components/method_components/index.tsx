@@ -1,6 +1,6 @@
 // src/components/method_components/index.ts
-import { createMethodComponent } from './createMethodComponent';
-import { methodsService } from '../../api/services';
+import { createMethodComponent } from '@/components/method_components/createMethodComponent';
+import { methodsService } from '@/api/services';
 
 export const Normalisation = createMethodComponent({
   methodType: 'Normalisation',

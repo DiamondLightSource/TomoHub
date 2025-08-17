@@ -1,10 +1,12 @@
 import React from 'react';
-import { NumericInput } from './methods_input/NumericInput';
-import { BooleanInput } from './methods_input/BooleanInput';
-import { LiteralInput } from './methods_input/LiteralInput';
-import { CenterInput } from './methods_input/CenterInput';
-import { TextInput } from './methods_input/TextInput';
-import { TupleInput } from './methods_input/TupleInput';
+import {
+  NumericInput,
+  BooleanInput,
+  LiteralInput,
+  CenterInput,
+  TextInput,
+  TupleInput,
+} from "@/components/method_components/methods_config/methods_input";
 
 interface ParameterInputFactoryProps {
   paramName: string;

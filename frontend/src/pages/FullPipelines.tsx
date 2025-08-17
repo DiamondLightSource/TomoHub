@@ -1,7 +1,7 @@
 import React from 'react';
-import { Box, styled } from '@mui/material';
-import PipelineSelector from '../components/fullPipelinesSelector';
-import YMLG from '../components/YamlGenerator';
+import { Box} from '@mui/material';
+import PipelineSelector from '@/components/fullPipelinesSelector';
+import YMLG from '@/components/YamlGenerator';
 
 const FullPipelines: React.FC = () => {
   return (

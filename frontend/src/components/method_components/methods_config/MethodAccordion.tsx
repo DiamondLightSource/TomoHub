@@ -4,10 +4,10 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-} from './StyledAccordion';
-import { MethodHeader } from './MethodHeader';
-import { MethodParameter } from './MethodParameter';
-import Method from '../uitypes';
+} from '@/components/method_components/methods_config/StyledAccordion';
+import { MethodHeader } from '@/components/method_components/methods_config/MethodHeader';
+import { MethodParameter } from '@/components/method_components/methods_config/MethodParameter';
+import Method from '@/types/method';
 
 interface MethodAccordionProps {
   method: Method;

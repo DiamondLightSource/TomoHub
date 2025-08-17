@@ -1,5 +1,5 @@
-import { useLoader } from '../contexts/LoaderContext';
-import { useMethods } from '../contexts/MethodsContext';
+import { useLoader } from '@/contexts/LoaderContext';
+import { useMethods } from '@/contexts/MethodsContext';
 
 export const useHTTOMOConfig = () => {
   const {

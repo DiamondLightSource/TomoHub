@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSweep } from '../contexts/SweepContext';
+import { useSweep } from '@/contexts/SweepContext';
 
 export const useSweepConfiguration = (methodId: string, paramName: string) => {
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -9,7 +9,7 @@ interface BooleanInputProps {
   onChange: (value: any) => void;
 }
 
-export const BooleanInput: React.FC<BooleanInputProps> = ({
+const BooleanInput: React.FC<BooleanInputProps> = ({
   paramName,
   paramDetails,
   value,
@@ -38,3 +38,5 @@ export const BooleanInput: React.FC<BooleanInputProps> = ({
     </Tooltip>
   );
 };
+
+export default BooleanInput;

@@ -9,7 +9,7 @@ interface TextInputProps {
   onChange: (value: any) => void;
 }
 
-export const TextInput: React.FC<TextInputProps> = ({
+const TextInput: React.FC<TextInputProps> = ({
   paramName,
   paramDetails,
   value,
@@ -39,3 +39,5 @@ export const TextInput: React.FC<TextInputProps> = ({
     </Tooltip>
   );
 };
+
+export default TextInput;

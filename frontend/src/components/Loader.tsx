@@ -14,8 +14,8 @@ import {
 } from '@mui/material';
 import ContrastIcon from '@mui/icons-material/Contrast';
 import PreviewIcon from '@mui/icons-material/Visibility'; // Icon for the preview button
-import { useLoader } from '../contexts/LoaderContext'; // Import the custom hook
-import LoaderPreview from './LoaderPreview'; // Import the new modal component
+import { useLoader } from '@/contexts/LoaderContext'; // Import the custom hook
+import LoaderPreview from '@/components/LoaderPreview'; // Import the new modal component
 import InfoIcon from '@mui/icons-material/Info';
 
 const Loader: React.FC = () => {
