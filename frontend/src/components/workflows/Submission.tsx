@@ -15,7 +15,7 @@ import SubmissionFormGPURun from './SubmissionFormGPURun';
 import SubmissionFormCOR from './SubmissionFormCOR';
 import { SubmissionQuery as SubmissionQueryType } from './__generated__/SubmissionQuery.graphql';
 import { SubmissionMutation as SubmissionMutationType } from './__generated__/SubmissionMutation.graphql';
-import React from 'react';
+
 
 const submissionQuery = graphql`
   query SubmissionQuery($name: String!) {
