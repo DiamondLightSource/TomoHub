@@ -19,7 +19,7 @@ interface ParametersType {
       stop_angle: number;
       angles_total: number;
     };
-  } | "auto";
+  };
   darks?: {
     file: string;
     data_path: string;

@@ -20,8 +20,6 @@ import InfoIcon from '@mui/icons-material/Info';
 
 const Loader: React.FC = () => {
   const {
-    method,
-    module_path,
     parameters,
     setDataPath,
     setImageKeyPath,
@@ -62,9 +60,8 @@ const Loader: React.FC = () => {
   ) => {
     if (newMode !== null) {
       setMode(newMode);
-      // If switching away from "setAddress" and rotationAnglePath was "auto", clear it
       if (newMode === 'defineCustom' && autoToggles.rotationAnglePath) {
-        handleAutoToggle('rotationAnglePath'); // This will set it to ""
+        handleAutoToggle('rotationAnglePath'); 
       }
     }
   };
@@ -72,26 +69,21 @@ const Loader: React.FC = () => {
   const toggleExtraFields = () => {
     if (showExtraFields) {
       removeDarksAndFlats();
-      // If hiding extra fields and imagePath was "auto", clear it
-      // This case might be complex if imagePath is mandatory when !showExtraFields
-      // For now, let's assume if user hides it, they might re-enable "auto" or fill it.
     } else {
-      // If showing extra fields (meaning image_key_path will be hidden)
-      // and imagePath was "auto", we should clear it from context and toggle.
       if (autoToggles.imagePath) {
-        setImageKeyPath(''); // Clear from context
-        setAutoToggles(prev => ({ ...prev, imagePath: false })); // Update local toggle
+        setImageKeyPath('');
+        setAutoToggles(prev => ({ ...prev, imagePath: false })); //
       }
     }
     setShowExtraFields(!showExtraFields);
   };
 
   const handlePreviewClick = () => {
-    setIsPreviewModalOpen(true); // Open the modal
+    setIsPreviewModalOpen(true); 
   };
 
   const handleClosePreviewModal = () => {
-    setIsPreviewModalOpen(false); // Close the modal
+    setIsPreviewModalOpen(false); 
   };
 
   // Handler for the "auto" button toggle
@@ -109,21 +101,15 @@ const Loader: React.FC = () => {
         if (!showExtraFields) {
           setImageKeyPath(newValue);
         } else {
-          // If extra fields are shown, imageKeyPath is conceptually not used with "auto"
-          // but we still toggle the button state if user clicks it.
-          // The context value for imageKeyPath should remain empty or undefined.
           if (newAutoState)
-            setImageKeyPath('auto'); // set to auto if toggled on
-          else setImageKeyPath(''); // clear if toggled off
+            setImageKeyPath('auto'); 
+          else setImageKeyPath(''); 
         }
       } else if (field === 'rotationAnglePath') {
         // Only update rotationAnglesDataPath if mode is "setAddress"
         if (mode === 'setAddress') {
           setRotationAnglesDataPath(newValue);
         } else {
-          // If mode is not "setAddress", rotation_angles.data_path is not used with "auto"
-          // but we still toggle the button state.
-          // The context value for rotation_angles.data_path should remain empty or undefined.
           if (newAutoState) setRotationAnglesDataPath('auto');
           else setRotationAnglesDataPath('');
         }
@@ -144,7 +130,6 @@ const Loader: React.FC = () => {
         borderRadius: '4px',
       }}
     >
-      {/* Title and Buttons */}
       <Box
         sx={{
           display: 'flex',
@@ -186,7 +171,7 @@ const Loader: React.FC = () => {
             variant="contained"
             onClick={toggleExtraFields}
             endIcon={<ContrastIcon />}
-            sx={{ fontSize: '0.7rem', mr: 1 }} // Add margin to separate buttons
+            sx={{ fontSize: '0.7rem', mr: 1 }} 
           >
             {showExtraFields ? 'Remove' : 'Load separate darks and flats'}
           </Button>
@@ -201,7 +186,6 @@ const Loader: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Input Field */}
       <TextField
         label="data path"
         variant="outlined"
@@ -230,7 +214,6 @@ const Loader: React.FC = () => {
         }}
       />
 
-      {/* Conditionally render the image_key_path text field */}
       {!showExtraFields && (
         <TextField
           label="image path"
@@ -263,7 +246,6 @@ const Loader: React.FC = () => {
         />
       )}
 
-      {/* Toggle Button */}
       <ToggleButtonGroup
         value={mode}
         exclusive
@@ -383,7 +365,6 @@ const Loader: React.FC = () => {
         </Grid>
       )}
 
-      {/* Extra Fields */}
       {showExtraFields && (
         <Grid container spacing={2}>
           <Grid item xs={6}>
@@ -451,7 +432,6 @@ const Loader: React.FC = () => {
         </Grid>
       )}
 
-      {/* Modal for Preview */}
       <Modal open={isPreviewModalOpen} onClose={handleClosePreviewModal}>
         <Box
           sx={{
@@ -467,7 +447,6 @@ const Loader: React.FC = () => {
           }}
         >
           <LoaderPreview onClose={handleClosePreviewModal} />{' '}
-          {/* Pass the close handler */}
         </Box>
       </Modal>
     </Card>

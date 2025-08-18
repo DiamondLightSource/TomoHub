@@ -86,7 +86,8 @@ export const useHTTOMOConfig = () => {
         !updatedParameters.rotation_angles.data_path ||
         updatedParameters.rotation_angles.data_path.trim() === ''
       ) {
-        updatedParameters.rotation_angles = 'auto';
+        // Fix: Set the data_path property instead of the entire rotation_angles object
+        updatedParameters.rotation_angles = { data_path: 'auto' };
         setRotationAnglesDataPath('auto');
       }
 
