@@ -12,5 +12,8 @@
     },
     "jsx": "react-jsx"
   },
-  "include": ["src", "vite.config.ts","src/types/**/*"]
+  "include": ["src", "vite.config.ts","src/types/**/*"],
+  "exclude": [
+    "node_modules/workflows-lib/**/*"
+  ]
 }
