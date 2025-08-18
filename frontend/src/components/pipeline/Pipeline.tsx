@@ -17,9 +17,9 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { useCenter } from '@/contexts/CenterContext';
-import { EditMethodModal } from '@/components/pipeline/EditMethodModal';
-import { Method } from '@/contexts/MethodsContext';
+import { useCenter } from '../../contexts/CenterContext';
+import { EditMethodModal } from './EditMethodModal';
+import { Method } from '../../contexts/MethodsContext';
 
 const Pipeline: React.FC = () => {
   const { methods, clearMethods, removeMethod, setMethods, updateMethodParameter } = useMethods();

@@ -2,7 +2,7 @@ import React from 'react';
 import { TextField, Tooltip, InputAdornment, IconButton } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ClearIcon from '@mui/icons-material/Clear';
-import { useParameterValidation } from '@/hooks/useParameterValidation';
+import { useParameterValidation } from '../../../../hooks/useParameterValidation';
 
 interface NumericInputProps {
   paramName: string;

@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import YMLG from '@/components/common/YamlGenerator';
+import YMLG from '../common/YamlGenerator';
 import React, { useEffect, useState } from 'react';
 import {
   Select,
@@ -11,9 +11,9 @@ import {
   Typography,
   Tooltip,
 } from '@mui/material';
-import { fullpipelinesService } from '@/api/services';
-import { ApiFullPipelineSchema } from '@/types/APIresponse';
-import { useMethods } from '@/contexts/MethodsContext';
+import { fullpipelinesService } from '../../api/services';
+import { ApiFullPipelineSchema } from '../../types/APIresponse';
+import { useMethods } from '../../contexts/MethodsContext';
 import InfoIcon from '@mui/icons-material/Info';
 
 

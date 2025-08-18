@@ -24,6 +24,7 @@ import { useMethods } from '../../contexts/MethodsContext';
 import { sharedFragment } from './Submission';
 import WorkflowStatus from './WorkflowStatus';
 import { useHTTOMOConfig } from '../../hooks/useHTTOMOConfig';
+import React from "react"
 
 const SubmissionFormGPURun = (props: {
   template: SubmissionFormSharedFragment$key;

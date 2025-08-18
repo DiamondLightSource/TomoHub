@@ -9,8 +9,8 @@ import {
   Button,
 } from '@mui/material';
 import { CheckCircle } from '@mui/icons-material'; 
-import { proxyService } from '@/api/services';
-import { useCenter } from '@/contexts/CenterContext'; 
+import { proxyService } from '../../../api/services';
+import { useCenter } from '../../../contexts/CenterContext'; 
 
 interface SweepResultViewerProps {
   workflowData: any; 

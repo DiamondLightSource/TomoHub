@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Tabs, Tab, Box, Typography } from '@mui/material';
-import Dropdown from '@/components/methods/MethodsDropDowns';
-import Loader from '@/components/loader/Loader';
+import Dropdown from './MethodsDropDowns';
+import Loader from '../loader/Loader';
 
 const MethodsTabs: React.FC = () => {
   const [value, setValue] = React.useState(0);
