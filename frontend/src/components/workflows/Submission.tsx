@@ -12,7 +12,7 @@ import {
 } from 'workflows-lib';
 import { visitToText } from '@diamondlightsource/sci-react-ui';
 import SubmissionFormGPURun from './SubmissionFormGPURun';
-import SubmissionFormCOR from './SubmissionFormCOR';
+import SubmissionFormCOR from './sweepPipeline/SubmissionFormCOR';
 import { SubmissionQuery as SubmissionQueryType } from './__generated__/SubmissionQuery.graphql';
 import { SubmissionMutation as SubmissionMutationType } from './__generated__/SubmissionMutation.graphql';
 
@@ -72,7 +72,6 @@ interface SubmissionProps {
 export default function Submission({
   workflowName,
   setVisit,
-  prepopulatedParameters,
   visit,
 }: SubmissionProps) {
   const data = useLazyLoadQuery<SubmissionQueryType>(submissionQuery, {

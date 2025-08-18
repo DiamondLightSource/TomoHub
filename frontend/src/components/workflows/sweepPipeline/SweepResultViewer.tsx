@@ -8,12 +8,12 @@ import {
   Divider,
   Button,
 } from '@mui/material';
-import { CheckCircle } from '@mui/icons-material'; // Add this import
-import { proxyService } from '../../../api/services';
-import { useCenter } from '../../../contexts/CenterContext'; // Add this import
+import { CheckCircle } from '@mui/icons-material'; 
+import { proxyService } from '@/api/services';
+import { useCenter } from '@/contexts/CenterContext'; 
 
 interface SweepResultViewerProps {
-  workflowData: any; // The workflow data from WorkflowStatus
+  workflowData: any; 
   start: number;
   stop: number;
   step: number;
@@ -44,7 +44,6 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
 
   // Add center context
   const { selectedCenter, setSelectedCenter } = useCenter();
-
   const [centerImages, setCenterImages] = useState<CenterImages>({});
   const [centerValues, setCenterValues] = useState<string[]>([]);
   const [currentCenterIndex, setCurrentCenterIndex] = useState(0);

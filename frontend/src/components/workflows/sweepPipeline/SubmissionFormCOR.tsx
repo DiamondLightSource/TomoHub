@@ -13,7 +13,7 @@ import { VisitInput, visitToText } from '@diamondlightsource/sci-react-ui';
 import Loader from '@/components/loader/Loader';
 import { useLoader } from '@/contexts/LoaderContext';
 import { SubmissionFormSharedFragment$key } from '@/components/workflows/__generated__/SubmissionFormSharedFragment.graphql';
-import { sharedFragment } from './Submission';
+import { sharedFragment } from '../Submission';
 import WorkflowStatus from '@/components/workflows/WorkflowStatus';
 import SweepResultViewer from '@/components/workflows/sweepPipeline/SweepResultViewer';
 import ParameterSweepForm, {
@@ -112,10 +112,10 @@ const SubmissionFormCOR = (props: {
   // ---- Pipeline JSON (unchanged from your current version) ----
   const generateConfigArray = (formParams: any) => {
     let updatedLoaderParams = { ...loaderParams };
-  
+
     if (!isContextValid()) {
       if (!updatedLoaderParams.data_path || updatedLoaderParams.data_path.trim() === '') {
-        updatedLoaderParams.data_path = null; 
+        updatedLoaderParams.data_path = null;
       }
       if (
         typeof updatedLoaderParams.rotation_angles === 'string' ||
@@ -124,9 +124,9 @@ const SubmissionFormCOR = (props: {
         updatedLoaderParams.rotation_angles.data_path.trim() === '' ||
         updatedLoaderParams.rotation_angles.data_path === 'auto'
       ) {
-        updatedLoaderParams.rotation_angles = { data_path: null }; 
+        updatedLoaderParams.rotation_angles = { data_path: null };
       }
-  
+
       const hasDarks =
         updatedLoaderParams.darks &&
         updatedLoaderParams.darks.file &&
@@ -135,7 +135,7 @@ const SubmissionFormCOR = (props: {
         updatedLoaderParams.flats &&
         updatedLoaderParams.flats.file &&
         updatedLoaderParams.flats.file.trim() !== '';
-  
+
       if (hasDarks && hasFlats) {
         delete updatedLoaderParams.image_key_path;
       } else if (
@@ -143,10 +143,10 @@ const SubmissionFormCOR = (props: {
         updatedLoaderParams.image_key_path.trim() === '' ||
         updatedLoaderParams.image_key_path === 'auto'
       ) {
-        updatedLoaderParams.image_key_path = null; 
+        updatedLoaderParams.image_key_path = null;
       }
     }
-  
+
     return [
       {
         method: method,
@@ -189,10 +189,10 @@ const SubmissionFormCOR = (props: {
       stop: sweepValues.stop,
       step: sweepValues.step,
     };
-  
+
     // Generate config as array (for validation)
     const configArray = generateConfigArray(mergedParams);
-  
+
     // Build validation object with correct backend key names
     const validationObject = {
       config: configArray,
@@ -200,22 +200,22 @@ const SubmissionFormCOR = (props: {
       output: wfValues.output === "" ? null : wfValues.output,
       nprocs: wfValues.nprocs,
       memory: wfValues.memory,
-      "httomo-outdir-name" : wfValues.httomo_outdir_name === "" ? null : wfValues.httomo_outdir_name,
+      "httomo-outdir-name": wfValues.httomo_outdir_name === "" ? null : wfValues.httomo_outdir_name,
     };
-  
+
     // Validate against schema
     const validate = ajv.compile(schema);
-    if(!validate(validationObject)){
+    if (!validate(validationObject)) {
       setErrorMessages(formatAjvErrors(validate.errors, validationObject));
       return; // Stop submission
     }
-  
+
     // Build final submission payload (config as string)
     const finalParams = {
       ...validationObject,
       config: JSON.stringify(configArray)
     };
-  
+
     // Submit
     props.onSubmit(visit, finalParams, (workflowName: string) => {
       setSubmittedWorkflowName(workflowName);
@@ -223,7 +223,7 @@ const SubmissionFormCOR = (props: {
       setErrorMessages([]);
     });
   };
-  
+
 
   const handleCloseSnackbar = () => setSubmitted(false);
 
@@ -241,7 +241,7 @@ const SubmissionFormCOR = (props: {
 
       <Divider />
       <Loader />
-      
+
       {errorMessages.length > 0 && (
         <Alert severity="error">
           <strong>Validation failed:</strong>
@@ -271,7 +271,7 @@ const SubmissionFormCOR = (props: {
           step={parameters.step as number}
         />
       )}
-      
+
 
       {!isContextValid() && (
         <Alert severity="info">
@@ -295,18 +295,18 @@ const SubmissionFormCOR = (props: {
         onChange={setWfValues}
       />
 
-      
-      
+
+
 
       <Divider />
 
-      
+
       <VisitInput
-      visit={props.visit}
-      onSubmit={doSubmit}
-      parameters={parameters}
-      submitOnReturn={false}
-      submitButton={true}
+        visit={props.visit}
+        onSubmit={doSubmit}
+        parameters={parameters}
+        submitOnReturn={false}
+        submitButton={true}
       />
 
       <Snackbar

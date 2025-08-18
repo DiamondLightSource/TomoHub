@@ -3,9 +3,9 @@ import {
   materialCells,
   materialRenderers,
 } from '@jsonforms/material-renderers';
-import { JsonSchema, UISchemaElement, createAjv } from '@jsonforms/core';
+import { UISchemaElement, createAjv } from '@jsonforms/core';
 import { JsonForms } from '@jsonforms/react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Divider,
   Snackbar,
