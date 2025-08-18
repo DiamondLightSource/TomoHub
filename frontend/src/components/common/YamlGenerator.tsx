@@ -15,7 +15,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CloseIcon from '@mui/icons-material/Close';
-import { useSweep } from '../contexts/SweepContext';
+import { useSweep } from '../../contexts/SweepContext';
 import { yamlService } from '@/api/services';
 import { Link } from 'react-router-dom';
 import { useHTTOMOConfig } from '@/hooks/useHTTOMOConfig';

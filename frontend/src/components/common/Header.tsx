@@ -14,8 +14,8 @@ import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import yaml from 'js-yaml';
-import { useLoader, PreviewType } from '../contexts/LoaderContext';
-import { useMethods, Method as MethodType } from '../contexts/MethodsContext';
+import { useLoader, PreviewType } from '../../contexts/LoaderContext';
+import { useMethods, Method as MethodType } from '../../contexts/MethodsContext';
 
 const Alert = React.forwardRef<
   HTMLDivElement,
@@ -256,7 +256,7 @@ function Header() {
         >
           Methods
         </Button>
-        {/* Hidden file input */}
+        
         <input
           type="file"
           accept=".yaml,.yml"

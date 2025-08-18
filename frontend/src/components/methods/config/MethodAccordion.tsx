@@ -4,9 +4,9 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-} from '@/components/method_components/methods_config/StyledAccordion';
-import { MethodHeader } from '@/components/method_components/methods_config/MethodHeader';
-import { MethodParameter } from '@/components/method_components/methods_config/MethodParameter';
+} from '@/components/methods/config/StyledAccordion';
+import { MethodHeader } from '@/components/methods/config/MethodHeader';
+import { MethodParameter } from '@/components/methods/config/MethodParameter';
 import Method from '@/types/method';
 
 interface MethodAccordionProps {

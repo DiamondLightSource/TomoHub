@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import Guide from '@/components/Guide';
+import Guide from '@/components/common/Guide';
 
 const Home: React.FC = () => {
   return (

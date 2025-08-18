@@ -1,21 +1,18 @@
 import React from 'react';
 import { Card, Tabs, Tab, Box, Typography } from '@mui/material';
-import Dropdown from './Dropdown';
-import Loader from './Loader';
-import Guide from './Guide';
+import Dropdown from '@/components/methods/MethodsDropDowns';
+import Loader from '@/components/loader/Loader';
 
-const Dropdowns: React.FC = () => {
-  const [value, setValue] = React.useState(0); // State to manage the active tab
+const MethodsTabs: React.FC = () => {
+  const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue); // Update the active tab
+    setValue(newValue); 
   };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', mt: 5 }}>
-      {/* Main content area with tabs and panels */}
       <Box sx={{ display: 'flex' }}>
-        {/* Vertical Tabs */}
         <Tabs
           orientation="vertical"
           value={value}
@@ -34,8 +31,7 @@ const Dropdowns: React.FC = () => {
           <Tab sx={{ fontSize: '0.9rem' }} label="Image Saving" />
           <Tab sx={{ fontSize: '0.9rem' }} label="Post-processing" />
         </Tabs>
-
-        {/* Tab Content */}
+        
         <Box sx={{ p: 2, maxWidth: '700px' }}>
           {value === 0 && <Loader />}
           {value === 1 && (
@@ -148,4 +144,4 @@ const Dropdowns: React.FC = () => {
   );
 };
 
-export default Dropdowns;
+export default MethodsTabs;

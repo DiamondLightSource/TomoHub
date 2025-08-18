@@ -6,7 +6,7 @@ import {
   CenterInput,
   TextInput,
   TupleInput,
-} from "@/components/method_components/methods_config/methods_input";
+} from "@/components/methods/config/inputs";
 
 interface ParameterInputFactoryProps {
   paramName: string;

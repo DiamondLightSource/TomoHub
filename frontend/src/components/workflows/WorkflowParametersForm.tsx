@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Stack, TextField, Button, IconButton } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close'; // Import the close icon
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Import the expand icon
+import CloseIcon from '@mui/icons-material/Close'; 
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; 
 
 export interface WorkflowParamsValues {
   input: string;
   output: string;
   nprocs: number | string;
   memory: string;
-  httomo_outdir_name: string; // mapped to 'httomo-outdir-name' on submit
+  httomo_outdir_name: string; 
 }
 
 export default function WorkflowParametersForm({

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Box, Typography } from '@mui/material';
-import { useMethods } from '../contexts/MethodsContext';
+import { useMethods } from '../../contexts/MethodsContext';
 import { ClearAll } from '@mui/icons-material';
 import PipelineMethod from './PipelineMethod';
 import {
@@ -18,7 +18,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useCenter } from '@/contexts/CenterContext';
-import { EditMethodModal } from '@/components/EditMethodModal';
+import { EditMethodModal } from '@/components/pipeline/EditMethodModal';
 import { Method } from '@/contexts/MethodsContext';
 
 const Pipeline: React.FC = () => {

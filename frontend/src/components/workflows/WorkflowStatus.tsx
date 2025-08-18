@@ -109,7 +109,7 @@ const workflowStatusQuery = graphql`
 interface WorkflowStatusProps {
   workflow: string;
   visit: string;
-  onWorkflowDataChange?: (data: any) => void; // Add this prop
+  onWorkflowDataChange?: (data: any) => void; 
 }
 
 const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
@@ -142,41 +142,18 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
     },
     {
       fetchKey: refreshKey,
-      fetchPolicy: 'network-only', // Force fresh fetch from server
+      fetchPolicy: 'network-only',
     }
   );
 
-  // Add this debugging immediately after the query
-  console.log('=== DETAILED DEBUG ===');
-  console.log('Raw data object:', data);
-  console.log('data.workflow:', data?.workflow);
-  console.log('data.workflow.status:', data?.workflow?.status);
-  console.log(
-    'data.workflow.status.__typename:',
-    data?.workflow?.status?.__typename
-  );
-  console.log('Type of __typename:', typeof data?.workflow?.status?.__typename);
-  console.log('=== END DEBUG ===');
 
   const statusType = data?.workflow?.status?.__typename ?? 'Unknown';
-  console.log('Final statusType:', statusType);
 
   const message =
     data?.workflow?.status && 'message' in data.workflow.status
       ? data.workflow.status.message
       : undefined;
 
-  // Add debugging
-  console.log('WorkflowStatus Debug:', {
-    workflow,
-    visit,
-    parsedVisit,
-    dataExists: !!data,
-    workflowExists: !!data?.workflow,
-    statusExists: !!data?.workflow?.status,
-    statusType,
-    fullData: data,
-  });
 
   // Check if status is final (no need to keep polling)
   const isFinalStatus = (status: string) => {
@@ -220,9 +197,9 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
     }
   };
 
-  // New function to extract log artifacts
+  
   const getLogArtifacts = () => {
-    // Only show artifacts for final status workflows with tasks
+  
     if (!data?.workflow?.status || !('tasks' in data.workflow.status)) {
       return [];
     }
@@ -239,7 +216,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
     const tasks = (data.workflow.status as any).tasks || [];
 
     return tasks
-      .filter((task: any) => task.stepType === 'Pod') // Only Pod tasks
+      .filter((task: any) => task.stepType === 'Pod') 
       .map((task: any) => {
         // Find main.log artifact
         const logArtifact = task.artifacts?.find(
@@ -268,7 +245,6 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
     }
 
     const interval = setInterval(() => {
-      console.log(`Polling workflow status for: ${workflow}`);
       setRefreshKey(prev => prev + 1);
     }, 2000);
 
@@ -278,17 +254,12 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
   // Stop polling when status becomes final
   useEffect(() => {
     if (isFinalStatus(statusType)) {
-      console.log(`Workflow ${workflow} reached final status: ${statusType}`);
       setIsPolling(false);
     }
   }, [statusType]);
 
-  // Add this useEffect to pass data back to parent
+  // useEffect to pass data back to parent
   useEffect(() => {
-    console.log(
-      'WorkflowStatus: Data changed, calling onWorkflowDataChange:',
-      data
-    );
     if (onWorkflowDataChange && data) {
       onWorkflowDataChange(data);
     }
@@ -338,7 +309,6 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
           />
         </Box>
 
-        {/* Log Artifacts Section */}
         {logArtifacts.length > 0 && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2" color="text.secondary">

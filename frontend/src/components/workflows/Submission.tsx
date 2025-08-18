@@ -113,7 +113,6 @@ export default function Submission({
           ]);
         } else {
           const submittedName = response.submitWorkflowTemplate.name;
-          console.log('Successfully submitted:', submittedName);
           setVisit(visit);
           setSubmissionResults(prev => [
             {
@@ -123,9 +122,8 @@ export default function Submission({
             ...prev,
           ]);
 
-          // NEW: Call the success callback with workflow name
+          // Call the success callback with workflow name
           if (onSuccess) {
-            console.log('Calling onSuccess callback with:', submittedName);
             onSuccess(submittedName);
           } else {
             console.log('No onSuccess callback provided');

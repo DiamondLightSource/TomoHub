@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMethods } from '@/contexts/MethodsContext';
-import { MethodAccordion } from '@/components/method_components/methods_config/MethodAccordion';
+import { MethodAccordion } from '@/components/methods/config/MethodAccordion';
 import {
   ApiMethodsSchema,
   Method,

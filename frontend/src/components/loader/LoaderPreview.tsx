@@ -82,7 +82,6 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
     }
 
     if (!enableDetectorX && !enableDetectorY) {
-      console.log('Calling removePreview');
       removePreview();
     }
     onClose();

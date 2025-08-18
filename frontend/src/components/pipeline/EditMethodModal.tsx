@@ -12,9 +12,9 @@ import {
   Alert,
   IconButton,
 } from '@mui/material';
-import { methodsService } from '../api/services';
-import { ParameterInputFactory } from './method_components/methods_config/ParameterInputFactory';
-import { Method } from '../contexts/MethodsContext';
+import { methodsService } from '../../api/services';
+import { ParameterInputFactory } from '../methods/config/ParameterInputFactory';
+import { Method } from '../../contexts/MethodsContext';
 import InfoIcon from '@mui/icons-material/Info';
 
 interface EditMethodModalProps {

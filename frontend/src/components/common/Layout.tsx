@@ -1,12 +1,12 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Pipeline from '@/components/Pipeline';
+import Pipeline from '@/components/pipeline/Pipeline';
 import { MethodsProvider } from '@/contexts/MethodsContext';
 import { SweepProvider } from '@/contexts/SweepContext';
 import { LoaderProvider } from '@/contexts/LoaderContext';
 import { CenterProvider } from '@/contexts/CenterContext';
 import { Box, CssBaseline, Paper, styled } from '@mui/material';
-import Header from '@/components/Header';
+import Header from '@/components/common/Header';
 import { Footer, Navbar, User } from '@diamondlightsource/sci-react-ui';
 import keycloak from '@/keycloak';
 

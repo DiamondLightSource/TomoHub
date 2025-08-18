@@ -9,8 +9,8 @@ import {
   Button,
 } from '@mui/material';
 import { CheckCircle } from '@mui/icons-material'; // Add this import
-import { proxyService } from '../api/services';
-import { useCenter } from '../contexts/CenterContext'; // Add this import
+import { proxyService } from '../../../api/services';
+import { useCenter } from '../../../contexts/CenterContext'; // Add this import
 
 interface SweepResultViewerProps {
   workflowData: any; // The workflow data from WorkflowStatus
@@ -41,12 +41,6 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
   stop,
   step,
 }) => {
-  console.log('SweepResultViewer: Received props:', {
-    workflowData,
-    start,
-    stop,
-    step,
-  });
 
   // Add center context
   const { selectedCenter, setSelectedCenter } = useCenter();
@@ -90,17 +84,13 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
     }
 
     const tasks = workflowData.workflow.status.tasks || [];
-    console.log('SweepResultViewer: Found tasks:', tasks);
+
 
     const generateSweepTask = tasks.find(
       (task: any) =>
         task.name === 'generate-sweep-artifact' && task.stepType === 'Pod'
     );
 
-    console.log(
-      'SweepResultViewer: Found generate-sweep-artifact task:',
-      generateSweepTask
-    );
 
     if (!generateSweepTask) return null;
 
@@ -110,7 +100,6 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
         artifact.mimeType === 'image/tiff'
     );
 
-    console.log('SweepResultViewer: Found TIFF artifact:', tiffArtifact);
 
     return tiffArtifact;
   };
@@ -122,10 +111,6 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
         return; // Already loaded or loading
       }
 
-      console.log(
-        `SweepResultViewer: Loading page ${pageIndex} for center ${centerValue}`
-      );
-
       setLoadingStates(prev => ({ ...prev, [centerValue]: true }));
 
       try {
@@ -136,9 +121,6 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
           [centerValue]: imageUrl,
         }));
 
-        console.log(
-          `SweepResultViewer: Loaded page ${pageIndex} for center ${centerValue}`
-        );
       } catch (err) {
         console.error(
           `SweepResultViewer: Error loading page ${pageIndex}:`,
@@ -178,17 +160,14 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
     setError(null);
 
     try {
-      console.log('SweepResultViewer: Getting TIFF metadata for URL:', tiffUrl);
-
       // Get TIFF metadata
       const metadata = await proxyService.getTiffMetadata(tiffUrl);
-      console.log('SweepResultViewer: Received TIFF metadata:', metadata);
 
       setTiffMetadata(metadata);
 
       // Generate center values
       const centerVals = generateCenterValues();
-      console.log('SweepResultViewer: Generated center values:', centerVals);
+
 
       // Validate page count matches expected center values
       if (metadata.page_count < centerVals.length) {
@@ -271,10 +250,6 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
   useEffect(() => {
     const tiffArtifact = getTiffArtifact();
     if (tiffArtifact) {
-      console.log(
-        'SweepResultViewer: Found TIFF artifact, initializing:',
-        tiffArtifact
-      );
       initializeTiffProcessing(tiffArtifact.url);
     } else {
       console.log('SweepResultViewer: No TIFF artifact found');
@@ -293,7 +268,7 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
 
   // Don't render if not a successful COR workflow
   const tiffArtifact = getTiffArtifact();
-  console.log('SweepResultViewer: Final tiffArtifact result:', tiffArtifact);
+
 
   if (!tiffArtifact) {
     console.log(
@@ -302,7 +277,6 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
     return null;
   }
 
-  console.log('SweepResultViewer: Rendering component with TIFF artifact');
 
   const currentCenterValue = centerValues[currentCenterIndex];
   const isCurrentImageLoading = loadingStates[currentCenterValue];
@@ -427,7 +401,7 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
                 value: index,
                 label:
                   index % Math.max(1, Math.floor(centerValues.length / 10)) ===
-                  0
+                    0
                     ? value
                     : '',
               }))}
