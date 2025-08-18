@@ -8,7 +8,9 @@
     "types": ["vite/client", "node"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "workflows-lib": ["node_modules/workflows-lib/dist"],
+      "workflows-lib/*": ["node_modules/workflows-lib/dist/*"]
     },
     "jsx": "react-jsx",
     "typeRoots": ["./node_modules/@types"]
