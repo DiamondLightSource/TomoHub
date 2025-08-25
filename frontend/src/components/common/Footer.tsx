@@ -19,8 +19,10 @@ export default function Footer() {
           target="_blank"
           href="https://www.diamond.ac.uk/Home.html"
           underline="hover"
-        >
-          Diamond Light Sources Ltd
+          
+          
+          >
+                  Diamond Light Sources Ltd
         </Link>
       </Typography>
     </Box>
