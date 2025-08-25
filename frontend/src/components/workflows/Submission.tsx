@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useLazyLoadQuery, useMutation } from 'react-relay/hooks';
 import { graphql } from 'relay-runtime';
 import { Box } from '@mui/material';
-import {
+import{
   JSONObject,
   SubmissionGraphQLErrorMessage,
   SubmissionNetworkErrorMessage,
@@ -15,7 +15,7 @@ import SubmissionFormGPURun from './SubmissionFormGPURun';
 import SubmissionFormCOR from './sweepPipeline/SubmissionFormCOR';
 import { SubmissionQuery as SubmissionQueryType } from './__generated__/SubmissionQuery.graphql';
 import { SubmissionMutation as SubmissionMutationType } from './__generated__/SubmissionMutation.graphql';
-
+import React from "react"
 
 const submissionQuery = graphql`
   query SubmissionQuery($name: String!) {

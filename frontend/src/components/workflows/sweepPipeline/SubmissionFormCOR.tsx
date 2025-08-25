@@ -10,19 +10,19 @@ import {
 } from '@mui/material';
 import { JSONObject, Visit } from 'workflows-lib';
 import { VisitInput, visitToText } from '@diamondlightsource/sci-react-ui';
-import Loader from '@/components/loader/Loader';
-import { useLoader } from '@/contexts/LoaderContext';
-import { SubmissionFormSharedFragment$key } from '@/components/workflows/__generated__/SubmissionFormSharedFragment.graphql';
+import Loader from '../../loader/Loader';
+import { useLoader } from '../../../contexts/LoaderContext';
+import { SubmissionFormSharedFragment$key } from '../__generated__/SubmissionFormSharedFragment.graphql';
 import { sharedFragment } from '../Submission';
-import WorkflowStatus from '@/components/workflows/WorkflowStatus';
-import SweepResultViewer from '@/components/workflows/sweepPipeline/SweepResultViewer';
+import WorkflowStatus from '../WorkflowStatus';
+import SweepResultViewer from './SweepResultViewer';
 import ParameterSweepForm, {
   SweepValues,
-} from '@/components/workflows/sweepPipeline/ParameterSweepForm';
+} from './ParameterSweepForm';
 import WorkflowParametersForm, {
   WorkflowParamsValues,
-} from '@/components/workflows/WorkflowParametersForm';
-import { buildAjv, validateWithDefaults, formatAjvErrors } from '@/components/workflows/utils/schemaValidation';
+} from '../WorkflowParametersForm';
+import { buildAjv, validateWithDefaults, formatAjvErrors } from '../utils/schemaValidation';
 import { ErrorObject } from 'ajv';
 
 const SubmissionFormCOR = (props: {

@@ -16,9 +16,9 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CloseIcon from '@mui/icons-material/Close';
 import { useSweep } from '../../contexts/SweepContext';
-import { yamlService } from '@/api/services';
+import { yamlService } from '../../api/services';
 import { Link } from 'react-router-dom';
-import { useHTTOMOConfig } from '@/hooks/useHTTOMOConfig';
+import { useHTTOMOConfig } from '../../hooks/useHTTOMOConfig';
 
 const YMLG = () => {
   const [yamlFileName, setYamlFileName] = React.useState<string>('config');

@@ -1,14 +1,14 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Pipeline from '@/components/pipeline/Pipeline';
-import { MethodsProvider } from '@/contexts/MethodsContext';
-import { SweepProvider } from '@/contexts/SweepContext';
-import { LoaderProvider } from '@/contexts/LoaderContext';
-import { CenterProvider } from '@/contexts/CenterContext';
+import Pipeline from '../pipeline/Pipeline';
+import { MethodsProvider } from '../../contexts/MethodsContext';
+import { SweepProvider } from '../../contexts/SweepContext';
+import { LoaderProvider } from '../../contexts/LoaderContext';
+import { CenterProvider } from '../../contexts/CenterContext';
 import { Box, CssBaseline, Paper, styled } from '@mui/material';
-import Header from '@/components/common/Header';
+import Header from './Header';
 import { Footer, Navbar, User } from '@diamondlightsource/sci-react-ui';
-import keycloak from '@/keycloak';
+import keycloak from '../../keycloak';
 
 const LeftSection = styled(Box)({
   display: 'flex',

@@ -3,7 +3,7 @@ import apiClient from './client';
 import type {
   ApiMethodsSchema,
   ApiFullPipelineSchema,
-} from '@/types/APIresponse';
+} from '../types/APIresponse';
 
 // Add interface for TIFF metadata
 interface TiffMetadata {

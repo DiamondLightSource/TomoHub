@@ -1,11 +1,11 @@
 import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from '@/App';
+import App from './App';
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider, DiamondTheme } from '@diamondlightsource/sci-react-ui';
 import { RelayEnvironmentProvider } from 'react-relay';
-import { RelayEnvironment } from '@/RelayEnviornment';
-import keycloak from '@/keycloak';
+import { RelayEnvironment } from './RelayEnviornment';
+import keycloak from './keycloak';
 
 // Wait for Keycloak before rendering
 keycloak.init({ onLoad: "login-required" }).then(authenticated => {
@@ -20,7 +20,7 @@ createRoot(document.getElementById('root')!).render(
     </ThemeProvider>
   </StrictMode>
 );
-  } else {
-    window.location.reload();
-  }
-});
+   } else {
+     window.location.reload();
+   }
+ });
