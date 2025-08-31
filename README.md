@@ -1,16 +1,7 @@
 # TomoHub 
-Tomohub is a graphical tool created with React and FastAPI to generate and configure YAML processlists for [HTTOMO](https://diamondlightsource.github.io/httomo/index.html) pacakge.
-Tomohub currently has 2 versions:
-  - deployment version : in the deployment version, Tomohub is limited to generating HTTOMO YAML config files
-  - local version : in the local version, beside the config file generator functionality, Tomohub is capable of running tomography reconstruction jobs via running HTTOMO package locally and also have access to [COR finder tool](#cor-finder-tool)
+Tomohub is a graphical tool created with React and FastAPI to generate and configure YAML processlists for [HTTOMO](https://diamondlightsource.github.io/httomo/index.html) pacakge and using React Relay and [Workflows](https://github.com/DiamondLightSource/workflows), it's able to run high throughput tomography jobs using [HTTOMO](https://diamondlightsource.github.io/httomo/index.html) as well.
+
 ## Usage
-For deployment:
-Both front-end and back-end images are ready to pull at GHCR registry (take a look at the packages for this repository)
-the only key point is making sure ```baseURL``` variable located at /frontend/src/api/client.ts is like following : 
-```
-  baseURL: window.__ENV__.VITE_API_BASE_URL,
-```
-For local:
 start by cloning the repo : 
 ```
 git clone https://github.com/DiamondLightSource/TomoHub
@@ -18,18 +9,17 @@ git clone https://github.com/DiamondLightSource/TomoHub
 set up frontend :
 ```
 cd Tomohub/frontend
-npm install
+npm i
+npm run relay 
 npm run dev
 ```
-and make sure the ```baseURL``` variable located at frontend/src/api/client.ts is like following:
-```
-baseURL: 'http://localhost:8000',
-```
 
-set up backend (preferably run with a virtual enviornment):
+set up backend :
 ```
 cd Tomohub/backend
 pip install -r requirements.txt
+pip install httomolibgpu --no-deps
+pip install httomo_backends --no-deps 
 uvicorn main:app --reload
 ```
 ## How to use
@@ -37,7 +27,7 @@ In order to run a tomography reconstruction jobs with HTTOMO package, you need t
 basically YAML files with different methods and parameters for the reconstruction job, with both deployment and local versions of tomohub you are able generate these processlists without editting the YAML files directly and then simply download your config files and use them in order to run HTTOMO.
 beside generating config files, the local version is able to run HTTOMO jobs as well, after selecting your desired methods (or if you have your own config file as well), you can run HTTOMO by clicking on "Run HTTOMO (Local)" button 
 ### cor finder tool
-the main available feature on the local version is COR finder tool, with this tool based on the [parameter sweeping](#parameter-sweeping) feature of HTTOMO, users are able to run a reconstruction job with either of gdric or FBP algorithms and a range of values for centre of rotation, in the result, users can see final png output of the reconstruction job and they can use the slider to see different outputs and select their desired one
+the main available feature on the local version is COR finder tool, with this tool based on the [parameter sweeping](#parameter-sweeping) feature of HTTOMO, users are able to run a reconstruction job with either of gdric or FBP algorithms and a range of values for centre of rotation, in the result, users can see final png output of the reconstruction job and they can use the slider to see different outputs and select their desired one, this feture is currently implemented with power of workflows.
 ### Loader
 - Configuring the loader for your pipeline is the first essential step to make a processlist, tomohub uses the standard_tomo_loader [see more](https://diamondlightsource.github.io/httomo/reference/loaders.html)
 - previewing feature allows you to change the dimensions of the input data by reducing them, in another way is a way to crop your data before the reconstruction job happens [see more](https://diamondlightsource.github.io/httomo/howto/httomo_features/previewing.html)
