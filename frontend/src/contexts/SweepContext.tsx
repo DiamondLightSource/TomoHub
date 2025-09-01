@@ -1,15 +1,15 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from "react";
 
 interface SweepContextType {
   activeSweep: {
     methodId: string;
     paramName: string;
-    sweepType: 'range' | 'values';
+    sweepType: "range" | "values";
   } | null;
   setActiveSweep: (
     methodId: string,
     paramName: string,
-    sweepType: 'range' | 'values'
+    sweepType: "range" | "values"
   ) => void;
   clearActiveSweep: () => void;
 }
@@ -22,13 +22,13 @@ export const SweepProvider: React.FC<{ children: React.ReactNode }> = ({
   const [activeSweep, setActiveSweepState] = useState<{
     methodId: string;
     paramName: string;
-    sweepType: 'range' | 'values';
+    sweepType: "range" | "values";
   } | null>(null);
 
   const setActiveSweep = (
     methodId: string,
     paramName: string,
-    sweepType: 'range' | 'values'
+    sweepType: "range" | "values"
   ) => {
     setActiveSweepState({ methodId, paramName, sweepType });
   };
@@ -49,7 +49,7 @@ export const SweepProvider: React.FC<{ children: React.ReactNode }> = ({
 export const useSweep = () => {
   const context = useContext(SweepContext);
   if (!context) {
-    throw new Error('useSweep must be used within a SweepProvider');
+    throw new Error("useSweep must be used within a SweepProvider");
   }
   return context;
 };

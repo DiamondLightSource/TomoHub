@@ -1,10 +1,10 @@
-import React from 'react';
-import { Stack, TextField } from '@mui/material';
+import React from "react";
+import { Stack, TextField } from "@mui/material";
 
 export interface SweepValues {
-  start: number | '';
-  stop: number | '';
-  step: number | '';
+  start: number | "";
+  stop: number | "";
+  step: number | "";
 }
 
 export default function ParameterSweepForm({
@@ -20,8 +20,8 @@ export default function ParameterSweepForm({
     (key: keyof SweepValues) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const raw = e.target.value;
-      const parsed = raw === '' ? '' : Number(raw);
-      onChange({ ...values, [key]: Number.isNaN(parsed) ? '' : parsed });
+      const parsed = raw === "" ? "" : Number(raw);
+      onChange({ ...values, [key]: Number.isNaN(parsed) ? "" : parsed });
     };
 
   return (
@@ -30,28 +30,28 @@ export default function ParameterSweepForm({
         label="Start"
         type="number"
         value={values.start}
-        onChange={handleNum('start')}
+        onChange={handleNum("start")}
         disabled={disabled}
         fullWidth
-        size='small'
+        size="small"
       />
       <TextField
         label="Stop"
         type="number"
         value={values.stop}
-        onChange={handleNum('stop')}
+        onChange={handleNum("stop")}
         disabled={disabled}
         fullWidth
-        size='small'
+        size="small"
       />
       <TextField
         label="Step"
         type="number"
         value={values.step}
-        onChange={handleNum('step')}
+        onChange={handleNum("step")}
         disabled={disabled}
         fullWidth
-        size='small'
+        size="small"
       />
     </Stack>
   );

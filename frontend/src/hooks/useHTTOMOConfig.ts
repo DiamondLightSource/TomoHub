@@ -1,5 +1,5 @@
-import { useLoader } from '../contexts/LoaderContext';
-import { useMethods } from '../contexts/MethodsContext';
+import { useLoader } from "../contexts/LoaderContext";
+import { useMethods } from "../contexts/MethodsContext";
 
 export const useHTTOMOConfig = () => {
   const {
@@ -20,19 +20,19 @@ export const useHTTOMOConfig = () => {
     // Helper function to recursively process objects
     const processObject = (obj: any): void => {
       for (const key in obj) {
-        if (typeof obj[key] === 'object' && obj[key] !== null) {
+        if (typeof obj[key] === "object" && obj[key] !== null) {
           if (Array.isArray(obj[key])) {
             processArray(obj[key]);
           } else {
             processObject(obj[key]);
           }
         } else if (
-          typeof obj[key] === 'string' &&
-          obj[key].includes('${') &&
-          !obj[key].includes('${{')
+          typeof obj[key] === "string" &&
+          obj[key].includes("${") &&
+          !obj[key].includes("${{")
         ) {
           // Replace ${something} with ${{something}}
-          obj[key] = obj[key].replace(/\$\{([^}]+)\}/g, '${{$1}}');
+          obj[key] = obj[key].replace(/\$\{([^}]+)\}/g, "${{$1}}");
         }
       }
     };
@@ -40,19 +40,19 @@ export const useHTTOMOConfig = () => {
     // Helper function to process arrays
     const processArray = (arr: any[]): void => {
       for (let i = 0; i < arr.length; i++) {
-        if (typeof arr[i] === 'object' && arr[i] !== null) {
+        if (typeof arr[i] === "object" && arr[i] !== null) {
           if (Array.isArray(arr[i])) {
             processArray(arr[i]);
           } else {
             processObject(arr[i]);
           }
         } else if (
-          typeof arr[i] === 'string' &&
-          arr[i].includes('${') &&
-          !arr[i].includes('${{')
+          typeof arr[i] === "string" &&
+          arr[i].includes("${") &&
+          !arr[i].includes("${{")
         ) {
           // Replace ${something} with ${{something}}
-          arr[i] = arr[i].replace(/\$\{([^}]+)\}/g, '${{$1}}');
+          arr[i] = arr[i].replace(/\$\{([^}]+)\}/g, "${{$1}}");
         }
       }
     };
@@ -60,7 +60,7 @@ export const useHTTOMOConfig = () => {
     // Start processing
     if (Array.isArray(processedData)) {
       processArray(processedData);
-    } else if (typeof processedData === 'object' && processedData !== null) {
+    } else if (typeof processedData === "object" && processedData !== null) {
       processObject(processedData);
     }
 
@@ -74,40 +74,40 @@ export const useHTTOMOConfig = () => {
     if (!isContextValid()) {
       if (
         !updatedParameters.data_path ||
-        updatedParameters.data_path.trim() === ''
+        updatedParameters.data_path.trim() === ""
       ) {
-        updatedParameters.data_path = 'auto';
-        setDataPath('auto');
+        updatedParameters.data_path = "auto";
+        setDataPath("auto");
       }
 
       if (
-        typeof updatedParameters.rotation_angles === 'string' ||
+        typeof updatedParameters.rotation_angles === "string" ||
         !updatedParameters.rotation_angles ||
         !updatedParameters.rotation_angles.data_path ||
-        updatedParameters.rotation_angles.data_path.trim() === ''
+        updatedParameters.rotation_angles.data_path.trim() === ""
       ) {
         // Fix: Set the data_path property instead of the entire rotation_angles object
-        updatedParameters.rotation_angles = { data_path: 'auto' };
-        setRotationAnglesDataPath('auto');
+        updatedParameters.rotation_angles = { data_path: "auto" };
+        setRotationAnglesDataPath("auto");
       }
 
       const hasDarks =
         updatedParameters.darks &&
         updatedParameters.darks.file &&
-        updatedParameters.darks.file.trim() !== '';
+        updatedParameters.darks.file.trim() !== "";
       const hasFlats =
         updatedParameters.flats &&
         updatedParameters.flats.file &&
-        updatedParameters.flats.file.trim() !== '';
+        updatedParameters.flats.file.trim() !== "";
 
       if (hasDarks && hasFlats) {
         delete updatedParameters.image_key_path;
       } else if (
         !updatedParameters.image_key_path ||
-        updatedParameters.image_key_path.trim() === ''
+        updatedParameters.image_key_path.trim() === ""
       ) {
-        updatedParameters.image_key_path = 'auto';
-        setImageKeyPath('auto');
+        updatedParameters.image_key_path = "auto";
+        setImageKeyPath("auto");
       }
     }
 
@@ -131,13 +131,13 @@ export const useHTTOMOConfig = () => {
         parameters: { ...method.parameters },
       };
 
-      if (method.method_name === 'rescale_to_int') {
+      if (method.method_name === "rescale_to_int") {
         acc.push({
-          method: 'calculate_stats',
-          module_path: 'httomo.methods',
+          method: "calculate_stats",
+          module_path: "httomo.methods",
           parameters: {},
-          id: 'statistics',
-          side_outputs: { glob_stats: 'glob_stats' },
+          id: "statistics",
+          side_outputs: { glob_stats: "glob_stats" },
         });
       } else {
         acc.push(transformedMethod);

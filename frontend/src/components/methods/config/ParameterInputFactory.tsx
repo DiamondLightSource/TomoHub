@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   NumericInput,
   BooleanInput,
@@ -32,13 +32,13 @@ export const ParameterInputFactory: React.FC<ParameterInputFactoryProps> = ({
   sweepProps,
 }) => {
   const getActualType = (type: string) => {
-    return type.replace('Optional[', '').replace(']', '');
+    return type.replace("Optional[", "").replace("]", "");
   };
 
   const actualType = getActualType(paramDetails.type);
 
   // Special case for center parameter
-  if (paramName === 'center') {
+  if (paramName === "center") {
     return (
       <CenterInput
         paramName={paramName}
@@ -51,7 +51,7 @@ export const ParameterInputFactory: React.FC<ParameterInputFactoryProps> = ({
   }
 
   // Handle Literal types
-  if (actualType.startsWith('Literal[')) {
+  if (actualType.startsWith("Literal[")) {
     return (
       <LiteralInput
         paramName={paramName}
@@ -65,8 +65,8 @@ export const ParameterInputFactory: React.FC<ParameterInputFactoryProps> = ({
 
   // Handle different parameter types
   switch (actualType) {
-    case 'int':
-    case 'float':
+    case "int":
+    case "float":
       return (
         <NumericInput
           paramName={paramName}
@@ -78,7 +78,7 @@ export const ParameterInputFactory: React.FC<ParameterInputFactoryProps> = ({
         />
       );
 
-    case 'bool':
+    case "bool":
       return (
         <BooleanInput
           paramName={paramName}
@@ -89,7 +89,7 @@ export const ParameterInputFactory: React.FC<ParameterInputFactoryProps> = ({
         />
       );
 
-    case 'tuple[float, float, float, int]':
+    case "tuple[float, float, float, int]":
       return (
         <TupleInput
           paramName={paramName}
@@ -100,10 +100,10 @@ export const ParameterInputFactory: React.FC<ParameterInputFactoryProps> = ({
         />
       );
 
-    case 'str':
-    case 'list':
-    case 'Union[float, str, NoneType]':
-    case 'ndarray':
+    case "str":
+    case "list":
+    case "Union[float, str, NoneType]":
+    case "ndarray":
       return (
         <TextInput
           paramName={paramName}

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { graphql, useLazyLoadQuery } from 'react-relay';
+import React, { useEffect, useState } from "react";
+import { graphql, useLazyLoadQuery } from "react-relay";
 import {
   Box,
   Typography,
@@ -7,14 +7,14 @@ import {
   CircularProgress,
   Button,
   ButtonGroup,
-} from '@mui/material';
-import { OpenInNew, Article } from '@mui/icons-material';
+} from "@mui/material";
+import { OpenInNew, Article } from "@mui/icons-material";
 import {
   Visit,
   visitRegex,
   regexToVisit,
-} from '@diamondlightsource/sci-react-ui';
-import { WorkflowStatusQuery as WorkflowStatusQueryType } from './__generated__/WorkflowStatusQuery.graphql';
+} from "@diamondlightsource/sci-react-ui";
+import { WorkflowStatusQuery as WorkflowStatusQueryType } from "./__generated__/WorkflowStatusQuery.graphql";
 
 const workflowStatusQuery = graphql`
   query WorkflowStatusQuery($visit: VisitInput!, $name: String!) {
@@ -109,7 +109,7 @@ const workflowStatusQuery = graphql`
 interface WorkflowStatusProps {
   workflow: string;
   visit: string;
-  onWorkflowDataChange?: (data: any) => void; 
+  onWorkflowDataChange?: (data: any) => void;
 }
 
 const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
@@ -142,72 +142,68 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
     },
     {
       fetchKey: refreshKey,
-      fetchPolicy: 'network-only',
+      fetchPolicy: "network-only",
     }
   );
 
-
-  const statusType = data?.workflow?.status?.__typename ?? 'Unknown';
+  const statusType = data?.workflow?.status?.__typename ?? "Unknown";
 
   const message =
-    data?.workflow?.status && 'message' in data.workflow.status
+    data?.workflow?.status && "message" in data.workflow.status
       ? data.workflow.status.message
       : undefined;
-
 
   // Check if status is final (no need to keep polling)
   const isFinalStatus = (status: string) => {
     return [
-      'WorkflowSucceededStatus',
-      'WorkflowFailedStatus',
-      'WorkflowErroredStatus',
+      "WorkflowSucceededStatus",
+      "WorkflowFailedStatus",
+      "WorkflowErroredStatus",
     ].includes(status);
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'WorkflowPendingStatus':
-        return 'warning';
-      case 'WorkflowRunningStatus':
-        return 'info';
-      case 'WorkflowSucceededStatus':
-        return 'success';
-      case 'WorkflowFailedStatus':
-      case 'WorkflowErroredStatus':
-        return 'error';
+      case "WorkflowPendingStatus":
+        return "warning";
+      case "WorkflowRunningStatus":
+        return "info";
+      case "WorkflowSucceededStatus":
+        return "success";
+      case "WorkflowFailedStatus":
+      case "WorkflowErroredStatus":
+        return "error";
       default:
-        return 'default';
+        return "default";
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'WorkflowPendingStatus':
-        return 'Pending';
-      case 'WorkflowRunningStatus':
-        return 'Running';
-      case 'WorkflowSucceededStatus':
-        return 'Succeeded';
-      case 'WorkflowFailedStatus':
-        return 'Failed';
-      case 'WorkflowErroredStatus':
-        return 'Error';
+      case "WorkflowPendingStatus":
+        return "Pending";
+      case "WorkflowRunningStatus":
+        return "Running";
+      case "WorkflowSucceededStatus":
+        return "Succeeded";
+      case "WorkflowFailedStatus":
+        return "Failed";
+      case "WorkflowErroredStatus":
+        return "Error";
       default:
-        return 'Unknown';
+        return "Unknown";
     }
   };
 
-  
   const getLogArtifacts = () => {
-  
-    if (!data?.workflow?.status || !('tasks' in data.workflow.status)) {
+    if (!data?.workflow?.status || !("tasks" in data.workflow.status)) {
       return [];
     }
 
     const finalStatuses = [
-      'WorkflowSucceededStatus',
-      'WorkflowFailedStatus',
-      'WorkflowErroredStatus',
+      "WorkflowSucceededStatus",
+      "WorkflowFailedStatus",
+      "WorkflowErroredStatus",
     ];
     if (!finalStatuses.includes(statusType)) {
       return [];
@@ -216,12 +212,12 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
     const tasks = (data.workflow.status as any).tasks || [];
 
     return tasks
-      .filter((task: any) => task.stepType === 'Pod') 
+      .filter((task: any) => task.stepType === "Pod")
       .map((task: any) => {
         // Find main.log artifact
         const logArtifact = task.artifacts?.find(
           (artifact: any) =>
-            artifact.name === 'main.log' && artifact.mimeType === 'text/plain'
+            artifact.name === "main.log" && artifact.mimeType === "text/plain"
         );
 
         return logArtifact
@@ -245,7 +241,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
     }
 
     const interval = setInterval(() => {
-      setRefreshKey(prev => prev + 1);
+      setRefreshKey((prev) => prev + 1);
     }, 2000);
 
     return () => clearInterval(interval);
@@ -269,19 +265,19 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
     <Box
       sx={{
         border: 1,
-        borderColor: 'grey.300',
+        borderColor: "grey.300",
         borderRadius: 1,
         p: 2,
         mt: 2,
-        backgroundColor: 'grey.50',
+        backgroundColor: "grey.50",
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
         <Typography variant="h6">Workflow Status</Typography>
         {isPolling && <CircularProgress size={16} />}
       </Box>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
         <Typography variant="body2" color="text.secondary">
           Workflow:
         </Typography>
@@ -292,13 +288,13 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
 
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
           mb: 1,
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Typography variant="body2" color="text.secondary">
             Status:
           </Typography>
@@ -310,7 +306,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
         </Box>
 
         {logArtifacts.length > 0 && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Typography variant="body2" color="text.secondary">
               Logs:
             </Typography>
@@ -320,11 +316,11 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
                   key={index}
                   startIcon={<Article />}
                   endIcon={<OpenInNew />}
-                  onClick={() => window.open(artifact.url, '_blank')}
+                  onClick={() => window.open(artifact.url, "_blank")}
                   sx={{
-                    textTransform: 'none',
-                    fontSize: '0.75rem',
-                    minWidth: 'auto',
+                    textTransform: "none",
+                    fontSize: "0.75rem",
+                    minWidth: "auto",
                     px: 1,
                   }}
                 >
@@ -337,7 +333,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
       </Box>
 
       {message && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Typography variant="body2" color="text.secondary">
             Message:
           </Typography>
@@ -349,7 +345,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
         <Typography
           variant="caption"
           color="text.secondary"
-          sx={{ mt: 1, display: 'block' }}
+          sx={{ mt: 1, display: "block" }}
         >
           Refreshing every 2 seconds...
         </Typography>

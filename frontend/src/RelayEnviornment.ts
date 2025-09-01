@@ -4,10 +4,10 @@ import {
   RecordSource,
   Store,
   FetchFunction,
-} from 'relay-runtime';
-import keycloak from './keycloak';
+} from "relay-runtime";
+import keycloak from "./keycloak";
 
-const HTTP_ENDPOINT = 'https://workflows.diamond.ac.uk/graphql';
+const HTTP_ENDPOINT = "https://workflows.diamond.ac.uk/graphql";
 
 const fetchFn: FetchFunction = async (request, variables) => {
   // Refresh token if needed (minValidity in seconds)
@@ -17,12 +17,12 @@ const fetchFn: FetchFunction = async (request, variables) => {
 
   if (keycloak.token) {
     const resp = await fetch(HTTP_ENDPOINT, {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${keycloak.token}`,
         Accept:
-          'application/graphql-response+json; charset=utf-8, application/json; charset=utf-8',
-        'Content-Type': 'application/json',
+          "application/graphql-response+json; charset=utf-8, application/json; charset=utf-8",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         query: request.text,
@@ -32,7 +32,7 @@ const fetchFn: FetchFunction = async (request, variables) => {
 
     return await resp.json();
   } else {
-    console.log('Not authenticated yet');
+    console.log("Not authenticated yet");
     return {};
   }
 };

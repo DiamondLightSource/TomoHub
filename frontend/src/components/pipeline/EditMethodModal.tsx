@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -11,11 +11,11 @@ import {
   Box,
   Alert,
   IconButton,
-} from '@mui/material';
-import { methodsService } from '../../api/services';
-import { ParameterInputFactory } from '../methods/config/ParameterInputFactory';
-import { Method } from '../../contexts/MethodsContext';
-import InfoIcon from '@mui/icons-material/Info';
+} from "@mui/material";
+import { methodsService } from "../../api/services";
+import { ParameterInputFactory } from "../methods/config/ParameterInputFactory";
+import { Method } from "../../contexts/MethodsContext";
+import InfoIcon from "@mui/icons-material/Info";
 
 interface EditMethodModalProps {
   open: boolean;
@@ -29,11 +29,14 @@ interface MethodSchema {
   module_path: string;
   method_desc: string;
   method_doc: string;
-  parameters: Record<string, {
-    type: string;
-    value: any;
-    desc: string;
-  }>;
+  parameters: Record<
+    string,
+    {
+      type: string;
+      value: any;
+      desc: string;
+    }
+  >;
 }
 
 export const EditMethodModal: React.FC<EditMethodModalProps> = ({
@@ -45,7 +48,9 @@ export const EditMethodModal: React.FC<EditMethodModalProps> = ({
   const [methodSchema, setMethodSchema] = useState<MethodSchema | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [parameterValues, setParameterValues] = useState<Record<string, any>>({});
+  const [parameterValues, setParameterValues] = useState<Record<string, any>>(
+    {}
+  );
 
   useEffect(() => {
     if (open && method) {
@@ -60,52 +65,55 @@ export const EditMethodModal: React.FC<EditMethodModalProps> = ({
     setError(null);
 
     try {
-        const [
-          denoise,
-          saving,
-          segmentation,
-          morphological,
-          stripe,
-          distortion,
-          normalization,
-          phaseRetrieval,
-          rotation,
-          reconstruction
-        ] = await Promise.all([
-          methodsService.getImageDenoiseArtifactRemoval(),
-          methodsService.getImageSavingMethods(),
-          methodsService.getSegmentationMethods(),
-          methodsService.getMorphologicalMethods(),
-          methodsService.getStripeRemovalMethods(),
-          methodsService.getDistortionCorrectionMethods(),
-          methodsService.getNormalizationMethods(),
-          methodsService.getPhaseRetrievalMethods(),
-          methodsService.getCORmethods(),
-          methodsService.getReconstructionMethods(),
-        ]);
-  
-        // Combine all responses
-        const allMethodsResponse = {
-          ...denoise,
-          ...saving,
-          ...segmentation,
-          ...morphological,
-          ...stripe,
-          ...distortion,
-          ...normalization,
-          ...phaseRetrieval,
-          ...rotation,
-          ...reconstruction,
-        };
-  
+      const [
+        denoise,
+        saving,
+        segmentation,
+        morphological,
+        stripe,
+        distortion,
+        normalization,
+        phaseRetrieval,
+        rotation,
+        reconstruction,
+      ] = await Promise.all([
+        methodsService.getImageDenoiseArtifactRemoval(),
+        methodsService.getImageSavingMethods(),
+        methodsService.getSegmentationMethods(),
+        methodsService.getMorphologicalMethods(),
+        methodsService.getStripeRemovalMethods(),
+        methodsService.getDistortionCorrectionMethods(),
+        methodsService.getNormalizationMethods(),
+        methodsService.getPhaseRetrievalMethods(),
+        methodsService.getCORmethods(),
+        methodsService.getReconstructionMethods(),
+      ]);
+
+      // Combine all responses
+      const allMethodsResponse = {
+        ...denoise,
+        ...saving,
+        ...segmentation,
+        ...morphological,
+        ...stripe,
+        ...distortion,
+        ...normalization,
+        ...phaseRetrieval,
+        ...rotation,
+        ...reconstruction,
+      };
+
       // Find the method schema by matching module_path and method_name
       let foundSchema: MethodSchema | null = null as MethodSchema | null;
-      
-        // Type assertion to handle the response structure
-      const methodsData = allMethodsResponse as Record<string, Record<string, any>>;
-      
+
+      // Type assertion to handle the response structure
+      const methodsData = allMethodsResponse as Record<
+        string,
+        Record<string, any>
+      >;
+
       Object.entries(methodsData).forEach(([modulePath, methods]) => {
-        if (methods && typeof methods === 'object') {
+        if (methods && typeof methods === "object") {
           Object.entries(methods).forEach(([methodName, schema]) => {
             if (
               methodName === method.method_name &&
@@ -114,25 +122,30 @@ export const EditMethodModal: React.FC<EditMethodModalProps> = ({
               foundSchema = schema as MethodSchema;
             }
           });
-        } 
+        }
       });
 
       if (!foundSchema) {
-        throw new Error(`Method ${method.method_name} not found in API response`);
+        throw new Error(
+          `Method ${method.method_name} not found in API response`
+        );
       }
 
       setMethodSchema(foundSchema);
 
       // Initialize parameter values with current method values
       const initialValues: Record<string, any> = {};
-      
+
       // Add type assertion for foundSchema.parameters
-      const schemaParameters = foundSchema.parameters as Record<string, {
-        type: string;
-        value: any;
-        desc: string;
-      }>;
-      
+      const schemaParameters = foundSchema.parameters as Record<
+        string,
+        {
+          type: string;
+          value: any;
+          desc: string;
+        }
+      >;
+
       Object.entries(schemaParameters).forEach(([paramName, paramSchema]) => {
         // Use current method value if it exists, otherwise use schema default
         if (method.parameters && method.parameters[paramName] !== undefined) {
@@ -140,9 +153,12 @@ export const EditMethodModal: React.FC<EditMethodModalProps> = ({
           const currentParam = method.parameters[paramName];
           // Check if currentParam has a 'value' property (parameter object structure)
           // or if it's just the raw value
-          initialValues[paramName] = (currentParam && typeof currentParam === 'object' && 'value' in currentParam) 
-            ? currentParam.value 
-            : currentParam;
+          initialValues[paramName] =
+            currentParam &&
+            typeof currentParam === "object" &&
+            "value" in currentParam
+              ? currentParam.value
+              : currentParam;
         } else {
           initialValues[paramName] = paramSchema.value;
         }
@@ -150,15 +166,17 @@ export const EditMethodModal: React.FC<EditMethodModalProps> = ({
 
       setParameterValues(initialValues);
     } catch (err) {
-      console.error('Error fetching method schema:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch method schema');
+      console.error("Error fetching method schema:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch method schema"
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleParameterChange = (paramName: string, value: any) => {
-    setParameterValues(prev => ({
+    setParameterValues((prev) => ({
       ...prev,
       [paramName]: value,
     }));
@@ -190,16 +208,16 @@ export const EditMethodModal: React.FC<EditMethodModalProps> = ({
       maxWidth="md"
       fullWidth
       PaperProps={{
-        sx: { minHeight: '60vh', maxHeight: '80vh' }
+        sx: { minHeight: "60vh", maxHeight: "80vh" },
       }}
     >
       <DialogTitle>
         <Typography variant="h6" component="div">
           Edit Method: {method.method_name}
           {methodSchema && methodSchema.method_doc && (
-            <IconButton 
-              size="small" 
-              href={methodSchema.method_doc} 
+            <IconButton
+              size="small"
+              href={methodSchema.method_doc}
               target="_blank"
               sx={{ ml: 1 }}
             >
@@ -214,7 +232,12 @@ export const EditMethodModal: React.FC<EditMethodModalProps> = ({
 
       <DialogContent dividers>
         {loading && (
-          <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            minHeight="200px"
+          >
             <CircularProgress />
           </Box>
         )}
@@ -228,23 +251,27 @@ export const EditMethodModal: React.FC<EditMethodModalProps> = ({
         {methodSchema && !loading && (
           <Box>
             {methodSchema.method_desc && (
-              <Typography variant="body2" sx={{ mb: 3, fontStyle: 'italic' }}>
+              <Typography variant="body2" sx={{ mb: 3, fontStyle: "italic" }}>
                 {methodSchema.method_desc}
               </Typography>
             )}
 
             <Grid container spacing={2}>
-              {Object.entries(methodSchema.parameters).map(([paramName, paramDetails]) => (
-                <Grid item xs={12} sm={6} key={paramName}>
-                  <ParameterInputFactory
-                    paramName={paramName}
-                    paramDetails={paramDetails}
-                    value={parameterValues[paramName]}
-                    isEnabled={true}
-                    onChange={(value) => handleParameterChange(paramName, value)}
-                  />
-                </Grid>
-              ))}
+              {Object.entries(methodSchema.parameters).map(
+                ([paramName, paramDetails]) => (
+                  <Grid item xs={12} sm={6} key={paramName}>
+                    <ParameterInputFactory
+                      paramName={paramName}
+                      paramDetails={paramDetails}
+                      value={parameterValues[paramName]}
+                      isEnabled={true}
+                      onChange={(value) =>
+                        handleParameterChange(paramName, value)
+                      }
+                    />
+                  </Grid>
+                )
+              )}
             </Grid>
           </Box>
         )}
@@ -254,9 +281,9 @@ export const EditMethodModal: React.FC<EditMethodModalProps> = ({
         <Button onClick={handleCancel} color="secondary">
           Cancel
         </Button>
-        <Button 
-          onClick={handleSave} 
-          variant="contained" 
+        <Button
+          onClick={handleSave}
+          variant="contained"
           color="primary"
           disabled={loading || !!error}
         >

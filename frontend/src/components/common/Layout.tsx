@@ -1,56 +1,56 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
-import Pipeline from '../pipeline/Pipeline';
-import { MethodsProvider } from '../../contexts/MethodsContext';
-import { SweepProvider } from '../../contexts/SweepContext';
-import { LoaderProvider } from '../../contexts/LoaderContext';
-import { CenterProvider } from '../../contexts/CenterContext';
-import { Box, CssBaseline, Paper, styled } from '@mui/material';
-import Header from './Header';
-import { Footer, Navbar, User } from '@diamondlightsource/sci-react-ui';
-import keycloak from '../../keycloak';
+import React from "react";
+import { Outlet } from "react-router-dom";
+import Pipeline from "../pipeline/Pipeline";
+import { MethodsProvider } from "../../contexts/MethodsContext";
+import { SweepProvider } from "../../contexts/SweepContext";
+import { LoaderProvider } from "../../contexts/LoaderContext";
+import { CenterProvider } from "../../contexts/CenterContext";
+import { Box, CssBaseline, Paper, styled } from "@mui/material";
+import Header from "./Header";
+import { Footer, Navbar, User } from "@diamondlightsource/sci-react-ui";
+import keycloak from "../../keycloak";
 
 const LeftSection = styled(Box)({
-  display: 'flex',
-  flexDirection: 'column',
+  display: "flex",
+  flexDirection: "column",
 });
 
 const RightSection = styled(Paper)({
-  display: 'flex',
-  justifyContent: 'center',
-  flexDirection: 'column',
-  boxShadow: 'none',
+  display: "flex",
+  justifyContent: "center",
+  flexDirection: "column",
+  boxShadow: "none",
 });
 
 const AppContainer = styled(Box)({
-  display: 'flex',
-  flexDirection: 'column',
-  minHeight: '100vh',
-  alignItems: 'center',
-  backgroundColor: '#fff',
-  overflowX: 'hidden',
+  display: "flex",
+  flexDirection: "column",
+  minHeight: "100vh",
+  alignItems: "center",
+  backgroundColor: "#fff",
+  overflowX: "hidden",
 });
 
 const MainContainer = styled(Box)({
-  display: 'grid',
-  gridTemplateColumns: '900px auto',
-  gap: '30px',
-  padding: '20px',
+  display: "grid",
+  gridTemplateColumns: "900px auto",
+  gap: "30px",
+  padding: "20px",
   flex: 1,
-  alignItems: 'flex-start',
-  margin: '30px auto',
+  alignItems: "flex-start",
+  margin: "30px auto",
 });
 
 const Layout = () => {
   // Determine the username to display
-  let username = 'Guest User';
+  let username = "Guest User";
 
   if (keycloak.authenticated && keycloak.tokenParsed) {
     username =
       keycloak.tokenParsed.preferred_username ||
       keycloak.tokenParsed.name ||
       keycloak.tokenParsed.email ||
-      'Authenticated User';
+      "Authenticated User";
   }
 
   // Handle logout
@@ -93,10 +93,10 @@ const Layout = () => {
                   copyright=""
                   logo="theme"
                   style={{
-                    width: '100%',
-                    backgroundColor: '#4C5266',
-                    display: 'flex',
-                    justifyContent: 'center',
+                    width: "100%",
+                    backgroundColor: "#4C5266",
+                    display: "flex",
+                    justifyContent: "center",
                   }}
                 ></Footer>
               </AppContainer>

@@ -1,5 +1,5 @@
-import { useFragment } from 'react-relay';
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import { useFragment } from "react-relay";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import {
   Alert,
   Divider,
@@ -7,23 +7,25 @@ import {
   Stack,
   Typography,
   useTheme,
-} from '@mui/material';
-import { JSONObject, Visit } from 'workflows-lib';
-import { VisitInput, visitToText } from '@diamondlightsource/sci-react-ui';
-import Loader from '../../loader/Loader';
-import { useLoader } from '../../../contexts/LoaderContext';
-import { SubmissionFormSharedFragment$key } from '../__generated__/SubmissionFormSharedFragment.graphql';
-import { sharedFragment } from '../Submission';
-import WorkflowStatus from '../WorkflowStatus';
-import SweepResultViewer from './SweepResultViewer';
-import ParameterSweepForm, {
-  SweepValues,
-} from './ParameterSweepForm';
+} from "@mui/material";
+import { JSONObject, Visit } from "workflows-lib";
+import { VisitInput, visitToText } from "@diamondlightsource/sci-react-ui";
+import Loader from "../../loader/Loader";
+import { useLoader } from "../../../contexts/LoaderContext";
+import { SubmissionFormSharedFragment$key } from "../__generated__/SubmissionFormSharedFragment.graphql";
+import { sharedFragment } from "../Submission";
+import WorkflowStatus from "../WorkflowStatus";
+import SweepResultViewer from "./SweepResultViewer";
+import ParameterSweepForm, { SweepValues } from "./ParameterSweepForm";
 import WorkflowParametersForm, {
   WorkflowParamsValues,
-} from '../WorkflowParametersForm';
-import { buildAjv, validateWithDefaults, formatAjvErrors } from '../utils/schemaValidation';
-import { ErrorObject } from 'ajv';
+} from "../WorkflowParametersForm";
+import {
+  buildAjv,
+  validateWithDefaults,
+  formatAjvErrors,
+} from "../utils/schemaValidation";
+import { ErrorObject } from "ajv";
 
 const SubmissionFormCOR = (props: {
   template: SubmissionFormSharedFragment$key;
@@ -60,31 +62,31 @@ const SubmissionFormCOR = (props: {
   const sweepValues = useMemo<SweepValues>(() => {
     // keep empty-string while typing; numbers are coerced by AJV at submit
     return {
-      start: (parameters as any)?.start ?? '',
-      stop: (parameters as any)?.stop ?? '',
-      step: (parameters as any)?.step ?? '',
+      start: (parameters as any)?.start ?? "",
+      stop: (parameters as any)?.stop ?? "",
+      step: (parameters as any)?.step ?? "",
     };
   }, [parameters]);
 
   const wfValues = useMemo<WorkflowParamsValues>(() => {
     return {
-      input: (parameters as any)?.input ?? '',
-      output: (parameters as any)?.output ?? '',
+      input: (parameters as any)?.input ?? "",
+      output: (parameters as any)?.output ?? "",
       nprocs: (parameters as any)?.nprocs ?? 1,
-      memory: (parameters as any)?.memory ?? '20Gi',
+      memory: (parameters as any)?.memory ?? "20Gi",
       httomo_outdir_name:
-        (parameters as any)?.httomo_outdir_name ?? 'sweep-run',
+        (parameters as any)?.httomo_outdir_name ?? "sweep-run",
     };
   }, [parameters]);
 
   const setSweepValues = useCallback(
     (next: SweepValues) =>
-      setParameters(prev => ({ ...prev, ...next }) as JSONObject),
+      setParameters((prev) => ({ ...prev, ...next }) as JSONObject),
     []
   );
   const setWfValues = useCallback(
     (next: WorkflowParamsValues) =>
-      setParameters(prev => ({ ...prev, ...next }) as JSONObject),
+      setParameters((prev) => ({ ...prev, ...next }) as JSONObject),
     []
   );
 
@@ -114,15 +116,18 @@ const SubmissionFormCOR = (props: {
     let updatedLoaderParams = { ...loaderParams };
 
     if (!isContextValid()) {
-      if (!updatedLoaderParams.data_path || updatedLoaderParams.data_path.trim() === '') {
+      if (
+        !updatedLoaderParams.data_path ||
+        updatedLoaderParams.data_path.trim() === ""
+      ) {
         updatedLoaderParams.data_path = null;
       }
       if (
-        typeof updatedLoaderParams.rotation_angles === 'string' ||
+        typeof updatedLoaderParams.rotation_angles === "string" ||
         !updatedLoaderParams.rotation_angles ||
         !updatedLoaderParams.rotation_angles.data_path ||
-        updatedLoaderParams.rotation_angles.data_path.trim() === '' ||
-        updatedLoaderParams.rotation_angles.data_path === 'auto'
+        updatedLoaderParams.rotation_angles.data_path.trim() === "" ||
+        updatedLoaderParams.rotation_angles.data_path === "auto"
       ) {
         updatedLoaderParams.rotation_angles = { data_path: null };
       }
@@ -130,18 +135,18 @@ const SubmissionFormCOR = (props: {
       const hasDarks =
         updatedLoaderParams.darks &&
         updatedLoaderParams.darks.file &&
-        updatedLoaderParams.darks.file.trim() !== '';
+        updatedLoaderParams.darks.file.trim() !== "";
       const hasFlats =
         updatedLoaderParams.flats &&
         updatedLoaderParams.flats.file &&
-        updatedLoaderParams.flats.file.trim() !== '';
+        updatedLoaderParams.flats.file.trim() !== "";
 
       if (hasDarks && hasFlats) {
         delete updatedLoaderParams.image_key_path;
       } else if (
         !updatedLoaderParams.image_key_path ||
-        updatedLoaderParams.image_key_path.trim() === '' ||
-        updatedLoaderParams.image_key_path === 'auto'
+        updatedLoaderParams.image_key_path.trim() === "" ||
+        updatedLoaderParams.image_key_path === "auto"
       ) {
         updatedLoaderParams.image_key_path = null;
       }
@@ -154,18 +159,18 @@ const SubmissionFormCOR = (props: {
         parameters: updatedLoaderParams,
       },
       {
-        method: 'normalize',
-        module_path: 'tomopy.prep.normalize',
-        parameters: { cutoff: null, averaging: 'mean' },
+        method: "normalize",
+        module_path: "tomopy.prep.normalize",
+        parameters: { cutoff: null, averaging: "mean" },
       },
       {
-        method: 'minus_log',
-        module_path: 'tomopy.prep.normalize',
+        method: "minus_log",
+        module_path: "tomopy.prep.normalize",
         parameters: {},
       },
       {
-        method: 'recon',
-        module_path: 'tomopy.recon.algorithm',
+        method: "recon",
+        module_path: "tomopy.recon.algorithm",
         parameters: {
           center: {
             start: formParams.start,
@@ -173,7 +178,7 @@ const SubmissionFormCOR = (props: {
             step: formParams.step,
           },
           sinogram_order: false,
-          algorithm: 'gridrec',
+          algorithm: "gridrec",
           init_recon: null,
         },
       },
@@ -200,7 +205,8 @@ const SubmissionFormCOR = (props: {
       output: wfValues.output === "" ? null : wfValues.output,
       nprocs: wfValues.nprocs,
       memory: wfValues.memory,
-      "httomo-outdir-name": wfValues.httomo_outdir_name === "" ? null : wfValues.httomo_outdir_name,
+      "httomo-outdir-name":
+        wfValues.httomo_outdir_name === "" ? null : wfValues.httomo_outdir_name,
     };
 
     // Validate against schema
@@ -213,7 +219,7 @@ const SubmissionFormCOR = (props: {
     // Build final submission payload (config as string)
     const finalParams = {
       ...validationObject,
-      config: JSON.stringify(configArray)
+      config: JSON.stringify(configArray),
     };
 
     // Submit
@@ -224,14 +230,17 @@ const SubmissionFormCOR = (props: {
     });
   };
 
-
   const handleCloseSnackbar = () => setSubmitted(false);
 
   const formWidth =
-    (data.uiSchema?.options?.formWidth as string | undefined) ?? '100%';
+    (data.uiSchema?.options?.formWidth as string | undefined) ?? "100%";
 
   return (
-    <Stack direction="column" spacing={theme.spacing(2)} sx={{ width: formWidth }}>
+    <Stack
+      direction="column"
+      spacing={theme.spacing(2)}
+      sx={{ width: formWidth }}
+    >
       <Typography variant="h4" align="center">
         Workflow: {data.title ? data.title : data.name}
       </Typography>
@@ -247,7 +256,9 @@ const SubmissionFormCOR = (props: {
           <strong>Validation failed:</strong>
           <ul style={{ marginTop: 8 }}>
             {errorMessages.map((m, i) => (
-              <li key={i} style={{ marginLeft: 16 }}>{m}</li>
+              <li key={i} style={{ marginLeft: 16 }}>
+                {m}
+              </li>
             ))}
           </ul>
         </Alert>
@@ -257,7 +268,7 @@ const SubmissionFormCOR = (props: {
         <WorkflowStatus
           workflow={submittedWorkflowName}
           visit={visitToText(submittedVisit)}
-          onWorkflowDataChange={data => {
+          onWorkflowDataChange={(data) => {
             setWorkflowData(data);
           }}
         />
@@ -272,34 +283,24 @@ const SubmissionFormCOR = (props: {
         />
       )}
 
-
       {!isContextValid() && (
         <Alert severity="info">
-          Some Loader fields are empty. They will be auto-filled with default values during submission.
+          Some Loader fields are empty. They will be auto-filled with default
+          values during submission.
         </Alert>
       )}
 
       <Divider />
 
       <Typography variant="h6">Parameter Sweep Configuration</Typography>
-      <ParameterSweepForm
-        values={sweepValues}
-        onChange={setSweepValues}
-      />
+      <ParameterSweepForm values={sweepValues} onChange={setSweepValues} />
 
       <Typography variant="h6" sx={{ mt: 2 }}>
         Workflow Parameterss
       </Typography>
-      <WorkflowParametersForm
-        values={wfValues}
-        onChange={setWfValues}
-      />
-
-
-
+      <WorkflowParametersForm values={wfValues} onChange={setWfValues} />
 
       <Divider />
-
 
       <VisitInput
         visit={props.visit}

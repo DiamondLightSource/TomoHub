@@ -1,5 +1,5 @@
-import React from 'react';
-import { FormControl, FormControlLabel, Switch, Tooltip } from '@mui/material';
+import React from "react";
+import { FormControl, FormControlLabel, Switch, Tooltip } from "@mui/material";
 
 interface BooleanInputProps {
   paramName: string;
@@ -22,7 +22,7 @@ const BooleanInput: React.FC<BooleanInputProps> = ({
 
   return (
     <Tooltip title={paramDetails.desc} placement="top-start">
-      <FormControl sx={{ display: 'flex', justifyContent: 'center' }}>
+      <FormControl sx={{ display: "flex", justifyContent: "center" }}>
         <FormControlLabel
           control={
             <Switch

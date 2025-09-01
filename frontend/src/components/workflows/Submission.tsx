@@ -1,21 +1,21 @@
-import { useState } from 'react';
-import { useLazyLoadQuery, useMutation } from 'react-relay/hooks';
-import { graphql } from 'relay-runtime';
-import { Box } from '@mui/material';
-import{
+import { useState } from "react";
+import { useLazyLoadQuery, useMutation } from "react-relay/hooks";
+import { graphql } from "relay-runtime";
+import { Box } from "@mui/material";
+import {
   JSONObject,
   SubmissionGraphQLErrorMessage,
   SubmissionNetworkErrorMessage,
   SubmissionSuccessMessage,
   SubmittedMessagesList,
   Visit,
-} from 'workflows-lib';
-import { visitToText } from '@diamondlightsource/sci-react-ui';
-import SubmissionFormGPURun from './SubmissionFormGPURun';
-import SubmissionFormCOR from './sweepPipeline/SubmissionFormCOR';
-import { SubmissionQuery as SubmissionQueryType } from './__generated__/SubmissionQuery.graphql';
-import { SubmissionMutation as SubmissionMutationType } from './__generated__/SubmissionMutation.graphql';
-import React from "react"
+} from "workflows-lib";
+import { visitToText } from "@diamondlightsource/sci-react-ui";
+import SubmissionFormGPURun from "./SubmissionFormGPURun";
+import SubmissionFormCOR from "./sweepPipeline/SubmissionFormCOR";
+import { SubmissionQuery as SubmissionQueryType } from "./__generated__/SubmissionQuery.graphql";
+import { SubmissionMutation as SubmissionMutationType } from "./__generated__/SubmissionMutation.graphql";
+import React from "react";
 
 const submissionQuery = graphql`
   query SubmissionQuery($name: String!) {
@@ -102,10 +102,10 @@ export default function Submission({
       },
       onCompleted: (response, errors) => {
         if (errors?.length) {
-          console.error('GraphQL errors:', errors);
-          setSubmissionResults(prev => [
+          console.error("GraphQL errors:", errors);
+          setSubmissionResults((prev) => [
             {
-              type: 'graphQLError',
+              type: "graphQLError",
               errors: errors,
             },
             ...prev,
@@ -113,9 +113,9 @@ export default function Submission({
         } else {
           const submittedName = response.submitWorkflowTemplate.name;
           setVisit(visit);
-          setSubmissionResults(prev => [
+          setSubmissionResults((prev) => [
             {
-              type: 'success',
+              type: "success",
               message: `${visitToText(visit)}/${submittedName}`,
             },
             ...prev,
@@ -125,15 +125,15 @@ export default function Submission({
           if (onSuccess) {
             onSuccess(submittedName);
           } else {
-            console.log('No onSuccess callback provided');
+            console.log("No onSuccess callback provided");
           }
         }
       },
-      onError: err => {
-        console.error('Submission failed:', err);
-        setSubmissionResults(prev => [
+      onError: (err) => {
+        console.error("Submission failed:", err);
+        setSubmissionResults((prev) => [
           {
-            type: 'networkError',
+            type: "networkError",
             error: err,
           },
           ...prev,
@@ -151,7 +151,7 @@ export default function Submission({
     };
 
     switch (workflowName) {
-      case 'httomo-cor-sweep':
+      case "httomo-cor-sweep":
         return <SubmissionFormCOR {...commonProps} />;
       default:
         return <SubmissionFormGPURun {...commonProps} />;

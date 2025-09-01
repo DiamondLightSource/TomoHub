@@ -1,8 +1,8 @@
-import React from 'react';
-import { TextField, Tooltip, InputAdornment, IconButton } from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
-import ClearIcon from '@mui/icons-material/Clear';
-import { useParameterValidation } from '../../../../hooks/useParameterValidation';
+import React from "react";
+import { TextField, Tooltip, InputAdornment, IconButton } from "@mui/material";
+import SettingsIcon from "@mui/icons-material/Settings";
+import ClearIcon from "@mui/icons-material/Clear";
+import { useParameterValidation } from "../../../../hooks/useParameterValidation";
 
 interface NumericInputProps {
   paramName: string;
@@ -45,19 +45,19 @@ const NumericInput: React.FC<NumericInputProps> = ({
 
   return (
     <Tooltip
-      title={`${paramDetails.type} - default: ${paramDetails.value ?? 'None'}`}
+      title={`${paramDetails.type} - default: ${paramDetails.value ?? "None"}`}
       placement="top-start"
     >
       <TextField
         label={paramName}
         type="text"
-        value={isSweepActive ? sweepDisplayText : (value ?? '')}
+        value={isSweepActive ? sweepDisplayText : (value ?? "")}
         onChange={handleInputChange}
         variant="outlined"
         disabled={
           !isEnabled ||
           isSweepActive ||
-          (typeof value === 'string' && paramName === 'axis')
+          (typeof value === "string" && paramName === "axis")
         }
         size="small"
         fullWidth

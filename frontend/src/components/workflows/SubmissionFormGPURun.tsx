@@ -1,11 +1,11 @@
-import { useFragment, graphql } from 'react-relay';
+import { useFragment, graphql } from "react-relay";
 import {
   materialCells,
   materialRenderers,
-} from '@jsonforms/material-renderers';
-import { UISchemaElement, createAjv } from '@jsonforms/core';
-import { JsonForms } from '@jsonforms/react';
-import { useState } from 'react';
+} from "@jsonforms/material-renderers";
+import { UISchemaElement, createAjv } from "@jsonforms/core";
+import { JsonForms } from "@jsonforms/react";
+import { useState } from "react";
 import {
   Divider,
   Snackbar,
@@ -13,18 +13,18 @@ import {
   Typography,
   useTheme,
   Alert,
-} from '@mui/material';
-import { ErrorObject } from 'ajv';
-import { JSONObject, Visit } from 'workflows-lib';
-import { VisitInput, visitToText } from '@diamondlightsource/sci-react-ui';
-import { SubmissionFormSharedFragment$key } from './__generated__/SubmissionFormSharedFragment.graphql';
-import Loader from '../loader/Loader';
-import { useLoader } from '../../contexts/LoaderContext';
-import { useMethods } from '../../contexts/MethodsContext';
-import { sharedFragment } from './Submission';
-import WorkflowStatus from './WorkflowStatus';
-import { useHTTOMOConfig } from '../../hooks/useHTTOMOConfig';
-import React from "react"
+} from "@mui/material";
+import { ErrorObject } from "ajv";
+import { JSONObject, Visit } from "workflows-lib";
+import { VisitInput, visitToText } from "@diamondlightsource/sci-react-ui";
+import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionFormSharedFragment.graphql";
+import Loader from "../loader/Loader";
+import { useLoader } from "../../contexts/LoaderContext";
+import { useMethods } from "../../contexts/MethodsContext";
+import { sharedFragment } from "./Submission";
+import WorkflowStatus from "./WorkflowStatus";
+import { useHTTOMOConfig } from "../../hooks/useHTTOMOConfig";
+import React from "react";
 
 const SubmissionFormGPURun = (props: {
   template: SubmissionFormSharedFragment$key;
@@ -53,31 +53,31 @@ const SubmissionFormGPURun = (props: {
     useHTTOMOConfig();
 
   const customSchema = {
-    type: 'object',
+    type: "object",
     properties: {
-      input: { type: 'string', title: 'Input Path' },
-      output: { type: 'string', title: 'Output Path' },
-      nprocs: { type: 'string', default: '1', title: 'Number of Processes' },
-      memory: { type: 'string', default: '20Gi', title: 'Memory' },
+      input: { type: "string", title: "Input Path" },
+      output: { type: "string", title: "Output Path" },
+      nprocs: { type: "string", default: "1", title: "Number of Processes" },
+      memory: { type: "string", default: "20Gi", title: "Memory" },
     },
-    required: ['input', 'output', 'nprocs', 'memory'],
+    required: ["input", "output", "nprocs", "memory"],
   };
 
   const customUISchema: UISchemaElement = {
-    type: 'VerticalLayout',
+    type: "VerticalLayout",
     elements: [
       {
-        type: 'HorizontalLayout',
+        type: "HorizontalLayout",
         elements: [
-          { type: 'Control', scope: '#/properties/input' },
-          { type: 'Control', scope: '#/properties/output' },
+          { type: "Control", scope: "#/properties/input" },
+          { type: "Control", scope: "#/properties/output" },
         ],
       },
       {
-        type: 'HorizontalLayout',
+        type: "HorizontalLayout",
         elements: [
-          { type: 'Control', scope: '#/properties/nprocs' },
-          { type: 'Control', scope: '#/properties/memory' },
+          { type: "Control", scope: "#/properties/nprocs" },
+          { type: "Control", scope: "#/properties/memory" },
         ],
       },
     ],
@@ -102,7 +102,7 @@ const SubmissionFormGPURun = (props: {
     if (errors.length === 0) {
       const configJSON = generateConfigJSON();
 
-      console.log('Generated config JSON for httomo-gpu-job:', configJSON);
+      console.log("Generated config JSON for httomo-gpu-job:", configJSON);
 
       const finalParams = {
         config: configJSON,
@@ -113,7 +113,7 @@ const SubmissionFormGPURun = (props: {
       };
 
       props.onSubmit(visit, finalParams, (workflowName: string) => {
-        console.log('SUCCESS CALLBACK RECEIVED:', workflowName);
+        console.log("SUCCESS CALLBACK RECEIVED:", workflowName);
         setSubmittedWorkflowName(workflowName);
         setSubmittedVisit(visit); // Capture the visit from the form
       });
@@ -127,7 +127,7 @@ const SubmissionFormGPURun = (props: {
   };
 
   const formWidth =
-    (data.uiSchema?.options?.formWidth as string | undefined) ?? '100%';
+    (data.uiSchema?.options?.formWidth as string | undefined) ?? "100%";
 
   return (
     <Stack

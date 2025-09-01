@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useMethods } from '../../contexts/MethodsContext';
-import { MethodAccordion } from './config/MethodAccordion';
+import React, { useState, useEffect } from "react";
+import { useMethods } from "../../contexts/MethodsContext";
+import { MethodAccordion } from "./config/MethodAccordion";
 import {
   ApiMethodsSchema,
   Method,
   MethodComponentConfig,
-} from '../../types/APIresponse';
+} from "../../types/APIresponse";
 
 export function createMethodComponent({
   methodType,
@@ -26,7 +26,7 @@ export function createMethodComponent({
           );
           setMethods(methodsList);
         } catch (error) {
-          console.error('Error fetching data:', error);
+          console.error("Error fetching data:", error);
         }
       };
 
@@ -34,7 +34,7 @@ export function createMethodComponent({
     }, []);
 
     const toggleMethodExpansion = (methodName: string) => {
-      setExpandedMethod(prev => (prev === methodName ? null : methodName));
+      setExpandedMethod((prev) => (prev === methodName ? null : methodName));
     };
 
     const {
@@ -44,11 +44,11 @@ export function createMethodComponent({
       updateMethodParameter,
     } = useMethods();
     const isMethodAdded = (methodName: string) =>
-      selectedMethods.some(method => method.method_name === methodName);
+      selectedMethods.some((method) => method.method_name === methodName);
 
     const handleAddMethod = (methodName: string, methodModule: string) => {
       const methodTemplate = methods.find(
-        method => method.method_name === methodName
+        (method) => method.method_name === methodName
       );
       if (methodTemplate) {
         const defaultParams = Object.fromEntries(
@@ -62,17 +62,17 @@ export function createMethodComponent({
 
     return (
       <div>
-        {methods.map(method => (
+        {methods.map((method) => (
           <MethodAccordion
             key={method.method_name}
             method={method}
             isExpanded={expandedMethod === method.method_name}
             isMethodAdded={isMethodAdded(method.method_name)}
             currentParameters={
-              selectedMethods.find(m => m.method_name === method.method_name)
+              selectedMethods.find((m) => m.method_name === method.method_name)
                 ?.parameters ?? {}
             }
-            onExpand={expanded => {
+            onExpand={(expanded) => {
               if (expanded) {
                 toggleMethodExpansion(method.method_name);
               } else {

@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { Stack, TextField, Button, IconButton } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close'; 
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; 
+import React, { useState } from "react";
+import { Stack, TextField, Button, IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export interface WorkflowParamsValues {
   input: string;
   output: string;
   nprocs: number | string;
   memory: string;
-  httomo_outdir_name: string; 
+  httomo_outdir_name: string;
 }
 
 export default function WorkflowParametersForm({
@@ -20,42 +20,42 @@ export default function WorkflowParametersForm({
   onChange: (next: WorkflowParamsValues) => void;
   disabled?: boolean;
 }) {
-  const [showAdvanced, setShowAdvanced] = useState(false); 
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   return (
     <Stack direction="column" spacing={2}>
       <Stack direction="row" spacing={2} alignItems="center">
         <TextField
           label="Input Path"
-          value={values.input ?? ''}
-          onChange={e => onChange({ ...values, input: e.target.value })}
+          value={values.input ?? ""}
+          onChange={(e) => onChange({ ...values, input: e.target.value })}
           disabled={disabled}
           fullWidth
-          size='small'
+          size="small"
         />
         <TextField
           label="Output Path"
-          value={values.output ?? ''}
-          onChange={e => onChange({ ...values, output: e.target.value })}
+          value={values.output ?? ""}
+          onChange={(e) => onChange({ ...values, output: e.target.value })}
           disabled={disabled}
           fullWidth
-          size='small'
+          size="small"
         />
         {!showAdvanced ? (
           <Button
             variant="outlined"
-            onClick={() => setShowAdvanced(true)} 
+            onClick={() => setShowAdvanced(true)}
             data-testid="wf-advanced-toggle"
-            sx={{ flexShrink: 0, minWidth: '120px' }} 
-            startIcon={<ExpandMoreIcon />} 
+            sx={{ flexShrink: 0, minWidth: "120px" }}
+            startIcon={<ExpandMoreIcon />}
           >
             Advanced
           </Button>
         ) : (
           <IconButton
-            onClick={() => setShowAdvanced(false)} 
+            onClick={() => setShowAdvanced(false)}
             data-testid="wf-close-advanced"
-            sx={{ flexShrink: 0, minWidth: '40px' }} 
+            sx={{ flexShrink: 0, minWidth: "40px" }}
           >
             <CloseIcon />
           </IconButton>
@@ -69,33 +69,33 @@ export default function WorkflowParametersForm({
             label="Number of Processes"
             type="number"
             value={values.nprocs}
-            onChange={e =>
+            onChange={(e) =>
               onChange({
                 ...values,
-                nprocs: e.target.value === '' ? '' : Number(e.target.value),
+                nprocs: e.target.value === "" ? "" : Number(e.target.value),
               })
             }
             disabled={disabled}
             fullWidth
-            size='small'
+            size="small"
           />
           <TextField
             label="Memory"
-            value={values.memory ?? ''}
-            onChange={e => onChange({ ...values, memory: e.target.value })}
+            value={values.memory ?? ""}
+            onChange={(e) => onChange({ ...values, memory: e.target.value })}
             disabled={disabled}
             fullWidth
-            size='small'
+            size="small"
           />
           <TextField
             label="Output Directory Name"
-            value={values.httomo_outdir_name ?? ''}
-            onChange={e =>
+            value={values.httomo_outdir_name ?? ""}
+            onChange={(e) =>
               onChange({ ...values, httomo_outdir_name: e.target.value })
             }
             disabled={disabled}
             fullWidth
-            size='small'
+            size="small"
           />
         </Stack>
       )}

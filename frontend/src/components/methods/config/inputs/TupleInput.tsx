@@ -1,5 +1,5 @@
-import React from 'react';
-import { FormControl, Typography, Button, Tooltip } from '@mui/material';
+import React from "react";
+import { FormControl, Typography, Button, Tooltip } from "@mui/material";
 
 interface TupleInputProps {
   paramName: string;
@@ -30,7 +30,7 @@ const TupleInput: React.FC<TupleInputProps> = ({
       placement="top-start"
     >
       <FormControl
-        sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
       >
         <Typography gutterBottom>{paramName}</Typography>
         <Button
@@ -39,13 +39,13 @@ const TupleInput: React.FC<TupleInputProps> = ({
           fullWidth
           disabled={!isEnabled}
           sx={{
-            backgroundColor: value !== null ? 'primary.main' : 'grey.500',
-            '&:hover': {
-              backgroundColor: value !== null ? 'primary.dark' : 'grey.600',
+            backgroundColor: value !== null ? "primary.main" : "grey.500",
+            "&:hover": {
+              backgroundColor: value !== null ? "primary.dark" : "grey.600",
             },
           }}
         >
-          {value !== null ? 'On' : 'Off'}
+          {value !== null ? "On" : "Off"}
         </Button>
       </FormControl>
     </Tooltip>

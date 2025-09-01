@@ -1,9 +1,9 @@
-import React from 'react';
-import { Grid } from '@mui/material';
-import { MethodParameterProps } from '../../../types';
-import { useSweepConfiguration } from '../../../hooks/useSweepConfiguration';
-import { ParameterInputFactory } from '../../../components/methods/config/ParameterInputFactory';
-import { SweepModal } from '../../../components/methods/config/SweepModal';
+import React from "react";
+import { Grid } from "@mui/material";
+import { MethodParameterProps } from "../../../types";
+import { useSweepConfiguration } from "../../../hooks/useSweepConfiguration";
+import { ParameterInputFactory } from "../../../components/methods/config/ParameterInputFactory";
+import { SweepModal } from "../../../components/methods/config/SweepModal";
 
 export const MethodParameter: React.FC<MethodParameterProps> = ({
   methodId,
@@ -15,7 +15,7 @@ export const MethodParameter: React.FC<MethodParameterProps> = ({
 }) => {
   const sweepConfig = useSweepConfiguration(methodId, paramName);
 
-  const canHaveSweep = ['int', 'float'].some(type =>
+  const canHaveSweep = ["int", "float"].some((type) =>
     paramDetails.type.includes(type)
   );
 

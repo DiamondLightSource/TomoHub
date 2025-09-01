@@ -14,7 +14,7 @@ export interface MethodParameterProps {
 }
 
 export interface SweepConfig {
-  type: 'range' | 'values';
+  type: "range" | "values";
   start?: number;
   stop?: number;
   step?: number;
