@@ -1,0 +1,29 @@
+name: Frontend Code
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: "22.x"
+
+      - name: Install Dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Check Formatting of TypeScript Code
+        working-directory: frontend
+        run: npm run format:check
