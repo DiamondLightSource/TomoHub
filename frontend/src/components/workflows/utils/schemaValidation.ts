@@ -1,12 +1,12 @@
-import addFormats from 'ajv-formats';
-import Ajv,{ ErrorObject } from 'ajv/dist/2020.js'
+import addFormats from "ajv-formats";
+import Ajv, { ErrorObject } from "ajv/dist/2020.js";
 
 // Build one AJV per schema instance so defaults/coercions are accurate per template
 export function buildAjv() {
   const ajv = new Ajv({
     allErrors: true,
-    useDefaults: true, 
-    coerceTypes: false, 
+    useDefaults: true,
+    coerceTypes: false,
     strict: true,
   });
   addFormats(ajv);
@@ -37,12 +37,14 @@ export function formatAjvErrors(
   data: unknown
 ): string[] {
   if (!errors?.length) return [];
-  return errors.map(err => {
-    const path = err.instancePath || '';
-    const where = path.split('/').filter(Boolean).pop() || '(root)'; 
+  return errors.map((err) => {
+    const path = err.instancePath || "";
+    const where = path.split("/").filter(Boolean).pop() || "(root)";
     const val = getByPath(data, path);
     const valStr =
-      typeof val === 'object' ? JSON.stringify(val) : String(val ?? 'undefined');
+      typeof val === "object"
+        ? JSON.stringify(val)
+        : String(val ?? "undefined");
     return `${where} — ${err.message}; value: ${valStr}`;
   });
 }
@@ -50,6 +52,6 @@ export function formatAjvErrors(
 function getByPath(data: any, instancePath: string) {
   if (!instancePath) return data;
   // instancePath is like "/properties/x" but Ajv uses JSON Pointer style (e.g. "/nprocs")
-  const parts = instancePath.split('/').filter(Boolean);
+  const parts = instancePath.split("/").filter(Boolean);
   return parts.reduce((acc, key) => (acc ? acc[key] : undefined), data);
 }

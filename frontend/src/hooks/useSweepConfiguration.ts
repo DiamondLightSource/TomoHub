@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useSweep } from '../contexts/SweepContext';
+import { useState } from "react";
+import { useSweep } from "../contexts/SweepContext";
 
 export const useSweepConfiguration = (methodId: string, paramName: string) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -7,7 +7,7 @@ export const useSweepConfiguration = (methodId: string, paramName: string) => {
   const [start, setStart] = useState<number | null>(null);
   const [stop, setStop] = useState<number | null>(null);
   const [step, setStep] = useState<number | null>(null);
-  const [values, setValues] = useState<string>('');
+  const [values, setValues] = useState<string>("");
 
   const { activeSweep, setActiveSweep, clearActiveSweep } = useSweep();
 
@@ -21,12 +21,12 @@ export const useSweepConfiguration = (methodId: string, paramName: string) => {
     if (activeTab === 0) {
       return start !== null && stop !== null && step !== null;
     }
-    return values.trim() !== '';
+    return values.trim() !== "";
   };
 
   const getSweepDisplayText = () => {
     if (activeTab === 0) {
-      return `RangeSweep start:${start ?? 'null'} stop:${stop ?? 'null'} step:${step ?? 'null'}`;
+      return `RangeSweep start:${start ?? "null"} stop:${stop ?? "null"} step:${step ?? "null"}`;
     }
     return `Sweep ${values}`;
   };
@@ -36,14 +36,14 @@ export const useSweepConfiguration = (methodId: string, paramName: string) => {
       return { start, stop, step };
     }
     return values
-      .split(',')
-      .map(val => val.trim())
-      .map(val => (val.includes('.') ? parseFloat(val) : parseInt(val, 10)));
+      .split(",")
+      .map((val) => val.trim())
+      .map((val) => (val.includes(".") ? parseFloat(val) : parseInt(val, 10)));
   };
 
   const handleSweepDone = (onChange: (value: any) => void) => {
     const sweepValue = getSweepValue();
-    const sweepType = activeTab === 0 ? 'range' : 'values';
+    const sweepType = activeTab === 0 ? "range" : "values";
 
     onChange(sweepValue);
     setActiveSweep(methodId, paramName, sweepType);
@@ -55,7 +55,7 @@ export const useSweepConfiguration = (methodId: string, paramName: string) => {
     setStart(null);
     setStop(null);
     setStep(null);
-    setValues('');
+    setValues("");
     onChange(null);
   };
 
@@ -63,7 +63,7 @@ export const useSweepConfiguration = (methodId: string, paramName: string) => {
     setStart(null);
     setStop(null);
     setStep(null);
-    setValues('');
+    setValues("");
   };
 
   return {

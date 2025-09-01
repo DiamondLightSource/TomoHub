@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // Added useEffect
+import React, { useState, useEffect } from "react"; // Added useEffect
 import {
   ToggleButton,
   ToggleButtonGroup,
@@ -10,13 +10,13 @@ import {
   Card,
   Modal,
   Tooltip,
-  InputAdornment, 
-} from '@mui/material';
-import ContrastIcon from '@mui/icons-material/Contrast';
-import PreviewIcon from '@mui/icons-material/Visibility'; 
-import { useLoader } from '../../contexts/LoaderContext'; 
-import LoaderPreview from '../loader/LoaderPreview'; 
-import InfoIcon from '@mui/icons-material/Info';
+  InputAdornment,
+} from "@mui/material";
+import ContrastIcon from "@mui/icons-material/Contrast";
+import PreviewIcon from "@mui/icons-material/Visibility";
+import { useLoader } from "../../contexts/LoaderContext";
+import LoaderPreview from "../loader/LoaderPreview";
+import InfoIcon from "@mui/icons-material/Info";
 
 const Loader: React.FC = () => {
   const {
@@ -30,23 +30,23 @@ const Loader: React.FC = () => {
     removeDarksAndFlats,
   } = useLoader();
 
-  const [mode, setMode] = useState('setAddress');
+  const [mode, setMode] = useState("setAddress");
   const [showExtraFields, setShowExtraFields] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
   // State for auto toggles
   const [autoToggles, setAutoToggles] = useState({
-    dataPath: parameters.data_path === 'auto',
-    imagePath: parameters.image_key_path === 'auto',
-    rotationAnglePath: parameters.rotation_angles?.data_path === 'auto',
+    dataPath: parameters.data_path === "auto",
+    imagePath: parameters.image_key_path === "auto",
+    rotationAnglePath: parameters.rotation_angles?.data_path === "auto",
   });
 
   // Effect to sync autoToggles if parameters change from elsewhere (e.g. context reset)
   useEffect(() => {
     setAutoToggles({
-      dataPath: parameters.data_path === 'auto',
-      imagePath: parameters.image_key_path === 'auto',
-      rotationAnglePath: parameters.rotation_angles?.data_path === 'auto',
+      dataPath: parameters.data_path === "auto",
+      imagePath: parameters.image_key_path === "auto",
+      rotationAnglePath: parameters.rotation_angles?.data_path === "auto",
     });
   }, [
     parameters.data_path,
@@ -60,8 +60,8 @@ const Loader: React.FC = () => {
   ) => {
     if (newMode !== null) {
       setMode(newMode);
-      if (newMode === 'defineCustom' && autoToggles.rotationAnglePath) {
-        handleAutoToggle('rotationAnglePath'); 
+      if (newMode === "defineCustom" && autoToggles.rotationAnglePath) {
+        handleAutoToggle("rotationAnglePath");
       }
     }
   };
@@ -71,47 +71,46 @@ const Loader: React.FC = () => {
       removeDarksAndFlats();
     } else {
       if (autoToggles.imagePath) {
-        setImageKeyPath('');
-        setAutoToggles(prev => ({ ...prev, imagePath: false })); //
+        setImageKeyPath("");
+        setAutoToggles((prev) => ({ ...prev, imagePath: false })); //
       }
     }
     setShowExtraFields(!showExtraFields);
   };
 
   const handlePreviewClick = () => {
-    setIsPreviewModalOpen(true); 
+    setIsPreviewModalOpen(true);
   };
 
   const handleClosePreviewModal = () => {
-    setIsPreviewModalOpen(false); 
+    setIsPreviewModalOpen(false);
   };
 
   // Handler for the "auto" button toggle
   const handleAutoToggle = (
-    field: 'dataPath' | 'imagePath' | 'rotationAnglePath'
+    field: "dataPath" | "imagePath" | "rotationAnglePath"
   ) => {
-    setAutoToggles(prevToggles => {
+    setAutoToggles((prevToggles) => {
       const newAutoState = !prevToggles[field];
-      const newValue = newAutoState ? 'auto' : '';
+      const newValue = newAutoState ? "auto" : "";
 
-      if (field === 'dataPath') {
+      if (field === "dataPath") {
         setDataPath(newValue);
-      } else if (field === 'imagePath') {
+      } else if (field === "imagePath") {
         // Only update imageKeyPath if extra fields are not shown (where imageKeyPath is visible)
         if (!showExtraFields) {
           setImageKeyPath(newValue);
         } else {
-          if (newAutoState)
-            setImageKeyPath('auto'); 
-          else setImageKeyPath(''); 
+          if (newAutoState) setImageKeyPath("auto");
+          else setImageKeyPath("");
         }
-      } else if (field === 'rotationAnglePath') {
+      } else if (field === "rotationAnglePath") {
         // Only update rotationAnglesDataPath if mode is "setAddress"
-        if (mode === 'setAddress') {
+        if (mode === "setAddress") {
           setRotationAnglesDataPath(newValue);
         } else {
-          if (newAutoState) setRotationAnglesDataPath('auto');
-          else setRotationAnglesDataPath('');
+          if (newAutoState) setRotationAnglesDataPath("auto");
+          else setRotationAnglesDataPath("");
         }
       }
 
@@ -123,18 +122,18 @@ const Loader: React.FC = () => {
     <Card
       variant="outlined"
       sx={{
-        mx: 'auto',
+        mx: "auto",
         mb: 2,
         p: 2,
-        border: '1px solid #89987880',
-        borderRadius: '4px',
+        border: "1px solid #89987880",
+        borderRadius: "4px",
       }}
     >
       <Box
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
           mb: 2,
         }}
       >
@@ -143,19 +142,19 @@ const Loader: React.FC = () => {
           variant="h6"
           color="primary"
           component="div"
-          sx={{ display: 'flex', alignItems: 'center' }}
+          sx={{ display: "flex", alignItems: "center" }}
         >
           <strong>Loader</strong>
           <Tooltip
             title={
               <span>
                 HTTOMO loader, used to load tomography data collected at DLS
-                beamlines..{' '}
+                beamlines..{" "}
                 <a
                   href="https://diamondlightsource.github.io/httomo/reference/loaders.html"
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: '#90caf9', textDecoration: 'underline' }}
+                  style={{ color: "#90caf9", textDecoration: "underline" }}
                 >
                   Learn more
                 </a>
@@ -171,15 +170,15 @@ const Loader: React.FC = () => {
             variant="contained"
             onClick={toggleExtraFields}
             endIcon={<ContrastIcon />}
-            sx={{ fontSize: '0.7rem', mr: 1 }} 
+            sx={{ fontSize: "0.7rem", mr: 1 }}
           >
-            {showExtraFields ? 'Remove' : 'Load separate darks and flats'}
+            {showExtraFields ? "Remove" : "Load separate darks and flats"}
           </Button>
           <Button
             variant="contained"
             onClick={handlePreviewClick}
             endIcon={<PreviewIcon />}
-            sx={{ fontSize: '0.7rem' }}
+            sx={{ fontSize: "0.7rem" }}
           >
             Enable Preview
           </Button>
@@ -191,9 +190,9 @@ const Loader: React.FC = () => {
         variant="outlined"
         fullWidth
         size="small"
-        value={autoToggles.dataPath ? 'auto' : parameters.data_path || ''}
+        value={autoToggles.dataPath ? "auto" : parameters.data_path || ""}
         disabled={autoToggles.dataPath}
-        onChange={e => {
+        onChange={(e) => {
           if (!autoToggles.dataPath) setDataPath(e.target.value);
         }}
         placeholder="path to the dataset in the input hdf5/NeXuS file containing image data"
@@ -202,8 +201,8 @@ const Loader: React.FC = () => {
           endAdornment: (
             <InputAdornment position="end">
               <Button
-                onClick={() => handleAutoToggle('dataPath')}
-                variant={autoToggles.dataPath ? 'contained' : 'outlined'}
+                onClick={() => handleAutoToggle("dataPath")}
+                variant={autoToggles.dataPath ? "contained" : "outlined"}
                 size="small"
                 sx={{ mr: -1 }}
               >
@@ -221,10 +220,10 @@ const Loader: React.FC = () => {
           fullWidth
           size="small"
           value={
-            autoToggles.imagePath ? 'auto' : parameters.image_key_path || ''
+            autoToggles.imagePath ? "auto" : parameters.image_key_path || ""
           }
           disabled={autoToggles.imagePath}
-          onChange={e => {
+          onChange={(e) => {
             if (!autoToggles.imagePath) setImageKeyPath(e.target.value);
           }}
           placeholder="path to the image key in your data"
@@ -233,8 +232,8 @@ const Loader: React.FC = () => {
             endAdornment: (
               <InputAdornment position="end">
                 <Button
-                  onClick={() => handleAutoToggle('imagePath')}
-                  variant={autoToggles.imagePath ? 'contained' : 'outlined'}
+                  onClick={() => handleAutoToggle("imagePath")}
+                  variant={autoToggles.imagePath ? "contained" : "outlined"}
                   size="small"
                   sx={{ mr: -1 }}
                 >
@@ -265,7 +264,7 @@ const Loader: React.FC = () => {
       </ToggleButtonGroup>
 
       {/* Input Fields */}
-      {mode === 'setAddress' ? (
+      {mode === "setAddress" ? (
         <TextField
           label="Path to rotation angle"
           variant="outlined"
@@ -273,11 +272,11 @@ const Loader: React.FC = () => {
           size="small"
           value={
             autoToggles.rotationAnglePath
-              ? 'auto'
-              : parameters.rotation_angles.data_path || ''
+              ? "auto"
+              : parameters.rotation_angles.data_path || ""
           }
           disabled={autoToggles.rotationAnglePath}
-          onChange={e => {
+          onChange={(e) => {
             if (!autoToggles.rotationAnglePath)
               setRotationAnglesDataPath(e.target.value);
           }}
@@ -287,9 +286,9 @@ const Loader: React.FC = () => {
             endAdornment: (
               <InputAdornment position="end">
                 <Button
-                  onClick={() => handleAutoToggle('rotationAnglePath')}
+                  onClick={() => handleAutoToggle("rotationAnglePath")}
                   variant={
-                    autoToggles.rotationAnglePath ? 'contained' : 'outlined'
+                    autoToggles.rotationAnglePath ? "contained" : "outlined"
                   }
                   size="small"
                   sx={{ mr: -1 }}
@@ -312,7 +311,7 @@ const Loader: React.FC = () => {
               value={
                 parameters.rotation_angles.user_defined?.start_angle || null
               }
-              onChange={e =>
+              onChange={(e) =>
                 setUserDefinedRotationAngles(
                   Number(e.target.value),
                   parameters.rotation_angles.user_defined?.stop_angle || 0,
@@ -332,7 +331,7 @@ const Loader: React.FC = () => {
               value={
                 parameters.rotation_angles.user_defined?.stop_angle || null
               }
-              onChange={e =>
+              onChange={(e) =>
                 setUserDefinedRotationAngles(
                   parameters.rotation_angles.user_defined?.start_angle || 0,
                   Number(e.target.value),
@@ -352,7 +351,7 @@ const Loader: React.FC = () => {
               value={
                 parameters.rotation_angles.user_defined?.angles_total || null
               }
-              onChange={e =>
+              onChange={(e) =>
                 setUserDefinedRotationAngles(
                   parameters.rotation_angles.user_defined?.start_angle || 0,
                   parameters.rotation_angles.user_defined?.stop_angle || 0,
@@ -377,9 +376,9 @@ const Loader: React.FC = () => {
               fullWidth
               type="text"
               size="small"
-              value={parameters.darks?.file || ''}
-              onChange={e =>
-                setDarks(e.target.value, parameters.darks?.data_path || '')
+              value={parameters.darks?.file || ""}
+              onChange={(e) =>
+                setDarks(e.target.value, parameters.darks?.data_path || "")
               }
               sx={{ mb: 1 }}
               placeholder="path to the hdf5/NeXuS darks file "
@@ -390,9 +389,9 @@ const Loader: React.FC = () => {
               fullWidth
               size="small"
               type="text"
-              value={parameters.darks?.data_path || ''}
-              onChange={e =>
-                setDarks(parameters.darks?.file || '', e.target.value)
+              value={parameters.darks?.data_path || ""}
+              onChange={(e) =>
+                setDarks(parameters.darks?.file || "", e.target.value)
               }
               sx={{ mb: 1 }}
               placeholder="dataset that contains the darks data"
@@ -408,9 +407,9 @@ const Loader: React.FC = () => {
               fullWidth
               size="small"
               type="text"
-              value={parameters.flats?.file || ''}
-              onChange={e =>
-                setFlats(e.target.value, parameters.flats?.data_path || '')
+              value={parameters.flats?.file || ""}
+              onChange={(e) =>
+                setFlats(e.target.value, parameters.flats?.data_path || "")
               }
               sx={{ mb: 1 }}
               placeholder="path to the hdf5/NeXuS flats file"
@@ -421,9 +420,9 @@ const Loader: React.FC = () => {
               variant="outlined"
               fullWidth
               size="small"
-              value={parameters.flats?.data_path || ''}
-              onChange={e =>
-                setFlats(parameters.flats?.file || '', e.target.value)
+              value={parameters.flats?.data_path || ""}
+              onChange={(e) =>
+                setFlats(parameters.flats?.file || "", e.target.value)
               }
               sx={{ mb: 1 }}
               placeholder="dataset that contains the flats data"
@@ -435,18 +434,18 @@ const Loader: React.FC = () => {
       <Modal open={isPreviewModalOpen} onClose={handleClosePreviewModal}>
         <Box
           sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
             width: 500,
-            bgcolor: 'background.paper',
+            bgcolor: "background.paper",
             boxShadow: 24,
             p: 1,
             borderRadius: 1,
           }}
         >
-          <LoaderPreview onClose={handleClosePreviewModal} />{' '}
+          <LoaderPreview onClose={handleClosePreviewModal} />{" "}
         </Box>
       </Modal>
     </Card>

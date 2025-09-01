@@ -1,11 +1,11 @@
-import React, { useState, Suspense } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './components/pages/Home';
-import Layout from './components/common/Layout';
-import Methods from './components/pages/Methods';
-import FullPipelines from './components/pages/FullPipelines';
-import Submission from './components/workflows/Submission';
-import { Visit } from 'workflows-lib';
+import React, { useState, Suspense } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Home from "./components/pages/Home";
+import Layout from "./components/common/Layout";
+import Methods from "./components/pages/Methods";
+import FullPipelines from "./components/pages/FullPipelines";
+import Submission from "./components/workflows/Submission";
+import { Visit } from "workflows-lib";
 
 const App: React.FC = () => {
   const [userVisit, setUserVisit] = useState<Visit>();
@@ -34,7 +34,6 @@ const App: React.FC = () => {
                   setVisit={setUserVisit}
                 />
               }
-              
             />
           </Route>
         </Routes>

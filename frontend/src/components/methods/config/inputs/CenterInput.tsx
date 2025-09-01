@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Grid,
   Typography,
@@ -6,8 +6,8 @@ import {
   ToggleButton,
   TextField,
   Tooltip,
-} from '@mui/material';
-import { useCenter } from '../../../../contexts/CenterContext';
+} from "@mui/material";
+import { useCenter } from "../../../../contexts/CenterContext";
 
 interface CenterInputProps {
   paramName: string;
@@ -25,25 +25,25 @@ const CenterInput: React.FC<CenterInputProps> = ({
   onChange,
 }) => {
   const { selectedCenter, setSelectedCenter } = useCenter();
-  const [centerMode, setCenterMode] = useState<'auto' | 'manual'>(
-    selectedCenter === 0 ? 'auto' : 'manual'
+  const [centerMode, setCenterMode] = useState<"auto" | "manual">(
+    selectedCenter === 0 ? "auto" : "manual"
   );
 
   useEffect(() => {
-    if (centerMode === 'manual' && paramName === 'center') {
+    if (centerMode === "manual" && paramName === "center") {
       onChange(selectedCenter);
     }
   }, [selectedCenter, centerMode, paramName, onChange]);
 
   const handleCenterModeChange = (
     event: React.MouseEvent<HTMLElement>,
-    newMode: 'auto' | 'manual'
+    newMode: "auto" | "manual"
   ) => {
     if (newMode) {
       setCenterMode(newMode);
-      if (newMode === 'auto') {
+      if (newMode === "auto") {
         onChange(paramDetails.value);
-      } else if (newMode === 'manual') {
+      } else if (newMode === "manual") {
         onChange(selectedCenter);
       }
     }
@@ -52,7 +52,7 @@ const CenterInput: React.FC<CenterInputProps> = ({
   const handleManualValueChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const newValue = event.target.value === '' ? 0 : Number(event.target.value);
+    const newValue = event.target.value === "" ? 0 : Number(event.target.value);
     setSelectedCenter(newValue); // Update context
     onChange(newValue); // Update component value
   };
@@ -75,7 +75,7 @@ const CenterInput: React.FC<CenterInputProps> = ({
           <ToggleButton value="auto">Auto</ToggleButton>
           <ToggleButton value="manual">Manual</ToggleButton>
         </ToggleButtonGroup>
-        {centerMode === 'manual' && (
+        {centerMode === "manual" && (
           <TextField
             label="Manual Center"
             type="number"

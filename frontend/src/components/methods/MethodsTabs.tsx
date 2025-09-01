@@ -1,18 +1,18 @@
-import React from 'react';
-import { Card, Tabs, Tab, Box, Typography } from '@mui/material';
-import Dropdown from './MethodsDropDowns';
-import Loader from '../loader/Loader';
+import React from "react";
+import { Card, Tabs, Tab, Box, Typography } from "@mui/material";
+import Dropdown from "./MethodsDropDowns";
+import Loader from "../loader/Loader";
 
 const MethodsTabs: React.FC = () => {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue); 
+    setValue(newValue);
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', mt: 5 }}>
-      <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex", flexDirection: "column", mt: 5 }}>
+      <Box sx={{ display: "flex" }}>
         <Tabs
           orientation="vertical"
           value={value}
@@ -20,30 +20,30 @@ const MethodsTabs: React.FC = () => {
           onChange={handleChange}
           sx={{
             borderRight: 1,
-            borderColor: 'divider',
-            width: '200px',
-            minWidth: '200px',
+            borderColor: "divider",
+            width: "200px",
+            minWidth: "200px",
           }}
         >
-          <Tab sx={{ fontSize: '0.9rem' }} label="Loader" />
-          <Tab sx={{ fontSize: '0.9rem' }} label="Pre-processing" />
-          <Tab sx={{ fontSize: '0.9rem' }} label="Reconstruction" />
-          <Tab sx={{ fontSize: '0.9rem' }} label="Image Saving" />
-          <Tab sx={{ fontSize: '0.9rem' }} label="Post-processing" />
+          <Tab sx={{ fontSize: "0.9rem" }} label="Loader" />
+          <Tab sx={{ fontSize: "0.9rem" }} label="Pre-processing" />
+          <Tab sx={{ fontSize: "0.9rem" }} label="Reconstruction" />
+          <Tab sx={{ fontSize: "0.9rem" }} label="Image Saving" />
+          <Tab sx={{ fontSize: "0.9rem" }} label="Post-processing" />
         </Tabs>
-        
-        <Box sx={{ p: 2, maxWidth: '700px' }}>
+
+        <Box sx={{ p: 2, maxWidth: "700px" }}>
           {value === 0 && <Loader />}
           {value === 1 && (
             <Card
               variant="outlined"
               sx={{
-                mx: 'auto',
+                mx: "auto",
                 mb: 2,
                 p: 2,
-                border: '1px solid #89987880',
-                borderRadius: '4px',
-                minWidth: '650px',
+                border: "1px solid #89987880",
+                borderRadius: "4px",
+                minWidth: "650px",
               }}
             >
               <Typography
@@ -68,12 +68,12 @@ const MethodsTabs: React.FC = () => {
             <Card
               variant="outlined"
               sx={{
-                mx: 'auto',
+                mx: "auto",
                 mb: 2,
                 p: 2,
-                border: '1px solid #89987880',
-                borderRadius: '4px',
-                minWidth: '650px',
+                border: "1px solid #89987880",
+                borderRadius: "4px",
+                minWidth: "650px",
               }}
             >
               <Typography
@@ -92,12 +92,12 @@ const MethodsTabs: React.FC = () => {
             <Card
               variant="outlined"
               sx={{
-                mx: 'auto',
+                mx: "auto",
                 mb: 2,
                 p: 2,
-                border: '1px solid #89987880',
-                borderRadius: '4px',
-                minWidth: '650px',
+                border: "1px solid #89987880",
+                borderRadius: "4px",
+                minWidth: "650px",
               }}
             >
               <Typography
@@ -117,12 +117,12 @@ const MethodsTabs: React.FC = () => {
             <Card
               variant="outlined"
               sx={{
-                mx: 'auto',
+                mx: "auto",
                 mb: 2,
                 p: 2,
-                border: '1px solid #89987880',
-                borderRadius: '4px',
-                minWidth: '650px',
+                border: "1px solid #89987880",
+                borderRadius: "4px",
+                minWidth: "650px",
               }}
             >
               <Typography

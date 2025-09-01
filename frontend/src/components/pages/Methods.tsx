@@ -1,7 +1,7 @@
-import React from 'react';
-import { Box } from '@mui/material';
-import YMLG from '../common/YamlGenerator';
-import MethodsTabs from '../methods/MethodsTabs';
+import React from "react";
+import { Box } from "@mui/material";
+import YMLG from "../common/YamlGenerator";
+import MethodsTabs from "../methods/MethodsTabs";
 
 const Methods: React.FC = () => {
   return (

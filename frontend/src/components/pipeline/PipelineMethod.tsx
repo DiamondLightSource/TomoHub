@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Box,
   Typography,
@@ -9,13 +9,13 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-} from '@mui/material';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+} from "@mui/material";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface PipelineMethodProps {
   method: {
@@ -56,35 +56,35 @@ const PipelineMethod: React.FC<PipelineMethodProps> = ({
       ref={setNodeRef}
       style={style}
       sx={{
-        background: '#fff',
-        color: '#000',
-        margin: '10px 0',
+        background: "#fff",
+        color: "#000",
+        margin: "10px 0",
         borderRadius: 2,
         p: 0.5,
-        position: 'relative',
+        position: "relative",
       }}
     >
       <Box
         {...attributes}
         {...listeners}
         sx={{
-          position: 'absolute',
+          position: "absolute",
           left: 0,
-          top: '50%',
-          transform: 'translateY(-50%)',
-          cursor: 'move',
-          display: 'flex',
-          alignItems: 'center',
-          height: '100%',
+          top: "50%",
+          transform: "translateY(-50%)",
+          cursor: "move",
+          display: "flex",
+          alignItems: "center",
+          height: "100%",
           px: 1,
         }}
       ></Box>
 
       <Box
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
         <DragIndicatorIcon />
@@ -117,9 +117,9 @@ const PipelineMethod: React.FC<PipelineMethodProps> = ({
       {hasParameters && (
         <Accordion
           sx={{
-            backgroundColor: '#fff',
+            backgroundColor: "#fff",
             marginTop: 1,
-            pointerEvents: 'auto', // Ensure accordion is clickable
+            pointerEvents: "auto", // Ensure accordion is clickable
             p: 0,
             boxShadow: 0,
           }}
@@ -130,9 +130,9 @@ const PipelineMethod: React.FC<PipelineMethodProps> = ({
             id={`parameters-header-${method.method_name}`}
             sx={{
               m: 0,
-              p: '0 10px',
+              p: "0 10px",
               minHeight: 0,
-              '&.Mui-expanded': {
+              "&.Mui-expanded": {
                 minHeight: 0,
               },
             }}
@@ -151,13 +151,13 @@ const PipelineMethod: React.FC<PipelineMethodProps> = ({
                   >
                     <ListItemText
                       primary={`${key}: ${
-                        typeof value === 'string' && value.startsWith('${{') 
-                          ? 'auto' 
+                        typeof value === "string" && value.startsWith("${{")
+                          ? "auto"
                           : value
                       }`}
                       primaryTypographyProps={{
-                        variant: 'body2',
-                        fontSize: 'small',
+                        variant: "body2",
+                        fontSize: "small",
                       }}
                     />
                   </ListItem>

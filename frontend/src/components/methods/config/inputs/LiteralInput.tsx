@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   FormControl,
   FormLabel,
@@ -6,7 +6,7 @@ import {
   FormControlLabel,
   Radio,
   Tooltip,
-} from '@mui/material';
+} from "@mui/material";
 
 interface LiteralInputProps {
   paramName: string;
@@ -24,13 +24,13 @@ const LiteralInput: React.FC<LiteralInputProps> = ({
   onChange,
 }) => {
   const actualType = paramDetails.type
-    .replace('Optional[', '')
-    .replace(']', '');
+    .replace("Optional[", "")
+    .replace("]", "");
   const literals = actualType
-    .replace('Literal[', '')
-    .replace(']', '')
-    .split(', ')
-    .map(literal =>
+    .replace("Literal[", "")
+    .replace("]", "")
+    .split(", ")
+    .map((literal) =>
       literal.startsWith("'") && literal.endsWith("'")
         ? literal.slice(1, -1)
         : literal
@@ -48,18 +48,18 @@ const LiteralInput: React.FC<LiteralInputProps> = ({
       <FormControl
         component="fieldset"
         disabled={!isEnabled}
-        sx={{ display: 'flex', justifyContent: 'center' }}
+        sx={{ display: "flex", justifyContent: "center" }}
       >
-        <FormLabel component="legend" sx={{ m: 'auto' }}>
+        <FormLabel component="legend" sx={{ m: "auto" }}>
           {paramName}
         </FormLabel>
         <RadioGroup
           value={value ?? paramDetails.value}
           onChange={handleChange}
           row
-          sx={{ m: 'auto' }}
+          sx={{ m: "auto" }}
         >
-          {literals.map(literal => (
+          {literals.map((literal) => (
             <FormControlLabel
               key={literal}
               value={literal}

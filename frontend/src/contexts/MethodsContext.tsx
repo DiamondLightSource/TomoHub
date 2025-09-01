@@ -1,5 +1,5 @@
-import React, { createContext, useState, ReactNode, useContext } from 'react';
-import { useSweep } from './SweepContext'; // Import the useSweep hook
+import React, { createContext, useState, ReactNode, useContext } from "react";
+import { useSweep } from "./SweepContext"; // Import the useSweep hook
 
 export type Method = {
   method_name: string; // The name of the method
@@ -44,7 +44,7 @@ export const MethodsProvider: React.FC<{ children: ReactNode }> = ({
     methodModule: string,
     defaultParams: { [key: string]: any }
   ) => {
-    setMethods(prev => [
+    setMethods((prev) => [
       ...prev,
       {
         method_name: methodName,
@@ -59,7 +59,9 @@ export const MethodsProvider: React.FC<{ children: ReactNode }> = ({
     if (activeSweep && activeSweep.methodId === methodId) {
       clearActiveSweep(); // Clear the active sweep
     }
-    setMethods(prev => prev.filter(method => method.method_name !== methodId));
+    setMethods((prev) =>
+      prev.filter((method) => method.method_name !== methodId)
+    );
   };
 
   const updateMethodParameter = (
@@ -67,8 +69,8 @@ export const MethodsProvider: React.FC<{ children: ReactNode }> = ({
     paramName: string,
     value: any
   ) => {
-    setMethods(prev =>
-      prev.map(method =>
+    setMethods((prev) =>
+      prev.map((method) =>
         method.method_name === methodName
           ? {
               ...method,
@@ -108,7 +110,7 @@ export const MethodsProvider: React.FC<{ children: ReactNode }> = ({
 export const useMethods = () => {
   const context = useContext(MethodsContext);
   if (!context) {
-    throw new Error('useMethods must be used within a MethodsProvider');
+    throw new Error("useMethods must be used within a MethodsProvider");
   }
   return context;
 };

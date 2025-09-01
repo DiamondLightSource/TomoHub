@@ -1,13 +1,13 @@
-import React from 'react';
-import { Grid, Typography } from '@mui/material';
+import React from "react";
+import { Grid, Typography } from "@mui/material";
 import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-} from '../../../components/methods/config/StyledAccordion';
-import { MethodHeader } from '../../../components/methods/config/MethodHeader';
-import { MethodParameter } from '../../../components/methods/config/MethodParameter';
-import Method from '../../../types/method';
+} from "../../../components/methods/config/StyledAccordion";
+import { MethodHeader } from "../../../components/methods/config/MethodHeader";
+import { MethodParameter } from "../../../components/methods/config/MethodParameter";
+import Method from "../../../types/method";
 
 interface MethodAccordionProps {
   method: Method;
@@ -57,7 +57,7 @@ export const MethodAccordion: React.FC<MethodAccordionProps> = ({
             paramDetails={paramDetails}
             value={currentParameters?.[paramName]}
             isEnabled={isMethodAdded}
-            onChange={value => onParameterChange(paramName, value)}
+            onChange={(value) => onParameterChange(paramName, value)}
           />
         ))}
       </Grid>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -7,13 +7,13 @@ import {
   Alert,
   Divider,
   Button,
-} from '@mui/material';
-import { CheckCircle } from '@mui/icons-material'; 
-import { proxyService } from '../../../api/services';
-import { useCenter } from '../../../contexts/CenterContext'; 
+} from "@mui/material";
+import { CheckCircle } from "@mui/icons-material";
+import { proxyService } from "../../../api/services";
+import { useCenter } from "../../../contexts/CenterContext";
 
 interface SweepResultViewerProps {
-  workflowData: any; 
+  workflowData: any;
   start: number;
   stop: number;
   step: number;
@@ -41,13 +41,12 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
   stop,
   step,
 }) => {
-
   // Add center context
   const { selectedCenter, setSelectedCenter } = useCenter();
   const [centerImages, setCenterImages] = useState<CenterImages>({});
   const [centerValues, setCenterValues] = useState<string[]>([]);
   const [currentCenterIndex, setCurrentCenterIndex] = useState(0);
-  const [currentImageUrl, setCurrentImageUrl] = useState<string>('');
+  const [currentImageUrl, setCurrentImageUrl] = useState<string>("");
   const [isInitialLoading, setIsInitialLoading] = useState(false);
   const [loadingStates, setLoadingStates] = useState<LoadingStates>({});
   const [error, setError] = useState<string | null>(null);
@@ -65,18 +64,18 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
   // Extract multi-page TIFF artifact from workflow data
   const getTiffArtifact = () => {
     console.log(
-      'SweepResultViewer: getTiffArtifact called with workflowData:',
+      "SweepResultViewer: getTiffArtifact called with workflowData:",
       workflowData
     );
 
     if (!workflowData?.workflow?.status) {
-      console.log('SweepResultViewer: No workflow status found');
+      console.log("SweepResultViewer: No workflow status found");
       return null;
     }
 
-    if (workflowData.workflow.status.__typename !== 'WorkflowSucceededStatus') {
+    if (workflowData.workflow.status.__typename !== "WorkflowSucceededStatus") {
       console.log(
-        'SweepResultViewer: Workflow not in succeeded status:',
+        "SweepResultViewer: Workflow not in succeeded status:",
         workflowData.workflow.status.__typename
       );
       return null;
@@ -84,21 +83,18 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
 
     const tasks = workflowData.workflow.status.tasks || [];
 
-
     const generateSweepTask = tasks.find(
       (task: any) =>
-        task.name === 'generate-sweep-artifact' && task.stepType === 'Pod'
+        task.name === "generate-sweep-artifact" && task.stepType === "Pod"
     );
-
 
     if (!generateSweepTask) return null;
 
     const tiffArtifact = generateSweepTask.artifacts?.find(
       (artifact: any) =>
-        artifact.name === 'multi-page-tiff.tif' &&
-        artifact.mimeType === 'image/tiff'
+        artifact.name === "multi-page-tiff.tif" &&
+        artifact.mimeType === "image/tiff"
     );
-
 
     return tiffArtifact;
   };
@@ -110,23 +106,22 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
         return; // Already loaded or loading
       }
 
-      setLoadingStates(prev => ({ ...prev, [centerValue]: true }));
+      setLoadingStates((prev) => ({ ...prev, [centerValue]: true }));
 
       try {
         const imageUrl = await proxyService.getTiffPage(tiffUrl, pageIndex);
 
-        setCenterImages(prev => ({
+        setCenterImages((prev) => ({
           ...prev,
           [centerValue]: imageUrl,
         }));
-
       } catch (err) {
         console.error(
           `SweepResultViewer: Error loading page ${pageIndex}:`,
           err
         );
       } finally {
-        setLoadingStates(prev => ({ ...prev, [centerValue]: false }));
+        setLoadingStates((prev) => ({ ...prev, [centerValue]: false }));
       }
     },
     [centerImages, loadingStates]
@@ -167,7 +162,6 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
       // Generate center values
       const centerVals = generateCenterValues();
 
-
       // Validate page count matches expected center values
       if (metadata.page_count < centerVals.length) {
         console.warn(
@@ -181,18 +175,18 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
       if (centerVals.length > 0) {
         setCurrentCenterIndex(0);
         await loadPage(tiffUrl, 0, centerVals[0]);
-        setCurrentImageUrl(centerImages[centerVals[0]] || '');
+        setCurrentImageUrl(centerImages[centerVals[0]] || "");
 
         // Preload adjacent pages
         preloadAdjacentPages(tiffUrl, 0, centerVals);
       }
     } catch (err) {
       console.error(
-        'SweepResultViewer: Error initializing TIFF processing:',
+        "SweepResultViewer: Error initializing TIFF processing:",
         err
       );
       setError(
-        `Failed to process TIFF file: ${err instanceof Error ? err.message : 'Unknown error'}`
+        `Failed to process TIFF file: ${err instanceof Error ? err.message : "Unknown error"}`
       );
     } finally {
       setIsInitialLoading(false);
@@ -214,7 +208,7 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
       const tiffArtifact = getTiffArtifact();
       if (tiffArtifact) {
         await loadPage(tiffArtifact.url, index, centerValue);
-        setCurrentImageUrl(centerImages[centerValue] || '');
+        setCurrentImageUrl(centerImages[centerValue] || "");
       }
     }
 
@@ -231,7 +225,7 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
       const currentCenterValue = parseFloat(centerValues[currentCenterIndex]);
       setSelectedCenter(currentCenterValue);
       console.log(
-        'SweepResultViewer: Selected center value:',
+        "SweepResultViewer: Selected center value:",
         currentCenterValue
       );
     }
@@ -251,7 +245,7 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
     if (tiffArtifact) {
       initializeTiffProcessing(tiffArtifact.url);
     } else {
-      console.log('SweepResultViewer: No TIFF artifact found');
+      console.log("SweepResultViewer: No TIFF artifact found");
     }
   }, [workflowData]);
 
@@ -268,14 +262,12 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
   // Don't render if not a successful COR workflow
   const tiffArtifact = getTiffArtifact();
 
-
   if (!tiffArtifact) {
     console.log(
-      'SweepResultViewer: No TIFF artifact found, not rendering component'
+      "SweepResultViewer: No TIFF artifact found, not rendering component"
     );
     return null;
   }
-
 
   const currentCenterValue = centerValues[currentCenterIndex];
   const isCurrentImageLoading = loadingStates[currentCenterValue];
@@ -284,14 +276,14 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
     <Box
       sx={{
         border: 1,
-        borderColor: 'grey.300',
+        borderColor: "grey.300",
         borderRadius: 1,
         p: 2,
         mt: 2,
-        backgroundColor: 'grey.50',
+        backgroundColor: "grey.50",
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
         <Typography variant="h6">Sweep Results</Typography>
         {(isInitialLoading || isCurrentImageLoading) && (
           <CircularProgress size={16} />
@@ -305,7 +297,7 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
       )}
 
       {isInitialLoading && (
-        <Box sx={{ textAlign: 'center', py: 4 }}>
+        <Box sx={{ textAlign: "center", py: 4 }}>
           <CircularProgress size={40} />
           <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
             Loading TIFF metadata and first image...
@@ -318,30 +310,30 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
           <Divider sx={{ mb: 3 }} />
 
           {/* Image Preview */}
-          <Box sx={{ mb: 3, textAlign: 'center' }}>
+          <Box sx={{ mb: 3, textAlign: "center" }}>
             <Box
               sx={{
                 mb: 2,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
                 height: 400,
-                width: '100%',
-                overflow: 'hidden',
+                width: "100%",
+                overflow: "hidden",
                 border: 1,
-                borderColor: 'grey.300',
+                borderColor: "grey.300",
                 borderRadius: 1,
-                backgroundColor: 'white',
-                position: 'relative',
+                backgroundColor: "white",
+                position: "relative",
               }}
             >
               {isCurrentImageLoading && (
                 <Box
                   sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
                     zIndex: 2,
                   }}
                 >
@@ -354,22 +346,22 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
                   src={currentImageUrl}
                   alt={`Reconstruction with center ${currentCenterValue}`}
                   style={{
-                    maxWidth: '100%',
-                    maxHeight: '100%',
-                    objectFit: 'contain',
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    objectFit: "contain",
                     opacity: isCurrentImageLoading ? 0.5 : 1,
-                    transition: 'opacity 0.2s ease-in-out',
+                    transition: "opacity 0.2s ease-in-out",
                   }}
-                  onError={e => {
-                    console.error('Error loading image:', e);
-                    setError('Failed to load image');
+                  onError={(e) => {
+                    console.error("Error loading image:", e);
+                    setError("Failed to load image");
                   }}
                 />
               ) : (
                 <Typography variant="body2" color="text.secondary">
                   {isCurrentImageLoading
-                    ? 'Loading image...'
-                    : 'Image not available'}
+                    ? "Loading image..."
+                    : "Image not available"}
                 </Typography>
               )}
             </Box>
@@ -380,7 +372,7 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  sx={{ display: 'block' }}
+                  sx={{ display: "block" }}
                 >
                   {tiffMetadata.width} × {tiffMetadata.height}
                 </Typography>
@@ -400,21 +392,21 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
                 value: index,
                 label:
                   index % Math.max(1, Math.floor(centerValues.length / 10)) ===
-                    0
+                  0
                     ? value
-                    : '',
+                    : "",
               }))}
               valueLabelDisplay="auto"
-              valueLabelFormat={index => centerValues[index] || ''}
+              valueLabelFormat={(index) => centerValues[index] || ""}
               aria-labelledby="center-slider"
               sx={{ mb: 3 }}
             />
 
             {/* Select Center Button */}
-            <Box sx={{ textAlign: 'center', mb: 2 }}>
+            <Box sx={{ textAlign: "center", mb: 2 }}>
               <Button
-                variant={isCurrentCenterSelected ? 'contained' : 'outlined'}
-                color={isCurrentCenterSelected ? 'success' : 'primary'}
+                variant={isCurrentCenterSelected ? "contained" : "outlined"}
+                color={isCurrentCenterSelected ? "success" : "primary"}
                 onClick={handleSelectCenter}
                 startIcon={isCurrentCenterSelected ? <CheckCircle /> : null}
                 sx={{ minWidth: 180 }}
@@ -428,7 +420,7 @@ const SweepResultViewer: React.FC<SweepResultViewerProps> = ({
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  sx={{ display: 'block', mt: 1 }}
+                  sx={{ display: "block", mt: 1 }}
                 >
                   Currently selected: {selectedCenter}
                 </Typography>

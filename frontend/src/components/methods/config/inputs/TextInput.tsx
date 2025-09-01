@@ -1,5 +1,5 @@
-import React from 'react';
-import { TextField, Tooltip } from '@mui/material';
+import React from "react";
+import { TextField, Tooltip } from "@mui/material";
 
 interface TextInputProps {
   paramName: string;
@@ -22,7 +22,7 @@ const TextInput: React.FC<TextInputProps> = ({
 
   return (
     <Tooltip
-      title={`${paramDetails.type} - default: ${paramDetails.value ?? 'None'}`}
+      title={`${paramDetails.type} - default: ${paramDetails.value ?? "None"}`}
       placement="top-start"
     >
       <TextField

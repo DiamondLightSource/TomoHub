@@ -5,21 +5,24 @@ import {
   ButtonGroup,
   Snackbar,
   Alert as MuiAlert,
-} from '@mui/material';
-import React, { useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
-import ScienceIcon from '@mui/icons-material/Science';
-import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
-import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
-import yaml from 'js-yaml';
-import { useLoader, PreviewType } from '../../contexts/LoaderContext';
-import { useMethods, Method as MethodType } from '../../contexts/MethodsContext';
+} from "@mui/material";
+import React, { useRef, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import ScienceIcon from "@mui/icons-material/Science";
+import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
+import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+import yaml from "js-yaml";
+import { useLoader, PreviewType } from "../../contexts/LoaderContext";
+import {
+  useMethods,
+  Method as MethodType,
+} from "../../contexts/MethodsContext";
 
 const Alert = React.forwardRef<
   HTMLDivElement,
-  import('@mui/material').AlertProps
+  import("@mui/material").AlertProps
 >(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -35,8 +38,8 @@ function Header() {
   // Snackbar state
   const [snackbarState, setSnackbarState] = useState({
     open: false,
-    message: '',
-    severity: 'success' as 'success' | 'error' | 'info' | 'warning',
+    message: "",
+    severity: "success" as "success" | "error" | "info" | "warning",
   });
 
   const isActive = (path: string) => {
@@ -47,7 +50,7 @@ function Header() {
     event?: React.SyntheticEvent | Event,
     reason?: string
   ) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setSnackbarState({ ...snackbarState, open: false });
@@ -59,11 +62,11 @@ function Header() {
     const file = event.target.files?.[0];
     if (file) {
       const fileName = file.name.toLowerCase();
-      if (fileName.endsWith('.yaml') || fileName.endsWith('.yml')) {
+      if (fileName.endsWith(".yaml") || fileName.endsWith(".yml")) {
         const reader = new FileReader();
-        reader.onload = e => {
+        reader.onload = (e) => {
           const content = e.target?.result;
-          if (typeof content === 'string') {
+          if (typeof content === "string") {
             try {
               const loadedData = yaml.load(content) as Array<any>;
 
@@ -71,8 +74,8 @@ function Header() {
                 setSnackbarState({
                   open: true,
                   message:
-                    'Invalid YAML structure: Expected a HTTOMO YAML config file.',
-                  severity: 'error',
+                    "Invalid YAML structure: Expected a HTTOMO YAML config file.",
+                  severity: "error",
                 });
                 return;
               }
@@ -82,8 +85,8 @@ function Header() {
               if (loaderConfig && loaderConfig.parameters) {
                 const params = loaderConfig.parameters;
 
-                loaderContext.setDataPath(params.data_path || '');
-                loaderContext.setImageKeyPath(params.image_key_path || '');
+                loaderContext.setDataPath(params.data_path || "");
+                loaderContext.setImageKeyPath(params.image_key_path || "");
 
                 if (params.rotation_angles?.data_path) {
                   loaderContext.setRotationAnglesDataPath(
@@ -91,26 +94,26 @@ function Header() {
                   );
                 } else if (params.rotation_angles?.user_defined) {
                   loaderContext.setUserDefinedRotationAngles(
-                    params.rotation_angles.user_defined.start_angle || '',
-                    params.rotation_angles.user_defined.stop_angle || '',
-                    params.rotation_angles.user_defined.angles_total || ''
+                    params.rotation_angles.user_defined.start_angle || "",
+                    params.rotation_angles.user_defined.stop_angle || "",
+                    params.rotation_angles.user_defined.angles_total || ""
                   );
                 } else {
                   // Clear rotation angles if not present
-                  loaderContext.setRotationAnglesDataPath('');
+                  loaderContext.setRotationAnglesDataPath("");
                 }
 
                 loaderContext.removeDarksAndFlats(); // Clear existing
                 if (params.darks) {
                   loaderContext.setDarks(
-                    params.darks.file || '',
-                    params.darks.data_path || ''
+                    params.darks.file || "",
+                    params.darks.data_path || ""
                   );
                 }
                 if (params.flats) {
                   loaderContext.setFlats(
-                    params.flats.file || '',
-                    params.flats.data_path || ''
+                    params.flats.file || "",
+                    params.flats.data_path || ""
                   );
                 }
 
@@ -129,8 +132,8 @@ function Header() {
                 setSnackbarState({
                   open: true,
                   message:
-                    'Warning: Loader configuration missing or invalid in YAML.',
-                  severity: 'warning',
+                    "Warning: Loader configuration missing or invalid in YAML.",
+                  severity: "warning",
                 });
               }
 
@@ -138,32 +141,32 @@ function Header() {
               const methodConfigs = loadedData.slice(1);
               const newMethods: MethodType[] = methodConfigs
                 .filter(
-                  mc =>
-                    !(mc.method === 'calculate_stats' && mc.id === 'statistics')
+                  (mc) =>
+                    !(mc.method === "calculate_stats" && mc.id === "statistics")
                 ) // Filter out auto-injected stats
                 .map((mc: any) => ({
                   method_name: mc.method,
                   method_module: mc.module_path,
                   parameters: mc.parameters || {}, // Assuming parameters structure matches MethodType
                 }))
-                .filter(method => method.method_name && method.method_module); // Ensure basic validity
+                .filter((method) => method.method_name && method.method_module); // Ensure basic validity
 
               methodsContext.setMethods(newMethods);
 
               setSnackbarState({
                 open: true,
-                message: 'Configuration loaded successfully!',
-                severity: 'success',
+                message: "Configuration loaded successfully!",
+                severity: "success",
               });
             } catch (error) {
               console.error(
-                'Error parsing YAML or applying configuration:',
+                "Error parsing YAML or applying configuration:",
                 error
               );
               setSnackbarState({
                 open: true,
-                message: `Failed to load configuration: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                severity: 'error',
+                message: `Failed to load configuration: ${error instanceof Error ? error.message : "Unknown error"}`,
+                severity: "error",
               });
             }
           }
@@ -171,22 +174,22 @@ function Header() {
         reader.onerror = () => {
           setSnackbarState({
             open: true,
-            message: 'Failed to read the file.',
-            severity: 'error',
+            message: "Failed to read the file.",
+            severity: "error",
           });
         };
         reader.readAsText(file);
       } else {
         setSnackbarState({
           open: true,
-          message: 'Please select a YAML file (.yaml or .yml)',
-          severity: 'warning',
+          message: "Please select a YAML file (.yaml or .yml)",
+          severity: "warning",
         });
       }
     }
     // Reset the file input to allow selecting the same file again if needed
     if (event.target) {
-      event.target.value = '';
+      event.target.value = "";
     }
   };
 
@@ -198,21 +201,21 @@ function Header() {
     <Box
       component="header"
       sx={{
-        textAlign: 'center',
+        textAlign: "center",
         py: 3,
         px: 2,
-        backgroundColor: 'background.paper',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        width: '60%', // Consider making this responsive or removing if not needed
+        backgroundColor: "background.paper",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        width: "60%", // Consider making this responsive or removing if not needed
       }}
     >
       <Typography
         variant="h3"
         component="h2"
         gutterBottom
-        sx={{ fontWeight: 'bold', color: 'primary.main' }}
+        sx={{ fontWeight: "bold", color: "primary.main" }}
       >
         TomoHub | GUI for HTTOMO
       </Typography>
@@ -227,12 +230,12 @@ function Header() {
           to="/"
           startIcon={<MenuBookIcon />}
           sx={{
-            backgroundColor: isActive('/') ? 'primary.main' : 'transparent',
-            color: isActive('/') ? 'white' : 'primary.main',
-            '&:hover': {
-              backgroundColor: isActive('/')
-                ? 'primary.dark'
-                : 'rgba(25, 118, 210, 0.04)',
+            backgroundColor: isActive("/") ? "primary.main" : "transparent",
+            color: isActive("/") ? "white" : "primary.main",
+            "&:hover": {
+              backgroundColor: isActive("/")
+                ? "primary.dark"
+                : "rgba(25, 118, 210, 0.04)",
             },
           }}
         >
@@ -243,49 +246,49 @@ function Header() {
           to="/methods"
           startIcon={<ScienceIcon />}
           sx={{
-            backgroundColor: isActive('/methods')
-              ? 'primary.main'
-              : 'transparent',
-            color: isActive('/methods') ? 'white' : 'primary.main',
-            '&:hover': {
-              backgroundColor: isActive('/methods')
-                ? 'primary.dark'
-                : 'rgba(25, 118, 210, 0.04)',
+            backgroundColor: isActive("/methods")
+              ? "primary.main"
+              : "transparent",
+            color: isActive("/methods") ? "white" : "primary.main",
+            "&:hover": {
+              backgroundColor: isActive("/methods")
+                ? "primary.dark"
+                : "rgba(25, 118, 210, 0.04)",
             },
           }}
         >
           Methods
         </Button>
-        
+
         <input
           type="file"
           accept=".yaml,.yml"
-          style={{ display: 'none' }}
+          style={{ display: "none" }}
           ref={fileInputRef}
           onChange={handleConfigFileUpload}
         />
         <Button
           onClick={handleLoadConfigClick}
           startIcon={<UploadFileIcon />}
-          variant={'outlined'}
+          variant={"outlined"}
           color="primary"
         >
           Load Config
         </Button>
         <Button
           component={Link}
-          to={'/workflow-cor'}
+          to={"/workflow-cor"}
           startIcon={<CenterFocusStrongIcon />}
           sx={{
-            backgroundColor: isActive('/corfinder')
-              ? 'primary.main'
-              : 'transparent',
-            color: isActive('/corfinder') ? 'white' : 'primary.main',
-            '&:hover': {
-              backgroundColor: isActive('/corfinder')
-                ? 'primary.dark'
-                : 'rgba(25, 118, 210, 0.04)',
-              cursor: 'pointer',
+            backgroundColor: isActive("/corfinder")
+              ? "primary.main"
+              : "transparent",
+            color: isActive("/corfinder") ? "white" : "primary.main",
+            "&:hover": {
+              backgroundColor: isActive("/corfinder")
+                ? "primary.dark"
+                : "rgba(25, 118, 210, 0.04)",
+              cursor: "pointer",
             },
           }}
         >
@@ -296,14 +299,14 @@ function Header() {
           to="/fullpipelines"
           startIcon={<AutoFixHighIcon />}
           sx={{
-            backgroundColor: isActive('/fullpipelines')
-              ? 'primary.main'
-              : 'transparent',
-            color: isActive('/fullpipelines') ? 'white' : 'primary.main',
-            '&:hover': {
-              backgroundColor: isActive('/fullpipelines')
-                ? 'primary.dark'
-                : 'rgba(25, 118, 210, 0.04)',
+            backgroundColor: isActive("/fullpipelines")
+              ? "primary.main"
+              : "transparent",
+            color: isActive("/fullpipelines") ? "white" : "primary.main",
+            "&:hover": {
+              backgroundColor: isActive("/fullpipelines")
+                ? "primary.dark"
+                : "rgba(25, 118, 210, 0.04)",
             },
           }}
         >
@@ -316,12 +319,12 @@ function Header() {
         open={snackbarState.open}
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       >
         <Alert
           onClose={handleSnackbarClose}
           severity={snackbarState.severity}
-          sx={{ width: '100%' }}
+          sx={{ width: "100%" }}
         >
           {snackbarState.message}
         </Alert>
