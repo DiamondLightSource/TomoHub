@@ -29,6 +29,5 @@ venv
 # Ignore .env files
 .env
 .env.development
-.env.production
 
 frontend/src/components/workflows/__generated__/
