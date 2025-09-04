@@ -1,0 +1,18 @@
+{
+  "name": "tomohub-dev",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  },
+  "runArgs": ["--security-opt=label=type:container_runtime_t"],
+  "workspaceMount": "source=../,target=/workspace,type=bind",
+  "workspaceFolder": "/workspace"
+}
