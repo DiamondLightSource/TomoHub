@@ -1,27 +1,6 @@
 # TomoHub 
 Tomohub is a graphical tool created with React and FastAPI to generate and configure YAML processlists for [HTTOMO](https://diamondlightsource.github.io/httomo/index.html) pacakge and using React Relay and [Workflows](https://github.com/DiamondLightSource/workflows), it's able to run high throughput tomography jobs using [HTTOMO](https://diamondlightsource.github.io/httomo/index.html) as well.
 
-## Usage
-start by cloning the repo : 
-```
-git clone https://github.com/DiamondLightSource/TomoHub
-```
-set up frontend :
-```
-cd Tomohub/frontend
-npm i
-npm run relay 
-npm run dev
-```
-
-set up backend :
-```
-cd Tomohub/backend
-pip install -r requirements.txt
-pip install httomolibgpu --no-deps
-pip install httomo_backends --no-deps 
-uvicorn main:app --reload
-```
 ## How to use
 In order to run a tomography reconstruction jobs with HTTOMO package, you need to have your data and a processlist (pipeline), these processlists are
 basically YAML files with different methods and parameters for the reconstruction job, with both deployment and local versions of tomohub you are able generate these processlists without editting the YAML files directly and then simply download your config files and use them in order to run HTTOMO.
@@ -44,3 +23,25 @@ the main available feature on the local version is COR finder tool, with this to
 you can select a ready to use pipelines as well, simply select your pipeline from the "Ready to use piplines"
 ### Download your processlist
 after setting loader and selecting your methods, you can name download your config file and use it with HTTOMO
+
+## Setting up developer environment
+start by cloning the repo :
+```
+git clone https://github.com/DiamondLightSource/TomoHub
+```
+set up frontend :
+```
+cd Tomohub/frontend
+npm i
+npm run relay
+npm run dev
+```
+
+set up backend :
+```
+cd Tomohub/backend
+pip install -r requirements.txt
+pip install httomolibgpu --no-deps
+pip install httomo_backends --no-deps
+uvicorn main:app --reload
+```
