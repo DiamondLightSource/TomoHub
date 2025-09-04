@@ -3,7 +3,7 @@ import Keycloak from "keycloak-js";
 const keycloakConfig = {
   url: "https://authn.diamond.ac.uk/",
   realm: "master",
-  clientId: "tomohub",
+  clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID,
 };
 
 const keycloak = new Keycloak(keycloakConfig);
