@@ -25,11 +25,25 @@ you can select a ready to use pipelines as well, simply select your pipeline fro
 after setting loader and selecting your methods, you can name download your config file and use it with HTTOMO
 
 ## Setting up developer environment
-start by cloning the repo :
+
+### Clone the repo
+
 ```
 git clone https://github.com/DiamondLightSource/TomoHub
 ```
-set up frontend :
+
+### Setup frontend
+
+#### Add local env file
+
+In `frontend/`, add an `.env.local` file with the following contents:
+```
+VITE_API_BASE_URL = "http://localhost:8000"
+VITE_KEYCLOAK_CLIENT_ID = "tomohub-dev"
+```
+
+#### Install dependencies and generate code from GraphQL schema
+
 ```
 cd Tomohub/frontend
 npm i
@@ -37,7 +51,8 @@ npm run relay
 npm run dev
 ```
 
-set up backend :
+### Setup backend
+
 ```
 cd Tomohub/backend
 pip install -r requirements.txt
