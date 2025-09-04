@@ -8,6 +8,11 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - app: frontend
+          - app: backend
     permissions:
       contents: read
       packages: write
@@ -19,9 +24,7 @@ jobs:
 
       # Generate the image names dynamically
       - name: Generate Image Names
-        run: |
-          echo FRONTEND_IMAGE=ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]' | tr '[_]' '[\-]')-frontend >> $GITHUB_ENV
-          echo BACKEND_IMAGE=ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]' | tr '[_]' '[\-]')-backend >> $GITHUB_ENV
+        run: echo IMAGE=ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]' | tr '[_]' '[\-]')-${{ matrix.app }} >> $GITHUB_ENV
 
       # Log in to GitHub Container Registry
       - name: Log in to GitHub Docker Registry
@@ -32,29 +35,29 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract Version from Tag
+        id: tags
+        run: echo version=$(echo "${{ github.ref_name }}" | cut -c 2-) >> $GITHUB_OUTPUT
+
+      - name: Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=raw,value=${{ steps.tags.outputs.version }}
+            type=raw,value=latest
+
       # Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.7.1
 
-      # Build and push the frontend image
-      - name: Build and Push Frontend Image
+      - name: Build and Push Image
         uses: docker/build-push-action@v6.10.0
         with:
-          context: ./frontend # Path to the frontend directory
+          context: ./${{ matrix.app }}
           push: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
-          tags: ${{ env.FRONTEND_IMAGE }}:latest
-          labels: |
-            org.opencontainers.image.source=${{ github.repository_url }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      # Build and push the backend image
-      - name: Build and Push Backend Image
-        uses: docker/build-push-action@v6.10.0
-        with:
-          context: ./backend # Path to the backend directory
-          push: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
-          tags: ${{ env.BACKEND_IMAGE }}:latest
+          tags: ${{ steps.meta.outputs.tags }}
           labels: |
             org.opencontainers.image.source=${{ github.repository_url }}
           cache-from: type=gha
