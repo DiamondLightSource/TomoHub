@@ -280,12 +280,12 @@ function Header() {
           to={"/workflow-cor"}
           startIcon={<CenterFocusStrongIcon />}
           sx={{
-            backgroundColor: isActive("/corfinder")
+            backgroundColor: isActive("/workflow-cor")
               ? "primary.main"
               : "transparent",
-            color: isActive("/corfinder") ? "white" : "primary.main",
+            color: isActive("/workflow-cor") ? "white" : "primary.main",
             "&:hover": {
-              backgroundColor: isActive("/corfinder")
+              backgroundColor: isActive("/workflow-cor")
                 ? "primary.dark"
                 : "rgba(25, 118, 210, 0.04)",
               cursor: "pointer",
