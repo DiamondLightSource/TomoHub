@@ -296,7 +296,7 @@ const SubmissionFormCOR = (props: {
       <ParameterSweepForm values={sweepValues} onChange={setSweepValues} />
 
       <Typography variant="h6" sx={{ mt: 2 }}>
-        Workflow Parameterss
+        Workflow Parameters
       </Typography>
       <WorkflowParametersForm values={wfValues} onChange={setWfValues} />
 
