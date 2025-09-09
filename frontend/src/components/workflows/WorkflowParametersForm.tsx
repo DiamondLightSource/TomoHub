@@ -21,6 +21,13 @@ export default function WorkflowParametersForm({
   disabled?: boolean;
 }) {
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [memoryFieldError, setMemoryFieldError] = useState(false);
+  function onMemoryFieldChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) {
+    onChange({ ...values, memory: e.target.value });
+    setMemoryFieldError(!e.target.checkValidity());
+  }
 
   return (
     <Stack direction="column" spacing={2}>
@@ -80,9 +87,15 @@ export default function WorkflowParametersForm({
             size="small"
           />
           <TextField
+            error={memoryFieldError}
+            slotProps={{
+              htmlInput: {
+                pattern: "[0-9]+[GMK]i",
+              },
+            }}
             label="Memory"
             value={values.memory ?? ""}
-            onChange={(e) => onChange({ ...values, memory: e.target.value })}
+            onChange={(e) => onMemoryFieldChange(e)}
             disabled={disabled}
             fullWidth
             size="small"
