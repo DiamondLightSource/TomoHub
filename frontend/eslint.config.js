@@ -30,8 +30,6 @@ export default tseslint.config(
         "warn",
         { allowConstantExport: true },
       ],
-      "react/react-in-jsx-scope": "off",
-      "react/jsx-uses-react": "off",
       "@typescript-eslint/no-unused-vars": [
         "error",
         { argsIgnorePattern: "^_" },
