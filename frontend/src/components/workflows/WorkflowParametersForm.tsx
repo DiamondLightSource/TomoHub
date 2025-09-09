@@ -22,12 +22,6 @@ export default function WorkflowParametersForm({
 }) {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [memoryFieldError, setMemoryFieldError] = useState(false);
-  function onMemoryFieldChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) {
-    onChange({ ...values, memory: e.target.value });
-    setMemoryFieldError(!e.target.checkValidity());
-  }
 
   return (
     <Stack direction="column" spacing={2}>
@@ -95,7 +89,10 @@ export default function WorkflowParametersForm({
             }}
             label="Memory"
             value={values.memory ?? ""}
-            onChange={(e) => onMemoryFieldChange(e)}
+            onChange={(e) => {
+              onChange({ ...values, memory: e.target.value });
+              setMemoryFieldError(!e.target.checkValidity());
+            }}
             disabled={disabled}
             fullWidth
             size="small"
