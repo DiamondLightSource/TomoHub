@@ -99,6 +99,11 @@ export default function WorkflowParametersForm({
             disabled={disabled}
             fullWidth
             size="small"
+            helperText={
+              memoryFieldError
+                ? "Must be a number followed by Ki, Mi or Gi"
+                : " "
+            }
           />
           <TextField
             label="Output Directory Name"
