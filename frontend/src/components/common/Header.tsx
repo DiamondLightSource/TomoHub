@@ -12,6 +12,7 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import ScienceIcon from "@mui/icons-material/Science";
 import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import CropIcon from "@mui/icons-material/Crop";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import yaml from "js-yaml";
 import { useLoader, PreviewType } from "../../contexts/LoaderContext";
@@ -311,6 +312,22 @@ function Header() {
           }}
         >
           Full pipelines
+        </Button>
+        <Button
+          component={Link}
+          to="/crop"
+          startIcon={<CropIcon />}
+          sx={{
+            backgroundColor: isActive("/crop") ? "primary.main" : "transparent",
+            color: isActive("/crop") ? "white" : "primary.main",
+            "&:hover": {
+              backgroundColor: isActive("/crop")
+                ? "primary.dark"
+                : "rgba(25, 118, 210, 0.04)",
+            },
+          }}
+        >
+          Crop
         </Button>
       </ButtonGroup>
 
