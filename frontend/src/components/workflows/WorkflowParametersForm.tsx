@@ -21,6 +21,7 @@ export default function WorkflowParametersForm({
   disabled?: boolean;
 }) {
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [memoryFieldError, setMemoryFieldError] = useState(false);
 
   return (
     <Stack direction="column" spacing={2}>
@@ -80,12 +81,26 @@ export default function WorkflowParametersForm({
             size="small"
           />
           <TextField
+            error={memoryFieldError}
+            slotProps={{
+              htmlInput: {
+                pattern: "[0-9]+[GMK]i",
+              },
+            }}
             label="Memory"
             value={values.memory ?? ""}
-            onChange={(e) => onChange({ ...values, memory: e.target.value })}
+            onChange={(e) => {
+              onChange({ ...values, memory: e.target.value });
+              setMemoryFieldError(!e.target.checkValidity());
+            }}
             disabled={disabled}
             fullWidth
             size="small"
+            helperText={
+              memoryFieldError
+                ? "Must be a number followed by Ki, Mi or Gi"
+                : " "
+            }
           />
           <TextField
             label="Output Directory Name"
