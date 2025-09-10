@@ -118,7 +118,7 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
             Start Position
           </Typography>
           <Grid2 container spacing={1} alignItems="center">
-            <Grid2>
+            <Grid2 size="grow">
               <TextField
                 label="Custom Start"
                 variant="outlined"
@@ -202,7 +202,7 @@ const LoaderPreview: React.FC<LoaderPreviewProps> = ({ onClose }) => {
             Stop Position
           </Typography>
           <Grid2 container spacing={1} alignItems="center">
-            <Grid2>
+            <Grid2 size="grow">
               <TextField
                 label="Custom Stop"
                 variant="outlined"
