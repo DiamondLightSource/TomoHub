@@ -8,9 +8,8 @@ import {
   SubmissionNetworkErrorMessage,
   SubmissionSuccessMessage,
   SubmittedMessagesList,
-  Visit,
 } from "workflows-lib";
-import { visitToText } from "@diamondlightsource/sci-react-ui";
+import { Visit, visitToText } from "@diamondlightsource/sci-react-ui";
 import SubmissionFormGPURun from "./SubmissionFormGPURun";
 import SubmissionFormCOR from "./sweepPipeline/SubmissionFormCOR";
 import { SubmissionQuery as SubmissionQueryType } from "./__generated__/SubmissionQuery.graphql";
