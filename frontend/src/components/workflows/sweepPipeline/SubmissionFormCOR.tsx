@@ -8,7 +8,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { JSONObject } from "workflows-lib";
+import { JSONObject } from "../../../types";
 import {
   Visit,
   VisitInput,

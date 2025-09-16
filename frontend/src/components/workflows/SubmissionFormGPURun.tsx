@@ -15,7 +15,7 @@ import {
   Alert,
 } from "@mui/material";
 import { ErrorObject } from "ajv";
-import { JSONObject } from "workflows-lib";
+import { JSONObject } from "../../types";
 import {
   Visit,
   VisitInput,
