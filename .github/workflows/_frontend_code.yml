@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  lint:
+  code_checks:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository code
@@ -27,3 +27,7 @@ jobs:
       - name: Check Formatting of TypeScript Code
         working-directory: frontend
         run: npm run format:check
+
+      - name: Check Linting Rules for TypeScript Code
+        working-directory: frontend
+        run: npm run lint
