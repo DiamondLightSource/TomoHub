@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useLazyLoadQuery, useMutation } from "react-relay/hooks";
 import { graphql } from "relay-runtime";
 import { Box } from "@mui/material";
-import { SubmittedMessagesList } from "workflows-lib";
 import { Visit, visitToText } from "@diamondlightsource/sci-react-ui";
 import SubmissionFormGPURun from "./SubmissionFormGPURun";
 import SubmissionFormCOR from "./sweepPipeline/SubmissionFormCOR";
@@ -151,7 +150,7 @@ export default function Submission({
       {workflowName ? (
         <Box>
           {renderSubmissionForm()}
-          <SubmittedMessagesList submissionResults={submissionResults} />
+          <SubmittedMessagesList messages={submissionResults} />
         </Box>
       ) : (
         <>No Workflow Name provided</>
@@ -159,4 +158,38 @@ export default function Submission({
     </>
   );
 }
+
+const SubmittedMessagesList = ({ messages }: { messages: any[] }) => {
+  return (
+    <>
+      {messages.map((message, messageIdx) => {
+        switch (message.type) {
+          case "success":
+            return (
+              <p
+                key={messageIdx}
+              >{`Successfully submitted ${message.message}`}</p>
+            );
+          case "networkError":
+            return (
+              <p
+                key={messageIdx}
+              >{`Submission error type ${message.error.name}`}</p>
+            );
+          case "graphQLError":
+          default:
+            return (
+              <div key={messageIdx}>
+                <p>{"Submission error type GraphQL"}</p>
+                {message.errors.map((e, idx) => {
+                  return <p key={idx}>{`Error ${idx} ${e.message}`}</p>;
+                })}
+              </div>
+            );
+        }
+      })}
+    </>
+  );
+};
+
 export { sharedFragment };
