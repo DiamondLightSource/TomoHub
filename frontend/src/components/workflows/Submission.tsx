@@ -2,13 +2,7 @@ import { useState } from "react";
 import { useLazyLoadQuery, useMutation } from "react-relay/hooks";
 import { graphql } from "relay-runtime";
 import { Box } from "@mui/material";
-import {
-  JSONObject,
-  SubmissionGraphQLErrorMessage,
-  SubmissionNetworkErrorMessage,
-  SubmissionSuccessMessage,
-  SubmittedMessagesList,
-} from "workflows-lib";
+import { JSONObject, SubmittedMessagesList } from "workflows-lib";
 import { Visit, visitToText } from "@diamondlightsource/sci-react-ui";
 import SubmissionFormGPURun from "./SubmissionFormGPURun";
 import SubmissionFormCOR from "./sweepPipeline/SubmissionFormCOR";
@@ -77,13 +71,7 @@ export default function Submission({
     name: workflowName,
   });
 
-  const [submissionResults, setSubmissionResults] = useState<
-    (
-      | SubmissionSuccessMessage
-      | SubmissionNetworkErrorMessage
-      | SubmissionGraphQLErrorMessage
-    )[]
-  >([]);
+  const [submissionResults, setSubmissionResults] = useState([]);
 
   const [commitMutation] =
     useMutation<SubmissionMutationType>(submissionMutation);
