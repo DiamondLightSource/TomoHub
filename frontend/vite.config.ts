@@ -4,4 +4,7 @@ import relay from "vite-plugin-relay";
 
 export default defineConfig({
   plugins: [react(), relay],
+  define: {
+    global: "window",
+  },
 });
