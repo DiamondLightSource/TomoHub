@@ -5,7 +5,7 @@ import Layout from "./components/common/Layout";
 import Methods from "./components/pages/Methods";
 import FullPipelines from "./components/pages/FullPipelines";
 import Submission from "./components/workflows/Submission";
-import { Visit } from "workflows-lib";
+import { Visit } from "@diamondlightsource/sci-react-ui";
 
 const App: React.FC = () => {
   const [userVisit, setUserVisit] = useState<Visit>();

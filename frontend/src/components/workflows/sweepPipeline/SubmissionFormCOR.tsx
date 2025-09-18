@@ -8,8 +8,12 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { JSONObject, Visit } from "workflows-lib";
-import { VisitInput, visitToText } from "@diamondlightsource/sci-react-ui";
+import { JSONObject } from "../../../types";
+import {
+  Visit,
+  VisitInput,
+  visitToText,
+} from "@diamondlightsource/sci-react-ui";
 import Loader from "../../loader/Loader";
 import { useLoader } from "../../../contexts/LoaderContext";
 import { SubmissionFormSharedFragment$key } from "../__generated__/SubmissionFormSharedFragment.graphql";

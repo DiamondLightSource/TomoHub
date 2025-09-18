@@ -2,20 +2,13 @@ import { useState } from "react";
 import { useLazyLoadQuery, useMutation } from "react-relay/hooks";
 import { graphql } from "relay-runtime";
 import { Box } from "@mui/material";
-import {
-  JSONObject,
-  SubmissionGraphQLErrorMessage,
-  SubmissionNetworkErrorMessage,
-  SubmissionSuccessMessage,
-  SubmittedMessagesList,
-  Visit,
-} from "workflows-lib";
-import { visitToText } from "@diamondlightsource/sci-react-ui";
+import { Visit, visitToText } from "@diamondlightsource/sci-react-ui";
 import SubmissionFormGPURun from "./SubmissionFormGPURun";
 import SubmissionFormCOR from "./sweepPipeline/SubmissionFormCOR";
 import { SubmissionQuery as SubmissionQueryType } from "./__generated__/SubmissionQuery.graphql";
 import { SubmissionMutation as SubmissionMutationType } from "./__generated__/SubmissionMutation.graphql";
 import React from "react";
+import { JSONObject } from "../../types";
 
 const submissionQuery = graphql`
   query SubmissionQuery($name: String!) {
@@ -78,13 +71,7 @@ export default function Submission({
     name: workflowName,
   });
 
-  const [submissionResults, setSubmissionResults] = useState<
-    (
-      | SubmissionSuccessMessage
-      | SubmissionNetworkErrorMessage
-      | SubmissionGraphQLErrorMessage
-    )[]
-  >([]);
+  const [submissionResults, setSubmissionResults] = useState([]);
 
   const [commitMutation] =
     useMutation<SubmissionMutationType>(submissionMutation);
@@ -163,7 +150,7 @@ export default function Submission({
       {workflowName ? (
         <Box>
           {renderSubmissionForm()}
-          <SubmittedMessagesList submissionResults={submissionResults} />
+          <SubmittedMessagesList messages={submissionResults} />
         </Box>
       ) : (
         <>No Workflow Name provided</>
@@ -171,4 +158,38 @@ export default function Submission({
     </>
   );
 }
+
+const SubmittedMessagesList = ({ messages }: { messages: any[] }) => {
+  return (
+    <>
+      {messages.map((message, messageIdx) => {
+        switch (message.type) {
+          case "success":
+            return (
+              <p
+                key={messageIdx}
+              >{`Successfully submitted ${message.message}`}</p>
+            );
+          case "networkError":
+            return (
+              <p
+                key={messageIdx}
+              >{`Submission error type ${message.error.name}`}</p>
+            );
+          case "graphQLError":
+          default:
+            return (
+              <div key={messageIdx}>
+                <p>{"Submission error type GraphQL"}</p>
+                {message.errors.map((e, idx) => {
+                  return <p key={idx}>{`Error ${idx} ${e.message}`}</p>;
+                })}
+              </div>
+            );
+        }
+      })}
+    </>
+  );
+};
+
 export { sharedFragment };

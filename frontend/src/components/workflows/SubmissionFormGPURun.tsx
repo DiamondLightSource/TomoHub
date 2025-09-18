@@ -15,8 +15,12 @@ import {
   Alert,
 } from "@mui/material";
 import { ErrorObject } from "ajv";
-import { JSONObject, Visit } from "workflows-lib";
-import { VisitInput, visitToText } from "@diamondlightsource/sci-react-ui";
+import { JSONObject } from "../../types";
+import {
+  Visit,
+  VisitInput,
+  visitToText,
+} from "@diamondlightsource/sci-react-ui";
 import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionFormSharedFragment.graphql";
 import Loader from "../loader/Loader";
 import { useLoader } from "../../contexts/LoaderContext";
