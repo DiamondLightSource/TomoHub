@@ -3,18 +3,19 @@ import React from "react";
 // import Guide from "../common/Guide";
 
 import { HeatmapPlot, ScaleType } from "@diamondlightsource/davidia";
-import test_data from "./crop_test_data/test-projection.json";
-import big_test_data from "./crop_test_data/real-projection.json";
+// import test_data from "./crop_test_data/test-projection.json";
+import big_test_data from "./crop_test_data/real-projection.json" assert { type: "json" };
 import type { NDT } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 
 const Crop: React.FC = () => {
-  const big_test_data_typed: number[] = big_test_data;
-  const big_test_data_array: Uint16Array = new Uint16Array(big_test_data_typed);
+  const big_test_data_array: Uint16Array = new Uint16Array(
+    big_test_data as number[]
+  );
   const big_test_data_NDT = ndarray(big_test_data_array, [2160, 2560]) as NDT;
 
-  const test_data_array: Uint16Array = new Uint16Array(test_data);
-  const test_data_NDT = ndarray(test_data_array, [128, 160]) as NDT;
+  // const test_data_array: Uint16Array = new Uint16Array(test_data);
+  // const test_data_NDT = ndarray(test_data_array, [128, 160]) as NDT;
 
   const heatMap = (
     <HeatmapPlot
