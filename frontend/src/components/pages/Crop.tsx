@@ -31,7 +31,7 @@ const Crop: React.FC = () => {
   return (
     <div>
       <h1>Cropping page</h1>
-      {heatMap}
+      <div style={{ display: "grid", height: "49vh" }}>{heatMap}</div>
     </div>
   );
 };
