@@ -1,4 +1,7 @@
-import { Box, Grid2, Slider, Input } from "@mui/material";
+import { Box, Grid2, Slider, Input, Button } from "@mui/material";
+import Undo from "@mui/icons-material/Undo";
+import PlayArrowOutlined from "@mui/icons-material/PlayArrowOutlined";
+import Clear from "@mui/icons-material/Clear";
 
 interface ImageNavbarProps {
   totalImages: number;
@@ -60,6 +63,24 @@ export default function ImageNavbar({
               "aria-labelledby": "input-slider",
             }}
           />
+        </Grid2>
+      </Grid2>
+
+      <Grid2 container spacing={2} sx={{ alignItems: "center" }}>
+        <Grid2>
+          <Button variant="outlined">
+            <Undo />
+          </Button>
+        </Grid2>
+        <Grid2>
+          <Button variant="outlined">
+            <PlayArrowOutlined />
+          </Button>
+        </Grid2>
+        <Grid2>
+          <Button variant="outlined">
+            <Clear />
+          </Button>
         </Grid2>
       </Grid2>
     </Box>
