@@ -6,21 +6,22 @@ import ndarray from "ndarray";
 import ImagePlot from "../crop/Plot";
 import ImageNavbar from "../crop/Navbar";
 
-const Crop: React.FC = () => {
-  const image_width = 2560;
-  const image_height = 2160;
-  const max_pixel_value = 60000;
-  const copies = 10;
-  const sample_rate = 10;
+const image_width = 2560;
+const image_height = 2160;
+const max_pixel_value = 60000;
+const copies = 10;
+// turn up sample rate to sample less pixels, maybe needs renaming?
+const sample_rate = 10;
 
+// the initial image is copied [copies] times
+// each copy is shifted to the left by an increasing number of pixels
+// the copies are then added to shifted_images
+const shifted_images: NDT[] = [];
+
+function load_data() {
   const image_array: Uint16Array = new Uint16Array(raw_image as number[]);
 
   const image_NDT = ndarray(image_array, [image_height, image_width]) as NDT;
-
-  // the initial image is copied [copies] times
-  // each copy is shifted to the left by an increasing number of pixels
-  // the copies are then added to shifted_images
-  const shifted_images: NDT[] = [];
 
   // will loop [copies] times
   for (
@@ -42,6 +43,13 @@ const Crop: React.FC = () => {
       Math.floor(image_width / sample_rate),
     ]) as NDT;
     shifted_images.push(current_frame_NDT);
+  }
+}
+
+const Crop: React.FC = () => {
+  // only "loads" data if its not been loaded already
+  if (shifted_images.length == 0) {
+    load_data();
   }
 
   const [imageIndex, setImageIndex] = useState(0);
