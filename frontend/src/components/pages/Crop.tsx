@@ -1,9 +1,9 @@
 import React from "react";
 
-import { HeatmapPlot, ScaleType } from "@diamondlightsource/davidia";
 import raw_image from "./crop_test_data/real-projection.json";
 import type { NDT } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
+import ImagePlot from "../crop/Plot";
 
 const Crop: React.FC = () => {
   const image_width = 2560;
@@ -20,7 +20,6 @@ const Crop: React.FC = () => {
   // loops through every pixel in the frame
   for (let y = 0; y < image_height; y += sample_rate) {
     for (let x = 0; x < image_width; x += sample_rate) {
-      // the modulo operator here creates the wrapping effect
       current_copy.push(image_NDT.get(y, x));
     }
   }
@@ -30,25 +29,13 @@ const Crop: React.FC = () => {
     Math.floor(image_width / sample_rate),
   ]) as NDT;
 
-  const heatMap = (
-    <HeatmapPlot
-      aspect="auto"
-      colourMap="Purples"
-      domain={[0, max_pixel_value]}
-      heatmapScale={ScaleType.Linear}
-      plotConfig={{
-        title: "Sample Heatmap Plot",
-        xLabel: "x-axis",
-        yLabel: "y-axis",
-      }}
-      values={downsampled_image_NDT}
-    />
-  );
-
   return (
     <div>
       <h1>Cropping page</h1>
-      <div style={{ display: "grid", height: "49vh" }}>{heatMap}</div>
+      <ImagePlot
+        image={downsampled_image_NDT}
+        max_pixel_value={max_pixel_value}
+      />
     </div>
   );
 };
