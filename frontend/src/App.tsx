@@ -5,6 +5,7 @@ import Layout from "./components/common/Layout";
 import Methods from "./components/pages/Methods";
 import FullPipelines from "./components/pages/FullPipelines";
 import Submission from "./components/workflows/Submission";
+import Crop from "./components/pages/Crop";
 import { Visit } from "@diamondlightsource/sci-react-ui";
 
 const App: React.FC = () => {
@@ -35,6 +36,7 @@ const App: React.FC = () => {
                 />
               }
             />
+            <Route path="crop" element={<Crop />} />
           </Route>
         </Routes>
       </Suspense>
