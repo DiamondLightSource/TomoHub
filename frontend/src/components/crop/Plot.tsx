@@ -9,7 +9,7 @@ interface ImagePlotProps {
 
 export default function ImagePlot({ image, max_pixel_value }: ImagePlotProps) {
   return (
-    <Box style={{ display: "grid", height: "49vh" }}>
+    <Box style={{ display: "grid", height: "49vh", minHeight: "400px" }}>
       <HeatmapPlot
         aspect="auto"
         colourMap="Purples"
