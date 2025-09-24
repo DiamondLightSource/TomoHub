@@ -37,10 +37,11 @@ export default function ImageNavbar({
   };
 
   return (
-    <Box style={{ display: "grid", height: "49vh" }}>
-      <Grid2 container spacing={2} sx={{ alignItems: "center" }}>
+    <Box style={{ display: "grid", height: "15vh", minHeight: "100px" }}>
+      <Grid2 container spacing={6} sx={{ alignItems: "center" }}>
         <Grid2 size="grow">
           <Slider
+            style={{ margin: "15px" }}
             value={
               typeof currentImageIndex === "number" ? currentImageIndex : 0
             }
@@ -52,7 +53,6 @@ export default function ImageNavbar({
         <Grid2>
           <Input
             value={currentImageIndex}
-            size="small"
             onChange={handleInputChange}
             onBlur={handleBlur}
             inputProps={{
@@ -67,18 +67,18 @@ export default function ImageNavbar({
       </Grid2>
 
       <Grid2 container spacing={2} sx={{ alignItems: "center" }}>
-        <Grid2>
-          <Button variant="outlined">
+        <Grid2 size="grow">
+          <Button variant="outlined" fullWidth>
             <Undo />
           </Button>
         </Grid2>
-        <Grid2>
-          <Button variant="outlined">
+        <Grid2 size="grow">
+          <Button variant="outlined" fullWidth>
             <PlayArrowOutlined />
           </Button>
         </Grid2>
-        <Grid2>
-          <Button variant="outlined">
+        <Grid2 size="grow">
+          <Button variant="outlined" fullWidth>
             <Clear />
           </Button>
         </Grid2>
