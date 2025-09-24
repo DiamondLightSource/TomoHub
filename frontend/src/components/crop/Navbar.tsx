@@ -1,10 +1,16 @@
 import { Box, Grid2, Slider, Input } from "@mui/material";
-import { useState } from "react";
 
-export default function ImageNavbar() {
-  const [currentImageIndex, imageIndexSetter] = useState(0);
-  const total_images = 100;
+interface ImageNavbarProps {
+  totalImages: number;
+  currentImageIndex: number;
+  imageIndexSetter: React.Dispatch<React.SetStateAction<number>>;
+}
 
+export default function ImageNavbar({
+  totalImages: total_images,
+  currentImageIndex,
+  imageIndexSetter,
+}: ImageNavbarProps) {
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
     if (typeof newValue == "number") {
       imageIndexSetter(newValue);

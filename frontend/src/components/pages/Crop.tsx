@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import raw_image from "./crop_test_data/real-projection.json";
 import type { NDT } from "@diamondlightsource/davidia";
@@ -44,11 +44,20 @@ const Crop: React.FC = () => {
     shifted_images.push(current_frame_NDT);
   }
 
+  const [imageIndex, setImageIndex] = useState(0);
+
   return (
     <div>
       <h1>Cropping page</h1>
-      <ImagePlot image={shifted_images[0]} max_pixel_value={max_pixel_value} />
-      <ImageNavbar />
+      <ImagePlot
+        image={shifted_images[imageIndex]}
+        max_pixel_value={max_pixel_value}
+      />
+      <ImageNavbar
+        totalImages={copies}
+        currentImageIndex={imageIndex}
+        imageIndexSetter={setImageIndex}
+      />
     </div>
   );
 };
