@@ -26,10 +26,6 @@ const Crop: React.FC = () => {
         yLabel: "y-axis",
       }}
       values={image_NDT}
-      selectionsListener={(e, f, g) => {
-        console.log(g);
-      }}
-      updateSelection={undefined}
     />
   );
 
