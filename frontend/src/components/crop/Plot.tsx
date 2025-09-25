@@ -22,9 +22,9 @@ export default function ImagePlot({
 }: ImagePlotProps) {
   // useMemo so the empty array is only created once (unless copies is updated)
   const emptyArray: (SelectionBase[] | null)[] = useMemo(() => {
-    const result: (SelectionBase[] | null)[] = [];
+    const result: SelectionBase[][] = [];
     for (let i = 0; i < copies; i++) {
-      result.push(null);
+      result.push([]);
     }
     return result;
   }, [copies]);
@@ -33,11 +33,11 @@ export default function ImagePlot({
 
   let currentSelections: SelectionBase[] = [];
   let currentSelectionIndex = -1;
-  // searches backwards from the current frame for the first previous selection that is not null
+  // searches backwards from the current frame for the first previous selection that is not empty
   // + copies and modulo create looping effect
   for (let i = index + copies; i > 0; i--) {
     const iteration_selection = imageSelections[i % copies];
-    if (iteration_selection != null) {
+    if (iteration_selection.length != 0) {
       currentSelections = iteration_selection;
       currentSelectionIndex = i % copies;
       break;
@@ -72,7 +72,7 @@ export default function ImagePlot({
                 setSelections(imageSelectionsCopy);
               }
             } else if (eventType == "removed" && selection != undefined) {
-              imageSelectionsCopy[currentSelectionIndex] = null;
+              imageSelectionsCopy[currentSelectionIndex] = [];
               setSelections(imageSelectionsCopy);
             }
           }
