@@ -14,6 +14,22 @@ const Crop: React.FC = () => {
 
   const image_NDT = ndarray(image_array, [image_height, image_width]) as NDT;
 
+  const sample_rate = 10;
+
+  const current_copy: number[] = [];
+  // loops through every pixel in the frame
+  for (let y = 0; y < image_height; y += sample_rate) {
+    for (let x = 0; x < image_width; x += sample_rate) {
+      // the modulo operator here creates the wrapping effect
+      current_copy.push(image_NDT.get(y, x));
+    }
+  }
+
+  const downsampled_image_NDT = ndarray(new Uint16Array(current_copy), [
+    Math.floor(image_height / sample_rate),
+    Math.floor(image_width / sample_rate),
+  ]) as NDT;
+
   const heatMap = (
     <HeatmapPlot
       aspect="auto"
@@ -25,7 +41,7 @@ const Crop: React.FC = () => {
         xLabel: "x-axis",
         yLabel: "y-axis",
       }}
-      values={image_NDT}
+      values={downsampled_image_NDT}
     />
   );
 
