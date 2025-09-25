@@ -1,4 +1,4 @@
-import raw_image from "../pages/crop_test_data/real-projection.json";
+import raw_image from "./crop_test_data/real-projection.json";
 import type { NDT } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 
