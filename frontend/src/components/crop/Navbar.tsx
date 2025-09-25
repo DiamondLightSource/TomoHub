@@ -1,4 +1,4 @@
-import { Box, Grid2, Slider, Input, Button } from "@mui/material";
+import { Box, Grid2, Slider, Input, Button, Tooltip } from "@mui/material";
 import Undo from "@mui/icons-material/Undo";
 import PlayArrowOutlined from "@mui/icons-material/PlayArrowOutlined";
 import Clear from "@mui/icons-material/Clear";
@@ -51,36 +51,44 @@ export default function ImageNavbar({
           />
         </Grid2>
         <Grid2>
-          <Input
-            value={currentImageIndex}
-            onChange={handleInputChange}
-            onBlur={handleBlur}
-            inputProps={{
-              step: 1,
-              min: 0,
-              max: total_images - 1,
-              type: "number",
-              "aria-labelledby": "input-slider",
-            }}
-          />
+          <Tooltip title="Current viewing angle">
+            <Input
+              value={currentImageIndex}
+              onChange={handleInputChange}
+              onBlur={handleBlur}
+              inputProps={{
+                step: 1,
+                min: 0,
+                max: total_images - 1,
+                type: "number",
+                "aria-labelledby": "input-slider",
+              }}
+            />
+          </Tooltip>
         </Grid2>
       </Grid2>
 
       <Grid2 container spacing={2} sx={{ alignItems: "center" }}>
         <Grid2 size="grow">
-          <Button variant="outlined" fullWidth>
-            <Undo />
-          </Button>
+          <Tooltip title="Undo last action">
+            <Button variant="outlined" fullWidth>
+              <Undo />
+            </Button>
+          </Tooltip>
         </Grid2>
         <Grid2 size="grow">
-          <Button variant="outlined" fullWidth>
-            <PlayArrowOutlined />
-          </Button>
+          <Tooltip title="Show selection at each angle">
+            <Button variant="outlined" fullWidth>
+              <PlayArrowOutlined />
+            </Button>
+          </Tooltip>
         </Grid2>
         <Grid2 size="grow">
-          <Button variant="outlined" fullWidth>
-            <Clear />
-          </Button>
+          <Tooltip title="Remove all selections">
+            <Button variant="outlined" fullWidth>
+              <Clear />
+            </Button>
+          </Tooltip>
         </Grid2>
       </Grid2>
     </Box>
