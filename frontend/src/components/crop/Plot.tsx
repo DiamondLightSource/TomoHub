@@ -1,3 +1,4 @@
+import React from "react";
 import { Box } from "@mui/material";
 import { HeatmapPlot, ScaleType } from "@diamondlightsource/davidia";
 import type { NDT } from "@diamondlightsource/davidia";

@@ -1,17 +1,25 @@
+import React, { useRef } from "react";
 import { Box, Grid2, Slider, Input } from "@mui/material";
 
 interface ImageNavbarProps {
-  totalImages: number;
+  total_images: number;
   currentImageIndex: number;
   imageIndexSetter: React.Dispatch<React.SetStateAction<number>>;
+  setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function ImageNavbar({
-  totalImages: total_images,
+  total_images,
   currentImageIndex,
   imageIndexSetter,
+  setIsDragging,
 }: ImageNavbarProps) {
-  const handleSliderChange = (event: Event, newValue: number | number[]) => {
+  const timeoutRef = useRef<number | null>(null);
+
+  const handleSliderChange = (
+    _event: Event | React.SyntheticEvent<Element, Event>,
+    newValue: number | number[]
+  ) => {
     if (typeof newValue == "number") {
       imageIndexSetter(newValue);
     } else {
@@ -20,9 +28,15 @@ export default function ImageNavbar({
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    imageIndexSetter(
-      event.target.value === "" ? 0 : Number(event.target.value)
-    );
+    const value = event.target.value === "" ? 0 : Number(event.target.value);
+    setIsDragging(true);
+    imageIndexSetter(value);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      setIsDragging(false);
+    }, 300);
   };
 
   const handleBlur = () => {
@@ -38,11 +52,15 @@ export default function ImageNavbar({
       <Grid2 container spacing={2} sx={{ alignItems: "center" }}>
         <Grid2 size="grow">
           <Slider
-            value={
-              typeof currentImageIndex === "number" ? currentImageIndex : 0
-            }
-            onChange={handleSliderChange}
-            aria-labelledby="input-slider"
+            value={currentImageIndex}
+            onChange={(e, val) => {
+              setIsDragging(true);
+              handleSliderChange(e, val);
+            }}
+            onChangeCommitted={(e, val) => {
+              setIsDragging(false);
+              handleSliderChange(e, val);
+            }}
             max={total_images - 1}
           />
         </Grid2>
