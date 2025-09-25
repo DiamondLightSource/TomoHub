@@ -32,12 +32,14 @@ export default function ImagePlot({
   const [imageSelections, setSelections] = useState(emptyArray);
 
   let currentSelections: SelectionBase[] = [];
+  let currentSelectionIndex = -1;
   // searches backwards from the current frame for the first previous selection that is not null
   // + copies and modulo create looping effect
   for (let i = index + copies; i > 0; i--) {
     const iteration_selection = imageSelections[i % copies];
     if (iteration_selection != null) {
       currentSelections = iteration_selection;
+      currentSelectionIndex = i % copies;
       break;
     }
   }
@@ -55,17 +57,22 @@ export default function ImagePlot({
           yLabel: "y-axis",
         }}
         values={image}
-        selectionsListener={(eventType, _, selection) => {
-          if (eventType == "created" && selection != undefined) {
+        selectionsListener={(eventType, dragging, selection) => {
+          if (dragging == false) {
             const imageSelectionsCopy = [...imageSelections];
-            if (selection instanceof RectangularSelection) {
-              imageSelectionsCopy[index] = [selection];
-              setSelections(imageSelectionsCopy);
-            } else {
-              // copy the value of currentSelection and set it to that again (dont change it)
-              // this stops regions being added if theyre not a rectangle
-              // however, the component still needs to refresh as the new selection region will be visible otherwise
-              // lmk if theres a better way to "force refresh" a component
+            if (eventType == "created" && selection != undefined) {
+              if (selection instanceof RectangularSelection) {
+                imageSelectionsCopy[index] = [selection];
+                setSelections(imageSelectionsCopy);
+              } else {
+                // copy the value of currentSelection and set it to that again (dont change it)
+                // this stops regions being added if theyre not a rectangle
+                // however, the component still needs to refresh as the new selection region will be visible otherwise
+                // lmk if theres a better way to "force refresh" a component
+                setSelections(imageSelectionsCopy);
+              }
+            } else if (eventType == "removed" && selection != undefined) {
+              imageSelectionsCopy[currentSelectionIndex] = null;
               setSelections(imageSelectionsCopy);
             }
           }
