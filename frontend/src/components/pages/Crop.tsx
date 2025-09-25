@@ -4,6 +4,7 @@ import raw_image from "./crop_test_data/real-projection.json";
 import type { NDT } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 import ImagePlot from "../crop/Plot";
+import ImageNavbar from "../crop/Navbar";
 
 const Crop: React.FC = () => {
   const image_width = 2560;
@@ -47,6 +48,7 @@ const Crop: React.FC = () => {
     <div>
       <h1>Cropping page</h1>
       <ImagePlot image={shifted_images[0]} max_pixel_value={max_pixel_value} />
+      <ImageNavbar />
     </div>
   );
 };
