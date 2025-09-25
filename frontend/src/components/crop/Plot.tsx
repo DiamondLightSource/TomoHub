@@ -32,12 +32,14 @@ export default function ImagePlot({
   const [imageSelections, setSelections] = useState(emptyArray);
 
   let currentSelections: SelectionBase[] = [];
+  let currentSelectionIndex = -1;
   // searches backwards from the current frame for the first previous selection that is not null
   // + copies and modulo create looping effect
   for (let i = index + copies; i > 0; i--) {
     const iteration_selection = imageSelections[i % copies];
     if (iteration_selection != null) {
       currentSelections = iteration_selection;
+      currentSelectionIndex = i % copies;
       break;
     }
   }
@@ -68,9 +70,11 @@ export default function ImagePlot({
                 // however, the component still needs to refresh as the new selection region will be visible otherwise
                 setSelections(imageSelectionsCopy);
               }
-            }
-            if (eventType == "updated" && !dragging) {
+            } else if (eventType == "updated" && !dragging) {
               imageSelectionsCopy[index] = [selection];
+              setSelections(imageSelectionsCopy);
+            } else if (eventType == "removed") {
+              imageSelectionsCopy[currentSelectionIndex] = null;
               setSelections(imageSelectionsCopy);
             }
           }
