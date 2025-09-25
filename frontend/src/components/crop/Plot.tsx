@@ -1,6 +1,10 @@
 import { Box } from "@mui/material";
 import { HeatmapPlot, ScaleType } from "@diamondlightsource/davidia";
-import type { NDT, SelectionBase } from "@diamondlightsource/davidia";
+import {
+  NDT,
+  SelectionBase,
+  RectangularSelection,
+} from "@diamondlightsource/davidia";
 import { useState } from "react";
 
 interface ImagePlotProps {
@@ -26,7 +30,15 @@ export default function ImagePlot({ image, max_pixel_value }: ImagePlotProps) {
         values={image}
         selectionsListener={(eventType, _, selection) => {
           if (eventType == "created" && selection != undefined) {
-            setCurrentSelection([selection]);
+            if (selection instanceof RectangularSelection) {
+              setCurrentSelection([selection]);
+            } else {
+              // copy the value of currentSelection and set it to that again (dont change it)
+              // this stops regions being added if theyre not a rectangle
+              // however, the component still needs to refresh as the new selection region will be visible otherwise
+              // lmk if theres a better way to "force refresh" a component
+              setCurrentSelection([...currentSelection]);
+            }
           }
         }}
         selections={currentSelection}
