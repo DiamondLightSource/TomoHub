@@ -19,7 +19,12 @@ export default function DisplayAreaWrapper({
 
   return (
     <div>
-      <ImagePlot image={images[imageIndex]} max_pixel_value={max_pixel_value} />
+      <ImagePlot
+        image={images[imageIndex]}
+        max_pixel_value={max_pixel_value}
+        index={imageIndex}
+        copies={copies}
+      />
       <ImageNavbar
         totalImages={copies}
         currentImageIndex={imageIndex}
