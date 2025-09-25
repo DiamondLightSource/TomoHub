@@ -58,9 +58,9 @@ export default function ImagePlot({
         }}
         values={image}
         selectionsListener={(eventType, dragging, selection) => {
-          if (dragging == false) {
+          if (dragging == false && selection != undefined) {
             const imageSelectionsCopy = [...imageSelections];
-            if (eventType == "created" && selection != undefined) {
+            if (eventType == "created") {
               if (selection instanceof RectangularSelection) {
                 imageSelectionsCopy[index] = [selection];
                 setSelections(imageSelectionsCopy);
@@ -71,8 +71,11 @@ export default function ImagePlot({
                 // lmk if theres a better way to "force refresh" a component
                 setSelections(imageSelectionsCopy);
               }
-            } else if (eventType == "removed" && selection != undefined) {
+            } else if (eventType == "removed") {
               imageSelectionsCopy[currentSelectionIndex] = [];
+              setSelections(imageSelectionsCopy);
+            } else if (eventType == "updated") {
+              imageSelectionsCopy[index] = [selection];
               setSelections(imageSelectionsCopy);
             }
           }
