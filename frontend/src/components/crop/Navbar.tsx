@@ -100,7 +100,11 @@ export default function ImageNavbar({
         </Grid2>
         <Grid2 size="grow">
           <Tooltip title="Remove all selections">
-            <Button variant="outlined" fullWidth>
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={selection_operations.removeAll}
+            >
               <Clear />
             </Button>
           </Tooltip>
