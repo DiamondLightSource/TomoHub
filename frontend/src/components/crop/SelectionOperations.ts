@@ -83,7 +83,8 @@ function savePrevious(
   imageSelectionsCopy: SelectionBase[][],
   setPreviousSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
 ) {
-  setPreviousSelections(imageSelectionsCopy);
+  const imageSelectionsOtherCopy = [...imageSelectionsCopy];
+  setPreviousSelections(imageSelectionsOtherCopy);
 }
 
 export default function defineSelectionOperations(
