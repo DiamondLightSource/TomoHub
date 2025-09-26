@@ -6,6 +6,7 @@ export type SelectionOperations = {
   onScreenBeingModified: (selection: SelectionBase) => boolean;
   forceRefresh: () => void;
   removeAll: () => void;
+  toPrevious: () => void;
 };
 
 // creates selection at the current index
@@ -71,6 +72,13 @@ function removeAll(
   setSelections(emptyArray);
 }
 
+function toPrevious(
+  previousImageSelections: SelectionBase[][],
+  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
+) {
+  setSelections(previousImageSelections);
+}
+
 function savePrevious(
   imageSelectionsCopy: SelectionBase[][],
   setPreviousSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
@@ -82,6 +90,7 @@ export default function defineSelectionOperations(
   index: number,
   onScreenSelectionIndex: number,
   imageSelections: SelectionBase[][],
+  previousImageSelections: SelectionBase[][],
   setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>,
   setPreviousSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
 ): SelectionOperations {
@@ -92,7 +101,13 @@ export default function defineSelectionOperations(
 
   const functionHolder: SelectionOperations = {
     createSelection: function (selection: SelectionBase) {
-      createSelection(index, imageSelectionsCopy, setSelections, minSavePrevious, selection);
+      createSelection(
+        index,
+        imageSelectionsCopy,
+        setSelections,
+        minSavePrevious,
+        selection
+      );
     },
     removeSelection: function () {
       removeSelection(
@@ -119,6 +134,9 @@ export default function defineSelectionOperations(
     },
     removeAll: function () {
       removeAll(imageSelectionsCopy, setSelections);
+    },
+    toPrevious: function () {
+      toPrevious(previousImageSelections, setSelections);
     },
   };
   return functionHolder;
