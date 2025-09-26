@@ -70,6 +70,8 @@ export default function ImagePlot({
                 // copy the value of currentSelection and set it to that again (dont change it)
                 // this stops regions being added if theyre not a rectangle
                 // however, the component still needs to refresh as the new selection region will be visible otherwise
+                const indexSelections = [...imageSelectionsCopy[index]];
+                imageSelectionsCopy[index] = indexSelections;
                 setSelections(imageSelectionsCopy);
               }
             } else if (eventType == "updated" && !dragging) {
