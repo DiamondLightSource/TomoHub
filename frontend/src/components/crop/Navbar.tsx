@@ -80,6 +80,7 @@ export default function ImageNavbar({
               variant="outlined"
               fullWidth
               onClick={selection_operations.toPrevious}
+              disabled={!selection_operations.undo_possible}
             >
               <Undo />
             </Button>
