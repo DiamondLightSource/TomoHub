@@ -22,10 +22,14 @@ export default function DisplayAreaWrapper({
   // even with ndarray
   // this will also run every refresh but it doesnt make sense to create it in a parent component and pass it down
   const empty_array: SelectionBase[][] = [];
+  const empty_array_2: SelectionBase[][] = [];
   for (let i = 0; i < copies; i++) {
     empty_array.push([]);
+    empty_array_2.push([]);
   }
-  const [imageSelections, setSelections] = useState(empty_array);
+  const [previousImageSelections, setPreviousSelections] =
+    useState(empty_array);
+  const [imageSelections, setSelections] = useState(empty_array_2);
 
   // the selection currently being presented on the screen
   let on_screen_selections: SelectionBase[] = [];
@@ -46,7 +50,8 @@ export default function DisplayAreaWrapper({
     imageIndex,
     on_screen_selection_index,
     imageSelections,
-    setSelections
+    setSelections,
+    setPreviousSelections
   );
 
   return (
