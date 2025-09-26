@@ -65,8 +65,10 @@ function forceRefresh(
 
 function removeAll(
   image_selections_copy: SelectionBase[][],
-  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
+  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>,
+  savePrevious: () => void
 ) {
+  savePrevious();
   const empty_array: SelectionBase[][] = [];
   for (let i = 0; i < image_selections_copy.length; i++) {
     empty_array.push([]);
@@ -142,7 +144,7 @@ export default function defineSelectionOperations(
       );
     },
     removeAll: function () {
-      removeAll(image_selections_copy, setSelections);
+      removeAll(image_selections_copy, setSelections, minSavePrevious);
     },
     toPrevious: function () {
       toPrevious(
