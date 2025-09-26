@@ -18,15 +18,23 @@ export default function DisplayAreaWrapper({
   images,
 }: WrapperProps) {
   const [imageIndex, setImageIndex] = useState(0);
-  // useMemo so the empty array is only created once (unless copies is updated)
-  const empty_array: SelectionBase[][] = useMemo(() => {
+  const empty_array_generator = () => {
     const result: SelectionBase[][] = [];
     for (let i = 0; i < copies; i++) {
       result.push([]);
     }
     return result;
-  }, [copies]);
-  const [imageSelections, setSelections] = useState(empty_array);
+  };
+  // useMemo so the empty array is only created once (unless copies is updated)
+  const empty_array: SelectionBase[][] = useMemo(empty_array_generator, [
+    copies,
+  ]);
+  const empty_array_2: SelectionBase[][] = useMemo(empty_array_generator, [
+    copies,
+  ]);
+  const [previousImageSelections, setPreviousSelections] =
+    useState(empty_array);
+  const [imageSelections, setSelections] = useState(empty_array_2);
 
   // the selection currently being presented on the screen
   let on_screen_selections: SelectionBase[] = [];
@@ -47,7 +55,8 @@ export default function DisplayAreaWrapper({
     imageIndex,
     on_screen_selection_index,
     imageSelections,
-    setSelections
+    setSelections,
+    setPreviousSelections
   );
 
   return (

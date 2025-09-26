@@ -13,8 +13,10 @@ function createSelection(
   index: number,
   image_selections_copy: SelectionBase[][],
   setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>,
+  savePrevious: () => void,
   selection: SelectionBase
 ) {
+  savePrevious();
   image_selections_copy[index] = [selection];
   setSelections(image_selections_copy);
 }
@@ -23,8 +25,10 @@ function createSelection(
 function removeSelection(
   on_screen_selection_index: number,
   image_selections_copy: SelectionBase[][],
-  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
+  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>,
+  savePrevious: () => void
 ) {
+  savePrevious();
   image_selections_copy[on_screen_selection_index] = [];
   setSelections(image_selections_copy);
 }
@@ -68,22 +72,41 @@ function removeAll(
   setSelections(empty_array);
 }
 
+function savePrevious(
+  image_selections_copy: SelectionBase[][],
+  setPreviousSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
+) {
+  setPreviousSelections(image_selections_copy);
+}
+
 export default function defineSelectionOperations(
   index: number,
   on_screen_selection_index: number,
   image_selections: SelectionBase[][],
-  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
+  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>,
+  setPreviousSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
 ): SelectionOperations {
   const image_selections_copy = [...image_selections];
+  const minSavePrevious = function () {
+    savePrevious(image_selections_copy, setPreviousSelections);
+  };
+
   const function_holder: SelectionOperations = {
     createSelection: function (selection: SelectionBase) {
-      createSelection(index, image_selections_copy, setSelections, selection);
+      createSelection(
+        index,
+        image_selections_copy,
+        setSelections,
+        minSavePrevious,
+        selection
+      );
     },
     removeSelection: function () {
       removeSelection(
         on_screen_selection_index,
         image_selections_copy,
-        setSelections
+        setSelections,
+        minSavePrevious
       );
     },
     onScreenBeingModified: function (selection: SelectionBase): boolean {
