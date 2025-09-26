@@ -4,7 +4,7 @@ import ImagePlot from "../crop/Plot";
 import ImageNavbar from "../crop/Navbar";
 import type { NDT, SelectionBase } from "@diamondlightsource/davidia";
 import defineSelectionOperations from "./SelectionOperations";
-import type { selectionOperations } from "./SelectionOperations";
+import type { SelectionOperations } from "./SelectionOperations";
 
 interface WrapperProps {
   max_pixel_value: number;
@@ -19,14 +19,14 @@ export default function DisplayAreaWrapper({
 }: WrapperProps) {
   const [imageIndex, setImageIndex] = useState(0);
   // useMemo so the empty array is only created once (unless copies is updated)
-  const emptyArray: SelectionBase[][] = useMemo(() => {
+  const empty_array: SelectionBase[][] = useMemo(() => {
     const result: SelectionBase[][] = [];
     for (let i = 0; i < copies; i++) {
       result.push([]);
     }
     return result;
   }, [copies]);
-  const [imageSelections, setSelections] = useState(emptyArray);
+  const [imageSelections, setSelections] = useState(empty_array);
 
   // the selection currently being presented on the screen
   let on_screen_selections: SelectionBase[] = [];
@@ -43,7 +43,7 @@ export default function DisplayAreaWrapper({
     }
   }
 
-  const selection_operations: selectionOperations = defineSelectionOperations(
+  const selection_operations: SelectionOperations = defineSelectionOperations(
     imageIndex,
     on_screen_selection_index,
     imageSelections,
