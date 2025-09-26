@@ -32,18 +32,51 @@ export default function ImagePlot({
   const [imageSelections, setSelections] = useState(emptyArray);
 
   // the selection currently being presented on the screen
-  let currentSelections: SelectionBase[] = [];
-  let currentSelectionIndex = -1;
+  let onScreenSelections: SelectionBase[] = [];
+  let onScreenSelectionIndex = -1;
   // setting currentSelections
   // searches backwards from the current frame for the first previous selection that is not empty
   // + copies and modulo create looping effect
   for (let i = index + copies; i > 0; i--) {
     const iteration_selection = imageSelections[i % copies];
     if (iteration_selection.length !== 0) {
-      currentSelections = iteration_selection;
-      currentSelectionIndex = i % copies;
+      onScreenSelections = iteration_selection;
+      onScreenSelectionIndex = i % copies;
       break;
     }
+  }
+
+  // neater but functions are redefined every refresh :(
+  const imageSelectionsCopy = [...imageSelections];
+  // creates selection at the current index
+  function createSelection(selection: SelectionBase) {
+    imageSelectionsCopy[index] = [selection];
+    setSelections(imageSelectionsCopy);
+  }
+
+  // removes on screen selection
+  function removeSelection() {
+    imageSelectionsCopy[onScreenSelectionIndex] = [];
+    setSelections(imageSelectionsCopy);
+  }
+
+  function onScreenBeingModified(selection: SelectionBase): boolean {
+    return imageSelectionsCopy[onScreenSelectionIndex][0] == selection;
+  }
+
+  function forceRefresh() {
+    // copy the value of currentSelection and set it to that again (dont change it)
+    // this stops regions being added if theyre not a rectangle
+    // however, the component still needs to refresh as the new selection region will be visible otherwise
+    // lmk if theres a better way to "force refresh" a component
+    if (onScreenSelectionIndex == -1) {
+      onScreenSelectionIndex = index;
+    }
+    const currentSelectionsCopy = [
+      ...imageSelectionsCopy[onScreenSelectionIndex],
+    ];
+    imageSelectionsCopy[onScreenSelectionIndex] = currentSelectionsCopy;
+    setSelections(imageSelectionsCopy);
   }
 
   return (
@@ -63,37 +96,24 @@ export default function ImagePlot({
           if (selection === undefined) {
             return;
           }
-          const imageSelectionsCopy = [...imageSelections];
-          if (eventType === "created") {
-            if (selection instanceof RectangularSelection) {
-              imageSelectionsCopy[index] = [selection];
-            } else {
-              // stops index out of bounds error
-              if (currentSelectionIndex === -1) {
-                currentSelectionIndex = index;
+            if (eventType === "created") {
+              if (selection instanceof RectangularSelection) {
+                createSelection(selection);
+              } else {
+                // selection area is not a rectangle
+                // dont add anything to the list and force refresh so it disapears
+                forceRefresh();
               }
-              // copy the value of currentSelection and set it to that again (dont change it)
-              // this stops regions being added if theyre not a rectangle
-              // however, the component still needs to refresh as the new selection region will be visible otherwise
-              const currentSelectionsCopy = [
-                ...imageSelectionsCopy[currentSelectionIndex],
-              ];
-              imageSelectionsCopy[currentSelectionIndex] =
-                currentSelectionsCopy;
+            } else if (eventType === "removed") {
+              removeSelection();
+            } else if (eventType === "updated" && !dragging) {
+              if (!onScreenBeingModified(selection)) {
+                createSelection(selection);
+              }
             }
-          } // updated is also called after created, we dont want to consider this case
-          else if (
-            eventType === "updated" &&
-            !dragging &&
-            imageSelectionsCopy[currentSelectionIndex][0] !== selection
-          ) {
-            imageSelectionsCopy[index] = [selection];
-          } else if (eventType === "removed") {
-            imageSelectionsCopy[currentSelectionIndex] = [];
           }
-          setSelections(imageSelectionsCopy);
-        }}
-        selections={currentSelections}
+        }
+        selections={onScreenSelections}
       />
     </Box>
   );
