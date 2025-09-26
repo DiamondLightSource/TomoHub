@@ -43,6 +43,8 @@ export default function ImagePlot({
       break;
     }
   }
+  console.log("current selection index: " + currentSelectionIndex);
+  console.log(imageSelections);
 
   return (
     <Box style={{ display: "grid", height: "49vh", minHeight: "400px" }}>
@@ -72,11 +74,22 @@ export default function ImagePlot({
                 setSelections(imageSelectionsCopy);
               }
             } else if (eventType == "removed") {
+              console.log("setting " + currentSelectionIndex + " to empty");
               imageSelectionsCopy[currentSelectionIndex] = [];
+              console.log("new list: ");
+              console.log(imageSelectionsCopy);
               setSelections(imageSelectionsCopy);
             } else if (eventType == "updated") {
-              imageSelectionsCopy[index] = [selection];
-              setSelections(imageSelectionsCopy);
+              console.log("running 1");
+              // updated also gets called when a selection is deleted
+              // make sure the selection being updated is not being deleted
+              // if deleted, selection will be the same object as the one on screen
+              // in this case, dont create a new list as this will be delted instead of the one we want to delete
+              if (imageSelectionsCopy[currentSelectionIndex][0] != selection) {
+                console.log("running 2");
+                imageSelectionsCopy[index] = [selection];
+                setSelections(imageSelectionsCopy);
+              }
             }
           }
         }}
