@@ -1,91 +1,91 @@
 import type { SelectionBase } from "@diamondlightsource/davidia";
 
-export type selectionOperations = {
-  minCreateSelection: (selection: SelectionBase) => void;
-  minRemoveSelection: () => void;
-  minOnScreenBeingModified: (selection: SelectionBase) => boolean;
-  minForceRefresh: () => void;
+export type SelectionOperations = {
+  createSelection: (selection: SelectionBase) => void;
+  removeSelection: () => void;
+  onScreenBeingModified: (selection: SelectionBase) => boolean;
+  forceRefresh: () => void;
 };
 
 // creates selection at the current index
 function createSelection(
   index: number,
-  imageSelectionsCopy: SelectionBase[][],
+  image_selections_copy: SelectionBase[][],
   setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>,
   selection: SelectionBase
 ) {
-  imageSelectionsCopy[index] = [selection];
-  setSelections(imageSelectionsCopy);
+  image_selections_copy[index] = [selection];
+  setSelections(image_selections_copy);
 }
 
 // removes on screen selection
 function removeSelection(
-  onScreenSelectionIndex: number,
-  imageSelectionsCopy: SelectionBase[][],
+  on_screen_selection_index: number,
+  image_selections_copy: SelectionBase[][],
   setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
 ) {
-  imageSelectionsCopy[onScreenSelectionIndex] = [];
-  setSelections(imageSelectionsCopy);
+  image_selections_copy[on_screen_selection_index] = [];
+  setSelections(image_selections_copy);
 }
 
 function onScreenBeingModified(
-  onScreenSelectionIndex: number,
-  imageSelectionsCopy: SelectionBase[][],
+  on_screen_selection_index: number,
+  image_selections_copy: SelectionBase[][],
   selection: SelectionBase
 ): boolean {
-  return imageSelectionsCopy[onScreenSelectionIndex][0] == selection;
+  return image_selections_copy[on_screen_selection_index][0] == selection;
 }
 
 function forceRefresh(
   index: number,
-  onScreenSelectionIndex: number,
-  imageSelectionsCopy: SelectionBase[][],
+  on_screen_selection_index: number,
+  image_selections_copy: SelectionBase[][],
   setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
 ) {
   // copy the value of currentSelection and set it to that again (dont change it)
   // this stops regions being added if theyre not a rectangle
   // however, the component still needs to refresh as the new selection region will be visible otherwise
   // lmk if theres a better way to "force refresh" a component
-  if (onScreenSelectionIndex == -1) {
-    onScreenSelectionIndex = index;
+  if (on_screen_selection_index == -1) {
+    on_screen_selection_index = index;
   }
   const currentSelectionsCopy = [
-    ...imageSelectionsCopy[onScreenSelectionIndex],
+    ...image_selections_copy[on_screen_selection_index],
   ];
-  imageSelectionsCopy[onScreenSelectionIndex] = currentSelectionsCopy;
-  setSelections(imageSelectionsCopy);
+  image_selections_copy[on_screen_selection_index] = currentSelectionsCopy;
+  setSelections(image_selections_copy);
 }
 
 export default function defineSelectionOperations(
   index: number,
-  onScreenSelectionIndex: number,
-  imageSelections: SelectionBase[][],
+  on_screen_selection_index: number,
+  image_selections: SelectionBase[][],
   setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
-): selectionOperations {
-  const imageSelectionsCopy = [...imageSelections];
-  const function_holder: selectionOperations = {
-    minCreateSelection: function (selection: SelectionBase) {
-      createSelection(index, imageSelectionsCopy, setSelections, selection);
+): SelectionOperations {
+  const image_selections_copy = [...image_selections];
+  const function_holder: SelectionOperations = {
+    createSelection: function (selection: SelectionBase) {
+      createSelection(index, image_selections_copy, setSelections, selection);
     },
-    minRemoveSelection: function () {
+    removeSelection: function () {
       removeSelection(
-        onScreenSelectionIndex,
-        imageSelectionsCopy,
+        on_screen_selection_index,
+        image_selections_copy,
         setSelections
       );
     },
-    minOnScreenBeingModified: function (selection: SelectionBase): boolean {
+    onScreenBeingModified: function (selection: SelectionBase): boolean {
       return onScreenBeingModified(
-        onScreenSelectionIndex,
-        imageSelectionsCopy,
+        on_screen_selection_index,
+        image_selections_copy,
         selection
       );
     },
-    minForceRefresh: function () {
+    forceRefresh: function () {
       forceRefresh(
         index,
-        onScreenSelectionIndex,
-        imageSelectionsCopy,
+        on_screen_selection_index,
+        image_selections_copy,
         setSelections
       );
     },

@@ -5,13 +5,13 @@ import {
   SelectionBase,
   RectangularSelection,
 } from "@diamondlightsource/davidia";
-import type { selectionOperations } from "./SelectionOperations";
+import type { SelectionOperations } from "./SelectionOperations";
 
 interface ImagePlotProps {
   image: NDT;
   on_screen_selections: SelectionBase[];
   max_pixel_value: number;
-  selection_operations: selectionOperations;
+  selection_operations: SelectionOperations;
 }
 
 export default function ImagePlot({
@@ -39,17 +39,17 @@ export default function ImagePlot({
           }
             if (eventType === "created") {
               if (selection instanceof RectangularSelection) {
-                selection_operations.minCreateSelection(selection);
+                selection_operations.createSelection(selection);
               } else {
                 // selection area is not a rectangle
                 // dont add anything to the list and force refresh so it disapears
-                selection_operations.minForceRefresh();
+                selection_operations.forceRefresh();
               }
             } else if (eventType === "removed") {
-              selection_operations.minRemoveSelection();
+              selection_operations.removeSelection();
             } else if (eventType === "updated" && !dragging) {
-              if (!selection_operations.minOnScreenBeingModified(selection)) {
-                selection_operations.minCreateSelection(selection);
+              if (!selection_operations.onScreenBeingModified(selection)) {
+                selection_operations.createSelection(selection);
               }
             }
           }
