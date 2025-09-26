@@ -14,6 +14,99 @@ interface ImagePlotProps {
   copies: number;
 }
 
+// creates selection at the current index
+function createSelection(
+  index: number,
+  imageSelectionsCopy: SelectionBase[][],
+  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>,
+  selection: SelectionBase
+) {
+  imageSelectionsCopy[index] = [selection];
+  setSelections(imageSelectionsCopy);
+}
+
+// removes on screen selection
+function removeSelection(
+  onScreenSelectionIndex: number,
+  imageSelectionsCopy: SelectionBase[][],
+  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
+) {
+  imageSelectionsCopy[onScreenSelectionIndex] = [];
+  setSelections(imageSelectionsCopy);
+}
+
+function onScreenBeingModified(
+  onScreenSelectionIndex: number,
+  imageSelectionsCopy: SelectionBase[][],
+  selection: SelectionBase
+): boolean {
+  return imageSelectionsCopy[onScreenSelectionIndex][0] == selection;
+}
+
+function forceRefresh(
+  index: number,
+  onScreenSelectionIndex: number,
+  imageSelectionsCopy: SelectionBase[][],
+  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
+) {
+  // copy the value of currentSelection and set it to that again (dont change it)
+  // this stops regions being added if theyre not a rectangle
+  // however, the component still needs to refresh as the new selection region will be visible otherwise
+  // lmk if theres a better way to "force refresh" a component
+  if (onScreenSelectionIndex == -1) {
+    onScreenSelectionIndex = index;
+  }
+  const currentSelectionsCopy = [
+    ...imageSelectionsCopy[onScreenSelectionIndex],
+  ];
+  imageSelectionsCopy[onScreenSelectionIndex] = currentSelectionsCopy;
+  setSelections(imageSelectionsCopy);
+}
+
+type selectionOperations = {
+  minCreateSelection: (selection: SelectionBase) => void;
+  minRemoveSelection: () => void;
+  minOnScreenBeingModified: (selection: SelectionBase) => boolean;
+  minForceRefresh: () => void;
+};
+
+function defineSelectionOperations(
+  index: number,
+  onScreenSelectionIndex: number,
+  imageSelections: SelectionBase[][],
+  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
+): selectionOperations {
+  const imageSelectionsCopy = [...imageSelections];
+  const function_holder: selectionOperations = {
+    minCreateSelection: function (selection: SelectionBase) {
+      createSelection(index, imageSelectionsCopy, setSelections, selection);
+    },
+    minRemoveSelection: function () {
+      removeSelection(
+        onScreenSelectionIndex,
+        imageSelectionsCopy,
+        setSelections
+      );
+    },
+    minOnScreenBeingModified: function (selection: SelectionBase): boolean {
+      return onScreenBeingModified(
+        onScreenSelectionIndex,
+        imageSelectionsCopy,
+        selection
+      );
+    },
+    minForceRefresh: function () {
+      forceRefresh(
+        index,
+        onScreenSelectionIndex,
+        imageSelectionsCopy,
+        setSelections
+      );
+    },
+  };
+  return function_holder;
+}
+
 export default function ImagePlot({
   image,
   index,
@@ -46,38 +139,17 @@ export default function ImagePlot({
     }
   }
 
-  // neater but functions are redefined every refresh :(
-  const imageSelectionsCopy = [...imageSelections];
-  // creates selection at the current index
-  function createSelection(selection: SelectionBase) {
-    imageSelectionsCopy[index] = [selection];
-    setSelections(imageSelectionsCopy);
-  }
-
-  // removes on screen selection
-  function removeSelection() {
-    imageSelectionsCopy[onScreenSelectionIndex] = [];
-    setSelections(imageSelectionsCopy);
-  }
-
-  function onScreenBeingModified(selection: SelectionBase): boolean {
-    return imageSelectionsCopy[onScreenSelectionIndex][0] == selection;
-  }
-
-  function forceRefresh() {
-    // copy the value of currentSelection and set it to that again (dont change it)
-    // this stops regions being added if theyre not a rectangle
-    // however, the component still needs to refresh as the new selection region will be visible otherwise
-    // lmk if theres a better way to "force refresh" a component
-    if (onScreenSelectionIndex == -1) {
-      onScreenSelectionIndex = index;
-    }
-    const currentSelectionsCopy = [
-      ...imageSelectionsCopy[onScreenSelectionIndex],
-    ];
-    imageSelectionsCopy[onScreenSelectionIndex] = currentSelectionsCopy;
-    setSelections(imageSelectionsCopy);
-  }
+  const {
+    minCreateSelection,
+    minRemoveSelection,
+    minOnScreenBeingModified,
+    minForceRefresh,
+  } = defineSelectionOperations(
+    index,
+    onScreenSelectionIndex,
+    imageSelections,
+    setSelections
+  );
 
   return (
     <Box style={{ display: "grid", height: "49vh", minHeight: "400px" }}>
@@ -98,17 +170,17 @@ export default function ImagePlot({
           }
             if (eventType === "created") {
               if (selection instanceof RectangularSelection) {
-                createSelection(selection);
+                minCreateSelection(selection);
               } else {
                 // selection area is not a rectangle
                 // dont add anything to the list and force refresh so it disapears
-                forceRefresh();
+                minForceRefresh();
               }
             } else if (eventType === "removed") {
-              removeSelection();
+              minRemoveSelection();
             } else if (eventType === "updated" && !dragging) {
-              if (!onScreenBeingModified(selection)) {
-                createSelection(selection);
+              if (!minOnScreenBeingModified(selection)) {
+                minCreateSelection(selection);
               }
             }
           }
