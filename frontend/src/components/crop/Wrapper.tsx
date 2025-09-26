@@ -65,7 +65,7 @@ export default function DisplayAreaWrapper({
       <ImageNavbar
         totalImages={copies}
         currentImageIndex={imageIndex}
-        imageIndexSetter={setImageIndex}
+        setImageIndex={setImageIndex}
         selection_operations={selection_operations}
       />
     </div>
