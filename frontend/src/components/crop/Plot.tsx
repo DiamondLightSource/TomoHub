@@ -43,6 +43,8 @@ export default function ImagePlot({
       break;
     }
   }
+  console.log("current selection index: " + currentSelectionIndex);
+  console.log(imageSelections);
 
   return (
     <Box style={{ display: "grid", height: "49vh", minHeight: "400px" }}>
@@ -71,10 +73,15 @@ export default function ImagePlot({
                 setSelections(imageSelectionsCopy);
               }
             } else if (eventType == "updated" && !dragging) {
-              imageSelectionsCopy[index] = [selection];
-              setSelections(imageSelectionsCopy);
+              if (imageSelectionsCopy[currentSelectionIndex][0] != selection) {
+                imageSelectionsCopy[index] = [selection];
+                setSelections(imageSelectionsCopy);
+              }
             } else if (eventType == "removed") {
+              console.log("setting " + currentSelectionIndex + " to empty");
               imageSelectionsCopy[currentSelectionIndex] = [];
+              console.log("new list: ");
+              console.log(imageSelectionsCopy);
               setSelections(imageSelectionsCopy);
             }
           }
