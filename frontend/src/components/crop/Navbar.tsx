@@ -2,6 +2,7 @@ import { Box, Grid2, Slider, Input, Button, Tooltip } from "@mui/material";
 import Undo from "@mui/icons-material/Undo";
 import PlayArrowOutlined from "@mui/icons-material/PlayArrowOutlined";
 import Clear from "@mui/icons-material/Clear";
+import DeleteOutline from "@mui/icons-material/DeleteOutline";
 
 interface ImageNavbarProps {
   totalImages: number;
@@ -80,6 +81,13 @@ export default function ImageNavbar({
           <Tooltip title="Show selection at each angle">
             <Button variant="outlined" fullWidth>
               <PlayArrowOutlined />
+            </Button>
+          </Tooltip>
+        </Grid2>
+        <Grid2 size="grow">
+          <Tooltip title="Remove current selection">
+            <Button variant="outlined" fullWidth>
+              <DeleteOutline />
             </Button>
           </Tooltip>
         </Grid2>
