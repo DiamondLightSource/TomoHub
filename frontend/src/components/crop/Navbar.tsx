@@ -20,22 +20,16 @@ async function playFrame(
   setImageIndex(frame_index);
 }
 
-interface ImageNavbarProps {
-  totalImages: number;
-  currentImageIndex: number;
-  setImageIndex: React.Dispatch<React.SetStateAction<number>>;
-  selection_operations: SelectionOperations;
-}
-
-export default function ImageNavbar({
-  totalImages: total_images,
-  currentImageIndex,
-  setImageIndex: setImageIndex,
-  selection_operations,
-}: ImageNavbarProps) {
-  const [animationPlaying, setAnimationPlaying] = useState(false);
-  const [preanimationImageIndex, setPreanimationImageIndex] = useState(-1);
-
+// checks if the play animation should be playing
+function checkAnimation(
+  currentImageIndex: number,
+  preanimationImageIndex: number,
+  total_images: number,
+  animationPlaying: boolean,
+  setAnimationPlaying: React.Dispatch<React.SetStateAction<boolean>>,
+  setImageIndex: React.Dispatch<React.SetStateAction<number>>,
+  setPreanimationImageIndex: React.Dispatch<React.SetStateAction<number>>
+) {
   if (animationPlaying) {
     // reached the end of the animation
     if (currentImageIndex == total_images - 1) {
@@ -54,6 +48,34 @@ export default function ImageNavbar({
     playFrame(setImageIndex, preanimationImageIndex);
     setPreanimationImageIndex(-1);
   }
+}
+
+interface ImageNavbarProps {
+  totalImages: number;
+  currentImageIndex: number;
+  setImageIndex: React.Dispatch<React.SetStateAction<number>>;
+  selection_operations: SelectionOperations;
+}
+
+export default function ImageNavbar({
+  totalImages: total_images,
+  currentImageIndex,
+  setImageIndex: setImageIndex,
+  selection_operations,
+}: ImageNavbarProps) {
+  const [animationPlaying, setAnimationPlaying] = useState(false);
+  const [preanimationImageIndex, setPreanimationImageIndex] = useState(-1);
+
+  // will cause a state change (and refresh) if an animation should be playing
+  checkAnimation(
+    currentImageIndex,
+    preanimationImageIndex,
+    total_images,
+    animationPlaying,
+    setAnimationPlaying,
+    setImageIndex,
+    setPreanimationImageIndex
+  );
 
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
