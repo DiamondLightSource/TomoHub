@@ -14,31 +14,25 @@ async function sleep(ms: number): Promise<void> {
 // waits 300ms and then changes image index state
 async function playFrame(
   setImageIndex: React.Dispatch<React.SetStateAction<number>>,
-  frame_index: number
+  frameIndex: number
 ) {
   await sleep(300);
-  setImageIndex(frame_index);
+  setImageIndex(frameIndex);
 }
 
-interface ImageNavbarProps {
-  totalImages: number;
-  currentImageIndex: number;
-  setImageIndex: React.Dispatch<React.SetStateAction<number>>;
-  selectionOperations: SelectionOperations;
-}
-
-export default function ImageNavbar({
-  totalImages: totalImages,
-  currentImageIndex,
-  setImageIndex: setImageIndex,
-  selectionOperations: selectionOperations,
-}: ImageNavbarProps) {
-  const [animationPlaying, setAnimationPlaying] = useState(false);
-  const [preanimationImageIndex, setPreanimationImageIndex] = useState(-1);
-
+// checks if the play animation should be playing
+function checkAnimation(
+  currentImageIndex: number,
+  preanimationImageIndex: number,
+  totalImages: number,
+  animationPlaying: boolean,
+  setAnimationPlaying: React.Dispatch<React.SetStateAction<boolean>>,
+  setImageIndex: React.Dispatch<React.SetStateAction<number>>,
+  setPreanimationImageIndex: React.Dispatch<React.SetStateAction<number>>
+) {
   if (animationPlaying) {
     // reached the end of the animation
-    if (currentImageIndex == total_images - 1) {
+    if (currentImageIndex == totalImages - 1) {
       setAnimationPlaying(false);
       playFrame(setImageIndex, preanimationImageIndex);
       setPreanimationImageIndex(-1);
@@ -54,6 +48,34 @@ export default function ImageNavbar({
     playFrame(setImageIndex, preanimationImageIndex);
     setPreanimationImageIndex(-1);
   }
+}
+
+interface ImageNavbarProps {
+  totalImages: number;
+  currentImageIndex: number;
+  setImageIndex: React.Dispatch<React.SetStateAction<number>>;
+  selectionOperations: SelectionOperations;
+}
+
+export default function ImageNavbar({
+  totalImages: totalImages,
+  currentImageIndex,
+  setImageIndex: setImageIndex,
+  selectionOperations,
+}: ImageNavbarProps) {
+  const [animationPlaying, setAnimationPlaying] = useState(false);
+  const [preanimationImageIndex, setPreanimationImageIndex] = useState(-1);
+
+  // will cause a state change (and refresh) if an animation should be playing
+  checkAnimation(
+    currentImageIndex,
+    preanimationImageIndex,
+    totalImages,
+    animationPlaying,
+    setAnimationPlaying,
+    setImageIndex,
+    setPreanimationImageIndex
+  );
 
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
