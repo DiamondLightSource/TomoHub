@@ -4,6 +4,7 @@ import PlayArrowOutlined from "@mui/icons-material/PlayArrowOutlined";
 import Clear from "@mui/icons-material/Clear";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import type { SelectionOperations } from "./SelectionOperations";
+import type { SelectionOperations } from "./SelectionOperations";
 
 interface ImageNavbarProps {
   totalImages: number;
