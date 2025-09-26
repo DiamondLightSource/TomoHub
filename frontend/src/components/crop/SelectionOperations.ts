@@ -13,8 +13,10 @@ function createSelection(
   index: number,
   imageSelectionsCopy: SelectionBase[][],
   setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>,
+  savePrevious: () => void,
   selection: SelectionBase
 ) {
+  savePrevious();
   imageSelectionsCopy[index] = [selection];
   setSelections(imageSelectionsCopy);
 }
@@ -23,8 +25,10 @@ function createSelection(
 function removeSelection(
   onScreenSelectionIndex: number,
   imageSelectionsCopy: SelectionBase[][],
-  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
+  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>,
+  savePrevious: () => void
 ) {
+  savePrevious();
   imageSelectionsCopy[onScreenSelectionIndex] = [];
   setSelections(imageSelectionsCopy);
 }
@@ -67,22 +71,35 @@ function removeAll(
   setSelections(emptyArray);
 }
 
+function savePrevious(
+  imageSelectionsCopy: SelectionBase[][],
+  setPreviousSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
+) {
+  setPreviousSelections(imageSelectionsCopy);
+}
+
 export default function defineSelectionOperations(
   index: number,
   onScreenSelectionIndex: number,
   imageSelections: SelectionBase[][],
-  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
+  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>,
+  setPreviousSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
 ): SelectionOperations {
   const imageSelectionsCopy = [...imageSelections];
+  const minSavePrevious = function () {
+    savePrevious(imageSelectionsCopy, setPreviousSelections);
+  };
+
   const functionHolder: SelectionOperations = {
     createSelection: function (selection: SelectionBase) {
-      createSelection(index, imageSelectionsCopy, setSelections, selection);
+      createSelection(index, imageSelectionsCopy, setSelections, minSavePrevious, selection);
     },
     removeSelection: function () {
       removeSelection(
         onScreenSelectionIndex,
         imageSelectionsCopy,
-        setSelections
+        setSelections,
+        minSavePrevious
       );
     },
     onScreenBeingModified: function (selection: SelectionBase): boolean {
