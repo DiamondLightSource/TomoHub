@@ -5,38 +5,40 @@ import Clear from "@mui/icons-material/Clear";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import type { SelectionOperations } from "./SelectionOperations";
 
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 interface ImageNavbarProps {
   totalImages: number;
   currentImageIndex: number;
-  imageIndexSetter: React.Dispatch<React.SetStateAction<number>>;
+  setImageIndex: React.Dispatch<React.SetStateAction<number>>;
   selectionOperations: SelectionOperations;
 }
 
 export default function ImageNavbar({
   totalImages: totalImages,
   currentImageIndex,
-  imageIndexSetter,
+  setImageIndex: setImageIndex,
   selectionOperations: selectionOperations,
 }: ImageNavbarProps) {
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
-      imageIndexSetter(newValue);
+      setImageIndex(newValue);
     } else {
-      imageIndexSetter(newValue[0]);
+      setImageIndex(newValue[0]);
     }
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    imageIndexSetter(
-      event.target.value === "" ? 0 : Number(event.target.value)
-    );
+    setImageIndex(event.target.value === "" ? 0 : Number(event.target.value));
   };
 
   const handleBlur = () => {
     if (currentImageIndex < 0) {
-      imageIndexSetter(0);
+      setImageIndex(0);
     } else if (currentImageIndex > totalImages - 1) {
-      imageIndexSetter(totalImages - 1);
+      setImageIndex(totalImages - 1);
     }
   };
 
@@ -87,7 +89,18 @@ export default function ImageNavbar({
         </Grid2>
         <Grid2 size="grow">
           <Tooltip title="Show selection at each angle">
-            <Button variant="outlined" fullWidth>
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={async () => {
+                const starting_image_index = currentImageIndex;
+                for (let i = 0; i < total_images; i++) {
+                  setImageIndex(i);
+                  await sleep(300);
+                }
+                setImageIndex(starting_image_index);
+              }}
+            >
               <PlayArrowOutlined />
             </Button>
           </Tooltip>
