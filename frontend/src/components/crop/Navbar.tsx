@@ -1,12 +1,23 @@
 import { Box, Grid2, Slider, Input, Button, Tooltip } from "@mui/material";
 import Undo from "@mui/icons-material/Undo";
 import PlayArrowOutlined from "@mui/icons-material/PlayArrowOutlined";
+import StopOutlined from "@mui/icons-material/StopOutlined";
 import Clear from "@mui/icons-material/Clear";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import type { SelectionOperations } from "./SelectionOperations";
+import { useState } from "react";
 
 async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// waits 300ms and then changes image index state
+async function playFrame(
+  setImageIndex: React.Dispatch<React.SetStateAction<number>>,
+  frame_index: number
+) {
+  await sleep(300);
+  setImageIndex(frame_index);
 }
 
 interface ImageNavbarProps {
@@ -22,6 +33,28 @@ export default function ImageNavbar({
   setImageIndex: setImageIndex,
   selectionOperations: selectionOperations,
 }: ImageNavbarProps) {
+  const [animationPlaying, setAnimationPlaying] = useState(false);
+  const [preanimationImageIndex, setPreanimationImageIndex] = useState(-1);
+
+  if (animationPlaying) {
+    // reached the end of the animation
+    if (currentImageIndex == total_images - 1) {
+      setAnimationPlaying(false);
+      playFrame(setImageIndex, preanimationImageIndex);
+      setPreanimationImageIndex(-1);
+    } else {
+      // go to the next frame in animation
+      // this will cause a change in state, causing a refresh of the component
+      // letting us iterate through all images
+      playFrame(setImageIndex, currentImageIndex + 1);
+    }
+  }
+  // animation stopped prematurely
+  else if (preanimationImageIndex != -1) {
+    playFrame(setImageIndex, preanimationImageIndex);
+    setPreanimationImageIndex(-1);
+  }
+
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
       setImageIndex(newValue);
@@ -92,16 +125,19 @@ export default function ImageNavbar({
             <Button
               variant="outlined"
               fullWidth
-              onClick={async () => {
-                const starting_image_index = currentImageIndex;
-                for (let i = 0; i < total_images; i++) {
-                  setImageIndex(i);
-                  await sleep(300);
-                }
-                setImageIndex(starting_image_index);
-              }}
+              onClick={
+                animationPlaying
+                  ? () => {
+                      setAnimationPlaying(false);
+                    }
+                  : () => {
+                      setPreanimationImageIndex(currentImageIndex);
+                      setImageIndex(0);
+                      setAnimationPlaying(true);
+                    }
+              }
             >
-              <PlayArrowOutlined />
+              {animationPlaying ? <StopOutlined /> : <PlayArrowOutlined />}
             </Button>
           </Tooltip>
         </Grid2>
