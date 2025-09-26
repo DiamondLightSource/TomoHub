@@ -71,6 +71,8 @@ export default function ImagePlot({
                 // this stops regions being added if theyre not a rectangle
                 // however, the component still needs to refresh as the new selection region will be visible otherwise
                 // lmk if theres a better way to "force refresh" a component
+                const indexSelections = [...imageSelectionsCopy[index]];
+                imageSelectionsCopy[index] = indexSelections;
                 setSelections(imageSelectionsCopy);
               }
             } else if (eventType == "removed") {
