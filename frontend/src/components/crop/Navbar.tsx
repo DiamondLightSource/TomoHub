@@ -3,17 +3,20 @@ import Undo from "@mui/icons-material/Undo";
 import PlayArrowOutlined from "@mui/icons-material/PlayArrowOutlined";
 import Clear from "@mui/icons-material/Clear";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
+import type { SelectionOperations } from "./SelectionOperations";
 
 interface ImageNavbarProps {
   totalImages: number;
   currentImageIndex: number;
   imageIndexSetter: React.Dispatch<React.SetStateAction<number>>;
+  selection_operations: SelectionOperations;
 }
 
 export default function ImageNavbar({
   totalImages: totalImages,
   currentImageIndex,
   imageIndexSetter,
+  selection_operations,
 }: ImageNavbarProps) {
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
@@ -86,7 +89,11 @@ export default function ImageNavbar({
         </Grid2>
         <Grid2 size="grow">
           <Tooltip title="Remove current selection">
-            <Button variant="outlined" fullWidth>
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={selection_operations.removeSelection}
+            >
               <DeleteOutline />
             </Button>
           </Tooltip>
