@@ -1,15 +1,11 @@
 import { Box } from "@mui/material";
 import { HeatmapPlot, ScaleType } from "@diamondlightsource/davidia";
-import {
-  NDT,
-  SelectionBase,
-  RectangularSelection,
-} from "@diamondlightsource/davidia";
+import { NDT, RectangularSelection } from "@diamondlightsource/davidia";
 import type { SelectionOperations } from "./SelectionOperations";
 
 interface ImagePlotProps {
   image: NDT;
-  on_screen_selections: SelectionBase[];
+  on_screen_selections: RectangularSelection[];
   max_pixel_value: number;
   selection_operations: SelectionOperations;
 }
@@ -48,7 +44,10 @@ export default function ImagePlot({
             } else if (eventType === "removed") {
               selection_operations.removeSelection();
             } else if (eventType === "updated" && !dragging) {
-              if (!selection_operations.onScreenBeingModified(selection)) {
+              if (
+                selection instanceof RectangularSelection &&
+                !selection_operations.onScreenBeingModified(selection)
+              ) {
                 selection_operations.createSelection(selection);
               }
             }

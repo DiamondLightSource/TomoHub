@@ -1,9 +1,9 @@
-import type { SelectionBase } from "@diamondlightsource/davidia";
+import type { RectangularSelection } from "@diamondlightsource/davidia";
 
 export type SelectionOperations = {
-  createSelection: (selection: SelectionBase) => void;
+  createSelection: (selection: RectangularSelection) => void;
   removeSelection: () => void;
-  onScreenBeingModified: (selection: SelectionBase) => boolean;
+  onScreenBeingModified: (selection: RectangularSelection) => boolean;
   forceRefresh: () => void;
   removeAll: () => void;
   toPrevious: () => void;
@@ -13,10 +13,10 @@ export type SelectionOperations = {
 // creates selection at the current index
 function createSelection(
   index: number,
-  image_selections_copy: SelectionBase[][],
-  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>,
+  image_selections_copy: RectangularSelection[][],
+  setSelections: React.Dispatch<React.SetStateAction<RectangularSelection[][]>>,
   savePrevious: () => void,
-  selection: SelectionBase
+  selection: RectangularSelection
 ) {
   savePrevious();
   image_selections_copy[index] = [selection];
@@ -26,8 +26,8 @@ function createSelection(
 // removes on screen selection
 function removeSelection(
   on_screen_selection_index: number,
-  image_selections_copy: SelectionBase[][],
-  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>,
+  image_selections_copy: RectangularSelection[][],
+  setSelections: React.Dispatch<React.SetStateAction<RectangularSelection[][]>>,
   savePrevious: () => void
 ) {
   savePrevious();
@@ -37,8 +37,8 @@ function removeSelection(
 
 function onScreenBeingModified(
   on_screen_selection_index: number,
-  image_selections_copy: SelectionBase[][],
-  selection: SelectionBase
+  image_selections_copy: RectangularSelection[][],
+  selection: RectangularSelection
 ): boolean {
   return image_selections_copy[on_screen_selection_index][0] == selection;
 }
@@ -46,8 +46,8 @@ function onScreenBeingModified(
 function forceRefresh(
   index: number,
   on_screen_selection_index: number,
-  image_selections_copy: SelectionBase[][],
-  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
+  image_selections_copy: RectangularSelection[][],
+  setSelections: React.Dispatch<React.SetStateAction<RectangularSelection[][]>>
 ) {
   // copy the value of currentSelection and set it to that again (dont change it)
   // this stops regions being added if theyre not a rectangle
@@ -64,12 +64,12 @@ function forceRefresh(
 }
 
 function removeAll(
-  image_selections_copy: SelectionBase[][],
-  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>,
+  image_selections_copy: RectangularSelection[][],
+  setSelections: React.Dispatch<React.SetStateAction<RectangularSelection[][]>>,
   savePrevious: () => void
 ) {
   savePrevious();
-  const empty_array: SelectionBase[][] = [];
+  const empty_array: RectangularSelection[][] = [];
   for (let i = 0; i < image_selections_copy.length; i++) {
     empty_array.push([]);
   }
@@ -77,9 +77,11 @@ function removeAll(
 }
 
 function toPrevious(
-  previous_image_selections: SelectionBase[][],
-  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>,
-  setPreviousSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
+  previous_image_selections: RectangularSelection[][],
+  setSelections: React.Dispatch<React.SetStateAction<RectangularSelection[][]>>,
+  setPreviousSelections: React.Dispatch<
+    React.SetStateAction<RectangularSelection[][]>
+  >
 ) {
   // already "undone"
   if (previous_image_selections.length == 0) {
@@ -90,8 +92,10 @@ function toPrevious(
 }
 
 function savePrevious(
-  image_selections: SelectionBase[][],
-  setPreviousSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
+  image_selections: RectangularSelection[][],
+  setPreviousSelections: React.Dispatch<
+    React.SetStateAction<RectangularSelection[][]>
+  >
 ) {
   const image_selections_other_copy = [...image_selections];
   setPreviousSelections(image_selections_other_copy);
@@ -100,10 +104,12 @@ function savePrevious(
 export default function defineSelectionOperations(
   index: number,
   on_screen_selection_index: number,
-  image_selections: SelectionBase[][],
-  previous_image_selections: SelectionBase[][],
-  setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>,
-  setPreviousSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
+  image_selections: RectangularSelection[][],
+  previous_image_selections: RectangularSelection[][],
+  setSelections: React.Dispatch<React.SetStateAction<RectangularSelection[][]>>,
+  setPreviousSelections: React.Dispatch<
+    React.SetStateAction<RectangularSelection[][]>
+  >
 ): SelectionOperations {
   const image_selections_copy = [...image_selections];
   const minSavePrevious = function () {
@@ -111,7 +117,7 @@ export default function defineSelectionOperations(
   };
 
   const function_holder: SelectionOperations = {
-    createSelection: function (selection: SelectionBase) {
+    createSelection: function (selection: RectangularSelection) {
       createSelection(
         index,
         image_selections_copy,
@@ -128,7 +134,7 @@ export default function defineSelectionOperations(
         minSavePrevious
       );
     },
-    onScreenBeingModified: function (selection: SelectionBase): boolean {
+    onScreenBeingModified: function (selection: RectangularSelection): boolean {
       return onScreenBeingModified(
         on_screen_selection_index,
         image_selections_copy,
