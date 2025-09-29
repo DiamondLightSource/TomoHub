@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Contextbar from "./Contextbar";
 import ImagePlot from "../crop/Plot";
 import ImageNavbar from "../crop/Navbar";
-import type { NDT, SelectionBase } from "@diamondlightsource/davidia";
+import type { NDT, RectangularSelection } from "@diamondlightsource/davidia";
 import defineSelectionOperations from "./SelectionOperations";
 import type { SelectionOperations } from "./SelectionOperations";
 
@@ -22,17 +22,17 @@ export default function DisplayAreaWrapper({
   // I couldnt figure out how to make an empty array of fixed length for a custom type like SelectionBase
   // even with ndarray
   // this will also run every refresh but it doesnt make sense to create it in a parent component and pass it down
-  const empty_array: SelectionBase[][] = [];
+  const empty_array: RectangularSelection[][] = [];
   for (let i = 0; i < copies; i++) {
     empty_array.push([]);
   }
   const [previousImageSelections, setPreviousSelections] = useState<
-    SelectionBase[][]
+    RectangularSelection[][]
   >([]);
   const [imageSelections, setSelections] = useState(empty_array);
 
   // the selection currently being presented on the screen
-  let on_screen_selections: SelectionBase[] = [];
+  let on_screen_selections: RectangularSelection[] = [];
   let on_screen_selection_index = -1;
   // setting currentSelections
   // searches backwards from the current frame for the first previous selection that is not empty
