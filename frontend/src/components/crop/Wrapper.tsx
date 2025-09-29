@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 
+import Contextbar from "./Contextbar";
 import ImagePlot from "../crop/Plot";
 import ImageNavbar from "../crop/Navbar";
 import type { NDT, SelectionBase } from "@diamondlightsource/davidia";
@@ -56,6 +57,7 @@ export default function DisplayAreaWrapper({
 
   return (
     <div>
+      <Contextbar />
       <ImagePlot
         image={images[imageIndex]}
         maxPixelValue={maxPixelValue}
