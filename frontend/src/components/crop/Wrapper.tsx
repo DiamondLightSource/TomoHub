@@ -3,7 +3,7 @@ import React, { useMemo, useState } from "react";
 import Contextbar from "./Contextbar";
 import ImagePlot from "../crop/Plot";
 import ImageNavbar from "../crop/Navbar";
-import type { NDT, SelectionBase } from "@diamondlightsource/davidia";
+import type { NDT, RectangularSelection } from "@diamondlightsource/davidia";
 import defineSelectionOperations from "./SelectionOperations";
 import type { SelectionOperations } from "./SelectionOperations";
 
@@ -19,8 +19,8 @@ export default function DisplayAreaWrapper({
   images,
 }: WrapperProps) {
   const [imageIndex, setImageIndex] = useState(0);
-  const emptyArray: SelectionBase[][] = useMemo(() => {
-    const result: SelectionBase[][] = [];
+  const emptyArray: RectangularSelection[][] = useMemo(() => {
+    const result: RectangularSelection[][] = [];
     for (let i = 0; i < copies; i++) {
       result.push([]);
     }
@@ -28,11 +28,11 @@ export default function DisplayAreaWrapper({
   }, [copies]);
   const [imageSelections, setSelections] = useState(emptyArray);
   const [previousImageSelections, setPreviousSelections] = useState<
-    SelectionBase[][]
+    RectangularSelection[][]
   >([]);
 
   // the selection currently being presented on the screen
-  let onScreenSelections: SelectionBase[] = [];
+  let onScreenSelections: RectangularSelection[] = [];
   let onScreenSelectionIndex = -1;
   // setting currentSelections
   // searches backwards from the current frame for the first previous selection that is not empty
