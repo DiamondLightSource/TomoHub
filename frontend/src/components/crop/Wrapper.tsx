@@ -11,12 +11,14 @@ interface WrapperProps {
   max_pixel_value: number;
   copies: number;
   images: NDT[];
+  sample_rate: number;
 }
 
 export default function DisplayAreaWrapper({
   max_pixel_value,
   copies,
   images,
+  sample_rate,
 }: WrapperProps) {
   const [imageIndex, setImageIndex] = useState(0);
   // I couldnt figure out how to make an empty array of fixed length for a custom type like SelectionBase
@@ -57,7 +59,7 @@ export default function DisplayAreaWrapper({
 
   return (
     <div>
-      <Contextbar />
+      <Contextbar selections={imageSelections} sample_rate={sample_rate} />
       <ImagePlot
         image={images[imageIndex]}
         max_pixel_value={max_pixel_value}
