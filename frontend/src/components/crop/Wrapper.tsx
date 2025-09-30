@@ -11,12 +11,14 @@ interface WrapperProps {
   maxPixelValue: number;
   copies: number;
   images: NDT[];
+  sample_rate: number;
 }
 
 export default function DisplayAreaWrapper({
   maxPixelValue: maxPixelValue,
   copies,
   images,
+  sample_rate,
 }: WrapperProps) {
   const [imageIndex, setImageIndex] = useState(0);
   const emptyArray: RectangularSelection[][] = useMemo(() => {
@@ -57,7 +59,7 @@ export default function DisplayAreaWrapper({
 
   return (
     <div>
-      <Contextbar />
+      <Contextbar selections={imageSelections} sample_rate={sample_rate} />
       <ImagePlot
         image={images[imageIndex]}
         maxPixelValue={maxPixelValue}
