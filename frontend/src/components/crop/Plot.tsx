@@ -5,7 +5,7 @@ import {
   SelectionBase,
   RectangularSelection,
 } from "@diamondlightsource/davidia";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 interface ImagePlotProps {
   image: NDT;
@@ -20,13 +20,15 @@ export default function ImagePlot({
   max_pixel_value,
   copies,
 }: ImagePlotProps) {
-  // I couldnt figure out how to make an empty array of fixed length for a custom type like SelectionBase
-  // even with ndarray
-  // this will also run every refresh but it doesnt make sense to create it in a parent component and pass it down
-  const emptyArray: (SelectionBase[] | null)[] = [];
-  for (let i = 0; i < copies; i++) {
-    emptyArray.push(null);
-  }
+  // useMemo so the empty array is only created once (unless copies is updated)
+  const emptyArray: (SelectionBase[] | null)[] = useMemo(() => {
+    const result: (SelectionBase[] | null)[] = [];
+    for (let i = 0; i < copies; i++) {
+      result.push(null);
+    }
+    return result;
+  }, [copies]);
+
   const [imageSelections, setSelections] = useState(emptyArray);
 
   let currentSelections: SelectionBase[] = [];
