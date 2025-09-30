@@ -29,13 +29,10 @@ export default function Contextbar({
           <Button
             variant="outlined"
             onClick={() => {
-              console.log("selections: ");
-              console.log(selections);
               let min_x = -1;
               let max_x = -1;
               let min_y = -1;
               let max_y = -1;
-              // should be a for each loop
               for (const selection_list of selections) {
                 if (selection_list.length > 0) {
                   const selection = selection_list[0];
@@ -59,10 +56,6 @@ export default function Contextbar({
                     y1 = y2;
                     y2 = temp;
                   }
-                  console.log("x1: " + x1);
-                  console.log("x1: " + x2);
-                  console.log("x1: " + y1);
-                  console.log("x1: " + y2);
                   if (min_x == -1) {
                     min_x = x1;
                     max_x = x2;
@@ -85,7 +78,6 @@ export default function Contextbar({
                 }
               }
 
-              console.log("running!");
               const xValues: PreviewType = {
                 start: Math.floor(min_x * sample_rate),
                 stop: Math.floor(max_x * sample_rate),
