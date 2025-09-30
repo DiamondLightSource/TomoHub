@@ -38,10 +38,31 @@ export default function Contextbar({
               // should be a for each loop
               for (const selection_list of selections) {
                 if (selection_list.length > 0) {
-                  const x1 = selection_list[0].start[0];
-                  const x2 = x1 + selection_list[0].lengths[0];
-                  const y1 = selection_list[0].start[1];
-                  const y2 = y1 + selection_list[0].lengths[1];
+                  const selection = selection_list[0];
+                  const x_length =
+                    Math.cos(selection.angle) * selection.lengths[0] -
+                    Math.sin(selection.angle) * selection.lengths[1];
+                  const y_length =
+                    Math.sin(selection.angle) * selection.lengths[0] +
+                    Math.cos(selection.angle) * selection.lengths[1];
+                  let x1 = selection.start[0];
+                  let x2 = x1 + x_length;
+                  if (x1 > x2) {
+                    const temp = x1;
+                    x1 = x2;
+                    x2 = temp;
+                  }
+                  let y1 = selection.start[1];
+                  let y2 = y1 + y_length;
+                  if (y1 > y2) {
+                    const temp = y1;
+                    y1 = y2;
+                    y2 = temp;
+                  }
+                  console.log("x1: " + x1);
+                  console.log("x1: " + x2);
+                  console.log("x1: " + y1);
+                  console.log("x1: " + y2);
                   if (min_x == -1) {
                     min_x = x1;
                     max_x = x2;
