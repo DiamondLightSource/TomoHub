@@ -19,7 +19,6 @@ export default function DisplayAreaWrapper({
 
   return (
     <div>
-      <h1>Cropping page</h1>
       <ImagePlot image={images[imageIndex]} max_pixel_value={max_pixel_value} />
       <ImageNavbar
         totalImages={copies}
