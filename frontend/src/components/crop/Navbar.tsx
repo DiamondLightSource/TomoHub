@@ -64,6 +64,8 @@ interface ImageNavbarProps {
   currentImageIndex: number;
   setImageIndex: React.Dispatch<React.SetStateAction<number>>;
   selection_operations: SelectionOperations;
+  singleSelection: boolean;
+  setSingleSelection: (value: boolean) => void;
 }
 
 export default function ImageNavbar({
@@ -71,6 +73,8 @@ export default function ImageNavbar({
   currentImageIndex,
   setImageIndex: setImageIndex,
   selection_operations,
+  singleSelection,
+  setSingleSelection,
 }: ImageNavbarProps) {
   const [animationPlaying, setAnimationPlaying] = useState(false);
   const [preanimationImageIndex, setPreanimationImageIndex] = useState(-1);
@@ -138,7 +142,7 @@ export default function ImageNavbar({
         </Grid2>
         <Grid2>
           <Box display="flex" justifyContent="center">
-            <Switch />
+            <Switch onChange={(_, checked) => setSingleSelection(!checked)} />
           </Box>
           <Typography>Multiple Select Mode</Typography>
         </Grid2>
@@ -184,6 +188,7 @@ export default function ImageNavbar({
               variant="outlined"
               fullWidth
               onClick={selection_operations.removeSelection}
+              disabled={singleSelection}
             >
               <DeleteOutline />
             </Button>
@@ -195,6 +200,7 @@ export default function ImageNavbar({
               variant="outlined"
               fullWidth
               onClick={selection_operations.removeAll}
+              disabled={singleSelection}
             >
               <Clear />
             </Button>
