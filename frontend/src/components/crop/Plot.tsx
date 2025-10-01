@@ -8,6 +8,7 @@ interface ImagePlotProps {
   onScreenSelections: RectangularSelection[];
   maxPixelValue: number;
   selectionOperations: SelectionOperations;
+  singleSelection: boolean;
 }
 
 export default function ImagePlot({
@@ -15,6 +16,7 @@ export default function ImagePlot({
   onScreenSelections: onScreenSelections,
   maxPixelValue: maxPixelValue,
   selectionOperations: selectionOperations,
+  singleSelection,
 }: ImagePlotProps) {
   return (
     <Box style={{ display: "grid", height: "49vh", minHeight: "400px" }}>
@@ -34,7 +36,8 @@ export default function ImagePlot({
             return;
           }
           if (eventType === "created") {
-            if (selection instanceof RectangularSelection) {
+            // dont allow creating on single selection, force refresh
+            if (selection instanceof RectangularSelection && !singleSelection) {
               selectionOperations.createSelection(selection);
             } else {
               // selection area is not a rectangle
@@ -42,13 +45,23 @@ export default function ImagePlot({
               selectionOperations.forceRefresh();
             }
           } else if (eventType === "removed") {
-            selectionOperations.removeSelection();
+            if (singleSelection) {
+              // dont allow removing on single selection, force refresh
+              selectionOperations.forceRefresh();
+            } else {
+              selectionOperations.removeSelection();
+            }
           } else if (
             eventType === "updated" &&
             !dragging &&
             selection instanceof RectangularSelection &&
             !selectionOperations.onScreenBeingModified(selection)
           ) {
+            // when a box is modified on single selection
+            // make a new one to represent the modification and make sure no others exist
+            if (singleSelection) {
+              selectionOperations.removeAll();
+            }
             selectionOperations.createSelection(selection);
           }
         }}
