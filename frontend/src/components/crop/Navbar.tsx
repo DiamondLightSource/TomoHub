@@ -1,4 +1,13 @@
-import { Box, Grid2, Slider, Input, Button, Tooltip } from "@mui/material";
+import {
+  Box,
+  Grid2,
+  Slider,
+  Input,
+  Button,
+  Tooltip,
+  Switch,
+  Typography,
+} from "@mui/material";
 import Undo from "@mui/icons-material/Undo";
 import PlayArrowOutlined from "@mui/icons-material/PlayArrowOutlined";
 import StopOutlined from "@mui/icons-material/StopOutlined";
@@ -79,6 +88,12 @@ export default function ImageNavbar({
               }}
             />
           </Tooltip>
+        </Grid2>
+        <Grid2>
+          <Box display="flex" justifyContent="center">
+            <Switch />
+          </Box>
+          <Typography>Multiple Select Mode</Typography>
         </Grid2>
       </Grid2>
 
