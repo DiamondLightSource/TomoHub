@@ -21,6 +21,8 @@ interface ImageNavbarProps {
   currentImageIndex: number;
   setImageIndex: React.Dispatch<React.SetStateAction<number>>;
   selectionOperations: SelectionOperations;
+  singleSelection: boolean;
+  setSingleSelection: (value: boolean) => void;
 }
 
 export default function ImageNavbar({
@@ -28,6 +30,8 @@ export default function ImageNavbar({
   currentImageIndex,
   setImageIndex: setImageIndex,
   selectionOperations,
+  singleSelection,
+  setSingleSelection,
 }: ImageNavbarProps) {
   // id value of the interval that is playing the animation
   // cant use state for this as the initial value will be copied into the interval function and it will not be updated
@@ -91,7 +95,7 @@ export default function ImageNavbar({
         </Grid2>
         <Grid2>
           <Box display="flex" justifyContent="center">
-            <Switch />
+            <Switch onChange={(_, checked) => setSingleSelection(!checked)} />
           </Box>
           <Typography>Multiple Select Mode</Typography>
         </Grid2>
@@ -157,6 +161,7 @@ export default function ImageNavbar({
               variant="outlined"
               fullWidth
               onClick={selectionOperations.removeSelection}
+              disabled={singleSelection}
             >
               <DeleteOutline />
             </Button>
@@ -168,6 +173,7 @@ export default function ImageNavbar({
               variant="outlined"
               fullWidth
               onClick={selectionOperations.removeAll}
+              disabled={singleSelection}
             >
               <Clear />
             </Button>

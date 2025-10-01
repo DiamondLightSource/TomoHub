@@ -20,6 +20,7 @@ export default function DisplayAreaWrapper({
   images,
   sampleRate: sampleRate,
 }: WrapperProps) {
+  const [singleSelection, setSingleSelection] = useState(true);
   const [imageIndex, setImageIndex] = useState(0);
   const emptyArray: RectangularSelection[][] = useMemo(() => {
     const result: RectangularSelection[][] = [];
@@ -71,6 +72,8 @@ export default function DisplayAreaWrapper({
         currentImageIndex={imageIndex}
         setImageIndex={setImageIndex}
         selectionOperations={selectionOperations}
+        singleSelection={singleSelection}
+        setSingleSelection={setSingleSelection}
       />
     </div>
   );
