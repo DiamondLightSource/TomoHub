@@ -8,6 +8,7 @@ interface ImagePlotProps {
   on_screen_selections: RectangularSelection[];
   max_pixel_value: number;
   selection_operations: SelectionOperations;
+  singleSelection: boolean;
 }
 
 export default function ImagePlot({
@@ -15,6 +16,7 @@ export default function ImagePlot({
   on_screen_selections,
   max_pixel_value,
   selection_operations,
+  singleSelection,
 }: ImagePlotProps) {
   return (
     <Box style={{ display: "grid", height: "49vh", minHeight: "400px" }}>
@@ -34,7 +36,11 @@ export default function ImagePlot({
             return;
           }
             if (eventType === "created") {
-              if (selection instanceof RectangularSelection) {
+              // dont allow creating on single selection, force refresh
+              if (
+                selection instanceof RectangularSelection &&
+                !singleSelection
+              ) {
                 selection_operations.createSelection(selection);
               } else {
                 // selection area is not a rectangle
@@ -42,12 +48,22 @@ export default function ImagePlot({
                 selection_operations.forceRefresh();
               }
             } else if (eventType === "removed") {
-              selection_operations.removeSelection();
+              if (singleSelection) {
+                // dont allow removing on single selection, force refresh
+                selection_operations.forceRefresh();
+              } else {
+                selection_operations.removeSelection();
+              }
             } else if (eventType === "updated" && !dragging) {
               if (
                 selection instanceof RectangularSelection &&
                 !selection_operations.onScreenBeingModified(selection)
               ) {
+                // when a box is modified on single selection
+                // make a new one to represent the modification and make sure no others exist
+                if (singleSelection) {
+                  selection_operations.removeAll();
+                }
                 selection_operations.createSelection(selection);
               }
             }

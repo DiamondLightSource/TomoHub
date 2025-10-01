@@ -66,6 +66,7 @@ export default function DisplayAreaWrapper({
         max_pixel_value={max_pixel_value}
         on_screen_selections={on_screen_selections}
         selection_operations={selection_operations}
+        singleSelection={singleSelection}
       />
       <ImageNavbar
         totalImages={copies}
