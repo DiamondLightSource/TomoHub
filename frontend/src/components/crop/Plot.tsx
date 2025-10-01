@@ -67,7 +67,7 @@ export default function ImagePlot({
                 imageSelectionsCopy[index] = [selection];
                 setSelections(imageSelectionsCopy);
               } else {
-                // selection area is not a rectangle, should be deleted
+                // stops index out of bounds error
                 if (currentSelectionIndex == -1) {
                   currentSelectionIndex = index;
                 }
@@ -82,6 +82,7 @@ export default function ImagePlot({
                 setSelections(imageSelectionsCopy);
               }
             } else if (eventType == "updated" && !dragging) {
+              // updated is also called after created, we dont want to consider this case
               if (imageSelectionsCopy[currentSelectionIndex][0] != selection) {
                 imageSelectionsCopy[index] = [selection];
                 setSelections(imageSelectionsCopy);
