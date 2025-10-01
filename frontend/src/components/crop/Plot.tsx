@@ -76,9 +76,6 @@ export default function ImagePlot({
             } else if (eventType == "removed") {
               imageSelectionsCopy[currentSelectionIndex] = [];
               setSelections(imageSelectionsCopy);
-            } else if (eventType == "updated") {
-              imageSelectionsCopy[index] = [selection];
-              setSelections(imageSelectionsCopy);
             }
           }
         }}
