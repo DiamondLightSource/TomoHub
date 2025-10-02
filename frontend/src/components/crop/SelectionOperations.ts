@@ -1,13 +1,17 @@
 import { RectangularSelection } from "@diamondlightsource/davidia";
 
 export type SelectionOperations = {
-  createSelection: (selection: RectangularSelection) => void;
+  createSelection: (
+    selection: RectangularSelection,
+    delete_others: boolean
+  ) => void;
   removeSelection: () => void;
   onScreenBeingModified: (selection: RectangularSelection) => boolean;
   forceRefresh: () => void;
   removeAll: () => void;
   toPrevious: () => void;
   initialiseSingleSelectionMode: () => void;
+  debugPrint: () => void;
   undo_possible: boolean;
 };
 
@@ -17,9 +21,17 @@ function createSelection(
   image_selections_copy: RectangularSelection[][],
   setSelections: React.Dispatch<React.SetStateAction<RectangularSelection[][]>>,
   savePrevious: () => void,
-  selection: RectangularSelection
+  selection: RectangularSelection,
+  delete_others: boolean
 ) {
   savePrevious();
+  if (delete_others) {
+    const copies = image_selections_copy.length;
+    image_selections_copy = [];
+    for (let i = 0; i < copies; i++) {
+      image_selections_copy.push([]);
+    }
+  }
   image_selections_copy[index] = [selection];
   setSelections(image_selections_copy);
 }
@@ -115,6 +127,14 @@ function initialiseSingleSelectionMode(
   setSelections(empty_selections_list);
 }
 
+function debugPrint(image_selections, previous_image_selections) {
+  // wont be updated, will always be the last sets
+  console.log("image selections: ");
+  console.log(image_selections);
+  console.log("previous image selections: ");
+  console.log(previous_image_selections);
+}
+
 export default function defineSelectionOperations(
   index: number,
   on_screen_selection_index: number,
@@ -131,13 +151,17 @@ export default function defineSelectionOperations(
   };
 
   const function_holder: SelectionOperations = {
-    createSelection: function (selection: RectangularSelection) {
+    createSelection: function (
+      selection: RectangularSelection,
+      delete_others: boolean
+    ) {
       createSelection(
         index,
         image_selections_copy,
         setSelections,
         minSavePrevious,
-        selection
+        selection,
+        delete_others
       );
     },
     removeSelection: function () {
@@ -175,6 +199,9 @@ export default function defineSelectionOperations(
     },
     initialiseSingleSelectionMode: function () {
       initialiseSingleSelectionMode(image_selections, setSelections);
+    },
+    debugPrint: function () {
+      debugPrint(image_selections, previous_image_selections);
     },
     undo_possible: previous_image_selections.length != 0,
   };
