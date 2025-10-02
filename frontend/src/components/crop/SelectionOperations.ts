@@ -1,13 +1,17 @@
 import { RectangularSelection } from "@diamondlightsource/davidia";
 
 export type SelectionOperations = {
-  createSelection: (selection: RectangularSelection) => void;
+  createSelection: (
+    selection: RectangularSelection,
+    delete_others: boolean
+  ) => void;
   removeSelection: () => void;
   onScreenBeingModified: (selection: RectangularSelection) => boolean;
   forceRefresh: () => void;
   removeAll: () => void;
   toPrevious: () => void;
   initialiseSingleSelectionMode: () => void;
+  debugPrint: () => void;
   undoPossible: boolean;
 };
 
@@ -17,9 +21,17 @@ function createSelection(
   imageSelectionsCopy: RectangularSelection[][],
   setSelections: React.Dispatch<React.SetStateAction<RectangularSelection[][]>>,
   savePrevious: () => void,
-  selection: RectangularSelection
+  selection: RectangularSelection,
+  deleteOthers: boolean
 ) {
   savePrevious();
+  if (deleteOthers) {
+    const copies = imageSelectionsCopy.length;
+    imageSelectionsCopy = [];
+    for (let i = 0; i < copies; i++) {
+      imageSelectionsCopy.push([]);
+    }
+  }
   imageSelectionsCopy[index] = [selection];
   setSelections(imageSelectionsCopy);
 }
@@ -114,6 +126,14 @@ function initialiseSingleSelectionMode(
   setSelections(emptySelectionsList);
 }
 
+function debugPrint(imageSelections, previousImageSelections) {
+  // wont be updated, will always be the last sets
+  console.log("image selections: ");
+  console.log(imageSelections);
+  console.log("previous image selections: ");
+  console.log(previousImageSelections);
+}
+
 export default function defineSelectionOperations(
   index: number,
   onScreenSelectionIndex: number,
@@ -130,13 +150,17 @@ export default function defineSelectionOperations(
   };
 
   const functionHolder: SelectionOperations = {
-    createSelection: function (selection: RectangularSelection) {
+    createSelection: function (
+      selection: RectangularSelection,
+      deleteOthers: boolean
+    ) {
       createSelection(
         index,
         imageSelectionsCopy,
         setSelections,
         minSavePrevious,
-        selection
+        selection,
+        deleteOthers
       );
     },
     removeSelection: function () {
@@ -170,6 +194,9 @@ export default function defineSelectionOperations(
     },
     initialiseSingleSelectionMode: function () {
       initialiseSingleSelectionMode(imageSelections, setSelections);
+    },
+    debugPrint: function () {
+      debugPrint(imageSelections, previousImageSelections);
     },
     undoPossible: previousImageSelections.length !== 0,
   };

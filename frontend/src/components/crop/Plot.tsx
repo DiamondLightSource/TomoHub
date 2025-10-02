@@ -38,7 +38,7 @@ export default function ImagePlot({
           if (eventType === "created") {
             // dont allow creating on single selection, force refresh
             if (selection instanceof RectangularSelection && !singleSelection) {
-              selectionOperations.createSelection(selection);
+              selectionOperations.createSelection(selection, false);
             } else {
               // selection area is not a rectangle
               // dont add anything to the list and force refresh so it disapears
@@ -62,7 +62,7 @@ export default function ImagePlot({
             if (singleSelection) {
               selectionOperations.removeAll();
             }
-            selectionOperations.createSelection(selection);
+            selectionOperations.createSelection(selection, singleSelection);
           }
         }}
         selections={onScreenSelections}
