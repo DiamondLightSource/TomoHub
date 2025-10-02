@@ -115,7 +115,10 @@ function savePrevious(
 
 function initialiseSingleSelectionMode(
   imageSelections: RectangularSelection[][],
-  setSelections: React.Dispatch<React.SetStateAction<RectangularSelection[][]>>
+  setSelections: React.Dispatch<React.SetStateAction<RectangularSelection[][]>>,
+  setPreviousSelections: React.Dispatch<
+    React.SetStateAction<RectangularSelection[][]>
+  >
 ) {
   const emptySelectionsList: RectangularSelection[][] = [];
   for (let i = 0; i < imageSelections.length; i++) {
@@ -124,6 +127,7 @@ function initialiseSingleSelectionMode(
   // not good to have these magic numbers
   emptySelectionsList[0] = [new RectangularSelection([100, 100], [100, 100])];
   setSelections(emptySelectionsList);
+  setPreviousSelections([]);
 }
 
 function debugPrint(imageSelections, previousImageSelections) {
@@ -193,7 +197,11 @@ export default function defineSelectionOperations(
       toPrevious(previousImageSelections, setSelections, setPreviousSelections);
     },
     initialiseSingleSelectionMode: function () {
-      initialiseSingleSelectionMode(imageSelections, setSelections);
+      initialiseSingleSelectionMode(
+        imageSelections,
+        setSelections,
+        setPreviousSelections
+      );
     },
     debugPrint: function () {
       debugPrint(imageSelections, previousImageSelections);
