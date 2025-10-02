@@ -64,7 +64,7 @@ export default function ImagePlot({
             return;
           }
           const imageSelectionsCopy = [...imageSelections];
-          if (eventType == "created") {
+          if (eventType === "created") {
             if (selection instanceof RectangularSelection) {
               imageSelectionsCopy[index] = [selection];
             } else {
@@ -83,12 +83,12 @@ export default function ImagePlot({
             }
           } // updated is also called after created, we dont want to consider this case
           else if (
-            eventType == "updated" &&
+            eventType === "updated" &&
             !dragging &&
             imageSelectionsCopy[currentSelectionIndex][0] != selection
           ) {
             imageSelectionsCopy[index] = [selection];
-          } else if (eventType == "removed") {
+          } else if (eventType === "removed") {
             imageSelectionsCopy[currentSelectionIndex] = [];
           }
           setSelections(imageSelectionsCopy);
