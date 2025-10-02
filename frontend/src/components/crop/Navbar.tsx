@@ -9,14 +9,14 @@ interface ImageNavbarProps {
   totalImages: number;
   currentImageIndex: number;
   imageIndexSetter: React.Dispatch<React.SetStateAction<number>>;
-  selection_operations: SelectionOperations;
+  selectionOperations: SelectionOperations;
 }
 
 export default function ImageNavbar({
   totalImages: totalImages,
   currentImageIndex,
   imageIndexSetter,
-  selection_operations,
+  selectionOperations: selectionOperations,
 }: ImageNavbarProps) {
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
@@ -92,7 +92,7 @@ export default function ImageNavbar({
             <Button
               variant="outlined"
               fullWidth
-              onClick={selection_operations.removeSelection}
+              onClick={selectionOperations.removeSelection}
             >
               <DeleteOutline />
             </Button>
