@@ -60,38 +60,38 @@ export default function ImagePlot({
         }}
         values={image}
         selectionsListener={(eventType, dragging, selection) => {
-          if (selection != undefined) {
-            const imageSelectionsCopy = [...imageSelections];
-            if (eventType == "created") {
-              if (selection instanceof RectangularSelection) {
-                imageSelectionsCopy[index] = [selection];
-                setSelections(imageSelectionsCopy);
-              } else {
-                // stops index out of bounds error
-                if (currentSelectionIndex == -1) {
-                  currentSelectionIndex = index;
-                }
-                // copy the value of currentSelection and set it to that again (dont change it)
-                // this stops regions being added if theyre not a rectangle
-                // however, the component still needs to refresh as the new selection region will be visible otherwise
-                const currentSelectionsCopy = [
-                  ...imageSelectionsCopy[currentSelectionIndex],
-                ];
-                imageSelectionsCopy[currentSelectionIndex] =
-                  currentSelectionsCopy;
-                setSelections(imageSelectionsCopy);
-              }
-            } else if (eventType == "updated" && !dragging) {
-              // updated is also called after created, we dont want to consider this case
-              if (imageSelectionsCopy[currentSelectionIndex][0] != selection) {
-                imageSelectionsCopy[index] = [selection];
-                setSelections(imageSelectionsCopy);
-              }
-            } else if (eventType == "removed") {
-              imageSelectionsCopy[currentSelectionIndex] = [];
-              setSelections(imageSelectionsCopy);
-            }
+          if (selection == undefined) {
+            return;
           }
+          const imageSelectionsCopy = [...imageSelections];
+          if (eventType == "created") {
+            if (selection instanceof RectangularSelection) {
+              imageSelectionsCopy[index] = [selection];
+            } else {
+              // stops index out of bounds error
+              if (currentSelectionIndex == -1) {
+                currentSelectionIndex = index;
+              }
+              // copy the value of currentSelection and set it to that again (dont change it)
+              // this stops regions being added if theyre not a rectangle
+              // however, the component still needs to refresh as the new selection region will be visible otherwise
+              const currentSelectionsCopy = [
+                ...imageSelectionsCopy[currentSelectionIndex],
+              ];
+              imageSelectionsCopy[currentSelectionIndex] =
+                currentSelectionsCopy;
+            }
+          } // updated is also called after created, we dont want to consider this case
+          else if (
+            eventType == "updated" &&
+            !dragging &&
+            imageSelectionsCopy[currentSelectionIndex][0] != selection
+          ) {
+            imageSelectionsCopy[index] = [selection];
+          } else if (eventType == "removed") {
+            imageSelectionsCopy[currentSelectionIndex] = [];
+          }
+          setSelections(imageSelectionsCopy);
         }}
         selections={currentSelections}
       />
