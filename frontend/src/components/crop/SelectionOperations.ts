@@ -57,14 +57,14 @@ function forceRefresh(
 }
 
 function removeAll(
-  image_selections_copy: SelectionBase[][],
+  imageSelectionsCopy: SelectionBase[][],
   setSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
 ) {
-  const empty_array: SelectionBase[][] = [];
-  for (let i = 0; i < image_selections_copy.length; i++) {
-    empty_array.push([]);
+  const emptyArray: SelectionBase[][] = [];
+  for (let i = 0; i < imageSelectionsCopy.length; i++) {
+    emptyArray.push([]);
   }
-  setSelections(empty_array);
+  setSelections(emptyArray);
 }
 
 export default function defineSelectionOperations(
@@ -101,7 +101,7 @@ export default function defineSelectionOperations(
       );
     },
     removeAll: function () {
-      removeAll(image_selections_copy, setSelections);
+      removeAll(imageSelectionsCopy, setSelections);
     },
   };
   return functionHolder;

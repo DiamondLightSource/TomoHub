@@ -103,7 +103,7 @@ export default function ImageNavbar({
             <Button
               variant="outlined"
               fullWidth
-              onClick={selection_operations.removeAll}
+              onClick={selectionOperations.removeAll}
             >
               <Clear />
             </Button>
