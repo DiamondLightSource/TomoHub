@@ -9,23 +9,23 @@ import type { SelectionOperations } from "./SelectionOperations";
 
 interface ImagePlotProps {
   image: NDT;
-  on_screen_selections: SelectionBase[];
-  max_pixel_value: number;
-  selection_operations: SelectionOperations;
+  onScreenSelections: SelectionBase[];
+  maxPixelValue: number;
+  selectionOperations: SelectionOperations;
 }
 
 export default function ImagePlot({
   image,
-  on_screen_selections,
-  max_pixel_value,
-  selection_operations,
+  onScreenSelections: onScreenSelections,
+  maxPixelValue: maxPixelValue,
+  selectionOperations: selectionOperations,
 }: ImagePlotProps) {
   return (
     <Box style={{ display: "grid", height: "49vh", minHeight: "400px" }}>
       <HeatmapPlot
         aspect="auto"
         colourMap="Purples"
-        domain={[0, max_pixel_value]}
+        domain={[0, maxPixelValue]}
         heatmapScale={ScaleType.Linear}
         plotConfig={{
           title: "Sample Heatmap Plot",
@@ -39,23 +39,23 @@ export default function ImagePlot({
           }
           if (eventType === "created") {
             if (selection instanceof RectangularSelection) {
-              selection_operations.createSelection(selection);
+              selectionOperations.createSelection(selection);
             } else {
               // selection area is not a rectangle
               // dont add anything to the list and force refresh so it disapears
-              selection_operations.forceRefresh();
+              selectionOperations.forceRefresh();
             }
           } else if (eventType === "removed") {
-            selection_operations.removeSelection();
+            selectionOperations.removeSelection();
           } else if (
             eventType === "updated" &&
             !dragging &&
-            !selection_operations.onScreenBeingModified(selection)
+            !selectionOperations.onScreenBeingModified(selection)
           ) {
-            selection_operations.createSelection(selection);
+            selectionOperations.createSelection(selection);
           }
         }}
-        selections={on_screen_selections}
+        selections={onScreenSelections}
       />
     </Box>
   );

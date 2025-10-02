@@ -10,7 +10,7 @@ interface ImageNavbarProps {
 }
 
 export default function ImageNavbar({
-  totalImages: total_images,
+  totalImages: totalImages,
   currentImageIndex,
   imageIndexSetter,
 }: ImageNavbarProps) {
@@ -31,8 +31,8 @@ export default function ImageNavbar({
   const handleBlur = () => {
     if (currentImageIndex < 0) {
       imageIndexSetter(0);
-    } else if (currentImageIndex > total_images - 1) {
-      imageIndexSetter(total_images - 1);
+    } else if (currentImageIndex > totalImages - 1) {
+      imageIndexSetter(totalImages - 1);
     }
   };
 
@@ -47,7 +47,7 @@ export default function ImageNavbar({
             }
             onChange={handleSliderChange}
             aria-labelledby="input-slider"
-            max={total_images - 1}
+            max={totalImages - 1}
           />
         </Grid2>
         <Grid2>
@@ -59,7 +59,7 @@ export default function ImageNavbar({
               inputProps={{
                 step: 1,
                 min: 0,
-                max: total_images - 1,
+                max: totalImages - 1,
                 type: "number",
                 "aria-labelledby": "input-slider",
               }}

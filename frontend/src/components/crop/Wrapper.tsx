@@ -7,45 +7,45 @@ import defineSelectionOperations from "./SelectionOperations";
 import type { SelectionOperations } from "./SelectionOperations";
 
 interface WrapperProps {
-  max_pixel_value: number;
+  maxPixelValue: number;
   copies: number;
   images: NDT[];
 }
 
 export default function DisplayAreaWrapper({
-  max_pixel_value,
+  maxPixelValue: maxPixelValue,
   copies,
   images,
 }: WrapperProps) {
   const [imageIndex, setImageIndex] = useState(0);
   // useMemo so the empty array is only created once (unless copies is updated)
-  const empty_array: SelectionBase[][] = useMemo(() => {
+  const emptyArray: SelectionBase[][] = useMemo(() => {
     const result: SelectionBase[][] = [];
     for (let i = 0; i < copies; i++) {
       result.push([]);
     }
     return result;
   }, [copies]);
-  const [imageSelections, setSelections] = useState(empty_array);
+  const [imageSelections, setSelections] = useState(emptyArray);
 
   // the selection currently being presented on the screen
-  let on_screen_selections: SelectionBase[] = [];
-  let on_screen_selection_index = -1;
+  let onScreenSelections: SelectionBase[] = [];
+  let onScreenSelectionIndex = -1;
   // setting currentSelections
   // searches backwards from the current frame for the first previous selection that is not empty
   // + copies and modulo create looping effect
   for (let i = imageIndex + copies; i > 0; i--) {
-    const iteration_selection = imageSelections[i % copies];
-    if (iteration_selection.length !== 0) {
-      on_screen_selections = iteration_selection;
-      on_screen_selection_index = i % copies;
+    const iterationSelection = imageSelections[i % copies];
+    if (iterationSelection.length !== 0) {
+      onScreenSelections = iterationSelection;
+      onScreenSelectionIndex = i % copies;
       break;
     }
   }
 
-  const selection_operations: SelectionOperations = defineSelectionOperations(
+  const selectionOperations: SelectionOperations = defineSelectionOperations(
     imageIndex,
-    on_screen_selection_index,
+    onScreenSelectionIndex,
     imageSelections,
     setSelections
   );
@@ -54,9 +54,9 @@ export default function DisplayAreaWrapper({
     <div>
       <ImagePlot
         image={images[imageIndex]}
-        max_pixel_value={max_pixel_value}
-        on_screen_selections={on_screen_selections}
-        selection_operations={selection_operations}
+        maxPixelValue={maxPixelValue}
+        onScreenSelections={onScreenSelections}
+        selectionOperations={selectionOperations}
       />
       <ImageNavbar
         totalImages={copies}
