@@ -36,7 +36,7 @@ export default function DisplayAreaWrapper({
   // + copies and modulo create looping effect
   for (let i = imageIndex + copies; i > 0; i--) {
     const iteration_selection = imageSelections[i % copies];
-    if (iteration_selection.length != 0) {
+    if (iteration_selection.length !== 0) {
       on_screen_selections = iteration_selection;
       on_screen_selection_index = i % copies;
       break;
