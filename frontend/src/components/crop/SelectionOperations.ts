@@ -1,4 +1,4 @@
-import type { RectangularSelection } from "@diamondlightsource/davidia";
+import { RectangularSelection } from "@diamondlightsource/davidia";
 
 export type SelectionOperations = {
   createSelection: (selection: RectangularSelection) => void;
@@ -7,6 +7,7 @@ export type SelectionOperations = {
   forceRefresh: () => void;
   removeAll: () => void;
   toPrevious: () => void;
+  initialiseSingleSelectionMode: () => void;
   undo_possible: boolean;
 };
 
@@ -101,6 +102,19 @@ function savePrevious(
   setPreviousSelections(image_selections_other_copy);
 }
 
+function initialiseSingleSelectionMode(
+  image_selections: RectangularSelection[][],
+  setSelections: React.Dispatch<React.SetStateAction<RectangularSelection[][]>>
+) {
+  const empty_selections_list: RectangularSelection[][] = [];
+  for (let i = 0; i < image_selections.length; i++) {
+    empty_selections_list.push([]);
+  }
+  // not good to have these magic numbers
+  empty_selections_list[0] = [new RectangularSelection([100, 100], [100, 100])];
+  setSelections(empty_selections_list);
+}
+
 export default function defineSelectionOperations(
   index: number,
   on_screen_selection_index: number,
@@ -158,6 +172,9 @@ export default function defineSelectionOperations(
         setSelections,
         setPreviousSelections
       );
+    },
+    initialiseSingleSelectionMode: function () {
+      initialiseSingleSelectionMode(image_selections, setSelections);
     },
     undo_possible: previous_image_selections.length != 0,
   };
