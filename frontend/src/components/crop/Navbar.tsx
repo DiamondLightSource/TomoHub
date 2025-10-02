@@ -195,7 +195,9 @@ export default function ImageNavbar({
               variant="outlined"
               fullWidth
               onClick={selection_operations.removeSelection}
-              disabled={singleSelection}
+              disabled={
+                singleSelection || selection_operations.selections_empty
+              }
             >
               <DeleteOutline />
             </Button>
@@ -207,7 +209,9 @@ export default function ImageNavbar({
               variant="outlined"
               fullWidth
               onClick={selection_operations.removeAll}
-              disabled={singleSelection}
+              disabled={
+                singleSelection || selection_operations.selections_empty
+              }
             >
               <Clear />
             </Button>
