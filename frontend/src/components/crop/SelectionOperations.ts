@@ -120,14 +120,21 @@ function initialiseSingleSelectionMode(
   setSelections: React.Dispatch<React.SetStateAction<RectangularSelection[][]>>,
   setPreviousSelections: React.Dispatch<
     React.SetStateAction<RectangularSelection[][]>
-  >
+  >,
+  image_width: number,
+  image_height: number
 ) {
   const empty_selections_list: RectangularSelection[][] = [];
   for (let i = 0; i < image_selections.length; i++) {
     empty_selections_list.push([]);
   }
   // not good to have these magic numbers
-  empty_selections_list[0] = [new RectangularSelection([100, 100], [100, 100])];
+  empty_selections_list[0] = [
+    new RectangularSelection(
+      [image_width * 0.25, image_height * 0.25],
+      [image_width * 0.5, image_height * 0.5]
+    ),
+  ];
   setSelections(empty_selections_list);
   setPreviousSelections([]);
 }
@@ -148,7 +155,9 @@ export default function defineSelectionOperations(
   setSelections: React.Dispatch<React.SetStateAction<RectangularSelection[][]>>,
   setPreviousSelections: React.Dispatch<
     React.SetStateAction<RectangularSelection[][]>
-  >
+  >,
+  image_width: number,
+  image_height: number
 ): SelectionOperations {
   const image_selections_copy = [...image_selections];
   const minSavePrevious = function () {
@@ -206,7 +215,9 @@ export default function defineSelectionOperations(
       initialiseSingleSelectionMode(
         image_selections,
         setSelections,
-        setPreviousSelections
+        setPreviousSelections,
+        image_width,
+        image_height
       );
     },
     debugPrint: function () {
