@@ -57,6 +57,7 @@ export default function DisplayAreaWrapper({
     setSelections,
     setPreviousSelections
   );
+  useMemo(selectionOperations.initialiseSingleSelectionMode, []);
 
   return (
     <div>

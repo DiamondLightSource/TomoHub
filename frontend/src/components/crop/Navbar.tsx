@@ -95,7 +95,14 @@ export default function ImageNavbar({
         </Grid2>
         <Grid2>
           <Box display="flex" justifyContent="center">
-            <Switch onChange={(_, checked) => setSingleSelection(!checked)} />
+            <Switch
+              onChange={(_, checked) => {
+                setSingleSelection(!checked);
+                if (!checked) {
+                  selectionOperations.initialiseSingleSelectionMode();
+                }
+              }}
+            />
           </Box>
           <Typography>Multiple Select Mode</Typography>
         </Grid2>
