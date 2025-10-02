@@ -59,9 +59,6 @@ export default function ImagePlot({
           ) {
             // when a box is modified on single selection
             // make a new one to represent the modification and make sure no others exist
-            if (singleSelection) {
-              selectionOperations.removeAll();
-            }
             selectionOperations.createSelection(selection, singleSelection);
           }
         }}
