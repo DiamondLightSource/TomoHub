@@ -35,40 +35,33 @@ export default function ImagePlot({
           if (selection === undefined) {
             return;
           }
-            if (eventType === "created") {
-              // dont allow creating on single selection, force refresh
-              if (
-                selection instanceof RectangularSelection &&
-                !singleSelection
-              ) {
-                selection_operations.createSelection(selection, false);
-              } else {
-                // selection area is not a rectangle
-                // dont add anything to the list and force refresh so it disapears
-                selection_operations.forceRefresh();
-              }
-            } else if (eventType === "removed") {
-              if (singleSelection) {
-                // dont allow removing on single selection, force refresh
-                selection_operations.forceRefresh();
-              } else {
-                selection_operations.removeSelection();
-              }
-            } else if (eventType === "updated" && !dragging) {
-              if (
-                selection instanceof RectangularSelection &&
-                !selection_operations.onScreenBeingModified(selection)
-              ) {
-                // when a box is modified on single selection
-                // make a new one to represent the modification and make sure no others exist
-                selection_operations.createSelection(
-                  selection,
-                  singleSelection
-                );
-              }
+          if (eventType === "created") {
+            // dont allow creating on single selection, force refresh
+            if (selection instanceof RectangularSelection && !singleSelection) {
+              selection_operations.createSelection(selection, false);
+            } else {
+              // selection area is not a rectangle
+              // dont add anything to the list and force refresh so it disapears
+              selection_operations.forceRefresh();
+            }
+          } else if (eventType === "removed") {
+            if (singleSelection) {
+              // dont allow removing on single selection, force refresh
+              selection_operations.forceRefresh();
+            } else {
+              selection_operations.removeSelection();
+            }
+          } else if (eventType === "updated" && !dragging) {
+            if (
+              selection instanceof RectangularSelection &&
+              !selection_operations.onScreenBeingModified(selection)
+            ) {
+              // when a box is modified on single selection
+              // make a new one to represent the modification and make sure no others exist
+              selection_operations.createSelection(selection, singleSelection);
             }
           }
-        }
+        }}
         selections={on_screen_selections}
       />
     </Box>
