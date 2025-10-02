@@ -55,7 +55,9 @@ export default function DisplayAreaWrapper({
     imageSelections,
     previousImageSelections,
     setSelections,
-    setPreviousSelections
+    setPreviousSelections,
+    images[0].shape[1],
+    images[0].shape[0]
   );
   useMemo(selectionOperations.initialiseSingleSelectionMode, []);
 
