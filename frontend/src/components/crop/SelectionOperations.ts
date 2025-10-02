@@ -13,6 +13,7 @@ export type SelectionOperations = {
   initialiseSingleSelectionMode: () => void;
   debugPrint: () => void;
   undoPossible: boolean;
+  selectionsEmpty: boolean;
 };
 
 // creates selection at the current index
@@ -207,6 +208,7 @@ export default function defineSelectionOperations(
       debugPrint(imageSelections, previousImageSelections);
     },
     undoPossible: previousImageSelections.length !== 0,
+    selectionsEmpty: onScreenSelectionIndex == -1,
   };
   return functionHolder;
 }
