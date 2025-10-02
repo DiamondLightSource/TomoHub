@@ -39,7 +39,7 @@ export default function ImagePlot({
   // + copies and modulo create looping effect
   for (let i = index + copies; i > 0; i--) {
     const iteration_selection = imageSelections[i % copies];
-    if (iteration_selection.length != 0) {
+    if (iteration_selection.length !== 0) {
       currentSelections = iteration_selection;
       currentSelectionIndex = i % copies;
       break;
@@ -60,7 +60,7 @@ export default function ImagePlot({
         }}
         values={image}
         selectionsListener={(eventType, dragging, selection) => {
-          if (selection == undefined) {
+          if (selection === undefined) {
             return;
           }
           const imageSelectionsCopy = [...imageSelections];
@@ -69,7 +69,7 @@ export default function ImagePlot({
               imageSelectionsCopy[index] = [selection];
             } else {
               // stops index out of bounds error
-              if (currentSelectionIndex == -1) {
+              if (currentSelectionIndex === -1) {
                 currentSelectionIndex = index;
               }
               // copy the value of currentSelection and set it to that again (dont change it)
@@ -85,7 +85,7 @@ export default function ImagePlot({
           else if (
             eventType === "updated" &&
             !dragging &&
-            imageSelectionsCopy[currentSelectionIndex][0] != selection
+            imageSelectionsCopy[currentSelectionIndex][0] !== selection
           ) {
             imageSelectionsCopy[index] = [selection];
           } else if (eventType === "removed") {

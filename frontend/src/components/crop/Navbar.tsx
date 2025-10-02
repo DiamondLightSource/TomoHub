@@ -15,7 +15,7 @@ export default function ImageNavbar({
   imageIndexSetter,
 }: ImageNavbarProps) {
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
-    if (typeof newValue == "number") {
+    if (typeof newValue === "number") {
       imageIndexSetter(newValue);
     } else {
       imageIndexSetter(newValue[0]);
