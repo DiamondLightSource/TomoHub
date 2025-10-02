@@ -33,7 +33,7 @@ function onScreenBeingModified(
   image_selections_copy: SelectionBase[][],
   selection: SelectionBase
 ): boolean {
-  return image_selections_copy[on_screen_selection_index][0] == selection;
+  return image_selections_copy[on_screen_selection_index][0] === selection;
 }
 
 function forceRefresh(
@@ -45,8 +45,7 @@ function forceRefresh(
   // copy the value of currentSelection and set it to that again (dont change it)
   // this stops regions being added if theyre not a rectangle
   // however, the component still needs to refresh as the new selection region will be visible otherwise
-  // lmk if theres a better way to "force refresh" a component
-  if (on_screen_selection_index == -1) {
+  if (on_screen_selection_index === -1) {
     on_screen_selection_index = index;
   }
   const currentSelectionsCopy = [

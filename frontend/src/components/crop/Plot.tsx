@@ -37,23 +37,24 @@ export default function ImagePlot({
           if (selection === undefined) {
             return;
           }
-            if (eventType === "created") {
-              if (selection instanceof RectangularSelection) {
-                selection_operations.createSelection(selection);
-              } else {
-                // selection area is not a rectangle
-                // dont add anything to the list and force refresh so it disapears
-                selection_operations.forceRefresh();
-              }
-            } else if (eventType === "removed") {
-              selection_operations.removeSelection();
-            } else if (eventType === "updated" && !dragging) {
-              if (!selection_operations.onScreenBeingModified(selection)) {
-                selection_operations.createSelection(selection);
-              }
+          if (eventType === "created") {
+            if (selection instanceof RectangularSelection) {
+              selection_operations.createSelection(selection);
+            } else {
+              // selection area is not a rectangle
+              // dont add anything to the list and force refresh so it disapears
+              selection_operations.forceRefresh();
             }
+          } else if (eventType === "removed") {
+            selection_operations.removeSelection();
+          } else if (
+            eventType === "updated" &&
+            !dragging &&
+            !selection_operations.onScreenBeingModified(selection)
+          ) {
+            selection_operations.createSelection(selection);
           }
-        }
+        }}
         selections={on_screen_selections}
       />
     </Box>
