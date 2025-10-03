@@ -62,6 +62,7 @@ export default function DisplayAreaWrapper({
         totalImages={copies}
         currentImageIndex={imageIndex}
         imageIndexSetter={setImageIndex}
+        selectionOperations={selectionOperations}
       />
     </div>
   );
