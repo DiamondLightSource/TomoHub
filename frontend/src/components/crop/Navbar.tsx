@@ -75,7 +75,12 @@ export default function ImageNavbar({
       <Grid2 container spacing={2} sx={{ alignItems: "center" }}>
         <Grid2 size="grow">
           <Tooltip title="Undo last action">
-            <Button variant="outlined" fullWidth>
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={selectionOperations.toPrevious}
+              disabled={!selectionOperations.undoPossible}
+            >
               <Undo />
             </Button>
           </Tooltip>

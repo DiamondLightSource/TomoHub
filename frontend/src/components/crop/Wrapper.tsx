@@ -18,7 +18,6 @@ export default function DisplayAreaWrapper({
   images,
 }: WrapperProps) {
   const [imageIndex, setImageIndex] = useState(0);
-  // useMemo so the empty array is only created once (unless copies is updated)
   const emptyArray: SelectionBase[][] = useMemo(() => {
     const result: SelectionBase[][] = [];
     for (let i = 0; i < copies; i++) {
@@ -27,6 +26,9 @@ export default function DisplayAreaWrapper({
     return result;
   }, [copies]);
   const [imageSelections, setSelections] = useState(emptyArray);
+  const [previousImageSelections, setPreviousSelections] = useState<
+    SelectionBase[][]
+  >([]);
 
   // the selection currently being presented on the screen
   let onScreenSelections: SelectionBase[] = [];
@@ -47,7 +49,9 @@ export default function DisplayAreaWrapper({
     imageIndex,
     onScreenSelectionIndex,
     imageSelections,
-    setSelections
+    previousImageSelections,
+    setSelections,
+    setPreviousSelections
   );
 
   return (
