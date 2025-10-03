@@ -32,7 +32,7 @@ function checkAnimation(
 ) {
   if (animationPlaying) {
     // reached the end of the animation
-    if (currentImageIndex == totalImages - 1) {
+    if (currentImageIndex === totalImages - 1) {
       setAnimationPlaying(false);
       playFrame(setImageIndex, preanimationImageIndex);
       setPreanimationImageIndex(-1);
@@ -44,7 +44,7 @@ function checkAnimation(
     }
   }
   // animation stopped prematurely
-  else if (preanimationImageIndex != -1) {
+  else if (preanimationImageIndex !== -1) {
     playFrame(setImageIndex, preanimationImageIndex);
     setPreanimationImageIndex(-1);
   }
