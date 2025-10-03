@@ -4,7 +4,6 @@ import PlayArrowOutlined from "@mui/icons-material/PlayArrowOutlined";
 import Clear from "@mui/icons-material/Clear";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import type { SelectionOperations } from "./SelectionOperations";
-import type { SelectionOperations } from "./SelectionOperations";
 
 interface ImageNavbarProps {
   totalImages: number;
@@ -79,8 +78,8 @@ export default function ImageNavbar({
             <Button
               variant="outlined"
               fullWidth
-              onClick={selection_operations.toPrevious}
-              disabled={!selection_operations.undo_possible}
+              onClick={selectionOperations.toPrevious}
+              disabled={!selectionOperations.undo_possible}
             >
               <Undo />
             </Button>
