@@ -89,10 +89,10 @@ function toPrevious(
 }
 
 function savePrevious(
-  imageSelectionsCopy: SelectionBase[][],
+  imageSelections: SelectionBase[][],
   setPreviousSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
 ) {
-  const imageSelectionsOtherCopy = [...imageSelectionsCopy];
+  const imageSelectionsOtherCopy = [...imageSelections];
   setPreviousSelections(imageSelectionsOtherCopy);
 }
 
@@ -106,7 +106,7 @@ export default function defineSelectionOperations(
 ): SelectionOperations {
   const imageSelectionsCopy = [...imageSelections];
   const minSavePrevious = function () {
-    savePrevious(imageSelectionsCopy, setPreviousSelections);
+    savePrevious(imageSelections, setPreviousSelections);
   };
 
   const functionHolder: SelectionOperations = {
