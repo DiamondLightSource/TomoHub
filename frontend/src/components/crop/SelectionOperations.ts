@@ -7,7 +7,7 @@ export type SelectionOperations = {
   forceRefresh: () => void;
   removeAll: () => void;
   toPrevious: () => void;
-  undo_possible: boolean;
+  undoPossible: boolean;
 };
 
 // creates selection at the current index
@@ -81,7 +81,7 @@ function toPrevious(
   setPreviousSelections: React.Dispatch<React.SetStateAction<SelectionBase[][]>>
 ) {
   // already "undone"
-  if (previousImageSelections.length == 0) {
+  if (previousImageSelections.length === 0) {
     return;
   }
   setSelections(previousImageSelections);
@@ -148,7 +148,7 @@ export default function defineSelectionOperations(
     toPrevious: function () {
       toPrevious(previousImageSelections, setSelections, setPreviousSelections);
     },
-    undo_possible: previousImageSelections.length != 0,
+    undoPossible: previousImageSelections.length !== 0,
   };
   return functionHolder;
 }
