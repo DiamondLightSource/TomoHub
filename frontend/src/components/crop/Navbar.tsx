@@ -23,19 +23,25 @@ async function playFrame(
 // checks if the play animation should be playing
 function checkAnimation(
   currentImageIndex: number,
-  preanimationImageIndex: number,
+  preanimationImageIndex: number | undefined,
   totalImages: number,
-  animationPlaying: boolean,
-  setAnimationPlaying: React.Dispatch<React.SetStateAction<boolean>>,
+  midAnimation: boolean,
+  setMidAnimation: React.Dispatch<React.SetStateAction<boolean>>,
   setImageIndex: React.Dispatch<React.SetStateAction<number>>,
-  setPreanimationImageIndex: React.Dispatch<React.SetStateAction<number>>
+  setPreanimationImageIndex: React.Dispatch<
+    React.SetStateAction<number | undefined>
+  >
 ) {
-  if (animationPlaying) {
+  if (preanimationImageIndex === undefined) {
+    // no animation is playing
+    return;
+  }
+  if (midAnimation) {
     // reached the end of the animation
     if (currentImageIndex === totalImages - 1) {
-      setAnimationPlaying(false);
+      setMidAnimation(false);
       playFrame(setImageIndex, preanimationImageIndex);
-      setPreanimationImageIndex(-1);
+      setPreanimationImageIndex(undefined);
     } else {
       // go to the next frame in animation
       // this will cause a change in state, causing a refresh of the component
@@ -43,10 +49,11 @@ function checkAnimation(
       playFrame(setImageIndex, currentImageIndex + 1);
     }
   }
-  // animation stopped prematurely
-  else if (preanimationImageIndex !== -1) {
+  // the animation has been stopped but the image has not been set back to what it was before
+  // this happens when the stop button is pressed mid animation
+  else {
     playFrame(setImageIndex, preanimationImageIndex);
-    setPreanimationImageIndex(-1);
+    setPreanimationImageIndex(undefined);
   }
 }
 
@@ -63,16 +70,22 @@ export default function ImageNavbar({
   setImageIndex: setImageIndex,
   selectionOperations,
 }: ImageNavbarProps) {
-  const [animationPlaying, setAnimationPlaying] = useState(false);
-  const [preanimationImageIndex, setPreanimationImageIndex] = useState(-1);
+  // set to true when an animation is started
+  // when the last frame of the animation is reached, this is set to false
+  const [midAnimation, setMidAnimation] = useState(false);
+  // records the imageIndex when an animation is started
+  // if its undefined, there is no animation playing
+  const [preanimationImageIndex, setPreanimationImageIndex] = useState<
+    number | undefined
+  >(undefined);
 
   // will cause a state change (and refresh) if an animation should be playing
   checkAnimation(
     currentImageIndex,
     preanimationImageIndex,
     totalImages,
-    animationPlaying,
-    setAnimationPlaying,
+    midAnimation,
+    setMidAnimation,
     setImageIndex,
     setPreanimationImageIndex
   );
@@ -148,18 +161,18 @@ export default function ImageNavbar({
               variant="outlined"
               fullWidth
               onClick={
-                animationPlaying
+                midAnimation
                   ? () => {
-                      setAnimationPlaying(false);
+                      setMidAnimation(false);
                     }
                   : () => {
                       setPreanimationImageIndex(currentImageIndex);
                       setImageIndex(0);
-                      setAnimationPlaying(true);
+                      setMidAnimation(true);
                     }
               }
             >
-              {animationPlaying ? <StopOutlined /> : <PlayArrowOutlined />}
+              {midAnimation ? <StopOutlined /> : <PlayArrowOutlined />}
             </Button>
           </Tooltip>
         </Grid2>
