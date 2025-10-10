@@ -7,72 +7,6 @@ import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import type { SelectionOperations } from "./SelectionOperations";
 import { useRef, useState } from "react";
 
-// waits 300ms and then changes image index state
-async function playFrame(
-  setImageIndex: React.Dispatch<React.SetStateAction<number>>,
-  frameIndex: number,
-  endOfAnimation: boolean,
-  setMidAnimation: React.Dispatch<React.SetStateAction<boolean>>,
-  preanimationImageIndex: React.MutableRefObject<number | undefined>
-) {
-  setTimeout(() => {
-    setImageIndex(frameIndex);
-    if (endOfAnimation) {
-      setMidAnimation(false);
-      preanimationImageIndex.current = undefined;
-    }
-  }, 300);
-}
-
-// checks if the play animation should be playing
-function checkAnimation(
-  currentImageIndex: number,
-  preanimationImageIndex: React.MutableRefObject<number | undefined>,
-  totalImages: number,
-  midAnimation: boolean,
-  setMidAnimation: React.Dispatch<React.SetStateAction<boolean>>,
-  setImageIndex: React.Dispatch<React.SetStateAction<number>>
-) {
-  if (preanimationImageIndex.current === undefined) {
-    // no animation is playing
-    return;
-  }
-  if (midAnimation) {
-    // reached the end of the animation
-    if (currentImageIndex === totalImages - 1) {
-      playFrame(
-        setImageIndex,
-        preanimationImageIndex.current,
-        true,
-        setMidAnimation,
-        preanimationImageIndex
-      );
-    } else {
-      // go to the next frame in animation
-      // this will cause a change in state, causing a refresh of the component
-      // letting us iterate through all images
-      playFrame(
-        setImageIndex,
-        currentImageIndex + 1,
-        false,
-        setMidAnimation,
-        preanimationImageIndex
-      );
-    }
-  }
-  // the animation has been stopped but the image has not been set back to what it was before
-  // this happens when the stop button is pressed mid animation
-  else {
-    playFrame(
-      setImageIndex,
-      preanimationImageIndex.current,
-      true,
-      setMidAnimation,
-      preanimationImageIndex
-    );
-  }
-}
-
 interface ImageNavbarProps {
   totalImages: number;
   currentImageIndex: number;
@@ -86,22 +20,15 @@ export default function ImageNavbar({
   setImageIndex: setImageIndex,
   selectionOperations,
 }: ImageNavbarProps) {
-  // set to true when an animation is started
-  // when the last frame of the animation is reached, this is set to false
-  const [midAnimation, setMidAnimation] = useState(false);
+  // id value of the interval that is playing the animation
+  // cant use state for this as the initial value will be copied into the interval function and it will not be updated
+  const animationIntervalID = useRef(0);
+  const [animationPlaying, setAnimationPlaying] = useState(false);
   // records the imageIndex when an animation is started
-  // if its undefined, there is no animation playing
-  const preanimationImageIndex = useRef<number | undefined>(undefined);
-
-  // will cause a state change (and refresh) if an animation should be playing
-  checkAnimation(
-    currentImageIndex,
-    preanimationImageIndex,
-    totalImages,
-    midAnimation,
-    setMidAnimation,
-    setImageIndex
-  );
+  const preanimationImageIndex = useRef(0);
+  // the image index whilst animation is playing
+  // cant use currentImageIndex directly as this messes with the interval function
+  const animationIndex = useRef(0);
 
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
     if (typeof newValue === "number") {
@@ -174,18 +101,38 @@ export default function ImageNavbar({
               variant="outlined"
               fullWidth
               onClick={
-                midAnimation
+                animationPlaying
                   ? () => {
-                      setMidAnimation(false);
+                      // stop button pressed
+                      setImageIndex(preanimationImageIndex.current);
+                      clearInterval(animationIntervalID.current);
+                      setAnimationPlaying(false);
                     }
                   : () => {
+                      // store index of the image before animation starts
                       preanimationImageIndex.current = currentImageIndex;
-                      setImageIndex(0);
-                      setMidAnimation(true);
+                      animationIndex.current = 0;
+                      const time_between_frames = 300; // in ms
+                      setAnimationPlaying(true);
+
+                      // play the animation
+                      animationIntervalID.current = setInterval(() => {
+                        // reached the end of the animation
+                        if (animationIndex.current === totalImages) {
+                          setImageIndex(preanimationImageIndex.current);
+                          clearInterval(animationIntervalID.current);
+                          setAnimationPlaying(false);
+                        }
+                        // play next frame
+                        else {
+                          setImageIndex(animationIndex.current);
+                          animationIndex.current = animationIndex.current + 1;
+                        }
+                      }, time_between_frames);
                     }
               }
             >
-              {midAnimation ? <StopOutlined /> : <PlayArrowOutlined />}
+              {animationPlaying ? <StopOutlined /> : <PlayArrowOutlined />}
             </Button>
           </Tooltip>
         </Grid2>
