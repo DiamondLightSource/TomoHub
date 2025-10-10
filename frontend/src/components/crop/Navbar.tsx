@@ -5,7 +5,7 @@ import StopOutlined from "@mui/icons-material/StopOutlined";
 import Clear from "@mui/icons-material/Clear";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import type { SelectionOperations } from "./SelectionOperations";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -14,46 +14,65 @@ async function sleep(ms: number): Promise<void> {
 // waits 300ms and then changes image index state
 async function playFrame(
   setImageIndex: React.Dispatch<React.SetStateAction<number>>,
-  frameIndex: number
+  frameIndex: number,
+  endOfAnimation: boolean,
+  setMidAnimation: React.Dispatch<React.SetStateAction<boolean>>,
+  preanimationImageIndex: React.MutableRefObject<number | undefined>
 ) {
   await sleep(300);
   setImageIndex(frameIndex);
+  if (endOfAnimation) {
+    setMidAnimation(false);
+    preanimationImageIndex.current = undefined;
+  }
 }
 
 // checks if the play animation should be playing
 function checkAnimation(
   currentImageIndex: number,
-  preanimationImageIndex: number | undefined,
+  preanimationImageIndex: React.MutableRefObject<number | undefined>,
   totalImages: number,
   midAnimation: boolean,
   setMidAnimation: React.Dispatch<React.SetStateAction<boolean>>,
-  setImageIndex: React.Dispatch<React.SetStateAction<number>>,
-  setPreanimationImageIndex: React.Dispatch<
-    React.SetStateAction<number | undefined>
-  >
+  setImageIndex: React.Dispatch<React.SetStateAction<number>>
 ) {
-  if (preanimationImageIndex === undefined) {
+  if (preanimationImageIndex.current === undefined) {
     // no animation is playing
     return;
   }
   if (midAnimation) {
     // reached the end of the animation
     if (currentImageIndex === totalImages - 1) {
-      setMidAnimation(false);
-      playFrame(setImageIndex, preanimationImageIndex);
-      setPreanimationImageIndex(undefined);
+      playFrame(
+        setImageIndex,
+        preanimationImageIndex.current,
+        true,
+        setMidAnimation,
+        preanimationImageIndex
+      );
     } else {
       // go to the next frame in animation
       // this will cause a change in state, causing a refresh of the component
       // letting us iterate through all images
-      playFrame(setImageIndex, currentImageIndex + 1);
+      playFrame(
+        setImageIndex,
+        currentImageIndex + 1,
+        false,
+        setMidAnimation,
+        preanimationImageIndex
+      );
     }
   }
   // the animation has been stopped but the image has not been set back to what it was before
   // this happens when the stop button is pressed mid animation
   else {
-    playFrame(setImageIndex, preanimationImageIndex);
-    setPreanimationImageIndex(undefined);
+    playFrame(
+      setImageIndex,
+      preanimationImageIndex.current,
+      true,
+      setMidAnimation,
+      preanimationImageIndex
+    );
   }
 }
 
@@ -75,9 +94,7 @@ export default function ImageNavbar({
   const [midAnimation, setMidAnimation] = useState(false);
   // records the imageIndex when an animation is started
   // if its undefined, there is no animation playing
-  const [preanimationImageIndex, setPreanimationImageIndex] = useState<
-    number | undefined
-  >(undefined);
+  const preanimationImageIndex = useRef<number | undefined>(undefined);
 
   // will cause a state change (and refresh) if an animation should be playing
   checkAnimation(
@@ -86,8 +103,7 @@ export default function ImageNavbar({
     totalImages,
     midAnimation,
     setMidAnimation,
-    setImageIndex,
-    setPreanimationImageIndex
+    setImageIndex
   );
 
   const handleSliderChange = (event: Event, newValue: number | number[]) => {
@@ -166,7 +182,7 @@ export default function ImageNavbar({
                       setMidAnimation(false);
                     }
                   : () => {
-                      setPreanimationImageIndex(currentImageIndex);
+                      preanimationImageIndex.current = currentImageIndex;
                       setImageIndex(0);
                       setMidAnimation(true);
                     }
