@@ -7,10 +7,6 @@ import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import type { SelectionOperations } from "./SelectionOperations";
 import { useRef, useState } from "react";
 
-async function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 // waits 300ms and then changes image index state
 async function playFrame(
   setImageIndex: React.Dispatch<React.SetStateAction<number>>,
@@ -19,12 +15,13 @@ async function playFrame(
   setMidAnimation: React.Dispatch<React.SetStateAction<boolean>>,
   preanimationImageIndex: React.MutableRefObject<number | undefined>
 ) {
-  await sleep(300);
-  setImageIndex(frameIndex);
-  if (endOfAnimation) {
-    setMidAnimation(false);
-    preanimationImageIndex.current = undefined;
-  }
+  setTimeout(() => {
+    setImageIndex(frameIndex);
+    if (endOfAnimation) {
+      setMidAnimation(false);
+      preanimationImageIndex.current = undefined;
+    }
+  }, 300);
 }
 
 // checks if the play animation should be playing
