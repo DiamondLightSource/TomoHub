@@ -13,6 +13,7 @@ import PlayArrowOutlined from "@mui/icons-material/PlayArrowOutlined";
 import StopOutlined from "@mui/icons-material/StopOutlined";
 import Clear from "@mui/icons-material/Clear";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
+import InfoIcon from "@mui/icons-material/Info";
 import type { SelectionOperations } from "./SelectionOperations";
 import { useRef, useState } from "react";
 import { SelectionMode } from "../../types/crop.ts";
@@ -114,6 +115,12 @@ export default function ImageNavbar({
               <MenuItem value={"Single"}>Single</MenuItem>
               <MenuItem value={"Multi"}>Multi</MenuItem>
             </Select>
+            <Tooltip
+              title="Single selection mode only allows one rectangular region of interest for all sample images.
+            Multi selection mode allows separate regions to be used in different images"
+            >
+              <InfoIcon fontSize="small" />
+            </Tooltip>
           </Box>
         </Grid2>
       </Grid2>
