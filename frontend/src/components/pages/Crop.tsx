@@ -14,6 +14,7 @@ const Crop: React.FC = () => {
       maxPixelValue={maxPixelValue}
       copies={copies}
       images={shiftedImages}
+      sampleRate={sampleRate}
     />
   );
 };
