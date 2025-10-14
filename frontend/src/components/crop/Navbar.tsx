@@ -112,7 +112,7 @@ export default function ImageNavbar({
                       // store index of the image before animation starts
                       preanimationImageIndex.current = currentImageIndex;
                       animationIndex.current = 0;
-                      const time_between_frames = 300; // in ms
+                      const timeBetweenFrames = 300; // in ms
                       setAnimationPlaying(true);
 
                       // play the animation
@@ -128,7 +128,7 @@ export default function ImageNavbar({
                           setImageIndex(animationIndex.current);
                           animationIndex.current = animationIndex.current + 1;
                         }
-                      }, time_between_frames);
+                      }, timeBetweenFrames);
                     }
               }
             >

@@ -59,7 +59,7 @@ export default function DisplayAreaWrapper({
 
   return (
     <div>
-      <Contextbar selections={imageSelections} sample_rate={sample_rate} />
+      <Contextbar selections={imageSelections} sampleRate={sample_rate} />
       <ImagePlot
         image={images[imageIndex]}
         maxPixelValue={maxPixelValue}
