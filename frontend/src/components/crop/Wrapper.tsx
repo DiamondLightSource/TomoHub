@@ -36,7 +36,7 @@ export default function DisplayAreaWrapper({
 
   // the selection currently being presented on the screen
   let onScreenSelections: RectangularSelection[] = [];
-  let onScreenSelectionIndex = -1;
+  let onScreenSelectionIndex: number | undefined = undefined;
   // setting currentSelections
   // searches backwards from the current frame for the first previous selection that is not empty
   // + copies and modulo create looping effect

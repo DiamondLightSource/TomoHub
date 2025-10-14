@@ -39,34 +39,40 @@ function createSelection(
 
 // removes on screen selection
 function removeSelection(
-  onScreenSelectionIndex: number,
+  onScreenSelectionIndex: number | undefined,
   imageSelectionsCopy: RectangularSelection[][],
   setSelections: React.Dispatch<React.SetStateAction<RectangularSelection[][]>>,
   savePrevious: () => void
 ) {
+  if (onScreenSelectionIndex === undefined) {
+    return;
+  }
   savePrevious();
   imageSelectionsCopy[onScreenSelectionIndex] = [];
   setSelections(imageSelectionsCopy);
 }
 
 function onScreenBeingModified(
-  onScreenSelectionIndex: number,
+  onScreenSelectionIndex: number | undefined,
   imageSelectionsCopy: RectangularSelection[][],
   selection: RectangularSelection
 ): boolean {
-  return imageSelectionsCopy[onScreenSelectionIndex][0] === selection;
+  return (
+    onScreenSelectionIndex !== undefined &&
+    imageSelectionsCopy[onScreenSelectionIndex][0] === selection
+  );
 }
 
 function forceRefresh(
   index: number,
-  onScreenSelectionIndex: number,
+  onScreenSelectionIndex: number | undefined,
   imageSelectionsCopy: RectangularSelection[][],
   setSelections: React.Dispatch<React.SetStateAction<RectangularSelection[][]>>
 ) {
   // copy the value of currentSelection and set it to that again (dont change it)
   // this stops regions being added if theyre not a rectangle
   // however, the component still needs to refresh as the new selection region will be visible otherwise
-  if (onScreenSelectionIndex === -1) {
+  if (onScreenSelectionIndex === undefined) {
     onScreenSelectionIndex = index;
   }
   const currentSelectionsCopy = [
@@ -148,7 +154,7 @@ function debugPrint(imageSelections, previousImageSelections) {
 
 export default function defineSelectionOperations(
   index: number,
-  onScreenSelectionIndex: number,
+  onScreenSelectionIndex: number | undefined,
   imageSelections: RectangularSelection[][],
   previousImageSelections: RectangularSelection[][],
   setSelections: React.Dispatch<React.SetStateAction<RectangularSelection[][]>>,
@@ -219,7 +225,7 @@ export default function defineSelectionOperations(
       debugPrint(imageSelections, previousImageSelections);
     },
     undoPossible: previousImageSelections.length !== 0,
-    selectionsEmpty: onScreenSelectionIndex === -1,
+    selectionsEmpty: onScreenSelectionIndex === undefined,
   };
   return functionHolder;
 }
