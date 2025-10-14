@@ -3,7 +3,7 @@ import { RectangularSelection } from "@diamondlightsource/davidia";
 export type SelectionOperations = {
   createSelection: (
     selection: RectangularSelection,
-    delete_others: boolean
+    deleteOthers: boolean
   ) => void;
   removeSelection: () => void;
   onScreenBeingModified: (selection: RectangularSelection) => boolean;
@@ -155,8 +155,8 @@ export default function defineSelectionOperations(
   setPreviousSelections: React.Dispatch<
     React.SetStateAction<RectangularSelection[][]>
   >,
-  image_width: number,
-  image_height: number
+  imageWidth: number,
+  imageHeight: number
 ): SelectionOperations {
   const imageSelectionsCopy = [...imageSelections];
   const minSavePrevious = function () {
@@ -211,15 +211,15 @@ export default function defineSelectionOperations(
         imageSelections,
         setSelections,
         setPreviousSelections,
-        image_width,
-        image_height
+        imageWidth,
+        imageHeight
       );
     },
     debugPrint: function () {
       debugPrint(imageSelections, previousImageSelections);
     },
     undoPossible: previousImageSelections.length !== 0,
-    selectionsEmpty: onScreenSelectionIndex == -1,
+    selectionsEmpty: onScreenSelectionIndex === -1,
   };
   return functionHolder;
 }
