@@ -8,7 +8,7 @@ interface ImagePlotProps {
   onScreenSelections: RectangularSelection[];
   maxPixelValue: number;
   selectionOperations: SelectionOperations;
-  singleSelection: boolean;
+  selectionMode: "single" | "multi";
 }
 
 export default function ImagePlot({
@@ -16,7 +16,7 @@ export default function ImagePlot({
   onScreenSelections: onScreenSelections,
   maxPixelValue: maxPixelValue,
   selectionOperations: selectionOperations,
-  singleSelection,
+  selectionMode: selectionMode,
 }: ImagePlotProps) {
   return (
     <Box style={{ display: "grid", height: "49vh", minHeight: "400px" }}>
@@ -37,7 +37,7 @@ export default function ImagePlot({
           }
           if (eventType === "created") {
             // dont allow creating on single selection, force refresh
-            if (selection instanceof RectangularSelection && !singleSelection) {
+            if (selection instanceof RectangularSelection && !selectionMode) {
               selectionOperations.createSelection(selection, false);
             } else {
               // selection area is not a rectangle
@@ -45,7 +45,7 @@ export default function ImagePlot({
               selectionOperations.forceRefresh();
             }
           } else if (eventType === "removed") {
-            if (singleSelection) {
+            if (selectionMode) {
               // dont allow removing on single selection, force refresh
               selectionOperations.forceRefresh();
             } else {
@@ -59,7 +59,10 @@ export default function ImagePlot({
           ) {
             // when a box is modified on single selection
             // make a new one to represent the modification and make sure no others exist
-            selectionOperations.createSelection(selection, singleSelection);
+            selectionOperations.createSelection(
+              selection,
+              selectionMode === "single"
+            );
           }
         }}
         selections={onScreenSelections}

@@ -20,7 +20,9 @@ export default function DisplayAreaWrapper({
   images,
   sampleRate: sampleRate,
 }: WrapperProps) {
-  const [singleSelection, setSingleSelection] = useState(true);
+  const [selectionMode, setSelectionMode] = useState<"single" | "multi">(
+    "single"
+  );
   const [imageIndex, setImageIndex] = useState(0);
   const emptyArray: RectangularSelection[][] = useMemo(() => {
     const result: RectangularSelection[][] = [];
@@ -69,15 +71,15 @@ export default function DisplayAreaWrapper({
         maxPixelValue={maxPixelValue}
         onScreenSelections={onScreenSelections}
         selectionOperations={selectionOperations}
-        singleSelection={singleSelection}
+        selectionMode={selectionMode}
       />
       <ImageNavbar
         totalImages={copies}
         currentImageIndex={imageIndex}
         setImageIndex={setImageIndex}
         selectionOperations={selectionOperations}
-        singleSelection={singleSelection}
-        setSingleSelection={setSingleSelection}
+        selectionMode={selectionMode}
+        setSelectionMode={setSelectionMode}
       />
     </div>
   );

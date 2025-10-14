@@ -21,8 +21,8 @@ interface ImageNavbarProps {
   currentImageIndex: number;
   setImageIndex: React.Dispatch<React.SetStateAction<number>>;
   selectionOperations: SelectionOperations;
-  singleSelection: boolean;
-  setSingleSelection: (value: boolean) => void;
+  selectionMode: "single" | "multi";
+  setSelectionMode: (value: "single" | "multi") => void;
 }
 
 export default function ImageNavbar({
@@ -30,8 +30,8 @@ export default function ImageNavbar({
   currentImageIndex,
   setImageIndex: setImageIndex,
   selectionOperations,
-  singleSelection,
-  setSingleSelection,
+  selectionMode: selectionMode,
+  setSelectionMode: setSelectionMode,
 }: ImageNavbarProps) {
   // id value of the interval that is playing the animation
   // cant use state for this as the initial value will be copied into the interval function and it will not be updated
@@ -97,7 +97,7 @@ export default function ImageNavbar({
           <Box display="flex" justifyContent="center">
             <Switch
               onChange={(_, checked) => {
-                setSingleSelection(!checked);
+                setSelectionMode(checked ? "multi" : "single");
                 if (!checked) {
                   selectionOperations.initialiseSingleSelectionMode();
                 }
@@ -168,7 +168,10 @@ export default function ImageNavbar({
               variant="outlined"
               fullWidth
               onClick={selectionOperations.removeSelection}
-              disabled={singleSelection || selectionOperations.selectionsEmpty}
+              disabled={
+                selectionMode === "single" ||
+                selectionOperations.selectionsEmpty
+              }
             >
               <DeleteOutline />
             </Button>
@@ -180,7 +183,10 @@ export default function ImageNavbar({
               variant="outlined"
               fullWidth
               onClick={selectionOperations.removeAll}
-              disabled={singleSelection || selectionOperations.selectionsEmpty}
+              disabled={
+                selectionMode === "single" ||
+                selectionOperations.selectionsEmpty
+              }
             >
               <Clear />
             </Button>
