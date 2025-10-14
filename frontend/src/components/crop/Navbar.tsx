@@ -5,8 +5,8 @@ import {
   Input,
   Button,
   Tooltip,
-  Switch,
-  Typography,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import Undo from "@mui/icons-material/Undo";
 import PlayArrowOutlined from "@mui/icons-material/PlayArrowOutlined";
@@ -96,18 +96,25 @@ export default function ImageNavbar({
         </Grid2>
         <Grid2>
           <Box display="flex" justifyContent="center">
-            <Switch
-              onChange={(_, checked) => {
-                setSelectionMode(
-                  checked ? SelectionMode.Multi : SelectionMode.Single
-                );
-                if (!checked) {
-                  selectionOperations.initialiseSingleSelectionMode();
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={
+                selectionMode === SelectionMode.Single ? "Single" : "Multi"
+              }
+              label="Age"
+              onChange={(e) => {
+                if (e.target.value === "Single") {
+                  setSelectionMode(SelectionMode.Single);
+                } else if (e.target.value === "Multi") {
+                  setSelectionMode(SelectionMode.Multi);
                 }
               }}
-            />
+            >
+              <MenuItem value={"Single"}>Single</MenuItem>
+              <MenuItem value={"Multi"}>Multi</MenuItem>
+            </Select>
           </Box>
-          <Typography>Multiple Select Mode</Typography>
         </Grid2>
       </Grid2>
 
