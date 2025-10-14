@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import { HeatmapPlot, ScaleType } from "@diamondlightsource/davidia";
 import { NDT, RectangularSelection } from "@diamondlightsource/davidia";
 import type { SelectionOperations } from "./SelectionOperations";
-import { SelectionMode } from "/workspace/frontend/src/types/crop.ts";
+import { SelectionMode } from "../../types/crop.ts";
 
 interface ImagePlotProps {
   image: NDT;

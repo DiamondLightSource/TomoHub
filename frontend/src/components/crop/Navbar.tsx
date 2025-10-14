@@ -15,7 +15,7 @@ import Clear from "@mui/icons-material/Clear";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import type { SelectionOperations } from "./SelectionOperations";
 import { useRef, useState } from "react";
-import { SelectionMode } from "/workspace/frontend/src/types/crop.ts";
+import { SelectionMode } from "../../types/crop.ts";
 
 interface ImageNavbarProps {
   totalImages: number;

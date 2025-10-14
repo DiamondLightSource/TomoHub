@@ -6,7 +6,7 @@ import ImageNavbar from "./Navbar";
 import type { NDT, RectangularSelection } from "@diamondlightsource/davidia";
 import defineSelectionOperations from "./SelectionOperations";
 import type { SelectionOperations } from "./SelectionOperations";
-import { SelectionMode } from "/workspace/frontend/src/types/crop.ts";
+import { SelectionMode } from "../../types/crop.ts";
 
 interface WrapperProps {
   maxPixelValue: number;
