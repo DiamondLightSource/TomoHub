@@ -98,7 +98,7 @@ export default function ImageNavbar({
         </Grid2>
         <Grid2>
           <Typography>Selection Mode</Typography>
-          <Box display="flex" justifyContent="center">
+          <Box display="flex" justifyContent="center" sx={{ padding: "5px" }}>
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
