@@ -21,8 +21,8 @@ export default function DisplayAreaWrapper({
   images,
   sampleRate: sampleRate,
 }: WrapperProps) {
-  const [selectionMode, setSelectionMode] = useState<"single" | "multi">(
-    "single"
+  const [selectionMode, setSelectionMode] = useState<SelectionMode>(
+    SelectionMode.Single
   );
   const [imageIndex, setImageIndex] = useState(0);
   const emptyArray: RectangularSelection[][] = useMemo(() => {

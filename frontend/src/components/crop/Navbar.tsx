@@ -15,14 +15,15 @@ import Clear from "@mui/icons-material/Clear";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import type { SelectionOperations } from "./SelectionOperations";
 import { useRef, useState } from "react";
+import { SelectionMode } from "/workspace/frontend/src/types/crop.ts";
 
 interface ImageNavbarProps {
   totalImages: number;
   currentImageIndex: number;
   setImageIndex: React.Dispatch<React.SetStateAction<number>>;
   selectionOperations: SelectionOperations;
-  selectionMode: "single" | "multi";
-  setSelectionMode: (value: "single" | "multi") => void;
+  selectionMode: SelectionMode;
+  setSelectionMode: (value: SelectionMode) => void;
 }
 
 export default function ImageNavbar({
@@ -97,7 +98,9 @@ export default function ImageNavbar({
           <Box display="flex" justifyContent="center">
             <Switch
               onChange={(_, checked) => {
-                setSelectionMode(checked ? "multi" : "single");
+                setSelectionMode(
+                  checked ? SelectionMode.Multi : SelectionMode.Single
+                );
                 if (!checked) {
                   selectionOperations.initialiseSingleSelectionMode();
                 }
@@ -169,7 +172,7 @@ export default function ImageNavbar({
               fullWidth
               onClick={selectionOperations.removeSelection}
               disabled={
-                selectionMode === "single" ||
+                selectionMode === SelectionMode.Single ||
                 selectionOperations.selectionsEmpty
               }
             >
@@ -184,7 +187,7 @@ export default function ImageNavbar({
               fullWidth
               onClick={selectionOperations.removeAll}
               disabled={
-                selectionMode === "single" ||
+                selectionMode === SelectionMode.Single ||
                 selectionOperations.selectionsEmpty
               }
             >

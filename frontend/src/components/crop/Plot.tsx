@@ -2,13 +2,14 @@ import { Box } from "@mui/material";
 import { HeatmapPlot, ScaleType } from "@diamondlightsource/davidia";
 import { NDT, RectangularSelection } from "@diamondlightsource/davidia";
 import type { SelectionOperations } from "./SelectionOperations";
+import { SelectionMode } from "/workspace/frontend/src/types/crop.ts";
 
 interface ImagePlotProps {
   image: NDT;
   onScreenSelections: RectangularSelection[];
   maxPixelValue: number;
   selectionOperations: SelectionOperations;
-  selectionMode: "single" | "multi";
+  selectionMode: SelectionMode;
 }
 
 export default function ImagePlot({
@@ -39,7 +40,7 @@ export default function ImagePlot({
             // dont allow creating on single selection, force refresh
             if (
               selection instanceof RectangularSelection &&
-              selectionMode === "multi"
+              selectionMode === SelectionMode.Multi
             ) {
               selectionOperations.createSelection(selection, false);
             } else {
@@ -48,7 +49,7 @@ export default function ImagePlot({
               selectionOperations.forceRefresh();
             }
           } else if (eventType === "removed") {
-            if (selectionMode === "single") {
+            if (selectionMode === SelectionMode.Single) {
               // dont allow removing on single selection, force refresh
               selectionOperations.forceRefresh();
             } else {
@@ -64,7 +65,7 @@ export default function ImagePlot({
             // make a new one to represent the modification and make sure no others exist
             selectionOperations.createSelection(
               selection,
-              selectionMode === "single"
+              selectionMode === SelectionMode.Single
             );
           }
         }}
