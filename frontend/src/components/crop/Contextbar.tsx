@@ -6,12 +6,12 @@ import type { RectangularSelection } from "@diamondlightsource/davidia";
 
 interface ContextbarProps {
   selections: RectangularSelection[][];
-  sample_rate: number;
+  sampleRate: number;
 }
 
 export default function Contextbar({
   selections,
-  sample_rate,
+  sampleRate: sampleRate,
 }: ContextbarProps) {
   const { setDetectorX, setDetectorY } = useLoader();
 
@@ -29,65 +29,78 @@ export default function Contextbar({
           <Button
             variant="outlined"
             onClick={() => {
-              let min_x = -1;
-              let max_x = -1;
-              let min_y = -1;
-              let max_y = -1;
-              for (const selection_list of selections) {
-                if (selection_list.length > 0) {
-                  const selection = selection_list[0];
-                  const x_length =
+              let minX: number | undefined = undefined;
+              let maxX: number | undefined = undefined;
+              let minY: number | undefined = undefined;
+              let maxY: number | undefined = undefined;
+              for (const selectionList of selections) {
+                if (selectionList.length > 0) {
+                  const selection = selectionList[0];
+                  const xLength =
                     Math.cos(selection.angle) * selection.lengths[0] -
                     Math.sin(selection.angle) * selection.lengths[1];
-                  const y_length =
+                  const yLength =
                     Math.sin(selection.angle) * selection.lengths[0] +
                     Math.cos(selection.angle) * selection.lengths[1];
                   let x1 = selection.start[0];
-                  let x2 = x1 + x_length;
+                  let x2 = x1 + xLength;
                   if (x1 > x2) {
                     const temp = x1;
                     x1 = x2;
                     x2 = temp;
                   }
                   let y1 = selection.start[1];
-                  let y2 = y1 + y_length;
+                  let y2 = y1 + yLength;
                   if (y1 > y2) {
                     const temp = y1;
                     y1 = y2;
                     y2 = temp;
                   }
-                  if (min_x == -1) {
-                    min_x = x1;
-                    max_x = x2;
-                    min_y = y1;
-                    max_y = y2;
+                  if (
+                    minX === undefined ||
+                    maxX === undefined ||
+                    minY === undefined ||
+                    maxY === undefined
+                  ) {
+                    minX = x1;
+                    maxX = x2;
+                    minY = y1;
+                    maxY = y2;
                     continue;
-                  }
-                  if (x1 < min_x) {
-                    min_x = x1;
-                  }
-                  if (x2 > max_x) {
-                    max_x = x2;
-                  }
-                  if (y1 < min_y) {
-                    min_y = y1;
-                  }
-                  if (y2 > max_y) {
-                    max_y = y2;
+                  } else {
+                    if (x1 < minX) {
+                      minX = x1;
+                    }
+                    if (x2 > maxX) {
+                      maxX = x2;
+                    }
+                    if (y1 < minY) {
+                      minY = y1;
+                    }
+                    if (y2 > maxY) {
+                      maxY = y2;
+                    }
                   }
                 }
               }
 
-              const xValues: PreviewType = {
-                start: Math.floor(min_x * sample_rate),
-                stop: Math.floor(max_x * sample_rate),
-              };
-              setDetectorX(xValues);
-              const yValues: PreviewType = {
-                start: Math.floor(min_y * sample_rate),
-                stop: Math.floor(max_y * sample_rate),
-              };
-              setDetectorY(yValues);
+              if (
+                minX !== undefined &&
+                maxX !== undefined &&
+                minY !== undefined &&
+                maxY !== undefined
+              ) {
+                const xValues: PreviewType = {
+                  start: Math.floor(minX * sampleRate),
+                  stop: Math.floor(maxX * sampleRate),
+                };
+                setDetectorX(xValues);
+                const yValues: PreviewType = {
+                  start: Math.floor(minY * sampleRate),
+                  stop: Math.floor(maxY * sampleRate),
+                };
+                setDetectorY(yValues);
+              }
             }}
           >
             <SaveOutlined fontSize="large" />
