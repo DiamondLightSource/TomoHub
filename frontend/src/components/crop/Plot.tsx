@@ -37,7 +37,10 @@ export default function ImagePlot({
           }
           if (eventType === "created") {
             // dont allow creating on single selection, force refresh
-            if (selection instanceof RectangularSelection && !selectionMode) {
+            if (
+              selection instanceof RectangularSelection &&
+              selectionMode === "multi"
+            ) {
               selectionOperations.createSelection(selection, false);
             } else {
               // selection area is not a rectangle
@@ -45,7 +48,7 @@ export default function ImagePlot({
               selectionOperations.forceRefresh();
             }
           } else if (eventType === "removed") {
-            if (selectionMode) {
+            if (selectionMode === "single") {
               // dont allow removing on single selection, force refresh
               selectionOperations.forceRefresh();
             } else {
