@@ -7,6 +7,7 @@ import {
   Tooltip,
   Select,
   MenuItem,
+  Typography,
 } from "@mui/material";
 import Undo from "@mui/icons-material/Undo";
 import PlayArrowOutlined from "@mui/icons-material/PlayArrowOutlined";
@@ -96,6 +97,7 @@ export default function ImageNavbar({
           </Tooltip>
         </Grid2>
         <Grid2>
+          <Typography>Selection Mode</Typography>
           <Box display="flex" justifyContent="center">
             <Select
               labelId="demo-simple-select-label"
