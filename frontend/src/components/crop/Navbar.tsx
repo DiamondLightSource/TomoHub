@@ -119,7 +119,8 @@ export default function ImageNavbar({
             </Select>
             <Tooltip
               title="Single selection mode only allows one rectangular region of interest for all sample images.
-            Multi selection mode allows separate regions to be used in different images"
+            Multi selection mode allows separate regions to be used in different images. 
+            The final region used for multi selection mode is a rectangle that encompasses all regions created"
             >
               <InfoIcon fontSize="small" />
             </Tooltip>
