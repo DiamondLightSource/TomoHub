@@ -109,6 +109,7 @@ export default function ImageNavbar({
               onChange={(e) => {
                 if (e.target.value === "Single") {
                   setSelectionMode(SelectionMode.Single);
+                  selectionOperations.initialiseSingleSelectionMode();
                 } else if (e.target.value === "Multi") {
                   setSelectionMode(SelectionMode.Multi);
                 }
