@@ -1,4 +1,4 @@
 export const enum SelectionMode {
-  Single,
-  Multi,
+  Single = "Single",
+  Multi = "Multi",
 }

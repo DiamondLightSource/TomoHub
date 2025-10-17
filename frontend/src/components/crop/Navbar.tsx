@@ -102,21 +102,23 @@ export default function ImageNavbar({
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={
-                selectionMode === SelectionMode.Single ? "Single" : "Multi"
-              }
+              value={selectionMode}
               label="Age"
               onChange={(e) => {
-                if (e.target.value === "Single") {
+                if (e.target.value === SelectionMode.Single) {
                   setSelectionMode(SelectionMode.Single);
                   selectionOperations.initialiseSingleSelectionMode();
-                } else if (e.target.value === "Multi") {
+                } else if (e.target.value === SelectionMode.Multi) {
                   setSelectionMode(SelectionMode.Multi);
                 }
               }}
             >
-              <MenuItem value={"Single"}>Single</MenuItem>
-              <MenuItem value={"Multi"}>Multi</MenuItem>
+              <MenuItem value={SelectionMode.Single}>
+                {SelectionMode.Single}
+              </MenuItem>
+              <MenuItem value={SelectionMode.Multi}>
+                {SelectionMode.Multi}
+              </MenuItem>
             </Select>
             <Tooltip
               title="Single selection mode only allows one rectangular region of interest for all sample images.
