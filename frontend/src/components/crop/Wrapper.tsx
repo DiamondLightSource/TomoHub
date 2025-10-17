@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from "react";
 
 import Contextbar from "./Contextbar";
-import ImagePlot from "../crop/Plot";
-import ImageNavbar from "../crop/Navbar";
+import ImagePlot from "./Plot";
+import ImageNavbar from "./Navbar";
 import type { NDT, RectangularSelection } from "@diamondlightsource/davidia";
 import defineSelectionOperations from "./SelectionOperations";
 import type { SelectionOperations } from "./SelectionOperations";
+import { SelectionMode } from "../../types/crop.ts";
 
 interface WrapperProps {
   maxPixelValue: number;
@@ -20,6 +21,9 @@ export default function DisplayAreaWrapper({
   images,
   sampleRate: sampleRate,
 }: WrapperProps) {
+  const [selectionMode, setSelectionMode] = useState<SelectionMode>(
+    SelectionMode.Single
+  );
   const [imageIndex, setImageIndex] = useState(0);
   const emptyArray: RectangularSelection[][] = useMemo(() => {
     const result: RectangularSelection[][] = [];
@@ -35,7 +39,7 @@ export default function DisplayAreaWrapper({
 
   // the selection currently being presented on the screen
   let onScreenSelections: RectangularSelection[] = [];
-  let onScreenSelectionIndex = -1;
+  let onScreenSelectionIndex: number | undefined = undefined;
   // setting currentSelections
   // searches backwards from the current frame for the first previous selection that is not empty
   // + copies and modulo create looping effect
@@ -54,8 +58,11 @@ export default function DisplayAreaWrapper({
     imageSelections,
     previousImageSelections,
     setSelections,
-    setPreviousSelections
+    setPreviousSelections,
+    images[0].shape[1],
+    images[0].shape[0]
   );
+  useMemo(selectionOperations.initialiseSingleSelectionMode, []);
 
   return (
     <div>
@@ -65,12 +72,15 @@ export default function DisplayAreaWrapper({
         maxPixelValue={maxPixelValue}
         onScreenSelections={onScreenSelections}
         selectionOperations={selectionOperations}
+        selectionMode={selectionMode}
       />
       <ImageNavbar
         totalImages={copies}
         currentImageIndex={imageIndex}
         setImageIndex={setImageIndex}
         selectionOperations={selectionOperations}
+        selectionMode={selectionMode}
+        setSelectionMode={setSelectionMode}
       />
     </div>
   );

@@ -1,17 +1,31 @@
-import { Box, Grid2, Slider, Input, Button, Tooltip } from "@mui/material";
+import {
+  Box,
+  Grid2,
+  Slider,
+  Input,
+  Button,
+  Tooltip,
+  Select,
+  MenuItem,
+  Typography,
+} from "@mui/material";
 import Undo from "@mui/icons-material/Undo";
 import PlayArrowOutlined from "@mui/icons-material/PlayArrowOutlined";
 import StopOutlined from "@mui/icons-material/StopOutlined";
 import Clear from "@mui/icons-material/Clear";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
+import InfoIcon from "@mui/icons-material/Info";
 import type { SelectionOperations } from "./SelectionOperations";
 import { useRef, useState } from "react";
+import { SelectionMode } from "../../types/crop.ts";
 
 interface ImageNavbarProps {
   totalImages: number;
   currentImageIndex: number;
   setImageIndex: React.Dispatch<React.SetStateAction<number>>;
   selectionOperations: SelectionOperations;
+  selectionMode: SelectionMode;
+  setSelectionMode: (value: SelectionMode) => void;
 }
 
 export default function ImageNavbar({
@@ -19,6 +33,8 @@ export default function ImageNavbar({
   currentImageIndex,
   setImageIndex: setImageIndex,
   selectionOperations,
+  selectionMode: selectionMode,
+  setSelectionMode: setSelectionMode,
 }: ImageNavbarProps) {
   // id value of the interval that is playing the animation
   // cant use state for this as the initial value will be copied into the interval function and it will not be updated
@@ -79,6 +95,39 @@ export default function ImageNavbar({
               }}
             />
           </Tooltip>
+        </Grid2>
+        <Grid2>
+          <Typography>Selection Mode</Typography>
+          <Box display="flex" justifyContent="center" sx={{ padding: "5px" }}>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={selectionMode}
+              label="Age"
+              onChange={(e) => {
+                if (e.target.value === SelectionMode.Single) {
+                  setSelectionMode(SelectionMode.Single);
+                  selectionOperations.initialiseSingleSelectionMode();
+                } else if (e.target.value === SelectionMode.Multi) {
+                  setSelectionMode(SelectionMode.Multi);
+                }
+              }}
+            >
+              <MenuItem value={SelectionMode.Single}>
+                {SelectionMode.Single}
+              </MenuItem>
+              <MenuItem value={SelectionMode.Multi}>
+                {SelectionMode.Multi}
+              </MenuItem>
+            </Select>
+            <Tooltip
+              title="Single selection mode only allows one rectangular region of interest for all sample images.
+            Multi selection mode allows separate regions to be used in different images. 
+            The final region used for multi selection mode is a rectangle that encompasses all regions created"
+            >
+              <InfoIcon fontSize="small" />
+            </Tooltip>
+          </Box>
         </Grid2>
       </Grid2>
 
@@ -142,6 +191,10 @@ export default function ImageNavbar({
               variant="outlined"
               fullWidth
               onClick={selectionOperations.removeSelection}
+              disabled={
+                selectionMode === SelectionMode.Single ||
+                selectionOperations.selectionsEmpty
+              }
             >
               <DeleteOutline />
             </Button>
@@ -153,6 +206,10 @@ export default function ImageNavbar({
               variant="outlined"
               fullWidth
               onClick={selectionOperations.removeAll}
+              disabled={
+                selectionMode === SelectionMode.Single ||
+                selectionOperations.selectionsEmpty
+              }
             >
               <Clear />
             </Button>
