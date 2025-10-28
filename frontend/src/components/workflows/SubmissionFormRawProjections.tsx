@@ -32,7 +32,7 @@ export default function SubmissionFormRawProjections({
   );
   const [sweepFormValue, setSweepFormValue] = useState<SweepValues>({
     start: 100,
-    stop: 3600,
+    stop: 3700,
     step: 100,
   });
   const [wfparamFormValue, setWFParamFormValue] =
@@ -45,7 +45,16 @@ export default function SubmissionFormRawProjections({
     });
 
   function onSubmit(visit: Visit) {
-    const indices = "100";
+    let indices = "";
+    const start: number =
+      sweepFormValue.start === "" ? 100 : sweepFormValue.start;
+    const stop: number =
+      sweepFormValue.stop === "" ? 3600 : sweepFormValue.stop;
+    const step: number = sweepFormValue.step === "" ? 100 : sweepFormValue.step;
+    for (let i = start; i < stop; i += step) {
+      indices += i + ", ";
+    }
+    indices += stop;
 
     // error handling here to replace empty strings with null in some cases??
     const parameters = {
