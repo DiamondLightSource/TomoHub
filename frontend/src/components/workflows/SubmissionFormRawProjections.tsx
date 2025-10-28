@@ -29,26 +29,24 @@ export default function SubmissionFormRawProjections({
   onSubmit: submitWorkflow,
 }: SubmissionFormRawProjectionsProps) {
   const DEVactuallyRunAWorkflow = true;
-  const [keyField, setKeyField] = useState<string | undefined>(undefined);
+  const [keyFormValue, setKeyFormValue] = useState<string | undefined>(
+    undefined
+  );
+  const [sweepFormValue, setSweepFormValue] = useState<SweepValues>({
+    start: 100,
+    stop: 100,
+    step: 3600,
+  });
+  const [wfparamFormValue, setWFParamFormValue] =
+    useState<WorkflowParamsValues>({
+      input: "",
+      output: "",
+      nprocs: 1,
+      memory: "20Gi",
+      httomo_outdir_name: "/tmp",
+    });
 
   const data = useFragment(sharedFragment, template);
-
-  const sweepValues: SweepValues = { start: "", stop: "", step: "" };
-  const placeholderSetter = (s: SweepValues) => {
-    console.log("run");
-  };
-
-  const workflowValues: WorkflowParamsValues = {
-    input: "",
-    output: "",
-    nprocs: 1,
-    memory: "20Gi",
-    httomo_outdir_name: "/tmp",
-  };
-
-  const otherPlaceHolderSetter = (w: WorkflowParamsValues) => {
-    console.log("other run");
-  };
 
   function onSubmit(visit: Visit, parameters?: object) {
     if (parameters === undefined) {
@@ -57,7 +55,7 @@ export default function SubmissionFormRawProjections({
     if (!DEVactuallyRunAWorkflow) {
       return;
     }
-    setKey(keyField);
+    setKey(keyFormValue);
 
     submitWorkflow(visit, parameters);
   }
@@ -67,13 +65,16 @@ export default function SubmissionFormRawProjections({
       <Typography variant="h6" sx={{ mt: 2 }}>
         Frames to Crop
       </Typography>
-      <ParameterSweepForm values={sweepValues} onChange={placeholderSetter} />
+      <ParameterSweepForm
+        values={sweepFormValue}
+        onChange={setSweepFormValue}
+      />
       <Typography variant="h6" sx={{ mt: 2 }}>
         Workflow Parameters
       </Typography>
       <WorkflowParametersForm
-        values={workflowValues}
-        onChange={otherPlaceHolderSetter}
+        values={wfparamFormValue}
+        onChange={setWFParamFormValue}
       />
       <TextField
         label="Auth Token"
@@ -81,7 +82,7 @@ export default function SubmissionFormRawProjections({
         fullWidth
         size="small"
         onChange={(e) => {
-          setKeyField(e.target.value);
+          setKeyFormValue(e.target.value);
         }}
       />
       <VisitInput
