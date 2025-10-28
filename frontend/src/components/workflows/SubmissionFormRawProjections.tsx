@@ -45,7 +45,7 @@ export default function SubmissionFormRawProjections({
     });
 
   function onSubmit(visit: Visit) {
-    const indices = "";
+    const indices = "100";
 
     // error handling here to replace empty strings with null in some cases??
     const parameters = {
@@ -57,7 +57,7 @@ export default function SubmissionFormRawProjections({
       "projection-indices": indices,
       "output-filename": wfparamFormValue.output,
     };
-    setKey(keyFormValue);
+    setKey(keyFormValue); // REMOVE IN PROD
     // add on success function as final paramter (load data and set data loaded to true)
     submitWorkflow(visit, parameters);
   }
