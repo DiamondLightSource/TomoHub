@@ -8,6 +8,8 @@ import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionForm
 import { JSONObject } from "../../types";
 import { useFragment } from "react-relay";
 import { sharedFragment } from "./Submission";
+import { setKey } from "../../devKey";
+import { useState } from "react";
 
 interface SubmissionFormRawProjectionsProps {
   template: SubmissionFormSharedFragment$key;
@@ -24,8 +26,11 @@ export default function SubmissionFormRawProjections({
   template,
   prepopulatedParameters,
   visit,
-  onSubmit,
+  onSubmit: submitWorkflow,
 }: SubmissionFormRawProjectionsProps) {
+  const DEVactuallyRunAWorkflow = true;
+  const [keyField, setKeyField] = useState<string | undefined>(undefined);
+
   const data = useFragment(sharedFragment, template);
 
   const sweepValues: SweepValues = { start: "", stop: "", step: "" };
@@ -45,9 +50,17 @@ export default function SubmissionFormRawProjections({
     console.log("other run");
   };
 
-  const anotherPlaceHolderSetter = (visit: Visit, parameters?: object) => {
-    onSubmit(visit, parameters || {});
-  };
+  function onSubmit(visit: Visit, parameters?: object) {
+    if (parameters === undefined) {
+      return;
+    }
+    if (!DEVactuallyRunAWorkflow) {
+      return;
+    }
+    setKey(keyField);
+
+    submitWorkflow(visit, parameters);
+  }
 
   return (
     <div>
@@ -62,10 +75,18 @@ export default function SubmissionFormRawProjections({
         values={workflowValues}
         onChange={otherPlaceHolderSetter}
       />
-      <TextField label="Auth Token" type="string" fullWidth size="small" />
+      <TextField
+        label="Auth Token"
+        type="string"
+        fullWidth
+        size="small"
+        onChange={(e) => {
+          setKeyField(e.target.value);
+        }}
+      />
       <VisitInput
         visit={visit}
-        onSubmit={anotherPlaceHolderSetter}
+        onSubmit={onSubmit}
         parameters={prepopulatedParameters}
         submitOnReturn={false}
         submitButton={true}
