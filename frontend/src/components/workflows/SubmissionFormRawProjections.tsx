@@ -33,8 +33,8 @@ export default function SubmissionFormRawProjections({
   );
   const [sweepFormValue, setSweepFormValue] = useState<SweepValues>({
     start: 100,
-    stop: 100,
-    step: 3600,
+    stop: 3600,
+    step: 100,
   });
   const [wfparamFormValue, setWFParamFormValue] =
     useState<WorkflowParamsValues>({
