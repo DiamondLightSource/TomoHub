@@ -49,15 +49,24 @@ export default function SubmissionFormRawProjections({
 
   const data = useFragment(sharedFragment, template);
 
-  function onSubmit(visit: Visit, parameters?: object) {
-    if (parameters === undefined) {
-      return;
-    }
+  function onSubmit(visit: Visit) {
     if (!DEVactuallyRunAWorkflow) {
       return;
     }
-    setKey(keyFormValue);
+    const indices = "";
 
+    // error handling here to replace empty strings with null in some cases??
+    const parameters = {
+      input: inputFormValue,
+      "tmpdir-path": wfparamFormValue.httomo_outdir_name,
+      "dataset-path": wfparamFormValue.input,
+      memory: wfparamFormValue.memory,
+      nprocs: wfparamFormValue.nprocs,
+      "projection-indices": indices,
+      "output-filename": wfparamFormValue.output,
+    };
+    setKey(keyFormValue);
+    // add on success function as final paramter (load data and set data loaded to true)
     submitWorkflow(visit, parameters);
   }
 
