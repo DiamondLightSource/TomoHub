@@ -6,8 +6,6 @@ import { WorkflowParamsValues } from "./WorkflowParametersForm";
 import { Visit, VisitInput } from "@diamondlightsource/sci-react-ui";
 import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionFormSharedFragment.graphql";
 import { JSONObject } from "../../types";
-import { useFragment } from "react-relay";
-import { sharedFragment } from "./Submission";
 import { setKey } from "../../devKey";
 import { useState } from "react";
 
@@ -23,7 +21,7 @@ interface SubmissionFormRawProjectionsProps {
 }
 
 export default function SubmissionFormRawProjections({
-  template,
+  template: _,
   prepopulatedParameters,
   visit,
   onSubmit: submitWorkflow,
@@ -46,8 +44,6 @@ export default function SubmissionFormRawProjections({
       memory: "20Gi",
       httomo_outdir_name: "/tmp",
     });
-
-  const data = useFragment(sharedFragment, template);
 
   function onSubmit(visit: Visit) {
     if (!DEVactuallyRunAWorkflow) {
