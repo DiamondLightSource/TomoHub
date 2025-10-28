@@ -144,7 +144,7 @@ export default function Submission({
       case "httomo-gpu-job":
         return <SubmissionFormGPURun {...commonProps} />;
       case "extract-raw-projections":
-        return <SubmissionFormRawProjections />;
+        return <SubmissionFormRawProjections {...commonProps} />;
       default:
         return <p>invalid workflow name</p>;
     }
