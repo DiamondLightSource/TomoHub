@@ -36,7 +36,7 @@ const App: React.FC = () => {
                 />
               }
             />
-            <Route path="crop" element={<Crop />} />
+            <Route path="crop" element={<Crop setVisit={setUserVisit} />} />
           </Route>
         </Routes>
       </Suspense>
