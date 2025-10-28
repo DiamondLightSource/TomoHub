@@ -29,6 +29,7 @@ export default function SubmissionFormRawProjections({
   onSubmit: submitWorkflow,
 }: SubmissionFormRawProjectionsProps) {
   const DEVactuallyRunAWorkflow = true;
+  const [inputFormValue, setInputFormValue] = useState<string>("");
   const [keyFormValue, setKeyFormValue] = useState<string | undefined>(
     undefined
   );
@@ -62,6 +63,15 @@ export default function SubmissionFormRawProjections({
 
   return (
     <div>
+      <TextField
+        label="Input"
+        type="string"
+        fullWidth
+        size="small"
+        onChange={(e) => {
+          setInputFormValue(e.target.value);
+        }}
+      />
       <Typography variant="h6" sx={{ mt: 2 }}>
         Frames to Crop
       </Typography>
