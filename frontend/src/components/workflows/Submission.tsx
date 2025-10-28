@@ -9,6 +9,7 @@ import { SubmissionQuery as SubmissionQueryType } from "./__generated__/Submissi
 import { SubmissionMutation as SubmissionMutationType } from "./__generated__/SubmissionMutation.graphql";
 import React from "react";
 import { JSONObject } from "../../types";
+import SubmissionFormRawProjections from "./SubmissionFormRawProjections";
 
 const submissionQuery = graphql`
   query SubmissionQuery($name: String!) {
@@ -140,8 +141,12 @@ export default function Submission({
     switch (workflowName) {
       case "httomo-cor-sweep":
         return <SubmissionFormCOR {...commonProps} />;
-      default:
+      case "httomo-gpu-job":
         return <SubmissionFormGPURun {...commonProps} />;
+      case "extract-raw-projections":
+        return <SubmissionFormRawProjections />;
+      default:
+        return <p>invalid workflow name</p>;
     }
   };
 

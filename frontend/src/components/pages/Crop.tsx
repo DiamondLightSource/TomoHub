@@ -31,6 +31,6 @@ export default function Crop({ setVisit }: CropProps) {
       sampleRate={sampleRate}
     />
   ) : (
-    <Submission workflowName="httomo-cor-sweep" setVisit={setVisit} />
+    <Submission workflowName="extract-raw-projections" setVisit={setVisit} />
   );
 }
