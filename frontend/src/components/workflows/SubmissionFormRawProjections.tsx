@@ -7,6 +7,7 @@ import { Visit, VisitInput } from "@diamondlightsource/sci-react-ui";
 import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionFormSharedFragment.graphql";
 import { JSONObject } from "../../types";
 import { useState } from "react";
+import { setKey } from "../../devKey";
 
 interface SubmissionFormRawProjectionsProps {
   template: SubmissionFormSharedFragment$key;
@@ -26,6 +27,9 @@ export default function SubmissionFormRawProjections({
   onSubmit: submitWorkflow,
 }: SubmissionFormRawProjectionsProps) {
   const [inputFormValue, setInputFormValue] = useState<string>("");
+  const [keyFormValue, setKeyFormValue] = useState<string | undefined>(
+    undefined
+  );
   const [sweepFormValue, setSweepFormValue] = useState<SweepValues>({
     start: 100,
     stop: 3700,
@@ -62,6 +66,7 @@ export default function SubmissionFormRawProjections({
       "projection-indices": indices,
       "output-filename": wfparamFormValue.output,
     };
+    setKey(keyFormValue);
     // TODO: add on success function as final paramter (load data and set data loaded to true)
     submitWorkflow(visit, parameters);
   }
@@ -90,6 +95,15 @@ export default function SubmissionFormRawProjections({
       <WorkflowParametersForm
         values={wfparamFormValue}
         onChange={setWFParamFormValue}
+      />
+      <TextField
+        label="Auth Token"
+        type="string"
+        fullWidth
+        size="small"
+        onChange={(e) => {
+          setKeyFormValue(e.target.value);
+        }}
       />
       <VisitInput
         visit={visit}
