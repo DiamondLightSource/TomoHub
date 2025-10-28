@@ -1,11 +1,33 @@
 import ParameterSweepForm from "./sweepPipeline/ParameterSweepForm";
 import WorkflowParametersForm from "./WorkflowParametersForm";
 import { SweepValues } from "./sweepPipeline/ParameterSweepForm";
-import { Divider, Input, TextField, Typography } from "@mui/material";
+import { TextField, Typography } from "@mui/material";
 import { WorkflowParamsValues } from "./WorkflowParametersForm";
 import { Visit, VisitInput } from "@diamondlightsource/sci-react-ui";
+import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionFormSharedFragment.graphql";
+import { JSONObject } from "../../types";
+import { useFragment } from "react-relay";
+import { sharedFragment } from "./Submission";
 
-export default function SubmissionFormRawProjections() {
+interface SubmissionFormRawProjectionsProps {
+  template: SubmissionFormSharedFragment$key;
+  prepopulatedParameters?: JSONObject;
+  visit?: Visit;
+  onSubmit: (
+    visit: Visit,
+    parameters: object,
+    onSuccess?: (workflowName: string) => void
+  ) => void;
+}
+
+export default function SubmissionFormRawProjections({
+  template,
+  prepopulatedParameters,
+  visit,
+  onSubmit,
+}: SubmissionFormRawProjectionsProps) {
+  const data = useFragment(sharedFragment, template);
+
   const sweepValues: SweepValues = { start: "", stop: "", step: "" };
   const placeholderSetter = (s: SweepValues) => {
     console.log("run");
@@ -23,14 +45,8 @@ export default function SubmissionFormRawProjections() {
     console.log("other run");
   };
 
-  const visit: Visit = {
-    proposalCode: "cm",
-    proposalNumber: 40628,
-    number: 2,
-  };
-
   const anotherPlaceHolderSetter = (visit: Visit, parameters?: object) => {
-    console.log("another run");
+    onSubmit(visit, parameters || {});
   };
 
   return (
@@ -50,6 +66,7 @@ export default function SubmissionFormRawProjections() {
       <VisitInput
         visit={visit}
         onSubmit={anotherPlaceHolderSetter}
+        parameters={prepopulatedParameters}
         submitOnReturn={false}
         submitButton={true}
       />
