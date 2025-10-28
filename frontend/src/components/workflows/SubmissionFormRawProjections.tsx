@@ -26,7 +26,6 @@ export default function SubmissionFormRawProjections({
   visit,
   onSubmit: submitWorkflow,
 }: SubmissionFormRawProjectionsProps) {
-  const DEVactuallyRunAWorkflow = true;
   const [inputFormValue, setInputFormValue] = useState<string>("");
   const [keyFormValue, setKeyFormValue] = useState<string | undefined>(
     undefined
@@ -46,9 +45,6 @@ export default function SubmissionFormRawProjections({
     });
 
   function onSubmit(visit: Visit) {
-    if (!DEVactuallyRunAWorkflow) {
-      return;
-    }
     const indices = "";
 
     // error handling here to replace empty strings with null in some cases??
