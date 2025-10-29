@@ -8,8 +8,6 @@ import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionForm
 import { JSONObject } from "../../types";
 import { useState } from "react";
 import { setKey } from "../../devKey";
-import { graphql } from "relay-runtime";
-import { useLazyLoadQuery } from "react-relay";
 import WorkflowStatus from "./WorkflowStatus";
 import { WorkflowStatusQuery$data } from "./__generated__/WorkflowStatusQuery.graphql";
 
@@ -37,10 +35,15 @@ export default function SubmissionFormRawProjections({
     const c = data.workflow.status;
     if (c !== null && c !== undefined) {
       if ("tasks" in c) {
-        setZipURL(
-          c.tasks[0].artifacts.filter((a) => a.name === "projections.zip")[0]
-            .url
+        const zipFilesList = c.tasks[0].artifacts.filter(
+          (a) => a.name === "projections.zip"
         );
+        if (zipFilesList.length !== 0) {
+          setZipURL(
+            c.tasks[0].artifacts.filter((a) => a.name === "projections.zip")[0]
+              .url
+          );
+        }
       }
     }
   }
@@ -135,7 +138,10 @@ export default function SubmissionFormRawProjections({
       />
       {!authTokenUpdated || (
         <WorkflowStatus
-          workflow={"extract-raw-projections-r4fb9"}
+          workflow={"extract-raw-projections-r4fb9"} // test for success
+          // workflow={"extract-raw-projections-tk4nt"} // test for failed
+          // workflow={"extract-raw-projections-7"} // test for errored
+          // have to make a live one to test for pending and running
           visit={"cm40628-2"}
           onWorkflowDataChange={onWorkflowDataChange}
         />
