@@ -29,7 +29,6 @@ export default function SubmissionFormRawProjections({
   onSubmit: submitWorkflow,
 }: SubmissionFormRawProjectionsProps) {
   const [workflowSubmitted, setWorkflowSubmitted] = useState(false);
-  const [workflowFinished, setWorkflowFinished] = useState(false);
   const [retryButtonVisible, setRetryButtonVisible] = useState(false);
 
   const [zipURL, setZipURL] = useState<string | undefined>(undefined);
@@ -79,8 +78,6 @@ export default function SubmissionFormRawProjections({
   }
 
   function onWorkflowDataChange(data: WorkflowStatusQuery$data) {
-    setWorkflowFinished(true);
-
     console.log(data);
     const c = data.workflow.status;
     if (
@@ -165,7 +162,6 @@ export default function SubmissionFormRawProjections({
       {!retryButtonVisible || (
         <Button
           onClick={() => {
-            setWorkflowSubmitted(false);
             setWorkflowSubmitted(false);
             setRetryButtonVisible(false);
           }}
