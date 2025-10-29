@@ -28,25 +28,9 @@ export default function SubmissionFormRawProjections({
   visit,
   onSubmit: submitWorkflow,
 }: SubmissionFormRawProjectionsProps) {
-  const [authTokenUpdated, setAuthTokenUpdated] = useState(false);
-
-  function onWorkflowDataChange(data: WorkflowStatusQuery$data) {
-    console.log(data);
-    const c = data.workflow.status;
-    if (c !== null && c !== undefined) {
-      if ("tasks" in c) {
-        const zipFilesList = c.tasks[0].artifacts.filter(
-          (a) => a.name === "projections.zip"
-        );
-        if (zipFilesList.length !== 0) {
-          setZipURL(
-            c.tasks[0].artifacts.filter((a) => a.name === "projections.zip")[0]
-              .url
-          );
-        }
-      }
-    }
-  }
+  const [workflowSubmitted, setWorkflowSubmitted] = useState(false);
+  const [workflowFinished, setWorkflowFinished] = useState(false);
+  const [retryButtonVisible, setRetryButtonVisible] = useState(false);
 
   const [zipURL, setZipURL] = useState<string | undefined>(undefined);
   const [inputFormValue, setInputFormValue] = useState<string>("");
@@ -90,9 +74,37 @@ export default function SubmissionFormRawProjections({
       "output-filename": wfparamFormValue.output,
     };
     setKey(keyFormValue);
-    // TODO: add on success function as final paramter (load data and set data loaded to true)
     // submitWorkflow(visit, parameters);
-    setAuthTokenUpdated(true);
+    setWorkflowSubmitted(true);
+  }
+
+  function onWorkflowDataChange(data: WorkflowStatusQuery$data) {
+    setWorkflowFinished(true);
+
+    console.log(data);
+    const c = data.workflow.status;
+    if (
+      c === null ||
+      c === undefined ||
+      c.__typename === "WorkflowErroredStatus" ||
+      c.__typename === "WorkflowFailedStatus"
+    ) {
+      setRetryButtonVisible(true);
+      return;
+    }
+
+    if ("tasks" in c) {
+      const zipFilesList = c.tasks[0].artifacts.filter(
+        (a) => a.name === "projections.zip"
+      );
+      if (zipFilesList.length !== 0) {
+        setZipURL(
+          c.tasks[0].artifacts.filter((a) => a.name === "projections.zip")[0]
+            .url
+        );
+      }
+      // maybe handle errors here too??
+    }
   }
 
   return (
@@ -136,7 +148,7 @@ export default function SubmissionFormRawProjections({
         submitOnReturn={false}
         submitButton={true}
       />
-      {!authTokenUpdated || (
+      {!workflowSubmitted || (
         <WorkflowStatus
           workflow={"extract-raw-projections-r4fb9"} // test for success
           // workflow={"extract-raw-projections-tk4nt"} // test for failed
