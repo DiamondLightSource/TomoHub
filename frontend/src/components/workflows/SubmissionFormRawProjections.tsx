@@ -1,7 +1,7 @@
 import ParameterSweepForm from "./sweepPipeline/ParameterSweepForm";
 import WorkflowParametersForm from "./WorkflowParametersForm";
 import { SweepValues } from "./sweepPipeline/ParameterSweepForm";
-import { TextField, Typography } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 import { WorkflowParamsValues } from "./WorkflowParametersForm";
 import { Visit, VisitInput } from "@diamondlightsource/sci-react-ui";
 import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionFormSharedFragment.graphql";
@@ -109,45 +109,49 @@ export default function SubmissionFormRawProjections({
 
   return (
     <div>
-      <TextField
-        label="Input"
-        type="string"
-        fullWidth
-        size="small"
-        onChange={(e) => {
-          setInputFormValue(e.target.value);
-        }}
-      />
-      <Typography variant="h6" sx={{ mt: 2 }}>
-        Frames to Crop
-      </Typography>
-      <ParameterSweepForm
-        values={sweepFormValue}
-        onChange={setSweepFormValue}
-      />
-      <Typography variant="h6" sx={{ mt: 2 }}>
-        Workflow Parameters
-      </Typography>
-      <WorkflowParametersForm
-        values={wfparamFormValue}
-        onChange={setWFParamFormValue}
-      />
-      <TextField
-        label="Auth Token"
-        type="string"
-        fullWidth
-        size="small"
-        onChange={(e) => {
-          setKeyFormValue(e.target.value);
-        }}
-      />
-      <VisitInput
-        visit={visit}
-        onSubmit={onRawProjectionsFormSubmit}
-        parameters={prepopulatedParameters}
-        submitOnReturn={false}
-        submitButton={true}
-      />
+      {workflowSubmitted || (
+        <div>
+          <TextField
+            label="Input"
+            type="string"
+            fullWidth
+            size="small"
+            onChange={(e) => {
+              setInputFormValue(e.target.value);
+            }}
+          />
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            Frames to Crop
+          </Typography>
+          <ParameterSweepForm
+            values={sweepFormValue}
+            onChange={setSweepFormValue}
+          />
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            Workflow Parameters
+          </Typography>
+          <WorkflowParametersForm
+            values={wfparamFormValue}
+            onChange={setWFParamFormValue}
+          />
+          <TextField
+            label="Auth Token"
+            type="string"
+            fullWidth
+            size="small"
+            onChange={(e) => {
+              setKeyFormValue(e.target.value);
+            }}
+          />
+          <VisitInput
+            visit={visit}
+            onSubmit={onRawProjectionsFormSubmit}
+            parameters={prepopulatedParameters}
+            submitOnReturn={false}
+            submitButton={true}
+          />
+        </div>
+      )}
       {!workflowSubmitted || (
         <WorkflowStatus
           workflow={"extract-raw-projections-r4fb9"} // test for success
@@ -157,6 +161,18 @@ export default function SubmissionFormRawProjections({
           visit={"cm40628-2"}
           onWorkflowDataChange={onWorkflowDataChange}
         />
+      )}
+      {!retryButtonVisible || (
+        <Button
+          onClick={() => {
+            setWorkflowSubmitted(false);
+            setWorkflowSubmitted(false);
+            setRetryButtonVisible(false);
+          }}
+          variant={"outlined"}
+        >
+          Refill form
+        </Button>
       )}
     </div>
   );
