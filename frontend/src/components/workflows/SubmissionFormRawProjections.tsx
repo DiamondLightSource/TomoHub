@@ -88,15 +88,17 @@ export default function SubmissionFormRawProjections({
   function onWorkflowDataChange(data: WorkflowStatusQuery$data) {
     console.log(data);
     const c = data.workflow.status;
+    if (c === null || c === undefined) {
+      return;
+    }
     if (
-      c === null ||
-      c === undefined ||
       c.__typename === "WorkflowErroredStatus" ||
       c.__typename === "WorkflowFailedStatus"
     ) {
       setRetryButtonVisible(true);
       return;
     }
+    setRetryButtonVisible(false);
 
     if ("tasks" in c) {
       const zipFilesList = c.tasks[0].artifacts.filter(
