@@ -62,7 +62,6 @@ export default function SubmissionFormRawProjections({
 
   function onRawProjectionsFormSubmit(visit: Visit) {
     setSubmittedVisit(visit);
-    console.log(visit);
     let indices = "";
     const start: number =
       sweepFormValue.start === "" ? 100 : sweepFormValue.start;
@@ -95,7 +94,6 @@ export default function SubmissionFormRawProjections({
   }
 
   function onWorkflowDataChange(data: WorkflowStatusQuery$data) {
-    console.log(data);
     const c = data.workflow.status;
     if (c === null || c === undefined) {
       return;
@@ -119,7 +117,6 @@ export default function SubmissionFormRawProjections({
             .url
         );
       }
-      // maybe handle errors here too??
     }
   }
 
@@ -177,7 +174,9 @@ export default function SubmissionFormRawProjections({
             onWorkflowDataChange={onWorkflowDataChange}
           />
         )}
-      {!retryButtonVisible || (
+      {retryButtonVisible ? (
+        <p>{zipURL}</p>
+      ) : (
         <Button
           onClick={() => {
             setWorkflowSubmitted(false);
