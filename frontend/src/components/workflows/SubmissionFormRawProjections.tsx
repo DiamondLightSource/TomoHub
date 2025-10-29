@@ -31,6 +31,9 @@ export default function SubmissionFormRawProjections({
   const [workflowSubmitted, setWorkflowSubmitted] = useState(false);
   const [retryButtonVisible, setRetryButtonVisible] = useState(false);
 
+  const [workflowName, setWorkflowName] = useState<undefined | string>(
+    undefined
+  );
   const [zipURL, setZipURL] = useState<string | undefined>(undefined);
   const [inputFormValue, setInputFormValue] = useState<string>("");
   const [keyFormValue, setKeyFormValue] = useState<string | undefined>(
@@ -73,8 +76,13 @@ export default function SubmissionFormRawProjections({
       "output-filename": wfparamFormValue.output,
     };
     setKey(keyFormValue);
-    // submitWorkflow(visit, parameters);
-    setWorkflowSubmitted(true);
+
+    function workflowSuccessfullySubmitted(submittedWorkflowName: string) {
+      setWorkflowName(submittedWorkflowName);
+      setWorkflowSubmitted(true);
+    }
+
+    submitWorkflow(visit, parameters, workflowSuccessfullySubmitted);
   }
 
   function onWorkflowDataChange(data: WorkflowStatusQuery$data) {
@@ -149,9 +157,10 @@ export default function SubmissionFormRawProjections({
           />
         </div>
       )}
-      {!workflowSubmitted || (
+      {!workflowSubmitted || workflowName === undefined || (
         <WorkflowStatus
-          workflow={"extract-raw-projections-r4fb9"} // test for success
+          workflow={workflowName}
+          // workflow={"extract-raw-projections-r4fb9"} // test for success
           // workflow={"extract-raw-projections-tk4nt"} // test for failed
           // workflow={"extract-raw-projections-7"} // test for errored
           // have to make a live one to test for pending and running
