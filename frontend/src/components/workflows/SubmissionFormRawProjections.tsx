@@ -8,6 +8,10 @@ import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionForm
 import { JSONObject } from "../../types";
 import { useState } from "react";
 import { setKey } from "../../devKey";
+import { graphql } from "relay-runtime";
+import { useLazyLoadQuery } from "react-relay";
+import WorkflowStatus from "./WorkflowStatus";
+import { WorkflowStatusQuery$data } from "./__generated__/WorkflowStatusQuery.graphql";
 
 interface SubmissionFormRawProjectionsProps {
   template: SubmissionFormSharedFragment$key;
@@ -26,6 +30,22 @@ export default function SubmissionFormRawProjections({
   visit,
   onSubmit: submitWorkflow,
 }: SubmissionFormRawProjectionsProps) {
+  const [authTokenUpdated, setAuthTokenUpdated] = useState(false);
+
+  function onWorkflowDataChange(data: WorkflowStatusQuery$data) {
+    console.log(data);
+    const c = data.workflow.status;
+    if (c !== null && c !== undefined) {
+      if ("tasks" in c) {
+        setZipURL(
+          c.tasks[0].artifacts.filter((a) => a.name === "projections.zip")[0]
+            .url
+        );
+      }
+    }
+  }
+
+  const [zipURL, setZipURL] = useState<string | undefined>(undefined);
   const [inputFormValue, setInputFormValue] = useState<string>("");
   const [keyFormValue, setKeyFormValue] = useState<string | undefined>(
     undefined
@@ -68,7 +88,8 @@ export default function SubmissionFormRawProjections({
     };
     setKey(keyFormValue);
     // TODO: add on success function as final paramter (load data and set data loaded to true)
-    submitWorkflow(visit, parameters);
+    // submitWorkflow(visit, parameters);
+    setAuthTokenUpdated(true);
   }
 
   return (
@@ -112,6 +133,13 @@ export default function SubmissionFormRawProjections({
         submitOnReturn={false}
         submitButton={true}
       />
+      {!authTokenUpdated || (
+        <WorkflowStatus
+          workflow={"extract-raw-projections-r4fb9"}
+          visit={"cm40628-2"}
+          onWorkflowDataChange={onWorkflowDataChange}
+        />
+      )}
     </div>
   );
 }
