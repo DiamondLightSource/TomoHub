@@ -3,7 +3,11 @@ import WorkflowParametersForm from "./WorkflowParametersForm";
 import { SweepValues } from "./sweepPipeline/ParameterSweepForm";
 import { Button, TextField, Typography } from "@mui/material";
 import { WorkflowParamsValues } from "./WorkflowParametersForm";
-import { Visit, VisitInput } from "@diamondlightsource/sci-react-ui";
+import {
+  Visit,
+  VisitInput,
+  visitToText,
+} from "@diamondlightsource/sci-react-ui";
 import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionFormSharedFragment.graphql";
 import { JSONObject } from "../../types";
 import { useState } from "react";
@@ -34,6 +38,9 @@ export default function SubmissionFormRawProjections({
   const [workflowName, setWorkflowName] = useState<undefined | string>(
     undefined
   );
+  const [submittedVisit, setSubmittedVisit] = useState<undefined | Visit>(
+    undefined
+  );
   const [zipURL, setZipURL] = useState<string | undefined>(undefined);
   const [inputFormValue, setInputFormValue] = useState<string>("");
   const [keyFormValue, setKeyFormValue] = useState<string | undefined>(
@@ -54,6 +61,8 @@ export default function SubmissionFormRawProjections({
     });
 
   function onRawProjectionsFormSubmit(visit: Visit) {
+    setSubmittedVisit(visit);
+    console.log(visit);
     let indices = "";
     const start: number =
       sweepFormValue.start === "" ? 100 : sweepFormValue.start;
@@ -159,17 +168,15 @@ export default function SubmissionFormRawProjections({
           />
         </div>
       )}
-      {!workflowSubmitted || workflowName === undefined || (
-        <WorkflowStatus
-          workflow={workflowName}
-          // workflow={"extract-raw-projections-r4fb9"} // test for success
-          // workflow={"extract-raw-projections-tk4nt"} // test for failed
-          // workflow={"extract-raw-projections-7"} // test for errored
-          // have to make a live one to test for pending and running
-          visit={"cm40628-2"}
-          onWorkflowDataChange={onWorkflowDataChange}
-        />
-      )}
+      {!workflowSubmitted ||
+        workflowName === undefined ||
+        submittedVisit === undefined || (
+          <WorkflowStatus
+            workflow={workflowName}
+            visit={visitToText(submittedVisit)}
+            onWorkflowDataChange={onWorkflowDataChange}
+          />
+        )}
       {!retryButtonVisible || (
         <Button
           onClick={() => {
