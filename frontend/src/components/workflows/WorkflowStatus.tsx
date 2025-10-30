@@ -7,7 +7,7 @@ import {
   Button,
   ButtonGroup,
 } from "@mui/material";
-import { OpenInNew, Article } from "@mui/icons-material";
+import { OpenInNew, Article, DataArray } from "@mui/icons-material";
 import {
   Visit,
   visitRegex,
@@ -15,6 +15,98 @@ import {
 } from "@diamondlightsource/sci-react-ui";
 import { WorkflowSubscriptionHandlerSubscription$data } from "./__generated__/WorkflowSubscriptionHandlerSubscription.graphql";
 import WorkflowSubscriptionHandler from "./WorkflowSubscriptionHandler";
+
+type StatusType = "WorkflowSucceededStatus" | "WorkflowFailedStatus" | "WorkflowErroredStatus" | "WorkflowPendingStatus" | "WorkflowRunningStatus" | "%other" | "Unknown";
+
+function parseVisit(visitStr: string): Visit {
+  const match = visitRegex.exec(visitStr);
+  if (!match) {
+    throw new Error(
+      `Invalid visit format: ${visitStr}. Expected format: xx12345-1`
+    );
+  }
+  return regexToVisit(match);
+}
+
+function isFinalStatus(status: string) {
+  return [
+    "WorkflowSucceededStatus",
+    "WorkflowFailedStatus",
+    "WorkflowErroredStatus",
+  ].includes(status);
+}
+
+function getStatusColor(status: string) {
+  switch (status) {
+    case "WorkflowPendingStatus":
+      return "warning";
+    case "WorkflowRunningStatus":
+      return "info";
+    case "WorkflowSucceededStatus":
+      return "success";
+    case "WorkflowFailedStatus":
+    case "WorkflowErroredStatus":
+      return "error";
+    default:
+      return "default";
+  }
+}
+
+function getStatusText(status: string) {
+  switch (status) {
+    case "WorkflowPendingStatus":
+      return "Pending";
+    case "WorkflowRunningStatus":
+      return "Running";
+    case "WorkflowSucceededStatus":
+      return "Succeeded";
+    case "WorkflowFailedStatus":
+      return "Failed";
+    case "WorkflowErroredStatus":
+      return "Error";
+    default:
+      return "Unknown";
+  }
+}
+
+function getLogArtifacts(
+  data: WorkflowSubscriptionHandlerSubscription$data | null | undefined,
+  statusType: StatusType
+) {
+  if (!data?.workflow?.status || !("tasks" in data.workflow.status)) {
+    return [];
+  }
+
+  const finalStatuses = [
+    "WorkflowSucceededStatus",
+    "WorkflowFailedStatus",
+    "WorkflowErroredStatus",
+  ];
+  if (!finalStatuses.includes(statusType)) {
+    return [];
+  }
+
+  const tasks = (data.workflow.status as any).tasks || [];
+
+  return tasks
+    .filter((task: any) => task.stepType === "Pod")
+    .map((task: any) => {
+      // Find main.log artifact
+      const logArtifact = task.artifacts?.find(
+        (artifact: any) =>
+          artifact.name === "main.log" && artifact.mimeType === "text/plain"
+      );
+
+      return logArtifact
+        ? {
+            taskName: task.name,
+            url: logArtifact.url,
+            name: logArtifact.name,
+          }
+        : null;
+    })
+    .filter(Boolean); // Remove null entries
+}
 
 interface WorkflowStatusProps {
   workflow: string;
@@ -37,108 +129,20 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
     onWorkflowDataChange(data);
   }
 
-  // Parse visit string using existing utility functions
-  const parseVisit = (visitStr: string): Visit => {
-    const match = visitRegex.exec(visitStr);
-    if (!match) {
-      throw new Error(
-        `Invalid visit format: ${visitStr}. Expected format: xx12345-1`
-      );
-    }
-    return regexToVisit(match);
-  };
-
   const parsedVisit = useMemo(() => {
     return parseVisit(visit);
   }, [visit]);
   // const parsedVisit = parseVisit(visit);
 
-  const statusType = data?.workflow?.status?.__typename ?? "Unknown";
+  const statusType: StatusType =
+    data?.workflow?.status?.__typename ?? "Unknown";
 
   const message =
     data?.workflow?.status && "message" in data.workflow.status
       ? data.workflow.status.message
       : undefined;
 
-  // Check if status is final (no need to keep polling)
-  const isFinalStatus = (status: string) => {
-    return [
-      "WorkflowSucceededStatus",
-      "WorkflowFailedStatus",
-      "WorkflowErroredStatus",
-    ].includes(status);
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "WorkflowPendingStatus":
-        return "warning";
-      case "WorkflowRunningStatus":
-        return "info";
-      case "WorkflowSucceededStatus":
-        return "success";
-      case "WorkflowFailedStatus":
-      case "WorkflowErroredStatus":
-        return "error";
-      default:
-        return "default";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "WorkflowPendingStatus":
-        return "Pending";
-      case "WorkflowRunningStatus":
-        return "Running";
-      case "WorkflowSucceededStatus":
-        return "Succeeded";
-      case "WorkflowFailedStatus":
-        return "Failed";
-      case "WorkflowErroredStatus":
-        return "Error";
-      default:
-        return "Unknown";
-    }
-  };
-
-  const getLogArtifacts = () => {
-    if (!data?.workflow?.status || !("tasks" in data.workflow.status)) {
-      return [];
-    }
-
-    const finalStatuses = [
-      "WorkflowSucceededStatus",
-      "WorkflowFailedStatus",
-      "WorkflowErroredStatus",
-    ];
-    if (!finalStatuses.includes(statusType)) {
-      return [];
-    }
-
-    const tasks = (data.workflow.status as any).tasks || [];
-
-    return tasks
-      .filter((task: any) => task.stepType === "Pod")
-      .map((task: any) => {
-        // Find main.log artifact
-        const logArtifact = task.artifacts?.find(
-          (artifact: any) =>
-            artifact.name === "main.log" && artifact.mimeType === "text/plain"
-        );
-
-        return logArtifact
-          ? {
-              taskName: task.name,
-              url: logArtifact.url,
-              name: logArtifact.name,
-            }
-          : null;
-      })
-      .filter(Boolean); // Remove null entries
-  };
-
-  const logArtifacts = getLogArtifacts();
+  const logArtifacts = getLogArtifacts(data, statusType);
 
   if (isFinalStatus(statusType)) {
     setIsPolling(false);
