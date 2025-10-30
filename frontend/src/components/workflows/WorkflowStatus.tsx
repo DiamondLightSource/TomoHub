@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { graphql, useLazyLoadQuery } from "react-relay";
+import { graphql, useLazyLoadQuery, useSubscription } from "react-relay";
 import {
   Box,
   Typography,
@@ -15,6 +15,11 @@ import {
   regexToVisit,
 } from "@diamondlightsource/sci-react-ui";
 import { WorkflowStatusQuery as WorkflowStatusQueryType } from "./__generated__/WorkflowStatusQuery.graphql";
+import {
+  WorkflowStatusSubscription$data,
+  WorkflowStatusSubscription as WorkflowStatusSubscriptionType,
+} from "./__generated__/WorkflowStatusSubscription.graphql";
+import { GraphQLSubscriptionConfig } from "relay-runtime";
 
 const workflowStatusQuery = graphql`
   query WorkflowStatusQuery($visit: VisitInput!, $name: String!) {
@@ -25,6 +30,91 @@ const workflowStatusQuery = graphql`
         proposalNumber
         number
       }
+      status {
+        __typename
+        ... on WorkflowPendingStatus {
+          message
+        }
+        ... on WorkflowRunningStatus {
+          startTime
+          message
+          tasks {
+            id
+            name
+            status
+            depends
+            dependencies
+            stepType
+            artifacts {
+              name
+              url
+              mimeType
+            }
+          }
+        }
+        ... on WorkflowSucceededStatus {
+          startTime
+          endTime
+          message
+          tasks {
+            id
+            name
+            status
+            depends
+            dependencies
+            stepType
+            artifacts {
+              name
+              url
+              mimeType
+            }
+          }
+        }
+        ... on WorkflowFailedStatus {
+          startTime
+          endTime
+          message
+          tasks {
+            id
+            name
+            status
+            depends
+            dependencies
+            stepType
+            artifacts {
+              name
+              url
+              mimeType
+            }
+          }
+        }
+        ... on WorkflowErroredStatus {
+          startTime
+          endTime
+          message
+          tasks {
+            id
+            name
+            status
+            depends
+            dependencies
+            stepType
+            artifacts {
+              name
+              url
+              mimeType
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+// test subscription on existing workflow
+const subscription = graphql`
+  subscription WorkflowStatusSubscription($visit: VisitInput!, $name: String!) {
+    workflow(visit: $visit, name: $name) {
       status {
         __typename
         ... on WorkflowPendingStatus {
@@ -233,33 +323,52 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
 
   const logArtifacts = getLogArtifacts();
 
-  // Polling effect
-  useEffect(() => {
-    if (!isPolling || isFinalStatus(statusType)) {
-      setIsPolling(false);
-      return;
-    }
+  function dataChange(
+    response: WorkflowStatusSubscription$data | null | undefined
+  ) {
+    console.log("data changed!!");
+    console.log(response);
+  }
 
-    const interval = setInterval(() => {
-      setRefreshKey((prev) => prev + 1);
-    }, 2000);
+  const v = { visit: parsedVisit, name: workflow };
+  const config: GraphQLSubscriptionConfig<WorkflowStatusSubscriptionType> = {
+    variables: v,
+    subscription: subscription,
+    onNext: dataChange,
+  };
 
-    return () => clearInterval(interval);
-  }, [statusType, isPolling]);
+  console.log("calling subscription");
+  console.log("with variables: ");
+  console.log(v);
+  useSubscription(config);
 
-  // Stop polling when status becomes final
-  useEffect(() => {
-    if (isFinalStatus(statusType)) {
-      setIsPolling(false);
-    }
-  }, [statusType]);
+  // // Polling effect
+  // useEffect(() => {
+  //   if (!isPolling || isFinalStatus(statusType)) {
+  //     setIsPolling(false);
+  //     return;
+  //   }
 
-  // useEffect to pass data back to parent
-  useEffect(() => {
-    if (onWorkflowDataChange && data) {
-      onWorkflowDataChange(data);
-    }
-  }, [data, onWorkflowDataChange]);
+  //   const interval = setInterval(() => {
+  //     setRefreshKey((prev) => prev + 1);
+  //   }, 2000);
+
+  //   return () => clearInterval(interval);
+  // }, [statusType, isPolling]);
+
+  // // Stop polling when status becomes final
+  // useEffect(() => {
+  //   if (isFinalStatus(statusType)) {
+  //     setIsPolling(false);
+  //   }
+  // }, [statusType]);
+
+  // // useEffect to pass data back to parent
+  // useEffect(() => {
+  //   if (onWorkflowDataChange && data) {
+  //     onWorkflowDataChange(data);
+  //   }
+  // }, [data, onWorkflowDataChange]);
 
   return (
     <Box
