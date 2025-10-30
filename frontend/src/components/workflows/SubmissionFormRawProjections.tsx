@@ -40,7 +40,7 @@ export default function SubmissionFormRawProjections({
       httomo_outdir_name: "/tmp",
     });
 
-  function onSubmit(visit: Visit) {
+  function onRawProjectionsFormSubmit(visit: Visit) {
     let indices = "";
     const start: number =
       sweepFormValue.start === "" ? 100 : sweepFormValue.start;
@@ -93,7 +93,7 @@ export default function SubmissionFormRawProjections({
       />
       <VisitInput
         visit={visit}
-        onSubmit={onSubmit}
+        onSubmit={onRawProjectionsFormSubmit}
         parameters={prepopulatedParameters}
         submitOnReturn={false}
         submitButton={true}
