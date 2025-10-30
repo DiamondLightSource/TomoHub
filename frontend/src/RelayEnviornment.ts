@@ -9,7 +9,6 @@ import {
   GraphQLResponse,
 } from "relay-runtime";
 import keycloak from "./keycloak";
-import { getKey } from "./devKey";
 import { createClient } from "graphql-ws";
 
 const HTTP_ENDPOINT = "https://workflows.diamond.ac.uk/graphql";
@@ -67,7 +66,6 @@ function ensureKeycloakInit(): Promise<boolean> {
 export const wsClient = createClient({
   url: WS_ENDPOINT,
   connectionParams: async () => {
-    // ONLY FOR DEV
     if (!keycloak.authenticated) {
       await ensureKeycloakInit();
     }
@@ -78,7 +76,6 @@ export const wsClient = createClient({
 });
 
 const subscribe: SubscribeFunction = (operation, variables) => {
-  console.log("subscribe function entered");
   return Observable.create((sink) => {
     const cleanup = wsClient.subscribe(
       {
@@ -88,7 +85,6 @@ const subscribe: SubscribeFunction = (operation, variables) => {
       },
       {
         next: (response) => {
-          console.log("calling next??");
           const data = response.data;
           if (data) {
             sink.next({ data } as GraphQLResponse);

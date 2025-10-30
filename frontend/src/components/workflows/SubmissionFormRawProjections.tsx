@@ -11,7 +11,6 @@ import {
 import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionFormSharedFragment.graphql";
 import { JSONObject } from "../../types";
 import { useState } from "react";
-import { setKey } from "../../devKey";
 import WorkflowStatus from "./WorkflowStatus";
 import { WorkflowSubscriptionHandlerSubscription$data } from "./__generated__/WorkflowSubscriptionHandlerSubscription.graphql";
 
@@ -43,9 +42,6 @@ export default function SubmissionFormRawProjections({
   );
   const [zipURL, setZipURL] = useState<string | undefined>(undefined);
   const [inputFormValue, setInputFormValue] = useState<string>("");
-  const [keyFormValue, setKeyFormValue] = useState<string | undefined>(
-    undefined
-  );
   const [sweepFormValue, setSweepFormValue] = useState<SweepValues>({
     start: 100,
     stop: 3700,
@@ -83,7 +79,6 @@ export default function SubmissionFormRawProjections({
       "projection-indices": indices,
       "output-filename": wfparamFormValue.output,
     };
-    setKey(keyFormValue);
 
     function workflowSuccessfullySubmitted(submittedWorkflowName: string) {
       setWorkflowName(submittedWorkflowName);
@@ -172,15 +167,6 @@ export default function SubmissionFormRawProjections({
           <WorkflowParametersForm
             values={wfparamFormValue}
             onChange={setWFParamFormValue}
-          />
-          <TextField
-            label="Auth Token"
-            type="string"
-            fullWidth
-            size="small"
-            onChange={(e) => {
-              setKeyFormValue(e.target.value);
-            }}
           />
           <VisitInput
             visit={visit}
