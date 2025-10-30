@@ -7,7 +7,7 @@ import {
   Button,
   ButtonGroup,
 } from "@mui/material";
-import { OpenInNew, Article, DataArray } from "@mui/icons-material";
+import { OpenInNew, Article } from "@mui/icons-material";
 import {
   Visit,
   visitRegex,
@@ -16,7 +16,14 @@ import {
 import { WorkflowSubscriptionHandlerSubscription$data } from "./__generated__/WorkflowSubscriptionHandlerSubscription.graphql";
 import WorkflowSubscriptionHandler from "./WorkflowSubscriptionHandler";
 
-type StatusType = "WorkflowSucceededStatus" | "WorkflowFailedStatus" | "WorkflowErroredStatus" | "WorkflowPendingStatus" | "WorkflowRunningStatus" | "%other" | "Unknown";
+type StatusType =
+  | "WorkflowSucceededStatus"
+  | "WorkflowFailedStatus"
+  | "WorkflowErroredStatus"
+  | "WorkflowPendingStatus"
+  | "WorkflowRunningStatus"
+  | "%other"
+  | "Unknown";
 
 function parseVisit(visitStr: string): Visit {
   const match = visitRegex.exec(visitStr);
@@ -111,7 +118,9 @@ function getLogArtifacts(
 interface WorkflowStatusProps {
   workflow: string;
   visit: string;
-  onWorkflowDataChange?: (data: any) => void;
+  onWorkflowDataChange?: (
+    data: WorkflowSubscriptionHandlerSubscription$data
+  ) => void;
 }
 
 const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
@@ -126,7 +135,11 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
 
   // the subscriptionHandler component will change data when it recieves some
   // this will trigger a re-render
-  if (onWorkflowDataChange !== undefined) {
+  if (
+    onWorkflowDataChange !== undefined &&
+    data !== null &&
+    data !== undefined
+  ) {
     console.log("data changed!!");
     onWorkflowDataChange(data);
   }

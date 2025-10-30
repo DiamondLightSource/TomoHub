@@ -13,7 +13,7 @@ import { JSONObject } from "../../types";
 import { useState } from "react";
 import { setKey } from "../../devKey";
 import WorkflowStatus from "./WorkflowStatus";
-import { WorkflowStatusQuery$data } from "./__generated__/WorkflowStatusQuery.graphql";
+import { WorkflowSubscriptionHandlerSubscription$data } from "./__generated__/WorkflowSubscriptionHandlerSubscription.graphql";
 
 interface SubmissionFormRawProjectionsProps {
   template: SubmissionFormSharedFragment$key;
@@ -93,7 +93,9 @@ export default function SubmissionFormRawProjections({
     submitWorkflow(visit, parameters, workflowSuccessfullySubmitted);
   }
 
-  function onWorkflowDataChange(data: WorkflowStatusQuery$data) {
+  function onWorkflowDataChange(
+    data: WorkflowSubscriptionHandlerSubscription$data
+  ) {
     const c = data.workflow.status;
     if (c === null || c === undefined) {
       return;
