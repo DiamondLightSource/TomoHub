@@ -8,6 +8,8 @@ import {
 } from "./__generated__/WorkflowSubscriptionHandlerSubscription.graphql";
 import { Box } from "@mui/material";
 
+// this subscription is a bit overkill with all the fields it requests
+// however, it is necessary to preserve the original functionality of the WorkflowStatus component
 const subscription = graphql`
   subscription WorkflowSubscriptionHandlerSubscription(
     $visit: VisitInput!

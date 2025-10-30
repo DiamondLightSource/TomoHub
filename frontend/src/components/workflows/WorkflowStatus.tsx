@@ -135,19 +135,20 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
 
   // the subscriptionHandler component will change data when it recieves some
   // this will trigger a re-render
+  // every variable that depends on data should be automatically be refreshed with the workflow
   if (
     onWorkflowDataChange !== undefined &&
     data !== null &&
     data !== undefined
   ) {
-    console.log("data changed!!");
     onWorkflowDataChange(data);
   }
 
+  // if parsedVisit is changed the subscriptionHanlder object is re-rendered, creating a new subscription
+  // we useMemo so a new object is not created every re-render of this component
   const parsedVisit = useMemo(() => {
     return parseVisit(visit);
   }, [visit]);
-  // const parsedVisit = parseVisit(visit);
 
   const statusType: StatusType =
     data?.workflow?.status?.__typename ?? "Unknown";
@@ -161,7 +162,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
 
   if (isFinalStatus(statusType) && !workflowFinished) {
     setWorkflowFinished(true);
-    // TODO: clean up the subscription here???
+    // TODO: clean up the subscription here??? (stop subscribing, delete objects?)
   }
 
   return (
