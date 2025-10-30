@@ -119,13 +119,15 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
   visit,
   onWorkflowDataChange,
 }) => {
-  const [isPolling, setIsPolling] = useState(true);
+  const [workflowFinished, setWorkflowFinished] = useState(true);
   const [data, setData] = useState<
     undefined | null | WorkflowSubscriptionHandlerSubscription$data
   >(undefined);
 
-  console.log("data changed!!");
+  // the subscriptionHandler component will change data when it recieves some
+  // this will trigger a re-render
   if (onWorkflowDataChange !== undefined) {
+    console.log("data changed!!");
     onWorkflowDataChange(data);
   }
 
@@ -145,7 +147,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
   const logArtifacts = getLogArtifacts(data, statusType);
 
   if (isFinalStatus(statusType)) {
-    setIsPolling(false);
+    setWorkflowFinished(false);
     // clean up the subscription here???
     // SOME ISSUE HAPPENS??
     // looks like we hit too many re-renders when workflow finishes
@@ -164,7 +166,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
         <Typography variant="h6">Workflow Status</Typography>
-        {isPolling && <CircularProgress size={16} />}
+        {workflowFinished && <CircularProgress size={16} />}
       </Box>
 
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
@@ -231,7 +233,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
         </Box>
       )}
 
-      {isPolling && (
+      {workflowFinished && (
         <Typography
           variant="caption"
           color="text.secondary"
