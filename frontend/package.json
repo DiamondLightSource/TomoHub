@@ -27,6 +27,7 @@
     "@mui/material": "^6.4.8",
     "@react-three/fiber": "^8.18.0",
     "axios": "^1.7.9",
+    "graphql-ws": "^6.0.6",
     "js-yaml": "^4.1.0",
     "keycloak-js": "^26.0.5",
     "ndarray": "^1.0.19",
