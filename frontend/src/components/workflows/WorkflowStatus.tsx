@@ -128,7 +128,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
   visit,
   onWorkflowDataChange,
 }) => {
-  const [workflowFinished, setWorkflowFinished] = useState(true);
+  const [workflowFinished, setWorkflowFinished] = useState(false);
   const [data, setData] = useState<
     undefined | null | WorkflowSubscriptionHandlerSubscription$data
   >(undefined);
@@ -159,11 +159,9 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
 
   const logArtifacts = getLogArtifacts(data, statusType);
 
-  if (isFinalStatus(statusType)) {
-    setWorkflowFinished(false);
-    // clean up the subscription here???
-    // SOME ISSUE HAPPENS??
-    // looks like we hit too many re-renders when workflow finishes
+  if (isFinalStatus(statusType) && !workflowFinished) {
+    setWorkflowFinished(true);
+    // TODO: clean up the subscription here???
   }
 
   return (
@@ -179,7 +177,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
         <Typography variant="h6">Workflow Status</Typography>
-        {workflowFinished && <CircularProgress size={16} />}
+        {!workflowFinished && <CircularProgress size={16} />}
       </Box>
 
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
@@ -246,7 +244,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
         </Box>
       )}
 
-      {workflowFinished && (
+      {!workflowFinished && (
         <Typography
           variant="caption"
           color="text.secondary"
