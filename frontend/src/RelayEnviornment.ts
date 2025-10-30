@@ -42,10 +42,6 @@ const fetchFn: FetchFunction = async (request, variables) => {
   }
 };
 
-// FULL DISCLOSURE:
-// I do not know what this code does, it is copied from the workflows git repository
-// frontend/dashboard/src/RelayEnvironment.ts
-// all I know is the subscribe function is run when a subscription is created and it needs to be added to the Network object
 let kcinitPromise: Promise<boolean> | null = null;
 
 // needed to prevent repeated refresh of page when using subscriptions
