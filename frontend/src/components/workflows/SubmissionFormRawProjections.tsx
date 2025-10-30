@@ -174,7 +174,7 @@ export default function SubmissionFormRawProjections({
             onWorkflowDataChange={onWorkflowDataChange}
           />
         )}
-      {retryButtonVisible ? (
+      {!retryButtonVisible ? (
         <p>{zipURL}</p>
       ) : (
         <Button
