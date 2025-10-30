@@ -90,6 +90,7 @@ export default function SubmissionFormRawProjections({
       setWorkflowSubmitted(true);
     }
 
+    // TODO: Also handle authentication errors here
     submitWorkflow(visit, parameters, workflowSuccessfullySubmitted);
   }
 

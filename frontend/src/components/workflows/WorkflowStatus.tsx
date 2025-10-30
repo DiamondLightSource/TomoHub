@@ -245,15 +245,6 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
         </Box>
       )}
 
-      {!workflowFinished && (
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ mt: 1, display: "block" }}
-        >
-          Refreshing every 2 seconds...
-        </Typography>
-      )}
       <WorkflowSubscriptionHandler
         parsedVisit={parsedVisit}
         workflow={workflow}
