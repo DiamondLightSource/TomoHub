@@ -104,6 +104,24 @@ const subscription = graphql`
     }
   }
 `;
+interface ChildProps {
+  parsedVisit: Visit;
+  workflow: string;
+  setData: React.Dispatch<
+    React.SetStateAction<WorkflowStatusSubscription$data | null | undefined>
+  >;
+}
+const Child = React.memo(({ parsedVisit, workflow, setData }: ChildProps) => {
+  console.log("refreshing child component");
+  const subscriptionConfig: GraphQLSubscriptionConfig<WorkflowStatusSubscriptionType> =
+    {
+      variables: { visit: parsedVisit, name: workflow },
+      subscription: subscription,
+      onNext: setData,
+    };
+  useSubscription(subscriptionConfig);
+  return <p>this</p>;
+});
 
 interface WorkflowStatusProps {
   workflow: string;
@@ -116,8 +134,15 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
   visit,
   onWorkflowDataChange,
 }) => {
-  const [refreshKey, setRefreshKey] = useState(0);
   const [isPolling, setIsPolling] = useState(true);
+  const [data, setData] = useState<
+    undefined | null | WorkflowStatusSubscription$data
+  >(undefined);
+
+  console.log("data changed!!");
+  if (onWorkflowDataChange !== undefined) {
+    onWorkflowDataChange(data);
+  }
 
   // Parse visit string using existing utility functions
   const parseVisit = (visitStr: string): Visit => {
@@ -318,6 +343,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
           Refreshing every 2 seconds...
         </Typography>
       )}
+      <Child parsedVisit={parsedVisit} workflow={workflow} setData={setData} />
     </Box>
   );
 };
