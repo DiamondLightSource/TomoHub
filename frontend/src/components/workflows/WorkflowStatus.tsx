@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from "react";
-import { graphql, useSubscription } from "react-relay";
 import {
   Box,
   Typography,
@@ -14,114 +13,8 @@ import {
   visitRegex,
   regexToVisit,
 } from "@diamondlightsource/sci-react-ui";
-import {
-  WorkflowStatusSubscription$data,
-  WorkflowStatusSubscription as WorkflowStatusSubscriptionType,
-} from "./__generated__/WorkflowStatusSubscription.graphql";
-import { GraphQLSubscriptionConfig } from "relay-runtime";
-
-// test subscription on existing workflow
-const subscription = graphql`
-  subscription WorkflowStatusSubscription($visit: VisitInput!, $name: String!) {
-    workflow(visit: $visit, name: $name) {
-      status {
-        __typename
-        ... on WorkflowPendingStatus {
-          message
-        }
-        ... on WorkflowRunningStatus {
-          startTime
-          message
-          tasks {
-            id
-            name
-            status
-            depends
-            dependencies
-            stepType
-            artifacts {
-              name
-              url
-              mimeType
-            }
-          }
-        }
-        ... on WorkflowSucceededStatus {
-          startTime
-          endTime
-          message
-          tasks {
-            id
-            name
-            status
-            depends
-            dependencies
-            stepType
-            artifacts {
-              name
-              url
-              mimeType
-            }
-          }
-        }
-        ... on WorkflowFailedStatus {
-          startTime
-          endTime
-          message
-          tasks {
-            id
-            name
-            status
-            depends
-            dependencies
-            stepType
-            artifacts {
-              name
-              url
-              mimeType
-            }
-          }
-        }
-        ... on WorkflowErroredStatus {
-          startTime
-          endTime
-          message
-          tasks {
-            id
-            name
-            status
-            depends
-            dependencies
-            stepType
-            artifacts {
-              name
-              url
-              mimeType
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-interface ChildProps {
-  parsedVisit: Visit;
-  workflow: string;
-  setData: React.Dispatch<
-    React.SetStateAction<WorkflowStatusSubscription$data | null | undefined>
-  >;
-}
-const Child = React.memo(({ parsedVisit, workflow, setData }: ChildProps) => {
-  console.log("refreshing child component");
-  const subscriptionConfig: GraphQLSubscriptionConfig<WorkflowStatusSubscriptionType> =
-    {
-      variables: { visit: parsedVisit, name: workflow },
-      subscription: subscription,
-      onNext: setData,
-    };
-  useSubscription(subscriptionConfig);
-  return <p>this</p>;
-});
+import { WorkflowSubscriptionHandlerSubscription$data } from "./__generated__/WorkflowSubscriptionHandlerSubscription.graphql";
+import WorkflowSubscriptionHandler from "./WorkflowSubscriptionHandler";
 
 interface WorkflowStatusProps {
   workflow: string;
@@ -136,7 +29,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
 }) => {
   const [isPolling, setIsPolling] = useState(true);
   const [data, setData] = useState<
-    undefined | null | WorkflowStatusSubscription$data
+    undefined | null | WorkflowSubscriptionHandlerSubscription$data
   >(undefined);
 
   console.log("data changed!!");
@@ -343,7 +236,11 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
           Refreshing every 2 seconds...
         </Typography>
       )}
-      <Child parsedVisit={parsedVisit} workflow={workflow} setData={setData} />
+      <WorkflowSubscriptionHandler
+        parsedVisit={parsedVisit}
+        workflow={workflow}
+        setData={setData}
+      />
     </Box>
   );
 };
