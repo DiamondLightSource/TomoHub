@@ -129,6 +129,8 @@ export default function SubmissionFormRawProjections({
               onClick={() => {
                 setWorkflowSubmitted(false);
                 setRetryButtonVisible(false);
+                setSubmittedVisit(undefined);
+                setWorkflowName(undefined);
               }}
               variant={"outlined"}
             >
