@@ -117,7 +117,28 @@ export default function SubmissionFormRawProjections({
 
   return (
     <div>
-      {workflowSubmitted || (
+      {workflowSubmitted ? (
+        <div>
+          <WorkflowStatus
+            workflow={workflowName ?? ""}
+            visit={visitToText(submittedVisit)}
+            onWorkflowDataChange={onWorkflowDataChange}
+          />
+          {retryButtonVisible ? (
+            <Button
+              onClick={() => {
+                setWorkflowSubmitted(false);
+                setRetryButtonVisible(false);
+              }}
+              variant={"outlined"}
+            >
+              Refill form
+            </Button>
+          ) : (
+            <p>{zipURL}</p>
+          )}
+        </div>
+      ) : (
         <div>
           <TextField
             label="Input"
@@ -150,28 +171,6 @@ export default function SubmissionFormRawProjections({
             submitButton={true}
           />
         </div>
-      )}
-      {!workflowSubmitted ||
-        workflowName === undefined ||
-        submittedVisit === undefined || (
-          <WorkflowStatus
-            workflow={workflowName}
-            visit={visitToText(submittedVisit)}
-            onWorkflowDataChange={onWorkflowDataChange}
-          />
-        )}
-      {!retryButtonVisible ? (
-        <p>{zipURL}</p>
-      ) : (
-        <Button
-          onClick={() => {
-            setWorkflowSubmitted(false);
-            setRetryButtonVisible(false);
-          }}
-          variant={"outlined"}
-        >
-          Refill form
-        </Button>
       )}
     </div>
   );
