@@ -117,10 +117,10 @@ export default function SubmissionFormRawProjections({
 
   return (
     <div>
-      {workflowSubmitted ? (
+      {workflowSubmitted && workflowName !== undefined ? (
         <div>
           <WorkflowStatus
-            workflow={workflowName ?? ""}
+            workflow={workflowName}
             visit={visitToText(submittedVisit)}
             onWorkflowDataChange={onWorkflowDataChange}
           />
