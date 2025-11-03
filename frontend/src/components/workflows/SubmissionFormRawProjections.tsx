@@ -1,12 +1,18 @@
 import ParameterSweepForm from "./sweepPipeline/ParameterSweepForm";
 import WorkflowParametersForm from "./WorkflowParametersForm";
 import { SweepValues } from "./sweepPipeline/ParameterSweepForm";
-import { TextField, Typography } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 import { WorkflowParamsValues } from "./WorkflowParametersForm";
-import { Visit, VisitInput } from "@diamondlightsource/sci-react-ui";
+import {
+  Visit,
+  VisitInput,
+  visitToText,
+} from "@diamondlightsource/sci-react-ui";
 import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionFormSharedFragment.graphql";
 import { JSONObject } from "../../types";
 import { useState } from "react";
+import WorkflowStatus from "./WorkflowStatus";
+import { WorkflowStatusQuery$data } from "./__generated__/WorkflowStatusQuery.graphql";
 
 interface SubmissionFormRawProjectionsProps {
   template: SubmissionFormSharedFragment$key;
@@ -25,6 +31,16 @@ export default function SubmissionFormRawProjections({
   visit,
   onSubmit: submitWorkflow,
 }: SubmissionFormRawProjectionsProps) {
+  const [workflowSubmitted, setWorkflowSubmitted] = useState(false);
+  const [retryButtonVisible, setRetryButtonVisible] = useState(false);
+
+  const [workflowName, setWorkflowName] = useState<undefined | string>(
+    undefined
+  );
+  const [submittedVisit, setSubmittedVisit] = useState<undefined | Visit>(
+    undefined
+  );
+  const [zipURL, setZipURL] = useState<string | undefined>(undefined);
   const [inputFormValue, setInputFormValue] = useState<string>("");
   const [sweepFormValue, setSweepFormValue] = useState<SweepValues>({
     start: 100,
@@ -41,6 +57,7 @@ export default function SubmissionFormRawProjections({
     });
 
   function onRawProjectionsFormSubmit(visit: Visit) {
+    setSubmittedVisit(visit);
     let indices = "";
     const start: number =
       sweepFormValue.start === "" ? 100 : sweepFormValue.start;
@@ -62,42 +79,101 @@ export default function SubmissionFormRawProjections({
       "projection-indices": indices,
       "output-filename": wfparamFormValue.output,
     };
-    // TODO: add on success function as final paramter (load data and set data loaded to true)
-    submitWorkflow(visit, parameters);
+
+    function workflowSuccessfullySubmitted(submittedWorkflowName: string) {
+      setWorkflowName(submittedWorkflowName);
+      setWorkflowSubmitted(true);
+    }
+
+    submitWorkflow(visit, parameters, workflowSuccessfullySubmitted);
+  }
+
+  function onWorkflowDataChange(data: WorkflowStatusQuery$data) {
+    const c = data.workflow.status;
+    if (c === null || c === undefined) {
+      return;
+    }
+    if (
+      c.__typename === "WorkflowErroredStatus" ||
+      c.__typename === "WorkflowFailedStatus"
+    ) {
+      setRetryButtonVisible(true);
+      return;
+    }
+    setRetryButtonVisible(false);
+
+    if ("tasks" in c) {
+      const zipFilesList = c.tasks[0].artifacts.filter(
+        (a) => a.name === "projections.zip"
+      );
+      if (zipFilesList.length !== 0) {
+        setZipURL(
+          c.tasks[0].artifacts.filter((a) => a.name === "projections.zip")[0]
+            .url
+        );
+      }
+    }
   }
 
   return (
     <div>
-      <TextField
-        label="Input"
-        type="string"
-        fullWidth
-        size="small"
-        onChange={(e) => {
-          setInputFormValue(e.target.value);
-        }}
-      />
-      <Typography variant="h6" sx={{ mt: 2 }}>
-        Frames to Crop
-      </Typography>
-      <ParameterSweepForm
-        values={sweepFormValue}
-        onChange={setSweepFormValue}
-      />
-      <Typography variant="h6" sx={{ mt: 2 }}>
-        Workflow Parameters
-      </Typography>
-      <WorkflowParametersForm
-        values={wfparamFormValue}
-        onChange={setWFParamFormValue}
-      />
-      <VisitInput
-        visit={visit}
-        onSubmit={onRawProjectionsFormSubmit}
-        parameters={prepopulatedParameters}
-        submitOnReturn={false}
-        submitButton={true}
-      />
+      {workflowSubmitted && workflowName !== undefined ? (
+        <div>
+          <WorkflowStatus
+            workflow={workflowName}
+            visit={visitToText(submittedVisit)}
+            onWorkflowDataChange={onWorkflowDataChange}
+          />
+          {retryButtonVisible ? (
+            <Button
+              onClick={() => {
+                setWorkflowSubmitted(false);
+                setRetryButtonVisible(false);
+                setSubmittedVisit(undefined);
+                setWorkflowName(undefined);
+              }}
+              variant={"outlined"}
+            >
+              Refill form
+            </Button>
+          ) : (
+            <p>{zipURL}</p>
+          )}
+        </div>
+      ) : (
+        <div>
+          <TextField
+            label="Input"
+            type="string"
+            fullWidth
+            size="small"
+            onChange={(e) => {
+              setInputFormValue(e.target.value);
+            }}
+          />
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            Frames to Crop
+          </Typography>
+          <ParameterSweepForm
+            values={sweepFormValue}
+            onChange={setSweepFormValue}
+          />
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            Workflow Parameters
+          </Typography>
+          <WorkflowParametersForm
+            values={wfparamFormValue}
+            onChange={setWFParamFormValue}
+          />
+          <VisitInput
+            visit={visit}
+            onSubmit={onRawProjectionsFormSubmit}
+            parameters={prepopulatedParameters}
+            submitOnReturn={false}
+            submitButton={true}
+          />
+        </div>
+      )}
     </div>
   );
 }
