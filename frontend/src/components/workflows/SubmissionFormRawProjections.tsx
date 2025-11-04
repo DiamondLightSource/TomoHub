@@ -89,9 +89,7 @@ export default function SubmissionFormRawProjections({
     submitWorkflow(visit, parameters, workflowSuccessfullySubmitted);
   }
 
-  function onWorkflowDataChange(
-    data: WorkflowSubscriptionHandlerSubscription$data
-  ) {
+  function onWorkflowDataChange(data: WorkflowStatusSubscription$data) {
     const c = data.workflow.status;
     if (c === null || c === undefined) {
       return;

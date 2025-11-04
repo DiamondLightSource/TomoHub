@@ -13,8 +13,96 @@ import {
   visitRegex,
   regexToVisit,
 } from "@diamondlightsource/sci-react-ui";
-import { WorkflowSubscriptionHandlerSubscription$data } from "./__generated__/WorkflowSubscriptionHandlerSubscription.graphql";
-import WorkflowSubscriptionHandler from "./WorkflowSubscriptionHandler";
+import { graphql, GraphQLSubscriptionConfig } from "relay-runtime";
+import { useSubscription } from "react-relay";
+import {
+  WorkflowStatusSubscription as WorkflowStatusSubscriptionType,
+  WorkflowStatusSubscription$data,
+} from "./__generated__/WorkflowStatusSubscription.graphql";
+
+const subscription = graphql`
+  subscription WorkflowStatusSubscription($visit: VisitInput!, $name: String!) {
+    workflow(visit: $visit, name: $name) {
+      status {
+        __typename
+        ... on WorkflowPendingStatus {
+          message
+        }
+        ... on WorkflowRunningStatus {
+          startTime
+          message
+          tasks {
+            id
+            name
+            status
+            depends
+            dependencies
+            stepType
+            artifacts {
+              name
+              url
+              mimeType
+            }
+          }
+        }
+        ... on WorkflowSucceededStatus {
+          startTime
+          endTime
+          message
+          tasks {
+            id
+            name
+            status
+            depends
+            dependencies
+            stepType
+            artifacts {
+              name
+              url
+              mimeType
+            }
+          }
+        }
+        ... on WorkflowFailedStatus {
+          startTime
+          endTime
+          message
+          tasks {
+            id
+            name
+            status
+            depends
+            dependencies
+            stepType
+            artifacts {
+              name
+              url
+              mimeType
+            }
+          }
+        }
+        ... on WorkflowErroredStatus {
+          startTime
+          endTime
+          message
+          tasks {
+            id
+            name
+            status
+            depends
+            dependencies
+            stepType
+            artifacts {
+              name
+              url
+              mimeType
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 
 type StatusType =
   | "WorkflowSucceededStatus"
@@ -77,7 +165,7 @@ function getStatusText(status: string) {
 }
 
 function getLogArtifacts(
-  data: WorkflowSubscriptionHandlerSubscription$data | null | undefined,
+  data: WorkflowStatusSubscription$data | null | undefined,
   statusType: StatusType
 ) {
   if (!data?.workflow?.status || !("tasks" in data.workflow.status)) {
@@ -118,9 +206,7 @@ function getLogArtifacts(
 interface WorkflowStatusProps {
   workflow: string;
   visit: string;
-  onWorkflowDataChange?: (
-    data: WorkflowSubscriptionHandlerSubscription$data
-  ) => void;
+  onWorkflowDataChange?: (data: WorkflowStatusSubscription$data) => void;
 }
 
 const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
@@ -130,7 +216,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
 }) => {
   const [workflowFinished, setWorkflowFinished] = useState(false);
   const [data, setData] = useState<
-    undefined | null | WorkflowSubscriptionHandlerSubscription$data
+    undefined | null | WorkflowStatusSubscription$data
   >(undefined);
 
   // the subscriptionHandler component will change data when it receives some
@@ -167,6 +253,17 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
     setWorkflowFinished(true);
     // TODO: clean up the subscription here??? (stop subscribing, delete objects?)
   }
+
+  const subscriptionConfig: GraphQLSubscriptionConfig<WorkflowStatusSubscriptionType> =
+    useMemo(() => {
+      return {
+        variables: { visit: parsedVisit, name: workflow },
+        subscription: subscription,
+        onNext: setData,
+      };
+    }, [parsedVisit, workflow, setData]);
+
+  useSubscription(subscriptionConfig);
 
   return (
     <Box
@@ -247,12 +344,6 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
           <Typography variant="body2">{message}</Typography>
         </Box>
       )}
-
-      <WorkflowSubscriptionHandler
-        parsedVisit={parsedVisit}
-        workflow={workflow}
-        setData={setData}
-      />
     </Box>
   );
 };
