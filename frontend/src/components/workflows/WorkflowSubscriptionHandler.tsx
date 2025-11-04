@@ -8,8 +8,6 @@ import {
 } from "./__generated__/WorkflowSubscriptionHandlerSubscription.graphql";
 import { Box } from "@mui/material";
 
-// this subscription is a bit overkill with all the fields it requests
-// however, it is necessary to preserve the original functionality of the WorkflowStatus component
 const subscription = graphql`
   subscription WorkflowSubscriptionHandlerSubscription(
     $visit: VisitInput!
@@ -109,6 +107,7 @@ interface WorkflowSubscriptionHandlerProps {
 const WorkflowSubscriptionHandler: React.FC<WorkflowSubscriptionHandlerProps> =
   // memo so it doesnt re-render unless any of the props change
   // this is why its important to memoise any props going in if they are objects (parsedVisit)
+  // (a bit of an abuse of memo)
   React.memo(
     ({ parsedVisit, workflow, setData }: WorkflowSubscriptionHandlerProps) => {
       console.log("refreshing child component");

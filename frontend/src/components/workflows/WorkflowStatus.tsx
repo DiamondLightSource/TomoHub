@@ -133,9 +133,9 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
     undefined | null | WorkflowSubscriptionHandlerSubscription$data
   >(undefined);
 
-  // the subscriptionHandler component will change data when it recieves some
+  // the subscriptionHandler component will change data when it receives some
   // this will trigger a re-render
-  // every variable that depends on data should be automatically be refreshed with the workflow
+  // every variable that depends on data should automatically be refreshed with the workflow
 
   useEffect(() => {
     if (
@@ -147,7 +147,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
     }
   }, [onWorkflowDataChange, data]);
 
-  // if parsedVisit is changed the subscriptionHanlder object is re-rendered, creating a new subscription
+  // if parsedVisit is changed the subscriptionHandler object is re-rendered, creating a new subscription
   // we useMemo so a new object is not created every re-render of this component
   const parsedVisit = useMemo(() => {
     return parseVisit(visit);
