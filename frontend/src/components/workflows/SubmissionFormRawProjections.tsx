@@ -12,7 +12,7 @@ import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionForm
 import { JSONObject } from "../../types";
 import { useState } from "react";
 import WorkflowStatus from "./WorkflowStatus";
-import { WorkflowSubscriptionHandlerSubscription$data } from "./__generated__/WorkflowSubscriptionHandlerSubscription.graphql";
+import { WorkflowStatusSubscription$data } from "./__generated__/WorkflowStatusSubscription.graphql";
 
 interface SubmissionFormRawProjectionsProps {
   template: SubmissionFormSharedFragment$key;
