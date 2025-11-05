@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { graphql, useLazyLoadQuery } from "react-relay";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Typography,
@@ -14,17 +13,16 @@ import {
   visitRegex,
   regexToVisit,
 } from "@diamondlightsource/sci-react-ui";
-import { WorkflowStatusQuery as WorkflowStatusQueryType } from "./__generated__/WorkflowStatusQuery.graphql";
+import { graphql, GraphQLSubscriptionConfig } from "relay-runtime";
+import { useSubscription } from "react-relay";
+import {
+  WorkflowStatusSubscription as WorkflowStatusSubscriptionType,
+  WorkflowStatusSubscription$data,
+} from "./__generated__/WorkflowStatusSubscription.graphql";
 
-const workflowStatusQuery = graphql`
-  query WorkflowStatusQuery($visit: VisitInput!, $name: String!) {
+const subscription = graphql`
+  subscription WorkflowStatusSubscription($visit: VisitInput!, $name: String!) {
     workflow(visit: $visit, name: $name) {
-      name
-      visit {
-        proposalCode
-        proposalNumber
-        number
-      }
       status {
         __typename
         ... on WorkflowPendingStatus {
@@ -106,10 +104,109 @@ const workflowStatusQuery = graphql`
   }
 `;
 
+type StatusType =
+  | "WorkflowSucceededStatus"
+  | "WorkflowFailedStatus"
+  | "WorkflowErroredStatus"
+  | "WorkflowPendingStatus"
+  | "WorkflowRunningStatus"
+  | "%other"
+  | "Unknown";
+
+function parseVisit(visitStr: string): Visit {
+  const match = visitRegex.exec(visitStr);
+  if (!match) {
+    throw new Error(
+      `Invalid visit format: ${visitStr}. Expected format: xx12345-1`
+    );
+  }
+  return regexToVisit(match);
+}
+
+function isFinalStatus(status: string) {
+  return [
+    "WorkflowSucceededStatus",
+    "WorkflowFailedStatus",
+    "WorkflowErroredStatus",
+  ].includes(status);
+}
+
+function getStatusColor(status: string) {
+  switch (status) {
+    case "WorkflowPendingStatus":
+      return "warning";
+    case "WorkflowRunningStatus":
+      return "info";
+    case "WorkflowSucceededStatus":
+      return "success";
+    case "WorkflowFailedStatus":
+    case "WorkflowErroredStatus":
+      return "error";
+    default:
+      return "default";
+  }
+}
+
+function getStatusText(status: string) {
+  switch (status) {
+    case "WorkflowPendingStatus":
+      return "Pending";
+    case "WorkflowRunningStatus":
+      return "Running";
+    case "WorkflowSucceededStatus":
+      return "Succeeded";
+    case "WorkflowFailedStatus":
+      return "Failed";
+    case "WorkflowErroredStatus":
+      return "Error";
+    default:
+      return "Unknown";
+  }
+}
+
+function getLogArtifacts(
+  data: WorkflowStatusSubscription$data | null | undefined,
+  statusType: StatusType
+) {
+  if (!data?.workflow?.status || !("tasks" in data.workflow.status)) {
+    return [];
+  }
+
+  const finalStatuses = [
+    "WorkflowSucceededStatus",
+    "WorkflowFailedStatus",
+    "WorkflowErroredStatus",
+  ];
+  if (!finalStatuses.includes(statusType)) {
+    return [];
+  }
+
+  const tasks = (data.workflow.status as any).tasks || [];
+
+  return tasks
+    .filter((task: any) => task.stepType === "Pod")
+    .map((task: any) => {
+      // Find main.log artifact
+      const logArtifact = task.artifacts?.find(
+        (artifact: any) =>
+          artifact.name === "main.log" && artifact.mimeType === "text/plain"
+      );
+
+      return logArtifact
+        ? {
+            taskName: task.name,
+            url: logArtifact.url,
+            name: logArtifact.name,
+          }
+        : null;
+    })
+    .filter(Boolean); // Remove null entries
+}
+
 interface WorkflowStatusProps {
   workflow: string;
   visit: string;
-  onWorkflowDataChange?: (data: any) => void;
+  onWorkflowDataChange?: (data: WorkflowStatusSubscription$data) => void;
 }
 
 const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
@@ -117,149 +214,56 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
   visit,
   onWorkflowDataChange,
 }) => {
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [isPolling, setIsPolling] = useState(true);
+  const [workflowFinished, setWorkflowFinished] = useState(false);
+  const [data, setData] = useState<
+    undefined | null | WorkflowStatusSubscription$data
+  >(undefined);
 
-  // Parse visit string using existing utility functions
-  const parseVisit = (visitStr: string): Visit => {
-    const match = visitRegex.exec(visitStr);
-    if (!match) {
-      throw new Error(
-        `Invalid visit format: ${visitStr}. Expected format: xx12345-1`
-      );
+  // the subscriptionHandler component will change data when it receives some
+  // this will trigger a re-render
+  // every variable that depends on data should automatically be refreshed with the workflow
+
+  useEffect(() => {
+    if (
+      onWorkflowDataChange !== undefined &&
+      data !== null &&
+      data !== undefined
+    ) {
+      onWorkflowDataChange(data);
     }
-    return regexToVisit(match);
-  };
+  }, [onWorkflowDataChange, data]);
 
-  const parsedVisit = parseVisit(visit);
+  // if parsedVisit is changed the subscriptionHandler object is re-rendered, creating a new subscription
+  // we useMemo so a new object is not created every re-render of this component
+  const parsedVisit = useMemo(() => {
+    return parseVisit(visit);
+  }, [visit]);
 
-  // GraphQL query - always called at top level
-  const data = useLazyLoadQuery<WorkflowStatusQueryType>(
-    workflowStatusQuery,
-    {
-      visit: parsedVisit,
-      name: workflow,
-    },
-    {
-      fetchKey: refreshKey,
-      fetchPolicy: "network-only",
-    }
-  );
-
-  const statusType = data?.workflow?.status?.__typename ?? "Unknown";
+  const statusType: StatusType =
+    data?.workflow?.status?.__typename ?? "Unknown";
 
   const message =
     data?.workflow?.status && "message" in data.workflow.status
       ? data.workflow.status.message
       : undefined;
 
-  // Check if status is final (no need to keep polling)
-  const isFinalStatus = (status: string) => {
-    return [
-      "WorkflowSucceededStatus",
-      "WorkflowFailedStatus",
-      "WorkflowErroredStatus",
-    ].includes(status);
-  };
+  const logArtifacts = getLogArtifacts(data, statusType);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "WorkflowPendingStatus":
-        return "warning";
-      case "WorkflowRunningStatus":
-        return "info";
-      case "WorkflowSucceededStatus":
-        return "success";
-      case "WorkflowFailedStatus":
-      case "WorkflowErroredStatus":
-        return "error";
-      default:
-        return "default";
-    }
-  };
+  if (isFinalStatus(statusType) && !workflowFinished) {
+    setWorkflowFinished(true);
+    // TODO: clean up the subscription here??? (stop subscribing, delete objects?)
+  }
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "WorkflowPendingStatus":
-        return "Pending";
-      case "WorkflowRunningStatus":
-        return "Running";
-      case "WorkflowSucceededStatus":
-        return "Succeeded";
-      case "WorkflowFailedStatus":
-        return "Failed";
-      case "WorkflowErroredStatus":
-        return "Error";
-      default:
-        return "Unknown";
-    }
-  };
+  const subscriptionConfig: GraphQLSubscriptionConfig<WorkflowStatusSubscriptionType> =
+    useMemo(() => {
+      return {
+        variables: { visit: parsedVisit, name: workflow },
+        subscription: subscription,
+        onNext: setData,
+      };
+    }, [parsedVisit, workflow, setData]);
 
-  const getLogArtifacts = () => {
-    if (!data?.workflow?.status || !("tasks" in data.workflow.status)) {
-      return [];
-    }
-
-    const finalStatuses = [
-      "WorkflowSucceededStatus",
-      "WorkflowFailedStatus",
-      "WorkflowErroredStatus",
-    ];
-    if (!finalStatuses.includes(statusType)) {
-      return [];
-    }
-
-    const tasks = (data.workflow.status as any).tasks || [];
-
-    return tasks
-      .filter((task: any) => task.stepType === "Pod")
-      .map((task: any) => {
-        // Find main.log artifact
-        const logArtifact = task.artifacts?.find(
-          (artifact: any) =>
-            artifact.name === "main.log" && artifact.mimeType === "text/plain"
-        );
-
-        return logArtifact
-          ? {
-              taskName: task.name,
-              url: logArtifact.url,
-              name: logArtifact.name,
-            }
-          : null;
-      })
-      .filter(Boolean); // Remove null entries
-  };
-
-  const logArtifacts = getLogArtifacts();
-
-  // Polling effect
-  useEffect(() => {
-    if (!isPolling || isFinalStatus(statusType)) {
-      setIsPolling(false);
-      return;
-    }
-
-    const interval = setInterval(() => {
-      setRefreshKey((prev) => prev + 1);
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, [statusType, isPolling]);
-
-  // Stop polling when status becomes final
-  useEffect(() => {
-    if (isFinalStatus(statusType)) {
-      setIsPolling(false);
-    }
-  }, [statusType]);
-
-  // useEffect to pass data back to parent
-  useEffect(() => {
-    if (onWorkflowDataChange && data) {
-      onWorkflowDataChange(data);
-    }
-  }, [data, onWorkflowDataChange]);
+  useSubscription(subscriptionConfig);
 
   return (
     <Box
@@ -274,7 +278,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
         <Typography variant="h6">Workflow Status</Typography>
-        {isPolling && <CircularProgress size={16} />}
+        {!workflowFinished && <CircularProgress size={16} />}
       </Box>
 
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
@@ -339,16 +343,6 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
           </Typography>
           <Typography variant="body2">{message}</Typography>
         </Box>
-      )}
-
-      {isPolling && (
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ mt: 1, display: "block" }}
-        >
-          Refreshing every 2 seconds...
-        </Typography>
       )}
     </Box>
   );

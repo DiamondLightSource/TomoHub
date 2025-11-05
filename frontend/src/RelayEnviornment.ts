@@ -4,10 +4,15 @@ import {
   RecordSource,
   Store,
   FetchFunction,
+  Observable,
+  SubscribeFunction,
+  GraphQLResponse,
 } from "relay-runtime";
 import keycloak from "./keycloak";
+import { createClient } from "graphql-ws";
 
 const HTTP_ENDPOINT = "https://workflows.diamond.ac.uk/graphql";
+const WS_ENDPOINT = "wss://workflows.diamond.ac.uk/graphql/ws";
 
 const fetchFn: FetchFunction = async (request, variables) => {
   // Refresh token if needed (minValidity in seconds)
@@ -37,9 +42,66 @@ const fetchFn: FetchFunction = async (request, variables) => {
   }
 };
 
+let kcinitPromise: Promise<boolean> | null = null;
+
+// needed to prevent repeated refresh of page when using subscriptions
+function ensureKeycloakInit(): Promise<boolean> {
+  if (!kcinitPromise) {
+    kcinitPromise = keycloak
+      .init({
+        onLoad: "login-required",
+      })
+      .catch((err: unknown) => {
+        console.error("Keycloak init failed", err);
+        return false;
+      });
+  }
+  return kcinitPromise;
+}
+
+export const wsClient = createClient({
+  url: WS_ENDPOINT,
+  connectionParams: async () => {
+    if (!keycloak.authenticated) {
+      await ensureKeycloakInit();
+    }
+    return {
+      Authorization: `Bearer ${keycloak.token ?? ""}`,
+    };
+  },
+});
+
+const subscribe: SubscribeFunction = (operation, variables) => {
+  return Observable.create((sink) => {
+    const cleanup = wsClient.subscribe(
+      {
+        operationName: operation.name,
+        query: operation.text ?? "",
+        variables,
+      },
+      {
+        next: (response) => {
+          const data = response.data;
+          if (data) {
+            sink.next({ data } as GraphQLResponse);
+          } else if (data == null) {
+            console.warn("Data is null:", response);
+          } else {
+            console.error("Subscription error response:", response);
+            sink.error(new Error("Subscription response missing data"));
+          }
+        },
+        error: sink.error.bind(sink),
+        complete: sink.complete.bind(sink),
+      }
+    );
+    return cleanup;
+  });
+};
+
 function createRelayEnvironment() {
   return new Environment({
-    network: Network.create(fetchFn),
+    network: Network.create(fetchFn, subscribe),
     store: new Store(new RecordSource()),
   });
 }

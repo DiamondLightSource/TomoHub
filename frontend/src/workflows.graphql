@@ -1,396 +1,859 @@
-type Artifact {
-	"""
-	The file name of the artifact
-	"""
-	name: String!
-	"""
-	The download URL for the artifact
-	"""
-	url: Url!
-	"""
-	The MIME type of the artifact data
-	"""
-	mimeType: String!
+schema
+  @link(url: "https://specs.apollo.dev/link/v1.0")
+  @link(url: "https://specs.apollo.dev/join/v0.3", for: EXECUTION)
+{
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
 }
 
+directive @join__enumValue(graph: join__Graph!) repeatable on ENUM_VALUE
 
-"""
-Implement the DateTime<Utc> scalar
+directive @join__field(graph: join__Graph, requires: join__FieldSet, provides: join__FieldSet, type: String, external: Boolean, override: String, usedOverridden: Boolean) repeatable on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
 
-The input/output is a string in RFC3339 format.
-"""
+directive @join__graph(name: String!, url: String!) on ENUM_VALUE
+
+directive @join__implements(graph: join__Graph!, interface: String!) repeatable on OBJECT | INTERFACE
+
+directive @join__type(graph: join__Graph!, key: join__FieldSet, extension: Boolean! = false, resolvable: Boolean! = true, isInterfaceObject: Boolean! = false) repeatable on OBJECT | INTERFACE | UNION | ENUM | INPUT_OBJECT | SCALAR
+
+directive @join__unionMember(graph: join__Graph!, member: String!) repeatable on UNION
+
+directive @link(url: String, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
+
+type Account
+  @join__type(graph: INSTRUMENT_SESSIONS)
+{
+  accountId: Int!
+  username: String!
+  emailAddress: String
+  title: String
+  givenName: String
+  familyName: String
+  type: AccountType!
+  state: AccountState!
+  proposalRoles: [ProposalAccount!]!
+  instrumentSessionRoles: [InstrumentSessionRole!]!
+}
+
+enum AccountState
+  @join__type(graph: INSTRUMENT_SESSIONS)
+{
+  enabled @join__enumValue(graph: INSTRUMENT_SESSIONS)
+  disabled @join__enumValue(graph: INSTRUMENT_SESSIONS)
+}
+
+enum AccountType
+  @join__type(graph: INSTRUMENT_SESSIONS)
+{
+  user @join__enumValue(graph: INSTRUMENT_SESSIONS)
+  staff @join__enumValue(graph: INSTRUMENT_SESSIONS)
+  functional @join__enumValue(graph: INSTRUMENT_SESSIONS)
+}
+
+input AddSampleEventInput
+  @join__type(graph: SAMPLES)
+{
+  description: String!
+}
+
+type Artifact
+  @join__type(graph: WORKFLOWS)
+{
+  """The file name of the artifact"""
+  name: String!
+
+  """The download URL for the artifact"""
+  url: Url!
+
+  """The MIME type of the artifact data"""
+  mimeType: String!
+}
+
+input CreateOrValidateSampleInput
+  @join__type(graph: SAMPLES)
+{
+  """URL of the JSON schema the samples' `data` should be validated against"""
+  dataSchemaUrl: String!
+
+  """Number of the proposal the samples should be associated with"""
+  proposalNumber: Int!
+
+  """Number of the instrument session the samples should be associated with"""
+  instrumentSessionNumber: Int!
+
+  """Samples to be created"""
+  samples: [SampleIn!]!
+
+  """
+  Whether or not the provided samples should only be validated and not created
+  """
+  validateOnly: Boolean! = false
+}
+
+input CreateSampleInput
+  @join__type(graph: SAMPLES)
+{
+  proposalNumber: Int!
+  instrumentSessionNumber: Int!
+  samples: [SampleInLegacy!]!
+  validateOnly: Boolean! = false
+}
+
+"""Return type when creating or validating samples"""
+type CreateSamplesResponse
+  @join__type(graph: SAMPLES)
+{
+  """Whether the operation has succeeded without validation errors"""
+  success: Boolean!
+
+  """Samples that have been created"""
+  samples: [Sample!]!
+
+  """Errors that occurred during sample validation"""
+  errors: [SampleValidationError!]!
+}
+
+scalar Creator
+  @join__type(graph: WORKFLOWS)
+
+"""Date with time (isoformat)"""
 scalar DateTime
+  @join__type(graph: INSTRUMENT_SESSIONS)
+  @join__type(graph: SAMPLES)
+  @join__type(graph: WORKFLOWS)
 
+input DatetimeOperatorInput
+  @join__type(graph: SAMPLES)
+{
+  """
+  Will filter to items where the `DateTime` field is greater than (i.e. after) the provided value
+  """
+  gt: DateTime = null
 
+  """
+  Will filter to items where the `DateTime` field is less than (i.e. before) the provided value
+  """
+  lt: DateTime = null
+}
 
+"""The details of sample validation error"""
+type ErrorDetails
+  @join__type(graph: SAMPLES)
+{
+  """The type of error that occurred"""
+  type: String!
+
+  """
+  Tuple of strings identifying where in the sample schema the error occurred.
+  """
+  location: [String!]!
+
+  """A human readable error message."""
+  message: String!
+}
+
+type Instrument
+  @join__type(graph: INSTRUMENT_SESSIONS)
+{
+  name: String!
+  scienceGroup: String
+  description: String
+  proposals: [Proposal!]!
+  instrumentSessions: [InstrumentSession!]!
+}
+
+type InstrumentSession
+  @join__type(graph: INSTRUMENT_SESSIONS)
+{
+  instrumentSessionId: Int!
+  instrumentSessionNumber: Int!
+  startTime: DateTime
+  endTime: DateTime
+  type: String
+  state: String
+  riskRating: String
+  proposal: Proposal
+  instrument: Instrument!
+  roles: [InstrumentSessionRole!]!
+}
+
+type InstrumentSessionRole
+  @join__type(graph: INSTRUMENT_SESSIONS)
+{
+  instrumentSession: InstrumentSession!
+  account: Account!
+  role: String!
+  onSite: Boolean!
+}
+
+scalar join__FieldSet
+
+enum join__Graph {
+  INSTRUMENT_SESSIONS @join__graph(name: "instrument_sessions", url: "https://instrument-sessions.diamond.ac.uk/api/graphql")
+  SAMPLES @join__graph(name: "samples", url: "https://sample-information.diamond.ac.uk/api/graphql")
+  WORKFLOWS @join__graph(name: "workflows", url: "https://workflows.diamond.ac.uk/graphql")
+}
 
 """
-A scalar that can represent any JSON value.
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](https://ecma-international.org/wp-content/uploads/ECMA-404_2nd_edition_december_2017.pdf).
 """
 scalar JSON
+  @join__type(graph: SAMPLES)
+  @join__type(graph: WORKFLOWS)
+  @specifiedBy(url: "https://ecma-international.org/wp-content/uploads/ECMA-404_2nd_edition_december_2017.pdf")
 
-"""
-A scalar that can represent any JSON Object value.
-"""
+"""A scalar that can represent any JSON Object value."""
 scalar JSONObject
+  @join__type(graph: WORKFLOWS)
 
-"""
-The root mutation of the service
-"""
-type Mutation {
-	submitWorkflowTemplate(name: String!, visit: VisitInput!, parameters: JSON!): Workflow!
+scalar link__Import
+
+enum link__Purpose {
+  """
+  `SECURITY` features provide metadata necessary to securely resolve fields.
+  """
+  SECURITY
+
+  """
+  `EXECUTION` features provide metadata necessary for operation execution.
+  """
+  EXECUTION
 }
 
-"""
-Information about pagination in a connection
-"""
-type PageInfo @shareable {
-	"""
-	When paginating backwards, are there more items?
-	"""
-	hasPreviousPage: Boolean!
-	"""
-	When paginating forwards, are there more items?
-	"""
-	hasNextPage: Boolean!
-	"""
-	When paginating backwards, the cursor to continue.
-	"""
-	startCursor: String
-	"""
-	When paginating forwards, the cursor to continue.
-	"""
-	endCursor: String
+"""A single log line streamed from a pod"""
+type LogEntry
+  @join__type(graph: WORKFLOWS)
+{
+  """The log line content"""
+  content: String!
+
+  """The name of the pod producing the log"""
+  podName: String!
 }
 
-"""
-The root query of the service
-"""
-type Query {
-	"""
-	Get a single [`Workflow`] by proposal, visit, and name
-	"""
-	workflow(visit: VisitInput!, name: String!): Workflow!
-	workflows(visit: VisitInput!, cursor: String, limit: Int, filter: WorkflowFilter): WorkflowConnection!
-	workflowTemplate(name: String!): WorkflowTemplate!
-	workflowTemplates(cursor: String, limit: Int, filter: WorkflowTemplatesFilter): WorkflowTemplateConnection!
+"""The root mutation of the service"""
+type Mutation
+  @join__type(graph: SAMPLES)
+  @join__type(graph: WORKFLOWS)
+{
+  createSamples(input: CreateSampleInput!): [Sample!]! @join__field(graph: SAMPLES) @deprecated(reason: "Will be replaced by createOrValidateSamples")
+  createOrValidateSamples(input: CreateOrValidateSampleInput!): CreateSamplesResponse! @join__field(graph: SAMPLES)
+  sample(sampleId: UUID!): SampleMutations @join__field(graph: SAMPLES)
+  submitWorkflowTemplate(name: String!, visit: VisitInput!, parameters: JSON!): Workflow! @join__field(graph: WORKFLOWS)
 }
 
+"""Information about pagination in a connection"""
+type PageInfo
+  @join__type(graph: SAMPLES)
+  @join__type(graph: WORKFLOWS)
+{
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
 
-type Task {
-	"""
-	Unique name of the task
-	"""
-	id: String!
-	"""
-	Display name of the task
-	"""
-	name: String!
-	"""
-	Current status of a task
-	"""
-	status: TaskStatus!
-	"""
-	Parent of a task
-	"""
-	depends: [String!]!
-	"""
-	Children of a task
-	"""
-	dependencies: [String!]!
-	"""
-	Artifacts produced by a task
-	"""
-	artifacts: [Artifact!]!
-	"""
-	Node type - Pod, DAG, etc
-	"""
-	stepType: String!
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
 }
 
-enum TaskStatus {
-	PENDING
-	RUNNING
-	SUCCEEDED
-	SKIPPED
-	FAILED
-	ERROR
-	OMITTED
+type Proposal
+  @join__type(graph: INSTRUMENT_SESSIONS)
+{
+  proposalNumber: Int!
+  proposalCategory: String
+  title: String
+  summary: String
+  state: ProposalState!
+  instrumentSessions: [InstrumentSession!]!
+  instruments: [Instrument!]!
+  roles: [ProposalAccount!]!
 }
+
+type ProposalAccount
+  @join__type(graph: INSTRUMENT_SESSIONS)
+{
+  proposal: Proposal!
+  account: Account!
+  role: String!
+}
+
+enum ProposalState
+  @join__type(graph: INSTRUMENT_SESSIONS)
+{
+  Open @join__enumValue(graph: INSTRUMENT_SESSIONS)
+  Closed @join__enumValue(graph: INSTRUMENT_SESSIONS)
+  Cancelled @join__enumValue(graph: INSTRUMENT_SESSIONS)
+}
+
+"""The root query of the service"""
+type Query
+  @join__type(graph: INSTRUMENT_SESSIONS)
+  @join__type(graph: SAMPLES)
+  @join__type(graph: WORKFLOWS)
+{
+  """Get a proposal by its number"""
+  proposal(proposalNumber: Int!): Proposal @join__field(graph: INSTRUMENT_SESSIONS)
+
+  """Get a list of proposals"""
+  proposals(proposalCategory: String = null): [Proposal!]! @join__field(graph: INSTRUMENT_SESSIONS)
+
+  """Get a instrument session"""
+  instrumentSession(proposalNumber: Int!, instrumentSessionNumber: Int!): InstrumentSession @join__field(graph: INSTRUMENT_SESSIONS)
+
+  """Get a instrument session"""
+  instrumentSessions(proposalNumber: Int = null, proposalCategory: String = null): [InstrumentSession!] @join__field(graph: INSTRUMENT_SESSIONS)
+
+  """Get an instrument"""
+  instrument(instrumentName: String!): Instrument @join__field(graph: INSTRUMENT_SESSIONS)
+
+  """Get a list of instruments"""
+  instruments(scienceGroup: String = null): [Instrument!]! @join__field(graph: INSTRUMENT_SESSIONS)
+
+  """Get an account"""
+  account(username: String!): Account @join__field(graph: INSTRUMENT_SESSIONS)
+
+  """Get a sample by its id"""
+  sample(sampleId: UUID!): Sample @join__field(graph: SAMPLES)
+
+  """Get a list of samples associated with a given instrument session"""
+  samples(proposalNumber: Int!, instrumentSessionNumber: Int!, first: Int!, filter: SampleFilterInput! = {}, before: String = null, after: String = null, last: Int = null, orderBy: SampleOrder! = {}): SampleConnection! @join__field(graph: SAMPLES)
+
+  """Get a single [`Workflow`] by proposal, visit, and name"""
+  workflow(visit: VisitInput!, name: String!): Workflow! @join__field(graph: WORKFLOWS)
+  workflows(visit: VisitInput!, cursor: String, limit: Int, filter: WorkflowFilter): WorkflowConnection! @join__field(graph: WORKFLOWS)
+  workflowTemplate(name: String!): WorkflowTemplate! @join__field(graph: WORKFLOWS)
+  workflowTemplates(cursor: String, limit: Int, filter: WorkflowTemplatesFilter): WorkflowTemplateConnection! @join__field(graph: WORKFLOWS)
+}
+
+type Sample
+  @join__type(graph: SAMPLES)
+{
+  id: UUID!
+  name: String!
+  data: JSON!
+  createdTime: DateTime!
+  updatedTime: DateTime!
+  dataSchemaUrl: String!
+
+  """Samples from which this sample is derived"""
+  parents(first: Int = null, before: String = null, after: String = null, last: Int = null): SampleConnection!
+
+  """Samples derived from this sample"""
+  children(first: Int = null, before: String = null, after: String = null, last: Int = null): SampleConnection!
+
+  """Events linked to this sample"""
+  events(first: Int = null, before: String = null, after: String = null, last: Int = null): SampleEventConnection!
+
+  """The JSON schema that the sample's `data` conforms to"""
+  dataSchema: JSON!
+}
+
+type SampleConnection
+  @join__type(graph: SAMPLES)
+{
+  edges: [SampleEdge!]!
+  pageInfo: PageInfo!
+}
+
+type SampleEdge
+  @join__type(graph: SAMPLES)
+{
+  cursor: String!
+  node: Sample!
+}
+
+type SampleEvent
+  @join__type(graph: SAMPLES)
+{
+  id: UUID!
+  timestamp: DateTime!
+  description: String!
+}
+
+type SampleEventConnection
+  @join__type(graph: SAMPLES)
+{
+  edges: [SampleEventEdge!]!
+  pageInfo: PageInfo!
+}
+
+type SampleEventEdge
+  @join__type(graph: SAMPLES)
+{
+  cursor: String!
+  node: SampleEvent!
+}
+
+input SampleFilterInput
+  @join__type(graph: SAMPLES)
+{
+  """Filter on the `schemaUrl` field of `Sample`"""
+  schemaUrl: StringOperatorInput = null
+
+  """Filter on the `createdTime` field of `Sample`"""
+  createdTime: DatetimeOperatorInput = null
+
+  """Filter on the `createdTime` field of `Sample`"""
+  updatedTime: DatetimeOperatorInput = null
+
+  """Filter on the `name` field of `Sample`"""
+  name: StringOperatorInput = null
+}
+
+input SampleIn
+  @join__type(graph: SAMPLES)
+{
+  """Name of the sample"""
+  name: String!
+
+  """Data of the sample"""
+  data: JSON!
+}
+
+input SampleInLegacy
+  @join__type(graph: SAMPLES)
+{
+  name: String!
+  data: JSON!
+  dataSchemaUrl: String!
+  parentIds: [Int!] = null
+  children: [SampleInLegacy!] = null
+}
+
+type SampleMutations
+  @join__type(graph: SAMPLES)
+{
+  sampleId: UUID!
+  linkInstrumentSessionToSample(proposalNumber: Int!, instrumentSessionNumber: Int!): Void
+  addSampleEvent(sampleEvent: AddSampleEventInput!): SampleEvent!
+}
+
+input SampleOrder
+  @join__type(graph: SAMPLES)
+{
+  name: SortingOrder = null
+  createdTime: SortingOrder = null
+  updatedTime: SortingOrder = null
+}
+
+"""The details of errors occurred when validating a sample"""
+type SampleValidationError
+  @join__type(graph: SAMPLES)
+{
+  """
+  The index of the sample in CreateSampleInput.samples for which the error occurred
+  """
+  index: Int!
+
+  """Errors that occurred when validating the sample"""
+  errors: [ErrorDetails!]!
+}
+
+"""Supported DLS science groups"""
+enum ScienceGroup
+  @join__type(graph: WORKFLOWS)
+{
+  """Macromolecular Crystallography"""
+  MX @join__enumValue(graph: WORKFLOWS)
+
+  """Workflows Examples"""
+  EXAMPLES @join__enumValue(graph: WORKFLOWS)
+
+  """Magnetic Materials"""
+  MAGNETIC_MATERIALS @join__enumValue(graph: WORKFLOWS)
+
+  """Soft Condensed Matter"""
+  CONDENSED_MATTER @join__enumValue(graph: WORKFLOWS)
+
+  """Imaging and Microscopy"""
+  IMAGING @join__enumValue(graph: WORKFLOWS)
+
+  """Biological Cryo-Imaging"""
+  BIO_CRYO_IMAGING @join__enumValue(graph: WORKFLOWS)
+
+  """Structures and Surfaces"""
+  SURFACES @join__enumValue(graph: WORKFLOWS)
+
+  """Crystallography"""
+  CRYSTALLOGRAPHY @join__enumValue(graph: WORKFLOWS)
+
+  """Spectroscopy"""
+  SPECTROSCOPY @join__enumValue(graph: WORKFLOWS)
+}
+
+enum SortingOrder
+  @join__type(graph: SAMPLES)
+{
+  ASC @join__enumValue(graph: SAMPLES)
+  DESC @join__enumValue(graph: SAMPLES)
+}
+
+"""Conditions used to filter results based on the value of a String field"""
+input StringOperatorInput
+  @join__type(graph: SAMPLES)
+{
+  """
+  Will filter to items where the `String` field is equal to the provided value
+  """
+  eq: String = null
+
+  """
+  Will filter to items where the `String` field is not equal to the provided value
+  """
+  ne: String = null
+
+  """
+  Will filter to items where the `String` field is a member of the provided value
+  """
+  in: [String!] = null
+
+  """
+  Will filter to items where the `String` field is not a member of the provided value
+  """
+  nin: [String!] = null
+
+  """
+  Will filter to items where the `String` field is contains the provided value
+  """
+  contains: String = null
+}
+
+"""The root mutation of the service"""
+type Subscription
+  @join__type(graph: WORKFLOWS)
+{
+  """Processing to subscribe to logs for a single pod of a workflow"""
+  logs(visit: VisitInput!, workflowName: String!, taskId: String!): LogEntry!
+
+  """Processing to subscribe to data for all workflows in a session"""
+  workflow(visit: VisitInput!, name: String!): Workflow!
+}
+
+type Task
+  @join__type(graph: WORKFLOWS)
+{
+  """Unique name of the task"""
+  id: String!
+
+  """Display name of the task"""
+  name: String!
+
+  """Current status of a task"""
+  status: TaskStatus!
+
+  """Parent of a task"""
+  depends: [String!]!
+
+  """Children of a task"""
+  dependencies: [String!]!
+
+  """Artifacts produced by a task"""
+  artifacts: [Artifact!]!
+
+  """Node type - Pod, DAG, etc"""
+  stepType: String!
+
+  """Start time for a task on a workflow"""
+  startTime: DateTime
+
+  """End time for a task on a workflow"""
+  endTime: DateTime
+
+  """
+  A human readable message indicating details about why this step is in this condition
+  """
+  message: String
+}
+
+enum TaskStatus
+  @join__type(graph: WORKFLOWS)
+{
+  PENDING @join__enumValue(graph: WORKFLOWS)
+  RUNNING @join__enumValue(graph: WORKFLOWS)
+  SUCCEEDED @join__enumValue(graph: WORKFLOWS)
+  SKIPPED @join__enumValue(graph: WORKFLOWS)
+  FAILED @join__enumValue(graph: WORKFLOWS)
+  ERROR @join__enumValue(graph: WORKFLOWS)
+  OMITTED @join__enumValue(graph: WORKFLOWS)
+}
+
+scalar Template
+  @join__type(graph: WORKFLOWS)
 
 """
 URL is a String implementing the [URL Standard](http://url.spec.whatwg.org/)
 """
 scalar Url
+  @join__type(graph: WORKFLOWS)
 
-"""
-A visit to an instrument as part of a session
-"""
-type Visit {
-	"""
-	Project Proposal Code
-	"""
-	proposalCode: String!
-	"""
-	Project Proposal Number
-	"""
-	proposalNumber: Int!
-	"""
-	Session visit Number
-	"""
-	number: Int!
+scalar UUID
+  @join__type(graph: SAMPLES)
+
+"""A visit to an instrument as part of a session"""
+type Visit
+  @join__type(graph: WORKFLOWS)
+{
+  """Project Proposal Code"""
+  proposalCode: String!
+
+  """Project Proposal Number"""
+  proposalNumber: Int!
+
+  """Session visit Number"""
+  number: Int!
 }
 
-"""
-A visit to an instrument as part of a session
-"""
-input VisitInput {
-	"""
-	Project Proposal Code
-	"""
-	proposalCode: String!
-	"""
-	Project Proposal Number
-	"""
-	proposalNumber: Int!
-	"""
-	Session visit Number
-	"""
-	number: Int!
+"""A visit to an instrument as part of a session"""
+input VisitInput
+  @join__type(graph: WORKFLOWS)
+{
+  """Project Proposal Code"""
+  proposalCode: String!
+
+  """Project Proposal Number"""
+  proposalNumber: Int!
+
+  """Session visit Number"""
+  number: Int!
 }
 
-type Workflow {
-	"""
-	The name given to the workflow, unique within a given visit
-	"""
-	name: String!
-	"""
-	The visit the Workflow was run against
-	"""
-	visit: Visit!
-	"""
-	The current status of the workflow
-	"""
-	status: WorkflowStatus
-	"""
-	The top-level workflow parameters
-	"""
-	parameters: JSONObject
-	"""
-	The name of the template used to run the workflow
-	"""
-	templateRef: String
+"""Represents NULL values"""
+scalar Void
+  @join__type(graph: SAMPLES)
+
+type Workflow
+  @join__type(graph: WORKFLOWS)
+{
+  """The name given to the workflow, unique within a given visit"""
+  name: String!
+
+  """The visit the Workflow was run against"""
+  visit: Visit!
+
+  """The current status of the workflow"""
+  status: WorkflowStatus
+
+  """The top-level workflow parameters"""
+  parameters: JSONObject
+
+  """The name of the template used to run the workflow"""
+  templateRef: String
+
+  """The workflow creator"""
+  creator: WorkflowCreator!
 }
 
-type WorkflowConnection @shareable {
-	"""
-	Information to aid in pagination.
-	"""
-	pageInfo: PageInfo!
-	"""
-	A list of edges.
-	"""
-	edges: [WorkflowEdge!]!
-	"""
-	A list of nodes.
-	"""
-	nodes: [Workflow!]!
+type WorkflowConnection
+  @join__type(graph: WORKFLOWS)
+{
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [WorkflowEdge!]!
+
+  """A list of nodes."""
+  nodes: [Workflow!]!
 }
 
-"""
-An edge in a connection.
-"""
-type WorkflowEdge @shareable {
-	"""
-	The item at the end of the edge
-	"""
-	node: Workflow!
-	"""
-	A cursor for use in pagination
-	"""
-	cursor: String!
+"""Information about the creator of a workflow."""
+type WorkflowCreator
+  @join__type(graph: WORKFLOWS)
+{
+  """
+  An identifier unique to the creator of the workflow.
+  Typically this is the creator's Fed-ID.
+  """
+  creatorId: String!
 }
 
-"""
-All tasks in the workflow have errored
-"""
-type WorkflowErroredStatus {
-	"""
-	Time at which this workflow started
-	"""
-	startTime: DateTime!
-	"""
-	Time at which this workflow completed
-	"""
-	endTime: DateTime!
-	"""
-	A human readable message indicating details about why the workflow is in this condition
-	"""
-	message: String
-	"""
-	Tasks created by the workflow
-	"""
-	tasks: [Task!]!
+"""An edge in a connection."""
+type WorkflowEdge
+  @join__type(graph: WORKFLOWS)
+{
+  """The item at the end of the edge"""
+  node: Workflow!
+
+  """A cursor for use in pagination"""
+  cursor: String!
 }
 
-"""
-All tasks in the workflow have failed
-"""
-type WorkflowFailedStatus {
-	"""
-	Time at which this workflow started
-	"""
-	startTime: DateTime!
-	"""
-	Time at which this workflow completed
-	"""
-	endTime: DateTime!
-	"""
-	A human readable message indicating details about why the workflow is in this condition
-	"""
-	message: String
-	"""
-	Tasks created by the workflow
-	"""
-	tasks: [Task!]!
+"""All tasks in the workflow have errored"""
+type WorkflowErroredStatus
+  @join__type(graph: WORKFLOWS)
+{
+  """Time at which this workflow started"""
+  startTime: DateTime!
+
+  """Time at which this workflow completed"""
+  endTime: DateTime!
+
+  """
+  A human readable message indicating details about why the workflow is in this condition
+  """
+  message: String
+
+  """Tasks created by the workflow"""
+  tasks: [Task!]!
 }
 
-"""
-All the supported Workflows filters
-"""
-input WorkflowFilter {
-	"""
-	The status field for a workflow
-	"""
-	workflowStatusFilter: WorkflowStatusFilter
-	"""
-	The creator of the workflow
-	"""
-	creator: String
+"""All tasks in the workflow have failed"""
+type WorkflowFailedStatus
+  @join__type(graph: WORKFLOWS)
+{
+  """Time at which this workflow started"""
+  startTime: DateTime!
+
+  """Time at which this workflow completed"""
+  endTime: DateTime!
+
+  """
+  A human readable message indicating details about why the workflow is in this condition
+  """
+  message: String
+
+  """Tasks created by the workflow"""
+  tasks: [Task!]!
 }
 
-type WorkflowPendingStatus {
-	"""
-	A human readable message indicating details about why the workflow is in this condition
-	"""
-	message: String
+"""All the supported Workflows filters"""
+input WorkflowFilter
+  @join__type(graph: WORKFLOWS)
+{
+  """The status field for a workflow"""
+  workflowStatusFilter: WorkflowStatusFilter
+
+  """The fedid of the user who created the workflow"""
+  creator: Creator
+
+  """The name of the workflow template"""
+  template: Template
 }
 
-type WorkflowRunningStatus {
-	"""
-	Time at which this workflow started
-	"""
-	startTime: DateTime!
-	"""
-	A human readable message indicating details about why the workflow is in this condition
-	"""
-	message: String
-	"""
-	Tasks created by the workflow
-	"""
-	tasks: [Task!]!
+type WorkflowPendingStatus
+  @join__type(graph: WORKFLOWS)
+{
+  """
+  A human readable message indicating details about why the workflow is in this condition
+  """
+  message: String
 }
 
-"""
-The status of a workflow
-"""
-union WorkflowStatus = WorkflowPendingStatus | WorkflowRunningStatus | WorkflowSucceededStatus | WorkflowFailedStatus | WorkflowErroredStatus
+type WorkflowRunningStatus
+  @join__type(graph: WORKFLOWS)
+{
+  """Time at which this workflow started"""
+  startTime: DateTime!
 
-"""
-Represents workflow status filters
-"""
-input WorkflowStatusFilter {
-	pending: Boolean! = false
-	running: Boolean! = false
-	succeeded: Boolean! = false
-	failed: Boolean! = false
-	error: Boolean! = false
+  """
+  A human readable message indicating details about why the workflow is in this condition
+  """
+  message: String
+
+  """Tasks created by the workflow"""
+  tasks: [Task!]!
 }
 
-"""
-All tasks in the workflow have succeded
-"""
-type WorkflowSucceededStatus {
-	"""
-	Time at which this workflow started
-	"""
-	startTime: DateTime!
-	"""
-	Time at which this workflow completed
-	"""
-	endTime: DateTime!
-	"""
-	A human readable message indicating details about why the workflow is in this condition
-	"""
-	message: String
-	"""
-	Tasks created by the workflow
-	"""
-	tasks: [Task!]!
+"""The status of a workflow"""
+union WorkflowStatus
+  @join__type(graph: WORKFLOWS)
+  @join__unionMember(graph: WORKFLOWS, member: "WorkflowPendingStatus")
+  @join__unionMember(graph: WORKFLOWS, member: "WorkflowRunningStatus")
+  @join__unionMember(graph: WORKFLOWS, member: "WorkflowSucceededStatus")
+  @join__unionMember(graph: WORKFLOWS, member: "WorkflowFailedStatus")
+  @join__unionMember(graph: WORKFLOWS, member: "WorkflowErroredStatus")
+ = WorkflowPendingStatus | WorkflowRunningStatus | WorkflowSucceededStatus | WorkflowFailedStatus | WorkflowErroredStatus
+
+"""Represents workflow status filters"""
+input WorkflowStatusFilter
+  @join__type(graph: WORKFLOWS)
+{
+  pending: Boolean! = false
+  running: Boolean! = false
+  succeeded: Boolean! = false
+  failed: Boolean! = false
+  error: Boolean! = false
 }
 
-type WorkflowTemplate {
-	"""
-	The name given to the workflow template, globally unique
-	"""
-	name: String!
-	"""
-	The group who maintains the workflow template
-	"""
-	maintainer: String!
-	"""
-	A human readable title for the workflow template
-	"""
-	title: String
-	"""
-	A human readable description of the workflow which is created
-	"""
-	description: String
-	"""
-	A JSON Schema describing the arguments of a Workflow Template
-	"""
-	arguments: JSON!
-	"""
-	A JSON Forms UI Schema describing how to render the arguments of the Workflow Template
-	"""
-	uiSchema: JSON
+"""All tasks in the workflow have succeded"""
+type WorkflowSucceededStatus
+  @join__type(graph: WORKFLOWS)
+{
+  """Time at which this workflow started"""
+  startTime: DateTime!
+
+  """Time at which this workflow completed"""
+  endTime: DateTime!
+
+  """
+  A human readable message indicating details about why the workflow is in this condition
+  """
+  message: String
+
+  """Tasks created by the workflow"""
+  tasks: [Task!]!
 }
 
-type WorkflowTemplateConnection @shareable {
-	"""
-	Information to aid in pagination.
-	"""
-	pageInfo: PageInfo!
-	"""
-	A list of edges.
-	"""
-	edges: [WorkflowTemplateEdge!]!
-	"""
-	A list of nodes.
-	"""
-	nodes: [WorkflowTemplate!]!
+type WorkflowTemplate
+  @join__type(graph: WORKFLOWS)
+{
+  """The name given to the workflow template, globally unique"""
+  name: String!
+
+  """The group who maintains the workflow template"""
+  maintainer: String!
+
+  """A human readable title for the workflow template"""
+  title: String
+
+  """A human readable description of the workflow which is created"""
+  description: String
+
+  """The repository storing the code associated with this template."""
+  repository: String
+
+  """A JSON Schema describing the arguments of a Workflow Template"""
+  arguments: JSON!
+
+  """
+  A JSON Forms UI Schema describing how to render the arguments of the Workflow Template
+  """
+  uiSchema: JSON
 }
 
-"""
-An edge in a connection.
-"""
-type WorkflowTemplateEdge @shareable {
-	"""
-	The item at the end of the edge
-	"""
-	node: WorkflowTemplate!
-	"""
-	A cursor for use in pagination
-	"""
-	cursor: String!
+type WorkflowTemplateConnection
+  @join__type(graph: WORKFLOWS)
+{
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [WorkflowTemplateEdge!]!
+
+  """A list of nodes."""
+  nodes: [WorkflowTemplate!]!
 }
 
-"""
-Supported label filters for ClusterWorkflowTemplates
-"""
-input WorkflowTemplatesFilter {
-	"""
-	The science group owning the template eg imaging
-	"""
-	scienceGroup: String
+"""An edge in a connection."""
+type WorkflowTemplateEdge
+  @join__type(graph: WORKFLOWS)
+{
+  """The item at the end of the edge"""
+  node: WorkflowTemplate!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""Supported label filters for ClusterWorkflowTemplates"""
+input WorkflowTemplatesFilter
+  @join__type(graph: WORKFLOWS)
+{
+  """The science group owning the template eg imaging"""
+  scienceGroup: [ScienceGroup!]
 }
