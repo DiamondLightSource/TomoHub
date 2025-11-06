@@ -1,7 +1,7 @@
 import ParameterSweepForm from "./sweepPipeline/ParameterSweepForm";
 import WorkflowParametersForm from "./WorkflowParametersForm";
 import { SweepValues } from "./sweepPipeline/ParameterSweepForm";
-import { Button, TextField, Typography } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import { WorkflowParamsValues } from "./WorkflowParametersForm";
 import {
   Visit,
@@ -14,6 +14,59 @@ import { useState } from "react";
 import WorkflowStatus from "./WorkflowStatus";
 import { WorkflowStatusSubscription$data } from "./__generated__/WorkflowStatusSubscription.graphql";
 import { setKey } from "../../devKey";
+import { graphql, useLazyLoadQuery } from "react-relay";
+import { SubmissionFormRawProjectionsQuery } from "./__generated__/SubmissionFormRawProjectionsQuery.graphql";
+
+const query = graphql`
+  query SubmissionFormRawProjectionsQuery {
+    workflow(
+      name: "extract-raw-projections-5kvk6"
+      visit: { proposalCode: "cm", proposalNumber: 40628, number: 2 }
+    ) {
+      name
+      status {
+        ... on WorkflowSucceededStatus {
+          tasks {
+            artifacts {
+              name
+              url
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+function CallQuery(): JSX.Element {
+  const data = useLazyLoadQuery<SubmissionFormRawProjectionsQuery>(query, {});
+
+  const c = data.workflow.status;
+  if (c === null || c === undefined) {
+    return <p>first</p>;
+  }
+  // if (
+  //   c.__typename === "WorkflowErroredStatus" ||
+  //   c.__typename === "WorkflowFailedStatus"
+  // ) {
+  //   return <p>second</p>;
+  // }
+
+  if (c.tasks !== undefined) {
+    const zipFilesList = c.tasks[0].artifacts.filter(
+      (a) => a.name === "projections.zip"
+    );
+    if (zipFilesList.length !== 0) {
+      // SET DATA HERE!!
+      console.log(
+        "tiff url: " +
+          c.tasks[0].artifacts.filter((a) => a.name === "projections.zip")[0]
+            .url
+      );
+    }
+  }
+  return <Box></Box>;
+}
 
 interface SubmissionFormRawProjectionsProps {
   template: SubmissionFormSharedFragment$key;
@@ -62,16 +115,21 @@ export default function SubmissionFormRawProjections({
 
   function onRawProjectionsFormSubmit(visit: Visit) {
     setSubmittedVisit(visit);
-    let indices = "";
-    const start: number =
-      sweepFormValue.start === "" ? 100 : sweepFormValue.start;
-    const stop: number =
-      sweepFormValue.stop === "" ? 3600 : sweepFormValue.stop;
-    const step: number = sweepFormValue.step === "" ? 100 : sweepFormValue.step;
-    for (let i = start; i < stop; i += step) {
-      indices += i + ", ";
-    }
-    indices += stop;
+    setKey(keyFormValue);
+
+    return;
+    setSubmittedVisit(visit);
+    // let indices = "";
+    const indices = "";
+    // const start: number =
+    //   sweepFormValue.start === "" ? 100 : sweepFormValue.start;
+    // const stop: number =
+    //   sweepFormValue.stop === "" ? 3600 : sweepFormValue.stop;
+    // const step: number = sweepFormValue.step === "" ? 100 : sweepFormValue.step;
+    // for (let i = start; i < stop; i += step) {
+    //   indices += i + ", ";
+    // }
+    // indices += stop;
 
     // TODO: error handling here to replace empty strings with null in some cases??
     const parameters = {
@@ -123,6 +181,7 @@ export default function SubmissionFormRawProjections({
 
   return (
     <div>
+      {submittedVisit !== undefined && <CallQuery />}
       {workflowSubmitted && workflowName !== undefined ? (
         <div>
           <WorkflowStatus
