@@ -28,6 +28,7 @@
     "@react-three/fiber": "^8.18.0",
     "axios": "^1.7.9",
     "graphql-ws": "^6.0.6",
+    "image-pixels": "^2.2.2",
     "js-yaml": "^4.1.0",
     "keycloak-js": "^26.0.5",
     "ndarray": "^1.0.19",
