@@ -7,8 +7,6 @@ import type { NDT, RectangularSelection } from "@diamondlightsource/davidia";
 import defineSelectionOperations from "./SelectionOperations";
 import type { SelectionOperations } from "./SelectionOperations";
 import { SelectionMode } from "../../types/crop.ts";
-import { loadData2 } from "./SampleLoad.ts";
-import { useTifURLContext } from "../../contexts/CropContext.tsx";
 
 interface WrapperProps {
   maxPixelValue: number;
@@ -23,17 +21,6 @@ export default function DisplayAreaWrapper({
   images,
   sampleRate: sampleRate,
 }: WrapperProps) {
-  const [images2, setImages2] = useState<NDT[]>([]);
-
-  const { tifURL } = useTifURLContext();
-  if (tifURL !== undefined && images2.length === 0) {
-    console.log("testing");
-    loadData2(tifURL, 10).then((png) => {
-      console.log("finished!");
-      setImages2(png);
-    });
-  }
-
   const [selectionMode, setSelectionMode] = useState<SelectionMode>(
     SelectionMode.Single
   );
@@ -80,15 +67,13 @@ export default function DisplayAreaWrapper({
   return (
     <div>
       <Contextbar selections={imageSelections} sampleRate={sampleRate} />
-      {images2.length !== 0 && (
-        <ImagePlot
-          image={images2[0]}
-          maxPixelValue={maxPixelValue}
-          onScreenSelections={onScreenSelections}
-          selectionOperations={selectionOperations}
-          selectionMode={selectionMode}
-        />
-      )}
+      <ImagePlot
+        image={images[imageIndex]}
+        maxPixelValue={maxPixelValue}
+        onScreenSelections={onScreenSelections}
+        selectionOperations={selectionOperations}
+        selectionMode={selectionMode}
+      />
       <ImageNavbar
         totalImages={copies}
         currentImageIndex={imageIndex}

@@ -4,7 +4,7 @@ import ndarray from "ndarray";
 import { proxyService } from "../../api/services";
 import pixels from "image-pixels";
 
-export default function loadData(
+export function loadData2(
   imageWidth: number,
   imageHeight: number,
   copies: number,
@@ -43,7 +43,7 @@ export default function loadData(
   return shiftedImages;
 }
 
-export async function loadData2(
+export default async function loadData(
   tifURL: string,
   sampleRate: number
 ): Promise<NDT[]> {
@@ -52,25 +52,32 @@ export async function loadData2(
 
   console.log("using url: " + tifURL);
 
-  const pngAsString: string = await proxyService.getTiffPage(tifURL, 1);
-  console.log(pngAsString);
+  const {
+    page_count: pageCount,
+    width,
+    height,
+  } = await proxyService.getTiffMetadata(tifURL);
 
-  const { data, width, height } = await pixels(pngAsString);
-  console.log(data);
+  for (let i = 0; i < pageCount; i++) {
+    console.log("loading image " + i + " of " + pageCount);
+    const pngAsString: string = await proxyService.getTiffPage(tifURL, i);
 
-  const currentPage: number[] = [];
-  for (let y = 0; y < height; y += sampleRate) {
-    for (let x = 0; x < width; x += sampleRate) {
-      const index = y * width + x;
-      // gets the r value at index
-      currentPage.push(data[index * 4]);
+    const { data } = await pixels(pngAsString);
+
+    const currentPage: number[] = [];
+    for (let y = 0; y < height; y += sampleRate) {
+      for (let x = 0; x < width; x += sampleRate) {
+        const index = y * width + x;
+        // gets the r value at index
+        currentPage.push(data[index * 4]);
+      }
     }
+    const currentPageNDT = ndarray(new Uint16Array(currentPage), [
+      Math.floor(height / sampleRate),
+      Math.floor(width / sampleRate),
+    ]) as NDT;
+    images.push(currentPageNDT);
   }
-  const currentPageNDT = ndarray(new Uint16Array(currentPage), [
-    Math.floor(height / sampleRate),
-    Math.floor(width / sampleRate),
-  ]) as NDT;
-  images.push(currentPageNDT);
 
   return images;
 }

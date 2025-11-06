@@ -3,6 +3,8 @@ import DisplayAreaWrapper from "../crop/Wrapper";
 import Submission from "../workflows/Submission";
 import { Visit } from "@diamondlightsource/sci-react-ui";
 import { useTifURLContext } from "../../contexts/CropContext";
+import { useEffect, useState } from "react";
+import { NDT } from "@diamondlightsource/davidia";
 
 interface CropProps {
   setVisit: (
@@ -14,20 +16,31 @@ interface CropProps {
 }
 
 export default function Crop({ setVisit }: CropProps) {
-  const imageWidth = 2560;
-  const imageHeight = 2160;
-  const maxPixelValue = 256;
-  const copies = 10;
   const sampleRate = 10;
-  const shiftedImages = loadData(imageWidth, imageHeight, copies, sampleRate);
+  const maxPixelValue = 255;
+  let copies: undefined | number = undefined;
+  const [images, setImages] = useState<NDT[] | undefined>(undefined);
+  if (images !== undefined) {
+    copies = images.length;
+  }
 
   const { tifURL } = useTifURLContext();
 
-  return tifURL !== undefined ? (
+  useEffect(() => {
+    console.log(tifURL);
+    if (tifURL === undefined) {
+      return;
+    }
+    loadData(tifURL, sampleRate).then((loadDataImages) => {
+      setImages(loadDataImages);
+    });
+  }, [tifURL]);
+
+  return images !== undefined ? (
     <DisplayAreaWrapper
       maxPixelValue={maxPixelValue}
-      copies={copies}
-      images={shiftedImages}
+      copies={copies ?? 0}
+      images={images}
       sampleRate={sampleRate}
     />
   ) : (
