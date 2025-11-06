@@ -18,6 +18,7 @@ export default async function loadData(
   const downsampledHeight = Math.floor(height / sampleRate);
 
   for (let i = 0; i < pageCount; i++) {
+    console.log("loading page" + i + " of " + pageCount);
     const pngAsString: string = await proxyService.getTiffPage(
       tifURL,
       i,

@@ -1,7 +1,7 @@
 import ParameterSweepForm from "./sweepPipeline/ParameterSweepForm";
 import WorkflowParametersForm from "./WorkflowParametersForm";
 import { SweepValues } from "./sweepPipeline/ParameterSweepForm";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 import { WorkflowParamsValues } from "./WorkflowParametersForm";
 import {
   Visit,
@@ -14,62 +14,7 @@ import { useState } from "react";
 import WorkflowStatus from "./WorkflowStatus";
 import { WorkflowStatusSubscription$data } from "./__generated__/WorkflowStatusSubscription.graphql";
 import { setKey } from "../../devKey";
-import { graphql, useLazyLoadQuery } from "react-relay";
-import { SubmissionFormRawProjectionsQuery } from "./__generated__/SubmissionFormRawProjectionsQuery.graphql";
 import { useTifURLContext } from "../../contexts/CropContext";
-
-const query = graphql`
-  query SubmissionFormRawProjectionsQuery {
-    workflow(
-      name: "extract-raw-projections-trh5f"
-      visit: { proposalCode: "cm", proposalNumber: 40628, number: 2 }
-    ) {
-      name
-      status {
-        ... on WorkflowSucceededStatus {
-          tasks {
-            artifacts {
-              name
-              url
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-function CallQuery({
-  setTifURL,
-}: {
-  setTifURL: (url: string | undefined) => void;
-}): JSX.Element {
-  const data = useLazyLoadQuery<SubmissionFormRawProjectionsQuery>(query, {});
-  console.log(data);
-
-  const c = data.workflow.status;
-  if (c === null || c === undefined) {
-    return <p>first</p>;
-  }
-
-  if (c.tasks !== undefined) {
-    const zipFilesList = c.tasks[0].artifacts.filter(
-      (a) => a.name === "projections.tif"
-    );
-    if (zipFilesList.length !== 0) {
-      // SET DATA HERE!!
-      console.log(
-        "tiff url: " +
-          c.tasks[0].artifacts.filter((a) => a.name === "projections.tif")[0]
-            .url
-      );
-      setTifURL(
-        c.tasks[0].artifacts.filter((a) => a.name === "projections.tif")[0].url
-      );
-    }
-  }
-  return <Box></Box>;
-}
 
 interface SubmissionFormRawProjectionsProps {
   template: SubmissionFormSharedFragment$key;
@@ -98,7 +43,6 @@ export default function SubmissionFormRawProjections({
   const [submittedVisit, setSubmittedVisit] = useState<undefined | Visit>(
     undefined
   );
-  const [zipURL, setZipURL] = useState<string | undefined>(undefined);
   const [inputFormValue, setInputFormValue] = useState<string>("");
   const [sweepFormValue, setSweepFormValue] = useState<SweepValues>({
     start: 100,
@@ -119,21 +63,16 @@ export default function SubmissionFormRawProjections({
 
   function onRawProjectionsFormSubmit(visit: Visit) {
     setSubmittedVisit(visit);
-    setKey(keyFormValue);
-
-    return;
-    setSubmittedVisit(visit);
-    // let indices = "";
-    const indices = "";
-    // const start: number =
-    //   sweepFormValue.start === "" ? 100 : sweepFormValue.start;
-    // const stop: number =
-    //   sweepFormValue.stop === "" ? 3600 : sweepFormValue.stop;
-    // const step: number = sweepFormValue.step === "" ? 100 : sweepFormValue.step;
-    // for (let i = start; i < stop; i += step) {
-    //   indices += i + ", ";
-    // }
-    // indices += stop;
+    let indices = "";
+    const start: number =
+      sweepFormValue.start === "" ? 100 : sweepFormValue.start;
+    const stop: number =
+      sweepFormValue.stop === "" ? 3600 : sweepFormValue.stop;
+    const step: number = sweepFormValue.step === "" ? 100 : sweepFormValue.step;
+    for (let i = start; i < stop; i += step) {
+      indices += i + ", ";
+    }
+    indices += stop;
 
     // TODO: error handling here to replace empty strings with null in some cases??
     const parameters = {
@@ -175,7 +114,7 @@ export default function SubmissionFormRawProjections({
         (a) => a.name === "projections.zip"
       );
       if (zipFilesList.length !== 0) {
-        setZipURL(
+        setTifURL(
           c.tasks[0].artifacts.filter((a) => a.name === "projections.zip")[0]
             .url
         );
@@ -185,7 +124,6 @@ export default function SubmissionFormRawProjections({
 
   return (
     <div>
-      {submittedVisit !== undefined && <CallQuery setTifURL={setTifURL} />}
       {workflowSubmitted && workflowName !== undefined ? (
         <div>
           <WorkflowStatus
@@ -193,7 +131,7 @@ export default function SubmissionFormRawProjections({
             visit={visitToText(submittedVisit)}
             onWorkflowDataChange={onWorkflowDataChange}
           />
-          {retryButtonVisible ? (
+          {retryButtonVisible && (
             <Button
               onClick={() => {
                 setWorkflowSubmitted(false);
@@ -205,8 +143,6 @@ export default function SubmissionFormRawProjections({
             >
               Refill form
             </Button>
-          ) : (
-            <p>{zipURL}</p>
           )}
         </div>
       ) : (
