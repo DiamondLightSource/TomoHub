@@ -5,6 +5,7 @@ import logging
 from PIL import Image
 from io import BytesIO
 import json
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -140,6 +141,10 @@ async def proxy_tiff_pages(
                     
                     # Convert to RGB if necessary (TIFF might be in different modes)
                     if img.mode not in ('RGB', 'RGBA'):
+                        if img.mode == 'I;16':
+                            array = np.array(img)
+                            normalized = (array.astype(np.uint16) - array.min()) * 255.0 / (array.max() - array.min())
+                            img = Image.fromarray(normalized.astype(np.uint8))
                         img = img.convert('RGB')
                     
                     # Save as PNG to BytesIO
