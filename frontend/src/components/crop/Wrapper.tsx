@@ -23,15 +23,16 @@ export default function DisplayAreaWrapper({
   images,
   sampleRate: sampleRate,
 }: WrapperProps) {
+  const [images2, setImages2] = useState<NDT[]>([]);
+
   const { tifURL } = useTifURLContext();
-  if (tifURL !== undefined) {
+  if (tifURL !== undefined && images2.length === 0) {
     console.log("testing");
-    loadData2(tifURL, 10).then(() => {
+    loadData2(tifURL, 10).then((png) => {
       console.log("finished!");
+      setImages2(png);
     });
   }
-
-  return <p>done</p>;
 
   const [selectionMode, setSelectionMode] = useState<SelectionMode>(
     SelectionMode.Single
@@ -79,13 +80,15 @@ export default function DisplayAreaWrapper({
   return (
     <div>
       <Contextbar selections={imageSelections} sampleRate={sampleRate} />
-      <ImagePlot
-        image={images[imageIndex]}
-        maxPixelValue={maxPixelValue}
-        onScreenSelections={onScreenSelections}
-        selectionOperations={selectionOperations}
-        selectionMode={selectionMode}
-      />
+      {images2.length !== 0 && (
+        <ImagePlot
+          image={images2[0]}
+          maxPixelValue={maxPixelValue}
+          onScreenSelections={onScreenSelections}
+          selectionOperations={selectionOperations}
+          selectionMode={selectionMode}
+        />
+      )}
       <ImageNavbar
         totalImages={copies}
         currentImageIndex={imageIndex}

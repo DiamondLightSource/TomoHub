@@ -16,7 +16,7 @@ interface CropProps {
 export default function Crop({ setVisit }: CropProps) {
   const imageWidth = 2560;
   const imageHeight = 2160;
-  const maxPixelValue = 60000;
+  const maxPixelValue = 256;
   const copies = 10;
   const sampleRate = 10;
   const shiftedImages = loadData(imageWidth, imageHeight, copies, sampleRate);

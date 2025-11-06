@@ -21,7 +21,7 @@ import { useTifURLContext } from "../../contexts/CropContext";
 const query = graphql`
   query SubmissionFormRawProjectionsQuery {
     workflow(
-      name: "extract-raw-projections-rr649"
+      name: "extract-raw-projections-trh5f"
       visit: { proposalCode: "cm", proposalNumber: 40628, number: 2 }
     ) {
       name
