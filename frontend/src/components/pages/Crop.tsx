@@ -1,8 +1,8 @@
-import { useState } from "react";
 import loadData from "../crop/SampleLoad";
 import DisplayAreaWrapper from "../crop/Wrapper";
 import Submission from "../workflows/Submission";
 import { Visit } from "@diamondlightsource/sci-react-ui";
+import { useTifURLContext } from "../../contexts/CropContext";
 
 interface CropProps {
   setVisit: (
@@ -21,9 +21,9 @@ export default function Crop({ setVisit }: CropProps) {
   const sampleRate = 10;
   const shiftedImages = loadData(imageWidth, imageHeight, copies, sampleRate);
 
-  const [dataLoaded, setDataLoaded] = useState(false);
+  const { tifURL } = useTifURLContext();
 
-  return dataLoaded ? (
+  return tifURL !== undefined ? (
     <DisplayAreaWrapper
       maxPixelValue={maxPixelValue}
       copies={copies}

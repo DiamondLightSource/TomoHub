@@ -16,6 +16,7 @@ import { WorkflowStatusSubscription$data } from "./__generated__/WorkflowStatusS
 import { setKey } from "../../devKey";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { SubmissionFormRawProjectionsQuery } from "./__generated__/SubmissionFormRawProjectionsQuery.graphql";
+import { useTifURLContext } from "../../contexts/CropContext";
 
 const query = graphql`
   query SubmissionFormRawProjectionsQuery {
@@ -38,19 +39,17 @@ const query = graphql`
   }
 `;
 
-function CallQuery(): JSX.Element {
+function CallQuery({
+  setTifURL,
+}: {
+  setTifURL: (url: string | undefined) => void;
+}): JSX.Element {
   const data = useLazyLoadQuery<SubmissionFormRawProjectionsQuery>(query, {});
 
   const c = data.workflow.status;
   if (c === null || c === undefined) {
     return <p>first</p>;
   }
-  // if (
-  //   c.__typename === "WorkflowErroredStatus" ||
-  //   c.__typename === "WorkflowFailedStatus"
-  // ) {
-  //   return <p>second</p>;
-  // }
 
   if (c.tasks !== undefined) {
     const zipFilesList = c.tasks[0].artifacts.filter(
@@ -62,6 +61,9 @@ function CallQuery(): JSX.Element {
         "tiff url: " +
           c.tasks[0].artifacts.filter((a) => a.name === "projections.zip")[0]
             .url
+      );
+      setTifURL(
+        c.tasks[0].artifacts.filter((a) => a.name === "projections.zip")[0].url
       );
     }
   }
@@ -85,6 +87,7 @@ export default function SubmissionFormRawProjections({
   visit,
   onSubmit: submitWorkflow,
 }: SubmissionFormRawProjectionsProps) {
+  const { setTifURL } = useTifURLContext();
   const [workflowSubmitted, setWorkflowSubmitted] = useState(false);
   const [retryButtonVisible, setRetryButtonVisible] = useState(false);
 
@@ -181,7 +184,7 @@ export default function SubmissionFormRawProjections({
 
   return (
     <div>
-      {submittedVisit !== undefined && <CallQuery />}
+      {submittedVisit !== undefined && <CallQuery setTifURL={setTifURL} />}
       {workflowSubmitted && workflowName !== undefined ? (
         <div>
           <WorkflowStatus
