@@ -1,6 +1,7 @@
 import rawImage from "./crop_test_data/real-projection.json";
 import type { NDT } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
+import { proxyService } from "../../api/services";
 
 export default function loadData(
   imageWidth: number,
@@ -39,4 +40,17 @@ export default function loadData(
   }
 
   return shiftedImages;
+}
+
+export async function loadData2(
+  tifURL: string,
+  sampleRate: number
+): Promise<NDT[]> {
+  console.log("load data 2 called");
+  const images: NDT[] = [];
+
+  const pngAsString: string = await proxyService.getTiffPage(tifURL, 0);
+  console.log(pngAsString);
+
+  return images;
 }

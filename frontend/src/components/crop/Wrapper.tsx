@@ -7,6 +7,8 @@ import type { NDT, RectangularSelection } from "@diamondlightsource/davidia";
 import defineSelectionOperations from "./SelectionOperations";
 import type { SelectionOperations } from "./SelectionOperations";
 import { SelectionMode } from "../../types/crop.ts";
+import { loadData2 } from "./SampleLoad.ts";
+import { useTifURLContext } from "../../contexts/CropContext.tsx";
 
 interface WrapperProps {
   maxPixelValue: number;
@@ -21,6 +23,16 @@ export default function DisplayAreaWrapper({
   images,
   sampleRate: sampleRate,
 }: WrapperProps) {
+  const { tifURL } = useTifURLContext();
+  if (tifURL !== undefined) {
+    console.log("testing");
+    loadData2(tifURL, 10).then(() => {
+      console.log("finished!");
+    });
+  }
+
+  return <p>done</p>;
+
   const [selectionMode, setSelectionMode] = useState<SelectionMode>(
     SelectionMode.Single
   );

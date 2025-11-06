@@ -21,7 +21,7 @@ import { useTifURLContext } from "../../contexts/CropContext";
 const query = graphql`
   query SubmissionFormRawProjectionsQuery {
     workflow(
-      name: "extract-raw-projections-5kvk6"
+      name: "extract-raw-projections-rr649"
       visit: { proposalCode: "cm", proposalNumber: 40628, number: 2 }
     ) {
       name
@@ -45,6 +45,7 @@ function CallQuery({
   setTifURL: (url: string | undefined) => void;
 }): JSX.Element {
   const data = useLazyLoadQuery<SubmissionFormRawProjectionsQuery>(query, {});
+  console.log(data);
 
   const c = data.workflow.status;
   if (c === null || c === undefined) {
@@ -53,17 +54,17 @@ function CallQuery({
 
   if (c.tasks !== undefined) {
     const zipFilesList = c.tasks[0].artifacts.filter(
-      (a) => a.name === "projections.zip"
+      (a) => a.name === "projections.tif"
     );
     if (zipFilesList.length !== 0) {
       // SET DATA HERE!!
       console.log(
         "tiff url: " +
-          c.tasks[0].artifacts.filter((a) => a.name === "projections.zip")[0]
+          c.tasks[0].artifacts.filter((a) => a.name === "projections.tif")[0]
             .url
       );
       setTifURL(
-        c.tasks[0].artifacts.filter((a) => a.name === "projections.zip")[0].url
+        c.tasks[0].artifacts.filter((a) => a.name === "projections.tif")[0].url
       );
     }
   }
