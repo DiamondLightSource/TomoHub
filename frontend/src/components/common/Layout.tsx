@@ -9,6 +9,7 @@ import { Box, CssBaseline, Paper, styled } from "@mui/material";
 import Header from "./Header";
 import { Footer, Navbar, User } from "@diamondlightsource/sci-react-ui";
 import keycloak from "../../keycloak";
+import CropProvider from "../../contexts/CropContext";
 
 const LeftSection = styled(Box)({
   display: "flex",
@@ -66,40 +67,42 @@ const Layout = () => {
         <SweepProvider>
           <MethodsProvider>
             <CenterProvider>
-              <CssBaseline />
-              <AppContainer>
-                <Navbar
-                  logo="theme"
-                  rightSlot={
-                    <User
-                      color="white"
-                      onLogout={handleLogout}
-                      user={{
-                        fedid: username,
-                      }}
-                    />
-                  }
-                ></Navbar>
-                <Header />
-                <MainContainer>
-                  <LeftSection as="section" className="left-section">
-                    <Outlet />
-                  </LeftSection>
-                  <RightSection as="section" className="right-section">
-                    <Pipeline />
-                  </RightSection>
-                </MainContainer>
-                <Footer
-                  copyright=""
-                  logo="theme"
-                  style={{
-                    width: "100%",
-                    backgroundColor: "#4C5266",
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                ></Footer>
-              </AppContainer>
+              <CropProvider>
+                <CssBaseline />
+                <AppContainer>
+                  <Navbar
+                    logo="theme"
+                    rightSlot={
+                      <User
+                        color="white"
+                        onLogout={handleLogout}
+                        user={{
+                          fedid: username,
+                        }}
+                      />
+                    }
+                  ></Navbar>
+                  <Header />
+                  <MainContainer>
+                    <LeftSection as="section" className="left-section">
+                      <Outlet />
+                    </LeftSection>
+                    <RightSection as="section" className="right-section">
+                      <Pipeline />
+                    </RightSection>
+                  </MainContainer>
+                  <Footer
+                    copyright=""
+                    logo="theme"
+                    style={{
+                      width: "100%",
+                      backgroundColor: "#4C5266",
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  ></Footer>
+                </AppContainer>
+              </CropProvider>
             </CenterProvider>
           </MethodsProvider>
         </SweepProvider>
