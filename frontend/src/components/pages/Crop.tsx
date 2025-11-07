@@ -20,14 +20,20 @@ export default function Crop({ setVisit }: CropProps) {
   const maxPixelValue = 255;
   const [images, setImages] = useState<NDT[] | undefined>(undefined);
 
+  const [loadingImages, setLoadingImages] = useState(false);
   const { tifURL } = useTifURLContext();
 
   useEffect(() => {
     if (tifURL === undefined) {
+      console.log("tif undefined, returning");
       return;
     }
+    console.log("setting load images to true");
+    setLoadingImages(true);
     loadData(tifURL, sampleRate).then((loadDataImages) => {
       setImages(loadDataImages);
+      console.log("setting load images to false");
+      setLoadingImages(false);
     });
   }, [tifURL]);
 
@@ -38,6 +44,8 @@ export default function Crop({ setVisit }: CropProps) {
       images={images}
       sampleRate={sampleRate}
     />
+  ) : loadingImages ? (
+    <p>loading images</p>
   ) : (
     <Submission workflowName="extract-raw-projections" setVisit={setVisit} />
   );
