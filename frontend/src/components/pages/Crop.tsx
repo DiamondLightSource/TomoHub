@@ -5,13 +5,7 @@ import { Visit } from "@diamondlightsource/sci-react-ui";
 import { useTifURLContext } from "../../contexts/CropContext";
 import { useEffect, useState } from "react";
 import { NDT } from "@diamondlightsource/davidia";
-import {
-  Box,
-  CircularProgress,
-  LinearProgress,
-  Modal,
-  Typography,
-} from "@mui/material";
+import { Box, LinearProgress, Modal, Typography } from "@mui/material";
 
 interface CropProps {
   setVisit: (
@@ -28,6 +22,10 @@ export default function Crop({ setVisit }: CropProps) {
   const [images, setImages] = useState<NDT[] | undefined>(undefined);
 
   const [loadingImages, setLoadingImages] = useState(false);
+  const [loadingImageIndex, setLoadingImageIndex] = useState<
+    number | undefined
+  >(undefined);
+  const [totalImages, setTotalImages] = useState<number | undefined>(undefined);
   const { tifURL } = useTifURLContext();
 
   useEffect(() => {
@@ -37,11 +35,13 @@ export default function Crop({ setVisit }: CropProps) {
     }
     console.log("setting load images to true");
     setLoadingImages(true);
-    loadData(tifURL, sampleRate).then((loadDataImages) => {
-      setImages(loadDataImages);
-      console.log("setting load images to false");
-      setLoadingImages(false);
-    });
+    loadData(tifURL, sampleRate, setLoadingImageIndex, setTotalImages).then(
+      (loadDataImages) => {
+        setImages(loadDataImages);
+        console.log("setting load images to false");
+        setLoadingImages(false);
+      }
+    );
   }, [tifURL]);
 
   return images !== undefined ? (
@@ -69,16 +69,30 @@ export default function Crop({ setVisit }: CropProps) {
             borderRadius: 1,
           }}
         >
-          <Typography
-            gutterBottom
-            variant="h6"
-            color="primary"
-            component="div"
-            align="center"
-          >
-            <strong>Loading Pages</strong>
-          </Typography>
-          <LinearProgress />
+          {loadingImageIndex === undefined ? (
+            <Typography
+              gutterBottom
+              variant="h6"
+              color="primary"
+              component="div"
+              align="center"
+            >
+              <strong>Fetching pages metadata</strong>
+            </Typography>
+          ) : (
+            <Typography
+              gutterBottom
+              variant="h6"
+              color="primary"
+              component="div"
+              align="center"
+            >
+              <strong>
+                Loading Page {loadingImageIndex} of {totalImages}
+              </strong>
+            </Typography>
+          )}
+          <LinearProgress sx={{ "margin-top": 25 }} />
         </Box>
       </Modal>
     </Box>
