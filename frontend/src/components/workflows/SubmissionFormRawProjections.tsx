@@ -13,7 +13,6 @@ import { JSONObject } from "../../types";
 import { useState } from "react";
 import WorkflowStatus from "./WorkflowStatus";
 import { WorkflowStatusSubscription$data } from "./__generated__/WorkflowStatusSubscription.graphql";
-import { setKey } from "../../devKey";
 import { useTifURLContext } from "../../contexts/CropContext";
 
 interface SubmissionFormRawProjectionsProps {
@@ -49,9 +48,6 @@ export default function SubmissionFormRawProjections({
     stop: 3700,
     step: 100,
   });
-  const [keyFormValue, setKeyFormValue] = useState<string | undefined>(
-    undefined
-  );
   const [wfparamFormValue, setWFParamFormValue] =
     useState<WorkflowParamsValues>({
       input: "",
@@ -84,7 +80,6 @@ export default function SubmissionFormRawProjections({
       "projection-indices": indices,
       "output-filename": wfparamFormValue.output,
     };
-    setKey(keyFormValue);
 
     function workflowSuccessfullySubmitted(submittedWorkflowName: string) {
       setWorkflowName(submittedWorkflowName);
@@ -169,15 +164,6 @@ export default function SubmissionFormRawProjections({
           <WorkflowParametersForm
             values={wfparamFormValue}
             onChange={setWFParamFormValue}
-          />
-          <TextField
-            label="Auth Token"
-            type="string"
-            fullWidth
-            size="small"
-            onChange={(e) => {
-              setKeyFormValue(e.target.value);
-            }}
           />
           <VisitInput
             visit={visit}

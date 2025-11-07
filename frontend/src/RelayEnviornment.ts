@@ -10,7 +10,6 @@ import {
 } from "relay-runtime";
 import keycloak from "./keycloak";
 import { createClient } from "graphql-ws";
-import { getKey } from "./devKey";
 
 const HTTP_ENDPOINT = "https://workflows.diamond.ac.uk/graphql";
 const WS_ENDPOINT = "wss://workflows.diamond.ac.uk/graphql/ws";
@@ -25,7 +24,7 @@ const fetchFn: FetchFunction = async (request, variables) => {
     const resp = await fetch(HTTP_ENDPOINT, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${getKey()}`,
+        Authorization: `Bearer ${keycloak.token}`,
         Accept:
           "application/graphql-response+json; charset=utf-8, application/json; charset=utf-8",
         "Content-Type": "application/json",
@@ -63,9 +62,6 @@ function ensureKeycloakInit(): Promise<boolean> {
 export const wsClient = createClient({
   url: WS_ENDPOINT,
   connectionParams: async () => {
-    return {
-      Authorization: `Bearer ${getKey()}`,
-    };
     if (!keycloak.authenticated) {
       await ensureKeycloakInit();
     }
