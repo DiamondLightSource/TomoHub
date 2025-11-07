@@ -30,6 +30,7 @@ export default function Crop({ setVisit }: CropProps) {
 
   useEffect(() => {
     if (tifURL === undefined) {
+      console.log("tif undefined, returning");
       return;
     }
     setLoadingImages(true);
@@ -48,6 +49,8 @@ export default function Crop({ setVisit }: CropProps) {
       images={images}
       sampleRate={sampleRate}
     />
+  ) : loadingImages ? (
+    <p>loading images</p>
   ) : (
     <Box>
       <Submission workflowName="extract-raw-projections" setVisit={setVisit} />
