@@ -1,7 +1,15 @@
 import ParameterSweepForm from "./sweepPipeline/ParameterSweepForm";
 import WorkflowParametersForm from "./WorkflowParametersForm";
 import { SweepValues } from "./sweepPipeline/ParameterSweepForm";
-import { Button, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  Stack,
+  TextField,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { WorkflowParamsValues } from "./WorkflowParametersForm";
 import {
   Visit,
@@ -13,7 +21,64 @@ import { JSONObject } from "../../types";
 import { useState } from "react";
 import WorkflowStatus from "./WorkflowStatus";
 import { WorkflowStatusSubscription$data } from "./__generated__/WorkflowStatusSubscription.graphql";
+import { setKey } from "../../devKey";
+import { graphql, useFragment, useLazyLoadQuery } from "react-relay";
+import { SubmissionFormRawProjectionsQuery } from "./__generated__/SubmissionFormRawProjectionsQuery.graphql";
 import { useTifURLContext } from "../../contexts/CropContext";
+import { sharedFragment } from "../Submission";
+
+const query = graphql`
+  query SubmissionFormRawProjectionsQuery {
+    workflow(
+      name: "extract-raw-projections-trh5f"
+      visit: { proposalCode: "cm", proposalNumber: 40628, number: 2 }
+    ) {
+      name
+      status {
+        ... on WorkflowSucceededStatus {
+          tasks {
+            artifacts {
+              name
+              url
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+function CallQuery({
+  setTifURL,
+}: {
+  setTifURL: (url: string | undefined) => void;
+}): JSX.Element {
+  const data = useLazyLoadQuery<SubmissionFormRawProjectionsQuery>(query, {});
+  console.log(data);
+
+  const c = data.workflow.status;
+  if (c === null || c === undefined) {
+    return <p>first</p>;
+  }
+
+  if (c.tasks !== undefined) {
+    const zipFilesList = c.tasks[0].artifacts.filter(
+      (a) => a.name === "projections.tif"
+    );
+    if (zipFilesList.length !== 0) {
+      // SET DATA HERE!!
+      console.log(
+        "tiff url: " +
+          c.tasks[0].artifacts.filter((a) => a.name === "projections.tif")[0]
+            .url
+      );
+      setTifURL(
+        c.tasks[0].artifacts.filter((a) => a.name === "projections.tif")[0].url
+      );
+    }
+  }
+  return <Box></Box>;
+}
 
 interface SubmissionFormRawProjectionsProps {
   template: SubmissionFormSharedFragment$key;
@@ -27,11 +92,13 @@ interface SubmissionFormRawProjectionsProps {
 }
 
 export default function SubmissionFormRawProjections({
-  template: _,
+  template,
   prepopulatedParameters,
   visit,
   onSubmit: submitWorkflow,
 }: SubmissionFormRawProjectionsProps) {
+  const templateData = useFragment(sharedFragment, template);
+  const theme = useTheme();
   const { setTifURL } = useTifURLContext();
   const [workflowSubmitted, setWorkflowSubmitted] = useState(false);
   const [retryButtonVisible, setRetryButtonVisible] = useState(false);
@@ -42,20 +109,18 @@ export default function SubmissionFormRawProjections({
   const [submittedVisit, setSubmittedVisit] = useState<undefined | Visit>(
     undefined
   );
-  const [inputFormValue, setInputFormValue] = useState<string>("");
-  const [sweepFormValue, setSweepFormValue] = useState<SweepValues>({
-    start: 100,
-    stop: 3700,
-    step: 100,
-  });
-  const [wfparamFormValue, setWFParamFormValue] =
-    useState<WorkflowParamsValues>({
-      input: "",
-      output: "",
-      nprocs: 1,
-      memory: "20Gi",
-      httomo_outdir_name: "/tmp",
-    });
+  const [zipURL, setZipURL] = useState<string | undefined>(undefined);
+  const [submitteddatasetPath, setSubmittedDatasetPath] = useState("");
+  const [submittedInput, setSubmittedInput] = useState("");
+  // is there a way to get the defualt parameter values to put in here??
+  const [submittedMemory, setSubmittedMemory] = useState("20Gi");
+  const [submittedNprocs, setSubmittedNprocs] = useState(1);
+  const [submittedOutputFilename, setSubmittedOutputFilename] =
+    useState("projections.tif");
+  const [submittedTmpdirPath, setSubmittedTmpdirPath] = useState("/tmp");
+  const [keyFormValue, setKeyFormValue] = useState<string | undefined>(
+    undefined
+  );
 
   function onRawProjectionsFormSubmit(visit: Visit) {
     setSubmittedVisit(visit);
@@ -141,30 +206,35 @@ export default function SubmissionFormRawProjections({
           )}
         </div>
       ) : (
-        <div>
+        <Stack direction="column" spacing={theme.spacing(2)}>
+          <Typography variant="h4" align="center">
+            Workflow:{" "}
+            {templateData.title ? templateData.title : templateData.name}
+          </Typography>
+          <Divider />
+          <TextField
+            label="Dataset Path"
+            type="string"
+            fullWidth
+            size="small"
+            onChange={(e) => {
+              setSubmittedDatasetPath(e.target.value);
+            }}
+          />
           <TextField
             label="Input"
             type="string"
             fullWidth
             size="small"
             onChange={(e) => {
-              setInputFormValue(e.target.value);
+              setSubmittedInput(e.target.value);
             }}
           />
-          <Typography variant="h6" sx={{ mt: 2 }}>
-            Frames to Crop
-          </Typography>
-          <ParameterSweepForm
-            values={sweepFormValue}
-            onChange={setSweepFormValue}
-          />
-          <Typography variant="h6" sx={{ mt: 2 }}>
-            Workflow Parameters
-          </Typography>
-          <WorkflowParametersForm
-            values={wfparamFormValue}
-            onChange={setWFParamFormValue}
-          />
+          <Divider />
+          <p>sort projection indices here</p>
+          <Divider />
+          <p>advanced options here</p>
+          <Divider />
           <VisitInput
             visit={visit}
             onSubmit={onRawProjectionsFormSubmit}
@@ -172,7 +242,17 @@ export default function SubmissionFormRawProjections({
             submitOnReturn={false}
             submitButton={true}
           />
-        </div>
+          <Divider />
+          <TextField
+            label="Auth Token"
+            type="string"
+            fullWidth
+            size="small"
+            onChange={(e) => {
+              setKeyFormValue(e.target.value);
+            }}
+          />
+        </Stack>
       )}
     </div>
   );
