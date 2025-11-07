@@ -27,7 +27,6 @@ export default function Crop({ setVisit }: CropProps) {
   const { tifURL } = useTifURLContext();
 
   useEffect(() => {
-    console.log(tifURL);
     if (tifURL === undefined) {
       return;
     }
