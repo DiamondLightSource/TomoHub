@@ -99,9 +99,13 @@ export const proxyService = {
     return response.data;
   },
 
-  getTiffPage: async (tiffUrl: string, page: number): Promise<string> => {
+  getTiffPage: async (
+    tiffUrl: string,
+    page: number,
+    downsample_rate: number = 1
+  ): Promise<string> => {
     const response = await apiClient.get(
-      `/proxy/tiff-pages?url=${encodeURIComponent(tiffUrl)}&page=${page}`,
+      `/proxy/tiff-pages?url=${encodeURIComponent(tiffUrl)}&page=${page}&downsample_rate=${downsample_rate}`,
       {
         responseType: "arraybuffer",
       }

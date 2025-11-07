@@ -57,25 +57,26 @@ export default async function loadData(
     width,
     height,
   } = await proxyService.getTiffMetadata(tifURL);
+  const downsampledWidth = Math.floor(width / sampleRate);
+  const downsampledHeight = Math.floor(height / sampleRate);
 
   for (let i = 0; i < pageCount; i++) {
     console.log("loading image " + i + " of " + pageCount);
-    const pngAsString: string = await proxyService.getTiffPage(tifURL, i);
+    const pngAsString: string = await proxyService.getTiffPage(
+      tifURL,
+      i,
+      sampleRate
+    );
 
-    const { data } = await pixels(pngAsString);
+    const { data }: { data: Uint8ClampedArray } = await pixels(pngAsString);
 
-    const currentPage: number[] = [];
-    for (let y = 0; y < height; y += sampleRate) {
-      for (let x = 0; x < width; x += sampleRate) {
-        const index = y * width + x;
-        // gets the r value at index
-        currentPage.push(data[index * 4]);
-      }
-    }
-    const currentPageNDT = ndarray(new Uint16Array(currentPage), [
-      Math.floor(height / sampleRate),
-      Math.floor(width / sampleRate),
-    ]) as NDT;
+    console.log(data);
+    console.log(data.filter((element, index) => index % 4 === 0));
+
+    const currentPageNDT = ndarray(
+      new Uint8Array(data.filter((element, index) => index % 4 === 0)),
+      [downsampledHeight, downsampledWidth]
+    ) as NDT;
     images.push(currentPageNDT);
   }
 
