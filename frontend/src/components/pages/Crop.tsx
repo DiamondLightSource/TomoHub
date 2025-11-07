@@ -5,6 +5,13 @@ import { Visit } from "@diamondlightsource/sci-react-ui";
 import { useTifURLContext } from "../../contexts/CropContext";
 import { useEffect, useState } from "react";
 import { NDT } from "@diamondlightsource/davidia";
+import {
+  Box,
+  CircularProgress,
+  LinearProgress,
+  Modal,
+  Typography,
+} from "@mui/material";
 
 interface CropProps {
   setVisit: (
@@ -44,9 +51,36 @@ export default function Crop({ setVisit }: CropProps) {
       images={images}
       sampleRate={sampleRate}
     />
-  ) : loadingImages ? (
-    <p>loading images</p>
   ) : (
-    <Submission workflowName="extract-raw-projections" setVisit={setVisit} />
+    <Box>
+      <Submission workflowName="extract-raw-projections" setVisit={setVisit} />
+      <Modal open={loadingImages}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 500,
+            height: 100,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 1,
+            borderRadius: 1,
+          }}
+        >
+          <Typography
+            gutterBottom
+            variant="h6"
+            color="primary"
+            component="div"
+            align="center"
+          >
+            <strong>Loading Pages</strong>
+          </Typography>
+          <LinearProgress />
+        </Box>
+      </Modal>
+    </Box>
   );
 }
