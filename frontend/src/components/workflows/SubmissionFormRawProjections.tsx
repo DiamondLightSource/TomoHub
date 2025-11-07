@@ -1,6 +1,3 @@
-import ParameterSweepForm from "./sweepPipeline/ParameterSweepForm";
-import WorkflowParametersForm from "./WorkflowParametersForm";
-import { SweepValues } from "./sweepPipeline/ParameterSweepForm";
 import {
   Box,
   Button,
@@ -10,7 +7,6 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { WorkflowParamsValues } from "./WorkflowParametersForm";
 import {
   Visit,
   VisitInput,
@@ -25,7 +21,7 @@ import { setKey } from "../../devKey";
 import { graphql, useFragment, useLazyLoadQuery } from "react-relay";
 import { SubmissionFormRawProjectionsQuery } from "./__generated__/SubmissionFormRawProjectionsQuery.graphql";
 import { useTifURLContext } from "../../contexts/CropContext";
-import { sharedFragment } from "../Submission";
+import { sharedFragment } from "./Submission";
 
 const query = graphql`
   query SubmissionFormRawProjectionsQuery {
@@ -114,7 +110,7 @@ export default function SubmissionFormRawProjections({
   const [submittedInput, setSubmittedInput] = useState("");
   // is there a way to get the defualt parameter values to put in here??
   const [submittedMemory, setSubmittedMemory] = useState("20Gi");
-  const [submittedNprocs, setSubmittedNprocs] = useState(1);
+  const [submittedNprocs, setSubmittedNprocs] = useState<number | string>(1);
   const [submittedOutputFilename, setSubmittedOutputFilename] =
     useState("projections.tif");
   const [submittedTmpdirPath, setSubmittedTmpdirPath] = useState("/tmp");
@@ -212,6 +208,7 @@ export default function SubmissionFormRawProjections({
             {templateData.title ? templateData.title : templateData.name}
           </Typography>
           <Divider />
+          <Typography variant="h6">Mandatory Parameters</Typography>
           <TextField
             label="Dataset Path"
             type="string"
@@ -231,9 +228,54 @@ export default function SubmissionFormRawProjections({
             }}
           />
           <Divider />
+          <Typography variant="h6">Projections</Typography>
           <p>sort projection indices here</p>
           <Divider />
-          <p>advanced options here</p>
+          <Typography variant="h6">Advanced Parameters</Typography>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <TextField
+              label="Memory"
+              type="string"
+              fullWidth
+              size="small"
+              value={submittedMemory}
+              onChange={(e) => {
+                setSubmittedMemory(e.target.value);
+              }}
+            />
+            <TextField
+              label="Nprocs"
+              type="number"
+              fullWidth
+              size="small"
+              value={submittedNprocs}
+              onChange={(e) => {
+                setSubmittedNprocs(
+                  e.target.value === "" ? "" : Number(e.target.value)
+                );
+              }}
+            />
+            <TextField
+              label="Output Filename"
+              type="string"
+              fullWidth
+              size="small"
+              value={submittedOutputFilename}
+              onChange={(e) => {
+                setSubmittedOutputFilename(e.target.value);
+              }}
+            />
+            <TextField
+              label="Tmpdir Path"
+              type="string"
+              fullWidth
+              size="small"
+              value={submittedTmpdirPath}
+              onChange={(e) => {
+                setSubmittedTmpdirPath(e.target.value);
+              }}
+            />
+          </Stack>
           <Divider />
           <VisitInput
             visit={visit}
