@@ -264,6 +264,7 @@ export default function SubmissionFormRawProjections({
             justifyContent="space-between"
           >
             {/* not sure I like the layout of this bit */}
+            {/* TODO: change or gather more opinions */}
             <Box
               onClick={() => {
                 setIndicesMethod("Checkbox");
@@ -277,6 +278,8 @@ export default function SubmissionFormRawProjections({
               }}
             >
               {/* can definitely make a function for these onClick functions */}
+              {/* but also I want to keep functionality of them nearby??
+              TODO: Ask Yousef about this */}
               <FormGroup row>
                 <FormControlLabel
                   control={
@@ -363,7 +366,7 @@ export default function SubmissionFormRawProjections({
                     : { border: "2px solid transparent" }),
                 }}
               >
-                {/* can definitely make a function for these onClick functions */}
+                {/* TODO: can definitely make a function for these onClick functions */}
                 <TextField
                   label="Start"
                   type="number"
