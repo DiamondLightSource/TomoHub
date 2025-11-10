@@ -20,7 +20,7 @@ import {
 } from "@diamondlightsource/sci-react-ui";
 import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionFormSharedFragment.graphql";
 import { JSONObject } from "../../types";
-import { useState } from "react";
+import React, { useState } from "react";
 import WorkflowStatus from "./WorkflowStatus";
 import { WorkflowStatusSubscription$data } from "./__generated__/WorkflowStatusSubscription.graphql";
 import { setKey } from "../../devKey";
@@ -131,6 +131,12 @@ export default function SubmissionFormRawProjections({
   const [indicesMethod, setIndicesMethod] = useState<
     "Checkbox" | "Interval" | "List"
   >("Checkbox");
+
+  const [projectionBoxesChecked, setProjectionBoxesChecked] = useState({
+    start: true,
+    mid: true,
+    end: true,
+  });
 
   function onRawProjectionsFormSubmit(visit: Visit) {
     setSubmittedVisit(visit);
@@ -264,17 +270,53 @@ export default function SubmissionFormRawProjections({
             >
               <FormGroup row>
                 <FormControlLabel
-                  control={<Checkbox />}
+                  control={
+                    <Checkbox
+                      checked={projectionBoxesChecked.start}
+                      onClick={(e) => {
+                        if ("checked" in e.target) {
+                          setProjectionBoxesChecked({
+                            ...projectionBoxesChecked,
+                            start: e.target.checked as boolean,
+                          });
+                        }
+                      }}
+                    />
+                  }
                   label="Start"
                   sx={{ "margin-left": 30, "margin-right": 30 }}
                 />
                 <FormControlLabel
-                  control={<Checkbox />}
+                  control={
+                    <Checkbox
+                      checked={projectionBoxesChecked.mid}
+                      onClick={(e) => {
+                        if ("checked" in e.target) {
+                          setProjectionBoxesChecked({
+                            ...projectionBoxesChecked,
+                            mid: e.target.checked as boolean,
+                          });
+                        }
+                      }}
+                    />
+                  }
                   label="Mid"
                   sx={{ "margin-left": 30, "margin-right": 30 }}
                 />
                 <FormControlLabel
-                  control={<Checkbox />}
+                  control={
+                    <Checkbox
+                      checked={projectionBoxesChecked.end}
+                      onClick={(e) => {
+                        if ("checked" in e.target) {
+                          setProjectionBoxesChecked({
+                            ...projectionBoxesChecked,
+                            end: e.target.checked as boolean,
+                          });
+                        }
+                      }}
+                    />
+                  }
                   label="End"
                   sx={{ "margin-left": 30, "margin-right": 30 }}
                 />
