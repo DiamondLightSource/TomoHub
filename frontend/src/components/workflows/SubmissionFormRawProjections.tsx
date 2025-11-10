@@ -144,6 +144,8 @@ export default function SubmissionFormRawProjections({
     step: 100,
   });
 
+  const [projectionsListValue, setProjectionsListValue] = useState("");
+
   function onRawProjectionsFormSubmit(visit: Visit) {
     setSubmittedVisit(visit);
     let indices = "";
@@ -426,7 +428,15 @@ export default function SubmissionFormRawProjections({
                     : { border: "2px solid transparent" }),
                 }}
               >
-                <TextField label="Indices List" fullWidth size="small" />
+                <TextField
+                  label="Indices List"
+                  fullWidth
+                  size="small"
+                  defaultValue={projectionsListValue}
+                  onChange={(e) => {
+                    setProjectionsListValue(e.target.value);
+                  }}
+                />
               </Box>
             </Box>
           )}
