@@ -59,22 +59,18 @@ export default function SubmissionFormRawProjections({
   const [workflowName, setWorkflowName] = useState<undefined | string>(
     undefined
   );
+
+  const [submittedWorkflowArguments, setSubmittedWorkflowArguments] = useState({
+    input: "",
+    "tmpdir-path": templateData.arguments.properties["tmpdir-path"].default,
+    "dataset-path": "",
+    memory: templateData.arguments.properties.memory.default,
+    nprocs: Number(templateData.arguments.properties.nprocs.default),
+    "output-filename":
+      templateData.arguments.properties["output-filename"].default,
+  });
   const [submittedVisit, setSubmittedVisit] = useState<undefined | Visit>(
     undefined
-  );
-  const [submittedDatasetPath, setSubmittedDatasetPath] = useState("");
-  const [submittedInput, setSubmittedInput] = useState("");
-  const [submittedMemory, setSubmittedMemory] = useState(
-    templateData.arguments.properties.memory.default
-  );
-  const [submittedNprocs, setSubmittedNprocs] = useState<number | string>(
-    Number(templateData.arguments.properties.nprocs.default)
-  );
-  const [submittedOutputFilename, setSubmittedOutputFilename] = useState(
-    templateData.arguments.properties["output-filename"].default
-  );
-  const [submittedTmpdirPath, setSubmittedTmpdirPath] = useState(
-    templateData.arguments.properties["tmpdir-path"].default
   );
   const [keyFormValue, setKeyFormValue] = useState<string | undefined>(
     undefined
@@ -91,37 +87,27 @@ export default function SubmissionFormRawProjections({
   const [submittedProjecitonIndicesMethod, setIndicesMethod] =
     useState<ProjectionIndicesMethod>(ProjectionIndicesMethod.Checkbox);
 
-  const [submittedProjectionBoxesChecked, setProjectionBoxesChecked] = useState(
-    {
-      start: true,
-      mid: true,
-      end: true,
-    }
-  );
-
-  const [submittedProjectionIntervalValues, setProjectionIntervalValues] =
+  const [submittedProjectionIndicesValues, setProjectionIndicesValues] =
     useState({
-      start: firstIndex,
-      stop: lastIndex,
-      step: 100,
+      boxesChecked: { start: true, mid: true, end: true },
+      intervalValues: { start: firstIndex, stop: lastIndex, step: 100 },
+      indexList: "",
     });
-
-  const [submittedProjectionsListValue, setProjectionsListValue] = useState("");
 
   function onRawProjectionsFormSubmit(visit: Visit) {
     setSubmittedVisit(visit);
     let indices = "";
     if (submittedProjecitonIndicesMethod === ProjectionIndicesMethod.Checkbox) {
-      if (submittedProjectionBoxesChecked.start) {
+      if (submittedProjectionIndicesValues.boxesChecked.start) {
         indices += String(firstIndex);
       }
-      if (submittedProjectionBoxesChecked.mid) {
+      if (submittedProjectionIndicesValues.boxesChecked.mid) {
         if (indices !== "") {
           indices += ", ";
         }
         indices += String((firstIndex + lastIndex) / 2);
       }
-      if (submittedProjectionBoxesChecked.end) {
+      if (submittedProjectionIndicesValues.boxesChecked.end) {
         if (indices !== "") {
           indices += ", ";
         }
@@ -130,9 +116,10 @@ export default function SubmissionFormRawProjections({
     } else if (
       submittedProjecitonIndicesMethod === ProjectionIndicesMethod.Interval
     ) {
-      const start: number = submittedProjectionIntervalValues.start;
-      const stop: number = submittedProjectionIntervalValues.stop;
-      const step: number = submittedProjectionIntervalValues.step;
+      const start: number =
+        submittedProjectionIndicesValues.intervalValues.start;
+      const stop: number = submittedProjectionIndicesValues.intervalValues.stop;
+      const step: number = submittedProjectionIndicesValues.intervalValues.step;
       for (let i = start; i < stop; i += step) {
         indices += i + ", ";
       }
@@ -141,18 +128,13 @@ export default function SubmissionFormRawProjections({
       submittedProjecitonIndicesMethod === ProjectionIndicesMethod.List
     ) {
       // TODO: error handling either here or on the textfield to make sure input is of the right form
-      indices = submittedProjectionsListValue;
+      indices = submittedProjectionIndicesValues.indexList;
     }
 
     // TODO: error handling here to replace empty strings with null in some cases??
     const parameters = {
-      input: submittedInput,
-      "tmpdir-path": submittedTmpdirPath,
-      "dataset-path": submittedDatasetPath,
-      memory: submittedMemory,
-      nprocs: submittedNprocs,
+      ...submittedWorkflowArguments,
       "projection-indices": indices,
-      "output-filename": submittedOutputFilename,
     };
 
     function workflowSuccessfullySubmitted(submittedWorkflowName: string) {
@@ -228,7 +210,10 @@ export default function SubmissionFormRawProjections({
             fullWidth
             size="small"
             onChange={(e) => {
-              setSubmittedDatasetPath(e.target.value);
+              setSubmittedWorkflowArguments({
+                ...submittedWorkflowArguments,
+                "dataset-path": e.target.value,
+              });
             }}
           />
           <TextField
@@ -237,7 +222,10 @@ export default function SubmissionFormRawProjections({
             fullWidth
             size="small"
             onChange={(e) => {
-              setSubmittedInput(e.target.value);
+              setSubmittedWorkflowArguments({
+                ...submittedWorkflowArguments,
+                input: e.target.value,
+              });
             }}
           />
           <Divider />
@@ -270,11 +258,16 @@ export default function SubmissionFormRawProjections({
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={submittedProjectionBoxesChecked.start}
+                      checked={
+                        submittedProjectionIndicesValues.boxesChecked.start
+                      }
                       onChange={(e) => {
-                        setProjectionBoxesChecked({
-                          ...submittedProjectionBoxesChecked,
-                          start: e.target.checked as boolean,
+                        setProjectionIndicesValues({
+                          ...submittedProjectionIndicesValues,
+                          boxesChecked: {
+                            ...submittedProjectionIndicesValues.boxesChecked,
+                            start: e.target.checked,
+                          },
                         });
                       }}
                     />
@@ -285,11 +278,16 @@ export default function SubmissionFormRawProjections({
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={submittedProjectionBoxesChecked.mid}
+                      checked={
+                        submittedProjectionIndicesValues.boxesChecked.mid
+                      }
                       onChange={(e) => {
-                        setProjectionBoxesChecked({
-                          ...submittedProjectionBoxesChecked,
-                          mid: e.target.checked as boolean,
+                        setProjectionIndicesValues({
+                          ...submittedProjectionIndicesValues,
+                          boxesChecked: {
+                            ...submittedProjectionIndicesValues.boxesChecked,
+                            mid: e.target.checked,
+                          },
                         });
                       }}
                     />
@@ -300,11 +298,16 @@ export default function SubmissionFormRawProjections({
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={submittedProjectionBoxesChecked.end}
+                      checked={
+                        submittedProjectionIndicesValues.boxesChecked.end
+                      }
                       onChange={(e) => {
-                        setProjectionBoxesChecked({
-                          ...submittedProjectionBoxesChecked,
-                          end: e.target.checked as boolean,
+                        setProjectionIndicesValues({
+                          ...submittedProjectionIndicesValues,
+                          boxesChecked: {
+                            ...submittedProjectionIndicesValues.boxesChecked,
+                            end: e.target.checked,
+                          },
                         });
                       }}
                     />
@@ -357,13 +360,18 @@ export default function SubmissionFormRawProjections({
                 <TextField
                   label="Start"
                   type="number"
-                  defaultValue={submittedProjectionIntervalValues.start}
+                  defaultValue={
+                    submittedProjectionIndicesValues.intervalValues.start
+                  }
                   onChange={(e) => {
                     const raw = e.target.value;
                     const parsed = raw === "" ? 0 : Number(raw);
-                    setProjectionIntervalValues({
-                      ...submittedProjectionIntervalValues,
-                      start: parsed === undefined ? 100 : parsed,
+                    setProjectionIndicesValues({
+                      ...submittedProjectionIndicesValues,
+                      intervalValues: {
+                        ...submittedProjectionIndicesValues.intervalValues,
+                        start: parsed ?? firstIndex,
+                      },
                     });
                   }}
                   fullWidth
@@ -372,13 +380,18 @@ export default function SubmissionFormRawProjections({
                 <TextField
                   label="Stop"
                   type="number"
-                  defaultValue={submittedProjectionIntervalValues.stop}
+                  defaultValue={
+                    submittedProjectionIndicesValues.intervalValues.stop
+                  }
                   onChange={(e) => {
                     const raw = e.target.value;
                     const parsed = raw === "" ? 0 : Number(raw);
-                    setProjectionIntervalValues({
-                      ...submittedProjectionIntervalValues,
-                      stop: parsed === undefined ? 100 : parsed,
+                    setProjectionIndicesValues({
+                      ...submittedProjectionIndicesValues,
+                      intervalValues: {
+                        ...submittedProjectionIndicesValues.intervalValues,
+                        stop: parsed ?? lastIndex,
+                      },
                     });
                   }}
                   fullWidth
@@ -387,13 +400,18 @@ export default function SubmissionFormRawProjections({
                 <TextField
                   label="Step"
                   type="number"
-                  defaultValue={submittedProjectionIntervalValues.step}
+                  defaultValue={
+                    submittedProjectionIndicesValues.intervalValues.step
+                  }
                   onChange={(e) => {
                     const raw = e.target.value;
                     const parsed = raw === "" ? 0 : Number(raw);
-                    setProjectionIntervalValues({
-                      ...submittedProjectionIntervalValues,
-                      step: parsed === undefined ? 100 : parsed,
+                    setProjectionIndicesValues({
+                      ...submittedProjectionIndicesValues,
+                      intervalValues: {
+                        ...submittedProjectionIndicesValues.intervalValues,
+                        start: parsed ?? 100,
+                      },
                     });
                   }}
                   fullWidth
@@ -417,9 +435,12 @@ export default function SubmissionFormRawProjections({
                   label="Indices List"
                   fullWidth
                   size="small"
-                  defaultValue={submittedProjectionsListValue}
+                  defaultValue={submittedProjectionIndicesValues.indexList}
                   onChange={(e) => {
-                    setProjectionsListValue(e.target.value);
+                    setProjectionIndicesValues({
+                      ...submittedProjectionIndicesValues,
+                      indexList: e.target.value,
+                    });
                   }}
                 />
               </Box>
@@ -433,9 +454,12 @@ export default function SubmissionFormRawProjections({
               type="string"
               fullWidth
               size="small"
-              value={submittedMemory}
+              value={submittedWorkflowArguments.memory}
               onChange={(e) => {
-                setSubmittedMemory(e.target.value);
+                setSubmittedWorkflowArguments({
+                  ...submittedWorkflowArguments,
+                  memory: e.target.value,
+                });
               }}
             />
             <TextField
@@ -443,11 +467,12 @@ export default function SubmissionFormRawProjections({
               type="number"
               fullWidth
               size="small"
-              value={submittedNprocs}
+              value={Number(submittedWorkflowArguments.nprocs)}
               onChange={(e) => {
-                setSubmittedNprocs(
-                  e.target.value === "" ? "" : Number(e.target.value)
-                );
+                setSubmittedWorkflowArguments({
+                  ...submittedWorkflowArguments,
+                  nprocs: Number(e.target.value),
+                });
               }}
             />
             <TextField
@@ -455,9 +480,12 @@ export default function SubmissionFormRawProjections({
               type="string"
               fullWidth
               size="small"
-              value={submittedOutputFilename}
+              value={submittedWorkflowArguments["output-filename"]}
               onChange={(e) => {
-                setSubmittedOutputFilename(e.target.value);
+                setSubmittedWorkflowArguments({
+                  ...submittedWorkflowArguments,
+                  "output-filename": e.target.value,
+                });
               }}
             />
             <TextField
@@ -465,9 +493,12 @@ export default function SubmissionFormRawProjections({
               type="string"
               fullWidth
               size="small"
-              value={submittedTmpdirPath}
+              value={submittedWorkflowArguments["tmpdir-path"]}
               onChange={(e) => {
-                setSubmittedTmpdirPath(e.target.value);
+                setSubmittedWorkflowArguments({
+                  ...submittedWorkflowArguments,
+                  "tmpdir-path": e.target.value,
+                });
               }}
             />
           </Stack>
