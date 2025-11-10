@@ -138,6 +138,12 @@ export default function SubmissionFormRawProjections({
     end: true,
   });
 
+  const [projectionIntervalValues, setProjectionIntervalValues] = useState({
+    start: 100,
+    stop: 3700,
+    step: 100,
+  });
+
   function onRawProjectionsFormSubmit(visit: Visit) {
     setSubmittedVisit(visit);
     let indices = "";
@@ -268,6 +274,7 @@ export default function SubmissionFormRawProjections({
                   : { border: "2px solid transparent" }),
               }}
             >
+              {/* can definitely make a function for these onClick functions */}
               <FormGroup row>
                 <FormControlLabel
                   control={
@@ -360,27 +367,49 @@ export default function SubmissionFormRawProjections({
                     : { border: "2px solid transparent" }),
                 }}
               >
+                {/* can definitely make a function for these onClick functions */}
                 <TextField
                   label="Start"
                   type="number"
-                  value={100}
-                  // onChange={handleNum("start")}
+                  defaultValue={projectionIntervalValues.start}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    const parsed = raw === "" ? 0 : Number(raw);
+                    setProjectionIntervalValues({
+                      ...projectionIntervalValues,
+                      start: parsed === undefined ? 100 : parsed,
+                    });
+                  }}
                   fullWidth
                   size="small"
                 />
                 <TextField
                   label="Stop"
                   type="number"
-                  value={3600}
-                  // onChange={handleNum("stop")}
+                  defaultValue={projectionIntervalValues.stop}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    const parsed = raw === "" ? 0 : Number(raw);
+                    setProjectionIntervalValues({
+                      ...projectionIntervalValues,
+                      stop: parsed === undefined ? 100 : parsed,
+                    });
+                  }}
                   fullWidth
                   size="small"
                 />
                 <TextField
                   label="Step"
                   type="number"
-                  value={100}
-                  // onChange={handleNum("step")}
+                  defaultValue={projectionIntervalValues.step}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    const parsed = raw === "" ? 0 : Number(raw);
+                    setProjectionIntervalValues({
+                      ...projectionIntervalValues,
+                      step: parsed === undefined ? 100 : parsed,
+                    });
+                  }}
                   fullWidth
                   size="small"
                 />
