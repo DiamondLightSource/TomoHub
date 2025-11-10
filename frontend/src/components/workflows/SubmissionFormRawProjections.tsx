@@ -99,6 +99,10 @@ export default function SubmissionFormRawProjections({
   visit,
   onSubmit: submitWorkflow,
 }: SubmissionFormRawProjectionsProps) {
+  // TODO: take these in as actual props instead of assuming
+  const firstIndex = 100;
+  const lastIndex = 3700;
+
   const templateData = useFragment(sharedFragment, template);
   const theme = useTheme();
   const { setTifURL } = useTifURLContext();
@@ -112,7 +116,7 @@ export default function SubmissionFormRawProjections({
     undefined
   );
   const [zipURL, setZipURL] = useState<string | undefined>(undefined);
-  const [submitteddatasetPath, setSubmittedDatasetPath] = useState("");
+  const [submittedDatasetPath, setSubmittedDatasetPath] = useState("");
   const [submittedInput, setSubmittedInput] = useState("");
   // is there a way to get the defualt parameter values to put in here??
   const [submittedMemory, setSubmittedMemory] = useState("20Gi");
@@ -139,8 +143,8 @@ export default function SubmissionFormRawProjections({
   });
 
   const [projectionIntervalValues, setProjectionIntervalValues] = useState({
-    start: 100,
-    stop: 3700,
+    start: firstIndex,
+    stop: lastIndex,
     step: 100,
   });
 
@@ -149,15 +153,34 @@ export default function SubmissionFormRawProjections({
   function onRawProjectionsFormSubmit(visit: Visit) {
     setSubmittedVisit(visit);
     let indices = "";
-    const start: number =
-      sweepFormValue.start === "" ? 100 : sweepFormValue.start;
-    const stop: number =
-      sweepFormValue.stop === "" ? 3600 : sweepFormValue.stop;
-    const step: number = sweepFormValue.step === "" ? 100 : sweepFormValue.step;
-    for (let i = start; i < stop; i += step) {
-      indices += i + ", ";
+    if (indicesMethod === "Checkbox") {
+      if (projectionBoxesChecked.start) {
+        indices += String(firstIndex);
+      }
+      if (projectionBoxesChecked.mid) {
+        if (indices !== "") {
+          indices += ", ";
+        }
+        indices += String((firstIndex + lastIndex) / 2);
+      }
+      if (projectionBoxesChecked.end) {
+        if (indices !== "") {
+          indices += ", ";
+        }
+        indices += String(lastIndex);
+      }
+    } else if (indicesMethod === "Interval") {
+      const start: number = projectionIntervalValues.start;
+      const stop: number = projectionIntervalValues.stop;
+      const step: number = projectionIntervalValues.step;
+      for (let i = start; i < stop; i += step) {
+        indices += i + ", ";
+      }
+      indices += stop;
+    } else if (indicesMethod === "List") {
+      // TODO: error handling either here or on the textfield to make sure input is of the right form
+      indices = projectionsListValue;
     }
-    indices += stop;
 
     // TODO: error handling here to replace empty strings with null in some cases??
     const parameters = {
