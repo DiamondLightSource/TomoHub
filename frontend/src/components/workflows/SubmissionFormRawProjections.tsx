@@ -127,6 +127,11 @@ export default function SubmissionFormRawProjections({
   const [showAdvancedIndicesOptions, setShowAdvancedIndicesOptions] =
     useState(false);
 
+  // convert this to an enum
+  const [indicesMethod, setIndicesMethod] = useState<
+    "Checkbox" | "Interval" | "List"
+  >("Checkbox");
+
   function onRawProjectionsFormSubmit(visit: Visit) {
     setSubmittedVisit(visit);
     let indices = "";
@@ -245,7 +250,20 @@ export default function SubmissionFormRawProjections({
             justifyContent="space-between"
           >
             {/* not sure I like the layout of this bit */}
-            <Box>
+            <Box
+              onClick={() => {
+                setIndicesMethod("Checkbox");
+              }}
+              sx={
+                indicesMethod === "Checkbox"
+                  ? {
+                      border: "2px solid grey",
+                      "border-radius": 5,
+                      padding: "10px",
+                    }
+                  : { padding: "10px" }
+              }
+            >
               <FormGroup row>
                 <FormControlLabel
                   control={<Checkbox />}
@@ -285,7 +303,22 @@ export default function SubmissionFormRawProjections({
           </Stack>
           {showAdvancedIndicesOptions && (
             <Box>
-              <Stack direction="row" spacing={2}>
+              <Stack
+                direction="row"
+                spacing={2}
+                onClick={() => {
+                  setIndicesMethod("Interval");
+                }}
+                sx={
+                  indicesMethod === "Interval"
+                    ? {
+                        border: "2px solid grey",
+                        "border-radius": 5,
+                        padding: "10px",
+                      }
+                    : { padding: "10px" }
+                }
+              >
                 <TextField
                   label="Start"
                   type="number"
@@ -311,13 +344,22 @@ export default function SubmissionFormRawProjections({
                   size="small"
                 />
               </Stack>
-              <Box>
-                <TextField
-                  label="Indices List"
-                  fullWidth
-                  size="small"
-                  sx={{ "margin-top": 10 }}
-                />
+              <Box
+                onClick={() => {
+                  setIndicesMethod("List");
+                }}
+                sx={
+                  indicesMethod === "List"
+                    ? {
+                        "margin-top": 10,
+                        border: "2px solid grey",
+                        "border-radius": 5,
+                        padding: "10px",
+                      }
+                    : { "margin-top": 10, padding: "10px" }
+                }
+              >
+                <TextField label="Indices List" fullWidth size="small" />
               </Box>
             </Box>
           )}
