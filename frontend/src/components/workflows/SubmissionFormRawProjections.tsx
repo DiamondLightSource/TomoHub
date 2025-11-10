@@ -24,63 +24,9 @@ import React, { useState } from "react";
 import WorkflowStatus from "./WorkflowStatus";
 import { WorkflowStatusSubscription$data } from "./__generated__/WorkflowStatusSubscription.graphql";
 import { setKey } from "../../devKey";
-import { graphql, useFragment, useLazyLoadQuery } from "react-relay";
-import { SubmissionFormRawProjectionsQuery } from "./__generated__/SubmissionFormRawProjectionsQuery.graphql";
+import { useFragment } from "react-relay";
 import { useTifURLContext } from "../../contexts/CropContext";
 import { sharedFragment } from "./Submission";
-
-const query = graphql`
-  query SubmissionFormRawProjectionsQuery {
-    workflow(
-      name: "extract-raw-projections-trh5f"
-      visit: { proposalCode: "cm", proposalNumber: 40628, number: 2 }
-    ) {
-      name
-      status {
-        ... on WorkflowSucceededStatus {
-          tasks {
-            artifacts {
-              name
-              url
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-function CallQuery({
-  setTifURL,
-}: {
-  setTifURL: (url: string | undefined) => void;
-}): JSX.Element {
-  const data = useLazyLoadQuery<SubmissionFormRawProjectionsQuery>(query, {});
-  console.log(data);
-
-  const c = data.workflow.status;
-  if (c === null || c === undefined) {
-    return <p>first</p>;
-  }
-
-  if (c.tasks !== undefined) {
-    const zipFilesList = c.tasks[0].artifacts.filter(
-      (a) => a.name === "projections.tif"
-    );
-    if (zipFilesList.length !== 0) {
-      // SET DATA HERE!!
-      console.log(
-        "tiff url: " +
-          c.tasks[0].artifacts.filter((a) => a.name === "projections.tif")[0]
-            .url
-      );
-      setTifURL(
-        c.tasks[0].artifacts.filter((a) => a.name === "projections.tif")[0].url
-      );
-    }
-  }
-  return <Box></Box>;
-}
 
 interface SubmissionFormRawProjectionsProps {
   template: SubmissionFormSharedFragment$key;
@@ -115,7 +61,6 @@ export default function SubmissionFormRawProjections({
   const [submittedVisit, setSubmittedVisit] = useState<undefined | Visit>(
     undefined
   );
-  const [zipURL, setZipURL] = useState<string | undefined>(undefined);
   const [submittedDatasetPath, setSubmittedDatasetPath] = useState("");
   const [submittedInput, setSubmittedInput] = useState("");
   // is there a way to get the defualt parameter values to put in here??
