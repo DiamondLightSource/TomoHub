@@ -254,15 +254,13 @@ export default function SubmissionFormRawProjections({
               onClick={() => {
                 setIndicesMethod("Checkbox");
               }}
-              sx={
-                indicesMethod === "Checkbox"
-                  ? {
-                      border: "2px solid grey",
-                      "border-radius": 5,
-                      padding: "10px",
-                    }
-                  : { padding: "10px" }
-              }
+              sx={{
+                padding: "10px",
+                "border-radius": "5px",
+                ...(indicesMethod === "Checkbox"
+                  ? { border: "2px solid grey" }
+                  : { border: "2px solid transparent" }),
+              }}
             >
               <FormGroup row>
                 <FormControlLabel
@@ -309,15 +307,13 @@ export default function SubmissionFormRawProjections({
                 onClick={() => {
                   setIndicesMethod("Interval");
                 }}
-                sx={
-                  indicesMethod === "Interval"
-                    ? {
-                        border: "2px solid grey",
-                        "border-radius": 5,
-                        padding: "10px",
-                      }
-                    : { padding: "10px" }
-                }
+                sx={{
+                  padding: "10px",
+                  "border-radius": "5px",
+                  ...(indicesMethod === "Interval"
+                    ? { border: "2px solid grey" }
+                    : { border: "2px solid transparent" }),
+                }}
               >
                 <TextField
                   label="Start"
@@ -348,16 +344,13 @@ export default function SubmissionFormRawProjections({
                 onClick={() => {
                   setIndicesMethod("List");
                 }}
-                sx={
-                  indicesMethod === "List"
-                    ? {
-                        "margin-top": 10,
-                        border: "2px solid grey",
-                        "border-radius": 5,
-                        padding: "10px",
-                      }
-                    : { "margin-top": 10, padding: "10px" }
-                }
+                sx={{
+                  padding: "10px",
+                  "border-radius": "5px",
+                  ...(indicesMethod === "List"
+                    ? { border: "2px solid grey" }
+                    : { border: "2px solid transparent" }),
+                }}
               >
                 <TextField label="Indices List" fullWidth size="small" />
               </Box>
