@@ -257,7 +257,7 @@ export default function SubmissionFormRawProjections({
               sx={{
                 padding: "10px",
                 "border-radius": "5px",
-                ...(indicesMethod === "Checkbox"
+                ...(indicesMethod === "Checkbox" && showAdvancedIndicesOptions
                   ? { border: "2px solid grey" }
                   : { border: "2px solid transparent" }),
               }}
@@ -283,7 +283,10 @@ export default function SubmissionFormRawProjections({
             {!showAdvancedIndicesOptions ? (
               <Button
                 variant="outlined"
-                onClick={() => setShowAdvancedIndicesOptions(true)}
+                onClick={() => {
+                  setShowAdvancedIndicesOptions(true);
+                  setIndicesMethod("Checkbox");
+                }}
                 data-testid="wf-advanced-toggle"
                 sx={{ flexShrink: 0, minWidth: "120px" }}
                 startIcon={<ExpandMoreIcon />}
