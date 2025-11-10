@@ -83,10 +83,13 @@ export default function SubmissionFormRawProjections({
   const [showAdvancedIndicesOptions, setShowAdvancedIndicesOptions] =
     useState(false);
 
-  // TODO: convert this to an enum
-  const [submittedProjecitonIndicesMethod, setIndicesMethod] = useState<
-    "Checkbox" | "Interval" | "List"
-  >("Checkbox");
+  enum ProjectionIndicesMethod {
+    Checkbox,
+    Interval,
+    List,
+  }
+  const [submittedProjecitonIndicesMethod, setIndicesMethod] =
+    useState<ProjectionIndicesMethod>(ProjectionIndicesMethod.Checkbox);
 
   const [submittedProjectionBoxesChecked, setProjectionBoxesChecked] = useState(
     {
@@ -108,7 +111,7 @@ export default function SubmissionFormRawProjections({
   function onRawProjectionsFormSubmit(visit: Visit) {
     setSubmittedVisit(visit);
     let indices = "";
-    if (submittedProjecitonIndicesMethod === "Checkbox") {
+    if (submittedProjecitonIndicesMethod === ProjectionIndicesMethod.Checkbox) {
       if (submittedProjectionBoxesChecked.start) {
         indices += String(firstIndex);
       }
@@ -124,7 +127,9 @@ export default function SubmissionFormRawProjections({
         }
         indices += String(lastIndex);
       }
-    } else if (submittedProjecitonIndicesMethod === "Interval") {
+    } else if (
+      submittedProjecitonIndicesMethod === ProjectionIndicesMethod.Interval
+    ) {
       const start: number = submittedProjectionIntervalValues.start;
       const stop: number = submittedProjectionIntervalValues.stop;
       const step: number = submittedProjectionIntervalValues.step;
@@ -132,7 +137,9 @@ export default function SubmissionFormRawProjections({
         indices += i + ", ";
       }
       indices += stop;
-    } else if (submittedProjecitonIndicesMethod === "List") {
+    } else if (
+      submittedProjecitonIndicesMethod === ProjectionIndicesMethod.List
+    ) {
       // TODO: error handling either here or on the textfield to make sure input is of the right form
       indices = submittedProjectionsListValue;
     }
@@ -245,13 +252,13 @@ export default function SubmissionFormRawProjections({
             {/* TODO: change or gather more opinions */}
             <Box
               onClick={() => {
-                setIndicesMethod("Checkbox");
+                setIndicesMethod(ProjectionIndicesMethod.Checkbox);
               }}
               sx={{
                 padding: "10px",
                 "border-radius": "5px",
-                ...(submittedProjecitonIndicesMethod === "Checkbox" &&
-                showAdvancedIndicesOptions
+                ...(submittedProjecitonIndicesMethod ===
+                  ProjectionIndicesMethod.Checkbox && showAdvancedIndicesOptions
                   ? { border: "2px solid grey" }
                   : { border: "2px solid transparent" }),
               }}
@@ -312,7 +319,7 @@ export default function SubmissionFormRawProjections({
                 variant="outlined"
                 onClick={() => {
                   setShowAdvancedIndicesOptions(true);
-                  setIndicesMethod("Checkbox");
+                  setIndicesMethod(ProjectionIndicesMethod.Checkbox);
                 }}
                 data-testid="wf-advanced-toggle"
                 sx={{ flexShrink: 0, minWidth: "120px" }}
@@ -335,12 +342,13 @@ export default function SubmissionFormRawProjections({
                 direction="row"
                 spacing={2}
                 onClick={() => {
-                  setIndicesMethod("Interval");
+                  setIndicesMethod(ProjectionIndicesMethod.Interval);
                 }}
                 sx={{
                   padding: "10px",
                   "border-radius": "5px",
-                  ...(submittedProjecitonIndicesMethod === "Interval"
+                  ...(submittedProjecitonIndicesMethod ===
+                  ProjectionIndicesMethod.Interval
                     ? { border: "2px solid grey" }
                     : { border: "2px solid transparent" }),
                 }}
@@ -394,12 +402,13 @@ export default function SubmissionFormRawProjections({
               </Stack>
               <Box
                 onClick={() => {
-                  setIndicesMethod("List");
+                  setIndicesMethod(ProjectionIndicesMethod.List);
                 }}
                 sx={{
                   padding: "10px",
                   "border-radius": "5px",
-                  ...(submittedProjecitonIndicesMethod === "List"
+                  ...(submittedProjecitonIndicesMethod ===
+                  ProjectionIndicesMethod.List
                     ? { border: "2px solid grey" }
                     : { border: "2px solid transparent" }),
                 }}
