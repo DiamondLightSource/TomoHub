@@ -282,13 +282,11 @@ export default function SubmissionFormRawProjections({
                   control={
                     <Checkbox
                       checked={projectionBoxesChecked.start}
-                      onClick={(e) => {
-                        if ("checked" in e.target) {
-                          setProjectionBoxesChecked({
-                            ...projectionBoxesChecked,
-                            start: e.target.checked as boolean,
-                          });
-                        }
+                      onChange={(e) => {
+                        setProjectionBoxesChecked({
+                          ...projectionBoxesChecked,
+                          start: e.target.checked as boolean,
+                        });
                       }}
                     />
                   }
@@ -299,13 +297,11 @@ export default function SubmissionFormRawProjections({
                   control={
                     <Checkbox
                       checked={projectionBoxesChecked.mid}
-                      onClick={(e) => {
-                        if ("checked" in e.target) {
-                          setProjectionBoxesChecked({
-                            ...projectionBoxesChecked,
-                            mid: e.target.checked as boolean,
-                          });
-                        }
+                      onChange={(e) => {
+                        setProjectionBoxesChecked({
+                          ...projectionBoxesChecked,
+                          mid: e.target.checked as boolean,
+                        });
                       }}
                     />
                   }
@@ -316,13 +312,11 @@ export default function SubmissionFormRawProjections({
                   control={
                     <Checkbox
                       checked={projectionBoxesChecked.end}
-                      onClick={(e) => {
-                        if ("checked" in e.target) {
-                          setProjectionBoxesChecked({
-                            ...projectionBoxesChecked,
-                            end: e.target.checked as boolean,
-                          });
-                        }
+                      onChange={(e) => {
+                        setProjectionBoxesChecked({
+                          ...projectionBoxesChecked,
+                          end: e.target.checked as boolean,
+                        });
                       }}
                     />
                   }
