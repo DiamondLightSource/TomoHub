@@ -50,6 +50,7 @@ export default function SubmissionFormRawProjections({
   const lastIndex = 3700;
 
   const templateData = useFragment(sharedFragment, template);
+  console.log(templateData);
   const theme = useTheme();
   const { setTifURL } = useTifURLContext();
   const [workflowSubmitted, setWorkflowSubmitted] = useState(false);
@@ -63,12 +64,18 @@ export default function SubmissionFormRawProjections({
   );
   const [submittedDatasetPath, setSubmittedDatasetPath] = useState("");
   const [submittedInput, setSubmittedInput] = useState("");
-  // is there a way to get the defualt parameter values to put in here??
-  const [submittedMemory, setSubmittedMemory] = useState("20Gi");
-  const [submittedNprocs, setSubmittedNprocs] = useState<number | string>(1);
-  const [submittedOutputFilename, setSubmittedOutputFilename] =
-    useState("projections.tif");
-  const [submittedTmpdirPath, setSubmittedTmpdirPath] = useState("/tmp");
+  const [submittedMemory, setSubmittedMemory] = useState(
+    templateData.arguments.properties.memory.default
+  );
+  const [submittedNprocs, setSubmittedNprocs] = useState<number | string>(
+    Number(templateData.arguments.properties.nprocs.default)
+  );
+  const [submittedOutputFilename, setSubmittedOutputFilename] = useState(
+    templateData.arguments.properties["output-filename"].default
+  );
+  const [submittedTmpdirPath, setSubmittedTmpdirPath] = useState(
+    templateData.arguments.properties["tmpdir-path"].default
+  );
   const [keyFormValue, setKeyFormValue] = useState<string | undefined>(
     undefined
   );
@@ -77,54 +84,57 @@ export default function SubmissionFormRawProjections({
     useState(false);
 
   // TODO: convert this to an enum
-  const [indicesMethod, setIndicesMethod] = useState<
+  const [submittedProjecitonIndicesMethod, setIndicesMethod] = useState<
     "Checkbox" | "Interval" | "List"
   >("Checkbox");
 
-  const [projectionBoxesChecked, setProjectionBoxesChecked] = useState({
-    start: true,
-    mid: true,
-    end: true,
-  });
+  const [submittedProjectionBoxesChecked, setProjectionBoxesChecked] = useState(
+    {
+      start: true,
+      mid: true,
+      end: true,
+    }
+  );
 
-  const [projectionIntervalValues, setProjectionIntervalValues] = useState({
-    start: firstIndex,
-    stop: lastIndex,
-    step: 100,
-  });
+  const [submittedProjectionIntervalValues, setProjectionIntervalValues] =
+    useState({
+      start: firstIndex,
+      stop: lastIndex,
+      step: 100,
+    });
 
-  const [projectionsListValue, setProjectionsListValue] = useState("");
+  const [submittedProjectionsListValue, setProjectionsListValue] = useState("");
 
   function onRawProjectionsFormSubmit(visit: Visit) {
     setSubmittedVisit(visit);
     let indices = "";
-    if (indicesMethod === "Checkbox") {
-      if (projectionBoxesChecked.start) {
+    if (submittedProjecitonIndicesMethod === "Checkbox") {
+      if (submittedProjectionBoxesChecked.start) {
         indices += String(firstIndex);
       }
-      if (projectionBoxesChecked.mid) {
+      if (submittedProjectionBoxesChecked.mid) {
         if (indices !== "") {
           indices += ", ";
         }
         indices += String((firstIndex + lastIndex) / 2);
       }
-      if (projectionBoxesChecked.end) {
+      if (submittedProjectionBoxesChecked.end) {
         if (indices !== "") {
           indices += ", ";
         }
         indices += String(lastIndex);
       }
-    } else if (indicesMethod === "Interval") {
-      const start: number = projectionIntervalValues.start;
-      const stop: number = projectionIntervalValues.stop;
-      const step: number = projectionIntervalValues.step;
+    } else if (submittedProjecitonIndicesMethod === "Interval") {
+      const start: number = submittedProjectionIntervalValues.start;
+      const stop: number = submittedProjectionIntervalValues.stop;
+      const step: number = submittedProjectionIntervalValues.step;
       for (let i = start; i < stop; i += step) {
         indices += i + ", ";
       }
       indices += stop;
-    } else if (indicesMethod === "List") {
+    } else if (submittedProjecitonIndicesMethod === "List") {
       // TODO: error handling either here or on the textfield to make sure input is of the right form
-      indices = projectionsListValue;
+      indices = submittedProjectionsListValue;
     }
 
     // TODO: error handling here to replace empty strings with null in some cases??
@@ -240,7 +250,8 @@ export default function SubmissionFormRawProjections({
               sx={{
                 padding: "10px",
                 "border-radius": "5px",
-                ...(indicesMethod === "Checkbox" && showAdvancedIndicesOptions
+                ...(submittedProjecitonIndicesMethod === "Checkbox" &&
+                showAdvancedIndicesOptions
                   ? { border: "2px solid grey" }
                   : { border: "2px solid transparent" }),
               }}
@@ -252,10 +263,10 @@ export default function SubmissionFormRawProjections({
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={projectionBoxesChecked.start}
+                      checked={submittedProjectionBoxesChecked.start}
                       onChange={(e) => {
                         setProjectionBoxesChecked({
-                          ...projectionBoxesChecked,
+                          ...submittedProjectionBoxesChecked,
                           start: e.target.checked as boolean,
                         });
                       }}
@@ -267,10 +278,10 @@ export default function SubmissionFormRawProjections({
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={projectionBoxesChecked.mid}
+                      checked={submittedProjectionBoxesChecked.mid}
                       onChange={(e) => {
                         setProjectionBoxesChecked({
-                          ...projectionBoxesChecked,
+                          ...submittedProjectionBoxesChecked,
                           mid: e.target.checked as boolean,
                         });
                       }}
@@ -282,10 +293,10 @@ export default function SubmissionFormRawProjections({
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={projectionBoxesChecked.end}
+                      checked={submittedProjectionBoxesChecked.end}
                       onChange={(e) => {
                         setProjectionBoxesChecked({
-                          ...projectionBoxesChecked,
+                          ...submittedProjectionBoxesChecked,
                           end: e.target.checked as boolean,
                         });
                       }}
@@ -329,7 +340,7 @@ export default function SubmissionFormRawProjections({
                 sx={{
                   padding: "10px",
                   "border-radius": "5px",
-                  ...(indicesMethod === "Interval"
+                  ...(submittedProjecitonIndicesMethod === "Interval"
                     ? { border: "2px solid grey" }
                     : { border: "2px solid transparent" }),
                 }}
@@ -338,12 +349,12 @@ export default function SubmissionFormRawProjections({
                 <TextField
                   label="Start"
                   type="number"
-                  defaultValue={projectionIntervalValues.start}
+                  defaultValue={submittedProjectionIntervalValues.start}
                   onChange={(e) => {
                     const raw = e.target.value;
                     const parsed = raw === "" ? 0 : Number(raw);
                     setProjectionIntervalValues({
-                      ...projectionIntervalValues,
+                      ...submittedProjectionIntervalValues,
                       start: parsed === undefined ? 100 : parsed,
                     });
                   }}
@@ -353,12 +364,12 @@ export default function SubmissionFormRawProjections({
                 <TextField
                   label="Stop"
                   type="number"
-                  defaultValue={projectionIntervalValues.stop}
+                  defaultValue={submittedProjectionIntervalValues.stop}
                   onChange={(e) => {
                     const raw = e.target.value;
                     const parsed = raw === "" ? 0 : Number(raw);
                     setProjectionIntervalValues({
-                      ...projectionIntervalValues,
+                      ...submittedProjectionIntervalValues,
                       stop: parsed === undefined ? 100 : parsed,
                     });
                   }}
@@ -368,12 +379,12 @@ export default function SubmissionFormRawProjections({
                 <TextField
                   label="Step"
                   type="number"
-                  defaultValue={projectionIntervalValues.step}
+                  defaultValue={submittedProjectionIntervalValues.step}
                   onChange={(e) => {
                     const raw = e.target.value;
                     const parsed = raw === "" ? 0 : Number(raw);
                     setProjectionIntervalValues({
-                      ...projectionIntervalValues,
+                      ...submittedProjectionIntervalValues,
                       step: parsed === undefined ? 100 : parsed,
                     });
                   }}
@@ -388,7 +399,7 @@ export default function SubmissionFormRawProjections({
                 sx={{
                   padding: "10px",
                   "border-radius": "5px",
-                  ...(indicesMethod === "List"
+                  ...(submittedProjecitonIndicesMethod === "List"
                     ? { border: "2px solid grey" }
                     : { border: "2px solid transparent" }),
                 }}
@@ -397,7 +408,7 @@ export default function SubmissionFormRawProjections({
                   label="Indices List"
                   fullWidth
                   size="small"
-                  defaultValue={projectionsListValue}
+                  defaultValue={submittedProjectionsListValue}
                   onChange={(e) => {
                     setProjectionsListValue(e.target.value);
                   }}
