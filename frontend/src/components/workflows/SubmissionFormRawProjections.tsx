@@ -1,12 +1,16 @@
 import {
   Box,
   Button,
+  Checkbox,
   Divider,
+  FormControlLabel,
+  FormGroup,
   Stack,
   TextField,
   Typography,
   useTheme,
 } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Visit,
   VisitInput,
@@ -229,7 +233,78 @@ export default function SubmissionFormRawProjections({
           />
           <Divider />
           <Typography variant="h6">Projections</Typography>
-          <p>sort projection indices here</p>
+          <Stack
+            direction="row"
+            spacing={4}
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            {/* not sure I like the layout of this bit */}
+            <Box>
+              <FormGroup row>
+                <FormControlLabel
+                  control={<Checkbox />}
+                  label="Start"
+                  sx={{ "margin-left": 30, "margin-right": 30 }}
+                />
+                <FormControlLabel
+                  control={<Checkbox />}
+                  label="Mid"
+                  sx={{ "margin-left": 30, "margin-right": 30 }}
+                />
+                <FormControlLabel
+                  control={<Checkbox />}
+                  label="End"
+                  sx={{ "margin-left": 30, "margin-right": 30 }}
+                />
+              </FormGroup>
+            </Box>
+            <Button
+              variant="outlined"
+              // onClick={() => setShowAdvanced(true)}
+              data-testid="wf-advanced-toggle"
+              sx={{ flexShrink: 0, minWidth: "120px" }}
+              startIcon={<ExpandMoreIcon />}
+            >
+              Advanced
+            </Button>
+          </Stack>
+          <Box>
+            <Stack direction="row" spacing={2}>
+              <TextField
+                label="Start"
+                type="number"
+                value={100}
+                // onChange={handleNum("start")}
+                fullWidth
+                size="small"
+              />
+              <TextField
+                label="Stop"
+                type="number"
+                value={3600}
+                // onChange={handleNum("stop")}
+                fullWidth
+                size="small"
+              />
+              <TextField
+                label="Step"
+                type="number"
+                value={100}
+                // onChange={handleNum("step")}
+                fullWidth
+                size="small"
+              />
+            </Stack>
+            <Box>
+              <TextField
+                label="Indices List"
+                fullWidth
+                size="small"
+                sx={{ "margin-top": 10 }}
+              />
+            </Box>
+          </Box>
           <Divider />
           <Typography variant="h6">Advanced Parameters</Typography>
           <Stack direction="row" spacing={2} alignItems="center">
