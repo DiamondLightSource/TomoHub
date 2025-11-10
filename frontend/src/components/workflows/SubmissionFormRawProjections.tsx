@@ -127,7 +127,7 @@ export default function SubmissionFormRawProjections({
   const [showAdvancedIndicesOptions, setShowAdvancedIndicesOptions] =
     useState(false);
 
-  // convert this to an enum
+  // TODO: convert this to an enum
   const [indicesMethod, setIndicesMethod] = useState<
     "Checkbox" | "Interval" | "List"
   >("Checkbox");
