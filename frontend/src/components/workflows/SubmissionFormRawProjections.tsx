@@ -5,12 +5,14 @@ import {
   Divider,
   FormControlLabel,
   FormGroup,
+  IconButton,
   Stack,
   TextField,
   Typography,
   useTheme,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Visit,
   VisitInput,
@@ -121,6 +123,9 @@ export default function SubmissionFormRawProjections({
   const [keyFormValue, setKeyFormValue] = useState<string | undefined>(
     undefined
   );
+
+  const [showAdvancedIndicesOptions, setShowAdvancedIndicesOptions] =
+    useState(false);
 
   function onRawProjectionsFormSubmit(visit: Visit) {
     setSubmittedVisit(visit);
@@ -259,52 +264,63 @@ export default function SubmissionFormRawProjections({
                 />
               </FormGroup>
             </Box>
-            <Button
-              variant="outlined"
-              // onClick={() => setShowAdvanced(true)}
-              data-testid="wf-advanced-toggle"
-              sx={{ flexShrink: 0, minWidth: "120px" }}
-              startIcon={<ExpandMoreIcon />}
-            >
-              Advanced
-            </Button>
+            {!showAdvancedIndicesOptions ? (
+              <Button
+                variant="outlined"
+                onClick={() => setShowAdvancedIndicesOptions(true)}
+                data-testid="wf-advanced-toggle"
+                sx={{ flexShrink: 0, minWidth: "120px" }}
+                startIcon={<ExpandMoreIcon />}
+              >
+                Advanced
+              </Button>
+            ) : (
+              <IconButton
+                onClick={() => setShowAdvancedIndicesOptions(false)}
+                sx={{ flexShrink: 0, minWidth: "40px" }}
+              >
+                <CloseIcon />
+              </IconButton>
+            )}
           </Stack>
-          <Box>
-            <Stack direction="row" spacing={2}>
-              <TextField
-                label="Start"
-                type="number"
-                value={100}
-                // onChange={handleNum("start")}
-                fullWidth
-                size="small"
-              />
-              <TextField
-                label="Stop"
-                type="number"
-                value={3600}
-                // onChange={handleNum("stop")}
-                fullWidth
-                size="small"
-              />
-              <TextField
-                label="Step"
-                type="number"
-                value={100}
-                // onChange={handleNum("step")}
-                fullWidth
-                size="small"
-              />
-            </Stack>
+          {showAdvancedIndicesOptions && (
             <Box>
-              <TextField
-                label="Indices List"
-                fullWidth
-                size="small"
-                sx={{ "margin-top": 10 }}
-              />
+              <Stack direction="row" spacing={2}>
+                <TextField
+                  label="Start"
+                  type="number"
+                  value={100}
+                  // onChange={handleNum("start")}
+                  fullWidth
+                  size="small"
+                />
+                <TextField
+                  label="Stop"
+                  type="number"
+                  value={3600}
+                  // onChange={handleNum("stop")}
+                  fullWidth
+                  size="small"
+                />
+                <TextField
+                  label="Step"
+                  type="number"
+                  value={100}
+                  // onChange={handleNum("step")}
+                  fullWidth
+                  size="small"
+                />
+              </Stack>
+              <Box>
+                <TextField
+                  label="Indices List"
+                  fullWidth
+                  size="small"
+                  sx={{ "margin-top": 10 }}
+                />
+              </Box>
             </Box>
-          </Box>
+          )}
           <Divider />
           <Typography variant="h6">Advanced Parameters</Typography>
           <Stack direction="row" spacing={2} alignItems="center">
