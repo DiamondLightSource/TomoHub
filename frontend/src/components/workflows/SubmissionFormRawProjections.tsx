@@ -161,13 +161,13 @@ export default function SubmissionFormRawProjections({
 
     // TODO: error handling here to replace empty strings with null in some cases??
     const parameters = {
-      input: inputFormValue,
-      "tmpdir-path": wfparamFormValue.httomo_outdir_name,
-      "dataset-path": wfparamFormValue.input,
-      memory: wfparamFormValue.memory,
-      nprocs: wfparamFormValue.nprocs,
+      input: submittedInput,
+      "tmpdir-path": submittedTmpdirPath,
+      "dataset-path": submittedDatasetPath,
+      memory: submittedMemory,
+      nprocs: submittedNprocs,
       "projection-indices": indices,
-      "output-filename": wfparamFormValue.output,
+      "output-filename": submittedOutputFilename,
     };
 
     function workflowSuccessfullySubmitted(submittedWorkflowName: string) {
