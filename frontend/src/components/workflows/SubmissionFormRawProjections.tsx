@@ -2,7 +2,6 @@ import ParameterSweepForm from "./sweepPipeline/ParameterSweepForm";
 import WorkflowParametersForm from "./WorkflowParametersForm";
 import { SweepValues } from "./sweepPipeline/ParameterSweepForm";
 import { Button, TextField, Typography } from "@mui/material";
-import { Button, TextField, Typography } from "@mui/material";
 import { WorkflowParamsValues } from "./WorkflowParametersForm";
 import {
   Visit,
