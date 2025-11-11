@@ -106,11 +106,11 @@ export default function SubmissionFormRawProjections({
 
     if ("tasks" in c) {
       const zipFilesList = c.tasks[0].artifacts.filter(
-        (a) => a.name === "projections.zip"
+        (a) => a.name === "projections.tif"
       );
       if (zipFilesList.length !== 0) {
         setTifURL(
-          c.tasks[0].artifacts.filter((a) => a.name === "projections.zip")[0]
+          c.tasks[0].artifacts.filter((a) => a.name === "projections.tif")[0]
             .url
         );
       }
