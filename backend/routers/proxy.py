@@ -5,6 +5,7 @@ import logging
 from PIL import Image
 from io import BytesIO
 import json
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +67,8 @@ async def proxy_tiff(url: str = Query(..., description="The S3 URL to proxy")):
 @proxy_router.get("/tiff-pages")
 async def proxy_tiff_pages(
     url: str = Query(..., description="The S3 URL to proxy"),
-    page: int = Query(None, description="Page number to extract (0-based). If not provided, returns metadata.")
+    page: int = Query(None, description="Page number to extract (0-based). If not provided, returns metadata."),
+    downsample_rate: int = 1
 ):
     """
     Process multi-page TIFF files server-side using Pillow.
@@ -136,10 +138,17 @@ async def proxy_tiff_pages(
             else:
                 try:
                     img.seek(page)
+                    if downsample_rate != 1:
+                        width, height = img.size
+                        img = img.resize((width // downsample_rate, height // downsample_rate))
                     logger.info(f"Extracting page {page}, size: {img.size}")
                     
                     # Convert to RGB if necessary (TIFF might be in different modes)
                     if img.mode not in ('RGB', 'RGBA'):
+                        if img.mode == 'I;16':
+                            array = np.array(img)
+                            normalized = (array.astype(np.uint16) - array.min()) * 255.0 / (array.max() - array.min())
+                            img = Image.fromarray(normalized.astype(np.uint8))
                         img = img.convert('RGB')
                     
                     # Save as PNG to BytesIO

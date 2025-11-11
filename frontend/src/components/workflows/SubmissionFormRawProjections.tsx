@@ -13,6 +13,7 @@ import { JSONObject } from "../../types";
 import { useState } from "react";
 import WorkflowStatus from "./WorkflowStatus";
 import { WorkflowStatusSubscription$data } from "./__generated__/WorkflowStatusSubscription.graphql";
+import { useTifURLContext } from "../../contexts/CropContext";
 
 interface SubmissionFormRawProjectionsProps {
   template: SubmissionFormSharedFragment$key;
@@ -31,6 +32,7 @@ export default function SubmissionFormRawProjections({
   visit,
   onSubmit: submitWorkflow,
 }: SubmissionFormRawProjectionsProps) {
+  const { setTifURL } = useTifURLContext();
   const [workflowSubmitted, setWorkflowSubmitted] = useState(false);
   const [retryButtonVisible, setRetryButtonVisible] = useState(false);
 
@@ -40,7 +42,6 @@ export default function SubmissionFormRawProjections({
   const [submittedVisit, setSubmittedVisit] = useState<undefined | Visit>(
     undefined
   );
-  const [zipURL, setZipURL] = useState<string | undefined>(undefined);
   const [inputFormValue, setInputFormValue] = useState<string>("");
   const [sweepFormValue, setSweepFormValue] = useState<SweepValues>({
     start: 100,
@@ -105,11 +106,11 @@ export default function SubmissionFormRawProjections({
 
     if ("tasks" in c) {
       const zipFilesList = c.tasks[0].artifacts.filter(
-        (a) => a.name === "projections.zip"
+        (a) => a.name === "projections.tif"
       );
       if (zipFilesList.length !== 0) {
-        setZipURL(
-          c.tasks[0].artifacts.filter((a) => a.name === "projections.zip")[0]
+        setTifURL(
+          c.tasks[0].artifacts.filter((a) => a.name === "projections.tif")[0]
             .url
         );
       }
@@ -125,7 +126,7 @@ export default function SubmissionFormRawProjections({
             visit={visitToText(submittedVisit)}
             onWorkflowDataChange={onWorkflowDataChange}
           />
-          {retryButtonVisible ? (
+          {retryButtonVisible && (
             <Button
               onClick={() => {
                 setWorkflowSubmitted(false);
@@ -137,8 +138,6 @@ export default function SubmissionFormRawProjections({
             >
               Refill form
             </Button>
-          ) : (
-            <p>{zipURL}</p>
           )}
         </div>
       ) : (
