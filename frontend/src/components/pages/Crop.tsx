@@ -18,11 +18,7 @@ interface CropProps {
 export default function Crop({ setVisit }: CropProps) {
   const sampleRate = 10;
   const maxPixelValue = 255;
-  let copies: undefined | number = undefined;
   const [images, setImages] = useState<NDT[] | undefined>(undefined);
-  if (images !== undefined) {
-    copies = images.length;
-  }
 
   const { tifURL } = useTifURLContext();
 
@@ -38,7 +34,7 @@ export default function Crop({ setVisit }: CropProps) {
   return images !== undefined ? (
     <DisplayAreaWrapper
       maxPixelValue={maxPixelValue}
-      copies={copies ?? 0}
+      copies={images.length}
       images={images}
       sampleRate={sampleRate}
     />
