@@ -30,15 +30,12 @@ export default function Crop({ setVisit }: CropProps) {
 
   useEffect(() => {
     if (tifURL === undefined) {
-      console.log("tif undefined, returning");
       return;
     }
-    console.log("setting load images to true");
     setLoadingImages(true);
     loadData(tifURL, sampleRate, setLoadingImageIndex, setTotalImages).then(
       (loadDataImages) => {
         setImages(loadDataImages);
-        console.log("setting load images to false");
         setLoadingImages(false);
       }
     );
