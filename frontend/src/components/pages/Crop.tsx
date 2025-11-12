@@ -77,7 +77,7 @@ export default function Crop({ setVisit }: CropProps) {
               component="div"
               align="center"
             >
-              <strong>Fetching pages metadata</strong>
+              <strong>Fetching images metadata</strong>
             </Typography>
           ) : (
             <Typography
@@ -88,7 +88,7 @@ export default function Crop({ setVisit }: CropProps) {
               align="center"
             >
               <strong>
-                Loading Page {loadingImageIndex} of {totalImages}
+                Loading Image {loadingImageIndex} of {totalImages}
               </strong>
             </Typography>
           )}
