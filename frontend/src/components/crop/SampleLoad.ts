@@ -5,7 +5,11 @@ import pixels from "image-pixels";
 
 export default async function loadData(
   tifURL: string,
-  sampleRate: number
+  sampleRate: number,
+  setLoadingImageIndex: React.Dispatch<
+    React.SetStateAction<number | undefined>
+  >,
+  setTotalImages: React.Dispatch<React.SetStateAction<number | undefined>>
 ): Promise<NDT[]> {
   const images: NDT[] = [];
 
@@ -17,8 +21,11 @@ export default async function loadData(
   const downsampledWidth = Math.floor(width / sampleRate);
   const downsampledHeight = Math.floor(height / sampleRate);
 
+  setTotalImages(pageCount);
+
   for (let i = 0; i < pageCount; i++) {
-    console.log("loading page" + i + " of " + pageCount);
+    setLoadingImageIndex(i);
+
     const pngAsString: string = await proxyService.getTiffPage(
       tifURL,
       i,
