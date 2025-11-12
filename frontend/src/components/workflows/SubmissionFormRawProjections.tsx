@@ -49,7 +49,6 @@ export default function SubmissionFormRawProjections({
   const lastIndex = 3700;
 
   const templateData = useFragment(sharedFragment, template);
-  console.log(templateData);
   const theme = useTheme();
   const { setTifURL } = useTifURLContext();
   const [workflowSubmitted, setWorkflowSubmitted] = useState(false);
@@ -94,6 +93,7 @@ export default function SubmissionFormRawProjections({
     setSubmittedVisit(visit);
     let indices = "";
     if (submittedProjecitonIndicesMethod === ProjectionIndicesMethod.Checkbox) {
+      // adds a projection frame for each box checked
       if (submittedProjectionIndicesValues.boxesChecked.start) {
         indices += String(firstIndex);
       }
@@ -112,6 +112,7 @@ export default function SubmissionFormRawProjections({
     } else if (
       submittedProjecitonIndicesMethod === ProjectionIndicesMethod.Interval
     ) {
+      // adds projection frame at start, increments by step and adds one iteratively until stop is reached
       const start: number =
         submittedProjectionIndicesValues.intervalValues.start;
       const stop: number = submittedProjectionIndicesValues.intervalValues.stop;
@@ -123,6 +124,7 @@ export default function SubmissionFormRawProjections({
     } else if (
       submittedProjecitonIndicesMethod === ProjectionIndicesMethod.List
     ) {
+      // user manually puts in which frames they want, comma separated integers
       // TODO: error handling either here or on the textfield to make sure input is of the right form
       indices = submittedProjectionIndicesValues.indexList;
     }
@@ -169,6 +171,8 @@ export default function SubmissionFormRawProjections({
     }
   }
 
+  // is this return statement too large??
+  // should I split this into components??
   return (
     <div>
       {workflowSubmitted && workflowName !== undefined ? (
@@ -195,7 +199,7 @@ export default function SubmissionFormRawProjections({
       ) : (
         <Stack direction="column" spacing={theme.spacing(2)}>
           <Typography variant="h4" align="center">
-            Workflow:{" "}
+            Workflow:
             {templateData.title ? templateData.title : templateData.name}
           </Typography>
           <Divider />
@@ -247,7 +251,7 @@ export default function SubmissionFormRawProjections({
                   : { border: "2px solid transparent" }),
               }}
             >
-              {/* can definitely make a function for these onClick functions */}
+              {/* can definitely make a function to reduce the code needed in these onClick functions */}
               {/* but also I want to keep functionality of them nearby??
               TODO: Ask Yousef about this */}
               <FormGroup row>
