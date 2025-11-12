@@ -23,7 +23,6 @@ import { JSONObject } from "../../types";
 import React, { useState } from "react";
 import WorkflowStatus from "./WorkflowStatus";
 import { WorkflowStatusSubscription$data } from "./__generated__/WorkflowStatusSubscription.graphql";
-import { setKey } from "../../devKey";
 import { useFragment } from "react-relay";
 import { useTifURLContext } from "../../contexts/CropContext";
 import { sharedFragment } from "./Submission";
@@ -70,9 +69,6 @@ export default function SubmissionFormRawProjections({
       templateData.arguments.properties["output-filename"].default,
   });
   const [submittedVisit, setSubmittedVisit] = useState<undefined | Visit>(
-    undefined
-  );
-  const [keyFormValue, setKeyFormValue] = useState<string | undefined>(
     undefined
   );
 
@@ -511,15 +507,6 @@ export default function SubmissionFormRawProjections({
             submitButton={true}
           />
           <Divider />
-          <TextField
-            label="Auth Token"
-            type="string"
-            fullWidth
-            size="small"
-            onChange={(e) => {
-              setKeyFormValue(e.target.value);
-            }}
-          />
         </Stack>
       )}
     </div>
