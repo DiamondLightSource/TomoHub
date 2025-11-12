@@ -6,7 +6,6 @@ import { useTifURLContext } from "../../contexts/CropContext";
 import { useEffect, useState } from "react";
 import { NDT } from "@diamondlightsource/davidia";
 import { Box, LinearProgress, Modal, Typography } from "@mui/material";
-import { Box, LinearProgress, Modal, Typography } from "@mui/material";
 
 interface CropProps {
   setVisit: (
@@ -27,22 +26,16 @@ export default function Crop({ setVisit }: CropProps) {
     number | undefined
   >(undefined);
   const [totalImages, setTotalImages] = useState<number | undefined>(undefined);
-  const [loadingImageIndex, setLoadingImageIndex] = useState<
-    number | undefined
-  >(undefined);
-  const [totalImages, setTotalImages] = useState<number | undefined>(undefined);
   const { tifURL } = useTifURLContext();
 
   useEffect(() => {
     if (tifURL === undefined) {
-      console.log("tif undefined, returning");
       return;
     }
     setLoadingImages(true);
     loadData(tifURL, sampleRate, setLoadingImageIndex, setTotalImages).then(
       (loadDataImages) => {
         setImages(loadDataImages);
-        console.log("setting load images to false");
         setLoadingImages(false);
       }
     );
@@ -83,7 +76,7 @@ export default function Crop({ setVisit }: CropProps) {
               component="div"
               align="center"
             >
-              <strong>Fetching pages metadata</strong>
+              <strong>Fetching images metadata</strong>
             </Typography>
           ) : (
             <Typography
@@ -94,7 +87,7 @@ export default function Crop({ setVisit }: CropProps) {
               align="center"
             >
               <strong>
-                Loading Page {loadingImageIndex} of {totalImages}
+                Loading Image {loadingImageIndex} of {totalImages}
               </strong>
             </Typography>
           )}
