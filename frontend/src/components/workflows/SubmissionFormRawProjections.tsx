@@ -223,6 +223,7 @@ export default function SubmissionFormRawProjections({
             spacing={4}
             alignItems="center"
             justifyContent="space-between"
+            sx={{ height: "100px" }}
           >
             <Select
               defaultValue={submittedProjecitonIndicesMethod}
@@ -231,6 +232,7 @@ export default function SubmissionFormRawProjections({
                   setIndicesMethod(e.target.value);
                 }
               }}
+              sx={{ width: "150px" }}
             >
               <MenuItem value={ProjectionIndicesMethod.Checkbox}>
                 Checkbox
@@ -242,6 +244,7 @@ export default function SubmissionFormRawProjections({
             <Box
               sx={{
                 padding: "10px",
+                width: "100%",
               }}
             >
               {/* can definitely make a function to reduce the code needed in these onClick functions */}
@@ -250,66 +253,69 @@ export default function SubmissionFormRawProjections({
               {submittedProjecitonIndicesMethod ===
                 ProjectionIndicesMethod.Checkbox && (
                 <FormGroup row>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={
-                          submittedProjectionIndicesValues.boxesChecked.start
-                        }
-                        onChange={(e) => {
-                          setProjectionIndicesValues({
-                            ...submittedProjectionIndicesValues,
-                            boxesChecked: {
-                              ...submittedProjectionIndicesValues.boxesChecked,
-                              start: e.target.checked,
-                            },
-                          });
-                        }}
-                      />
-                    }
-                    label="Start"
-                    sx={{ "margin-left": 30, "margin-right": 30 }}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={
-                          submittedProjectionIndicesValues.boxesChecked.mid
-                        }
-                        onChange={(e) => {
-                          setProjectionIndicesValues({
-                            ...submittedProjectionIndicesValues,
-                            boxesChecked: {
-                              ...submittedProjectionIndicesValues.boxesChecked,
-                              mid: e.target.checked,
-                            },
-                          });
-                        }}
-                      />
-                    }
-                    label="Mid"
-                    sx={{ "margin-left": 30, "margin-right": 30 }}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={
-                          submittedProjectionIndicesValues.boxesChecked.end
-                        }
-                        onChange={(e) => {
-                          setProjectionIndicesValues({
-                            ...submittedProjectionIndicesValues,
-                            boxesChecked: {
-                              ...submittedProjectionIndicesValues.boxesChecked,
-                              end: e.target.checked,
-                            },
-                          });
-                        }}
-                      />
-                    }
-                    label="End"
-                    sx={{ "margin-left": 30, "margin-right": 30 }}
-                  />
+                  <Stack
+                    direction="row"
+                    justifyContent={"space-evenly"}
+                    sx={{ width: "100%" }}
+                  >
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={
+                            submittedProjectionIndicesValues.boxesChecked.start
+                          }
+                          onChange={(e) => {
+                            setProjectionIndicesValues({
+                              ...submittedProjectionIndicesValues,
+                              boxesChecked: {
+                                ...submittedProjectionIndicesValues.boxesChecked,
+                                start: e.target.checked,
+                              },
+                            });
+                          }}
+                        />
+                      }
+                      label="Start"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={
+                            submittedProjectionIndicesValues.boxesChecked.mid
+                          }
+                          onChange={(e) => {
+                            setProjectionIndicesValues({
+                              ...submittedProjectionIndicesValues,
+                              boxesChecked: {
+                                ...submittedProjectionIndicesValues.boxesChecked,
+                                mid: e.target.checked,
+                              },
+                            });
+                          }}
+                        />
+                      }
+                      label="Mid"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={
+                            submittedProjectionIndicesValues.boxesChecked.end
+                          }
+                          onChange={(e) => {
+                            setProjectionIndicesValues({
+                              ...submittedProjectionIndicesValues,
+                              boxesChecked: {
+                                ...submittedProjectionIndicesValues.boxesChecked,
+                                end: e.target.checked,
+                              },
+                            });
+                          }}
+                        />
+                      }
+                      label="End"
+                    />
+                  </Stack>
                 </FormGroup>
               )}
               {submittedProjecitonIndicesMethod ===
