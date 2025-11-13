@@ -77,7 +77,6 @@ export default function SubmissionFormRawProjections({
   enum ProjectionIndicesMethod {
     Checkbox,
     Interval,
-    List,
   }
   const [submittedProjecitonIndicesMethod, setIndicesMethod] =
     useState<ProjectionIndicesMethod>(ProjectionIndicesMethod.Checkbox);
@@ -86,7 +85,6 @@ export default function SubmissionFormRawProjections({
     useState({
       boxesChecked: { start: true, mid: true, end: true },
       intervalValues: { start: firstIndex, stop: lastIndex, step: 100 },
-      indexList: "",
     });
 
   function onRawProjectionsFormSubmit(visit: Visit) {
@@ -121,12 +119,6 @@ export default function SubmissionFormRawProjections({
         indices += i + ", ";
       }
       indices += stop;
-    } else if (
-      submittedProjecitonIndicesMethod === ProjectionIndicesMethod.List
-    ) {
-      // user manually puts in which frames they want, comma separated integers
-      // TODO: error handling either here or on the textfield to make sure input is of the right form
-      indices = submittedProjectionIndicesValues.indexList;
     }
 
     // TODO: error handling here to replace empty strings with null in some cases??
@@ -418,32 +410,6 @@ export default function SubmissionFormRawProjections({
                   size="small"
                 />
               </Stack>
-              <Box
-                onClick={() => {
-                  setIndicesMethod(ProjectionIndicesMethod.List);
-                }}
-                sx={{
-                  padding: "10px",
-                  "border-radius": "5px",
-                  ...(submittedProjecitonIndicesMethod ===
-                  ProjectionIndicesMethod.List
-                    ? { border: "2px solid grey" }
-                    : { border: "2px solid transparent" }),
-                }}
-              >
-                <TextField
-                  label="Indices List"
-                  fullWidth
-                  size="small"
-                  defaultValue={submittedProjectionIndicesValues.indexList}
-                  onChange={(e) => {
-                    setProjectionIndicesValues({
-                      ...submittedProjectionIndicesValues,
-                      indexList: e.target.value,
-                    });
-                  }}
-                />
-              </Box>
             </Box>
           )}
           <Divider />
