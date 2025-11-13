@@ -224,7 +224,14 @@ export default function SubmissionFormRawProjections({
             alignItems="center"
             justifyContent="space-between"
           >
-            <Select defaultValue={ProjectionIndicesMethod.Checkbox}>
+            <Select
+              defaultValue={submittedProjecitonIndicesMethod}
+              onChange={(e) => {
+                if (typeof e.target.value !== "string") {
+                  setIndicesMethod(e.target.value);
+                }
+              }}
+            >
               <MenuItem value={ProjectionIndicesMethod.Checkbox}>
                 Checkbox
               </MenuItem>
