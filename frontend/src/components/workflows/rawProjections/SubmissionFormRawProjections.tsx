@@ -17,14 +17,14 @@ import {
   VisitInput,
   visitToText,
 } from "@diamondlightsource/sci-react-ui";
-import { SubmissionFormSharedFragment$key } from "./__generated__/SubmissionFormSharedFragment.graphql";
-import { JSONObject } from "../../types";
+import { SubmissionFormSharedFragment$key } from "../__generated__/SubmissionFormSharedFragment.graphql";
+import { JSONObject } from "../../../types";
 import { useState } from "react";
-import WorkflowStatus from "./WorkflowStatus";
-import { WorkflowStatusSubscription$data } from "./__generated__/WorkflowStatusSubscription.graphql";
+import WorkflowStatus from "../WorkflowStatus";
+import { WorkflowStatusSubscription$data } from "../__generated__/WorkflowStatusSubscription.graphql";
 import { useFragment } from "react-relay";
-import { useTifURLContext } from "../../contexts/CropContext";
-import { sharedFragment } from "./Submission";
+import { useTifURLContext } from "../../../contexts/CropContext";
+import { sharedFragment } from "../Submission";
 
 interface SubmissionFormRawProjectionsProps {
   template: SubmissionFormSharedFragment$key;

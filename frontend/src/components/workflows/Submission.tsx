@@ -9,7 +9,7 @@ import { SubmissionQuery as SubmissionQueryType } from "./__generated__/Submissi
 import { SubmissionMutation as SubmissionMutationType } from "./__generated__/SubmissionMutation.graphql";
 import React from "react";
 import { JSONObject } from "../../types";
-import SubmissionFormRawProjections from "./SubmissionFormRawProjections";
+import SubmissionFormRawProjections from "./rawProjections/SubmissionFormRawProjections";
 
 const submissionQuery = graphql`
   query SubmissionQuery($name: String!) {
