@@ -193,18 +193,6 @@ export default function SubmissionFormRawProjections({
           <Divider />
           <Typography variant="h6">Mandatory Parameters</Typography>
           <TextField
-            label="Dataset Path"
-            type="string"
-            fullWidth
-            size="small"
-            onChange={(e) => {
-              setSubmittedWorkflowArguments({
-                ...submittedWorkflowArguments,
-                "dataset-path": e.target.value,
-              });
-            }}
-          />
-          <TextField
             label="Input"
             type="string"
             fullWidth
@@ -213,6 +201,18 @@ export default function SubmissionFormRawProjections({
               setSubmittedWorkflowArguments({
                 ...submittedWorkflowArguments,
                 input: e.target.value,
+              });
+            }}
+          />
+          <TextField
+            label="Dataset Path"
+            type="string"
+            fullWidth
+            size="small"
+            onChange={(e) => {
+              setSubmittedWorkflowArguments({
+                ...submittedWorkflowArguments,
+                "dataset-path": e.target.value,
               });
             }}
           />
