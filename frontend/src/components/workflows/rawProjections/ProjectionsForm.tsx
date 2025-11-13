@@ -31,6 +31,62 @@ export default function ProjectionsForm({
   firstIndex,
   lastIndex,
 }: ProjectionsFormProps) {
+  function ProjectionsCheckbox({
+    label,
+    value,
+  }: {
+    label: string;
+    value: "start" | "mid" | "end";
+  }) {
+    const projectionIndicesObject: RawProjectionIndicesArguments = {
+      ...submittedProjectionIndicesValues,
+    };
+    return (
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={submittedProjectionIndicesValues.boxesChecked.start}
+            onChange={(e) => {
+              projectionIndicesObject.boxesChecked[value] = e.target.checked;
+              setProjectionIndicesValues(projectionIndicesObject);
+            }}
+          />
+        }
+        label={label}
+      />
+    );
+  }
+
+  function ProjectionsNumberInput({
+    label,
+    field,
+    defaultValue,
+  }: {
+    label: string;
+    field: "start" | "stop" | "step";
+    defaultValue: number;
+  }) {
+    const projectionIndicesObject: RawProjectionIndicesArguments = {
+      ...submittedProjectionIndicesValues,
+    };
+    return (
+      <TextField
+        label={label}
+        type="number"
+        defaultValue={submittedProjectionIndicesValues.intervalValues[field]}
+        onChange={(e) => {
+          const raw = e.target.value;
+          const parsed = raw === "" ? 0 : Number(raw);
+          projectionIndicesObject.intervalValues[field] =
+            parsed ?? defaultValue;
+          setProjectionIndicesValues(projectionIndicesObject);
+        }}
+        fullWidth
+        size="small"
+      />
+    );
+  }
+
   return (
     <Box>
       <Typography variant="h6">Projections</Typography>
@@ -59,9 +115,6 @@ export default function ProjectionsForm({
             width: "100%",
           }}
         >
-          {/* can definitely make a function to reduce the code needed in these onClick functions */}
-          {/* but also I want to keep functionality of them nearby??
-              TODO: Ask Yousef about this */}
           {submittedProjectionIndicesMethod ===
             ProjectionIndicesMethod.Checkbox && (
             <FormGroup row>
@@ -70,63 +123,9 @@ export default function ProjectionsForm({
                 justifyContent={"space-evenly"}
                 sx={{ width: "100%" }}
               >
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={
-                        submittedProjectionIndicesValues.boxesChecked.start
-                      }
-                      onChange={(e) => {
-                        setProjectionIndicesValues({
-                          ...submittedProjectionIndicesValues,
-                          boxesChecked: {
-                            ...submittedProjectionIndicesValues.boxesChecked,
-                            start: e.target.checked,
-                          },
-                        });
-                      }}
-                    />
-                  }
-                  label="Start"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={
-                        submittedProjectionIndicesValues.boxesChecked.mid
-                      }
-                      onChange={(e) => {
-                        setProjectionIndicesValues({
-                          ...submittedProjectionIndicesValues,
-                          boxesChecked: {
-                            ...submittedProjectionIndicesValues.boxesChecked,
-                            mid: e.target.checked,
-                          },
-                        });
-                      }}
-                    />
-                  }
-                  label="Mid"
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={
-                        submittedProjectionIndicesValues.boxesChecked.end
-                      }
-                      onChange={(e) => {
-                        setProjectionIndicesValues({
-                          ...submittedProjectionIndicesValues,
-                          boxesChecked: {
-                            ...submittedProjectionIndicesValues.boxesChecked,
-                            end: e.target.checked,
-                          },
-                        });
-                      }}
-                    />
-                  }
-                  label="End"
-                />
+                <ProjectionsCheckbox label={"Start"} value={"start"} />
+                <ProjectionsCheckbox label={"Mid"} value={"mid"} />
+                <ProjectionsCheckbox label={"End"} value={"end"} />
               </Stack>
             </FormGroup>
           )}
@@ -143,66 +142,20 @@ export default function ProjectionsForm({
                   padding: "10px",
                 }}
               >
-                {/* TODO: can definitely make a function for these onClick functions */}
-                <TextField
+                <ProjectionsNumberInput
                   label="Start"
-                  type="number"
-                  defaultValue={
-                    submittedProjectionIndicesValues.intervalValues.start
-                  }
-                  onChange={(e) => {
-                    const raw = e.target.value;
-                    const parsed = raw === "" ? 0 : Number(raw);
-                    setProjectionIndicesValues({
-                      ...submittedProjectionIndicesValues,
-                      intervalValues: {
-                        ...submittedProjectionIndicesValues.intervalValues,
-                        start: parsed ?? firstIndex,
-                      },
-                    });
-                  }}
-                  fullWidth
-                  size="small"
+                  field="start"
+                  defaultValue={firstIndex}
                 />
-                <TextField
+                <ProjectionsNumberInput
                   label="Stop"
-                  type="number"
-                  defaultValue={
-                    submittedProjectionIndicesValues.intervalValues.stop
-                  }
-                  onChange={(e) => {
-                    const raw = e.target.value;
-                    const parsed = raw === "" ? 0 : Number(raw);
-                    setProjectionIndicesValues({
-                      ...submittedProjectionIndicesValues,
-                      intervalValues: {
-                        ...submittedProjectionIndicesValues.intervalValues,
-                        stop: parsed ?? lastIndex,
-                      },
-                    });
-                  }}
-                  fullWidth
-                  size="small"
+                  field="stop"
+                  defaultValue={lastIndex}
                 />
-                <TextField
-                  label="Step"
-                  type="number"
-                  defaultValue={
-                    submittedProjectionIndicesValues.intervalValues.step
-                  }
-                  onChange={(e) => {
-                    const raw = e.target.value;
-                    const parsed = raw === "" ? 0 : Number(raw);
-                    setProjectionIndicesValues({
-                      ...submittedProjectionIndicesValues,
-                      intervalValues: {
-                        ...submittedProjectionIndicesValues.intervalValues,
-                        start: parsed ?? 100,
-                      },
-                    });
-                  }}
-                  fullWidth
-                  size="small"
+                <ProjectionsNumberInput
+                  label="Steo"
+                  field="step"
+                  defaultValue={100}
                 />
               </Stack>
             </Box>
