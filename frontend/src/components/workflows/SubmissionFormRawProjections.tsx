@@ -233,164 +233,158 @@ export default function SubmissionFormRawProjections({
               </MenuItem>
             </Select>
             <Box
-              onClick={() => {
-                setIndicesMethod(ProjectionIndicesMethod.Checkbox);
-              }}
               sx={{
                 padding: "10px",
-                "border-radius": "5px",
-                ...(submittedProjecitonIndicesMethod ===
-                ProjectionIndicesMethod.Checkbox
-                  ? { border: "2px solid grey" }
-                  : { border: "2px solid transparent" }),
               }}
             >
               {/* can definitely make a function to reduce the code needed in these onClick functions */}
               {/* but also I want to keep functionality of them nearby??
               TODO: Ask Yousef about this */}
-              <FormGroup row>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={
-                        submittedProjectionIndicesValues.boxesChecked.start
+              {submittedProjecitonIndicesMethod ===
+                ProjectionIndicesMethod.Checkbox && (
+                <FormGroup row>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={
+                          submittedProjectionIndicesValues.boxesChecked.start
+                        }
+                        onChange={(e) => {
+                          setProjectionIndicesValues({
+                            ...submittedProjectionIndicesValues,
+                            boxesChecked: {
+                              ...submittedProjectionIndicesValues.boxesChecked,
+                              start: e.target.checked,
+                            },
+                          });
+                        }}
+                      />
+                    }
+                    label="Start"
+                    sx={{ "margin-left": 30, "margin-right": 30 }}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={
+                          submittedProjectionIndicesValues.boxesChecked.mid
+                        }
+                        onChange={(e) => {
+                          setProjectionIndicesValues({
+                            ...submittedProjectionIndicesValues,
+                            boxesChecked: {
+                              ...submittedProjectionIndicesValues.boxesChecked,
+                              mid: e.target.checked,
+                            },
+                          });
+                        }}
+                      />
+                    }
+                    label="Mid"
+                    sx={{ "margin-left": 30, "margin-right": 30 }}
+                  />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={
+                          submittedProjectionIndicesValues.boxesChecked.end
+                        }
+                        onChange={(e) => {
+                          setProjectionIndicesValues({
+                            ...submittedProjectionIndicesValues,
+                            boxesChecked: {
+                              ...submittedProjectionIndicesValues.boxesChecked,
+                              end: e.target.checked,
+                            },
+                          });
+                        }}
+                      />
+                    }
+                    label="End"
+                    sx={{ "margin-left": 30, "margin-right": 30 }}
+                  />
+                </FormGroup>
+              )}
+              {submittedProjecitonIndicesMethod ===
+                ProjectionIndicesMethod.Interval && (
+                <Box>
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    onClick={() => {
+                      setIndicesMethod(ProjectionIndicesMethod.Interval);
+                    }}
+                    sx={{
+                      padding: "10px",
+                    }}
+                  >
+                    {/* TODO: can definitely make a function for these onClick functions */}
+                    <TextField
+                      label="Start"
+                      type="number"
+                      defaultValue={
+                        submittedProjectionIndicesValues.intervalValues.start
                       }
                       onChange={(e) => {
+                        const raw = e.target.value;
+                        const parsed = raw === "" ? 0 : Number(raw);
                         setProjectionIndicesValues({
                           ...submittedProjectionIndicesValues,
-                          boxesChecked: {
-                            ...submittedProjectionIndicesValues.boxesChecked,
-                            start: e.target.checked,
+                          intervalValues: {
+                            ...submittedProjectionIndicesValues.intervalValues,
+                            start: parsed ?? firstIndex,
                           },
                         });
                       }}
+                      fullWidth
+                      size="small"
                     />
-                  }
-                  label="Start"
-                  sx={{ "margin-left": 30, "margin-right": 30 }}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={
-                        submittedProjectionIndicesValues.boxesChecked.mid
+                    <TextField
+                      label="Stop"
+                      type="number"
+                      defaultValue={
+                        submittedProjectionIndicesValues.intervalValues.stop
                       }
                       onChange={(e) => {
+                        const raw = e.target.value;
+                        const parsed = raw === "" ? 0 : Number(raw);
                         setProjectionIndicesValues({
                           ...submittedProjectionIndicesValues,
-                          boxesChecked: {
-                            ...submittedProjectionIndicesValues.boxesChecked,
-                            mid: e.target.checked,
+                          intervalValues: {
+                            ...submittedProjectionIndicesValues.intervalValues,
+                            stop: parsed ?? lastIndex,
                           },
                         });
                       }}
+                      fullWidth
+                      size="small"
                     />
-                  }
-                  label="Mid"
-                  sx={{ "margin-left": 30, "margin-right": 30 }}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={
-                        submittedProjectionIndicesValues.boxesChecked.end
+                    <TextField
+                      label="Step"
+                      type="number"
+                      defaultValue={
+                        submittedProjectionIndicesValues.intervalValues.step
                       }
                       onChange={(e) => {
+                        const raw = e.target.value;
+                        const parsed = raw === "" ? 0 : Number(raw);
                         setProjectionIndicesValues({
                           ...submittedProjectionIndicesValues,
-                          boxesChecked: {
-                            ...submittedProjectionIndicesValues.boxesChecked,
-                            end: e.target.checked,
+                          intervalValues: {
+                            ...submittedProjectionIndicesValues.intervalValues,
+                            start: parsed ?? 100,
                           },
                         });
                       }}
+                      fullWidth
+                      size="small"
                     />
-                  }
-                  label="End"
-                  sx={{ "margin-left": 30, "margin-right": 30 }}
-                />
-              </FormGroup>
+                  </Stack>
+                </Box>
+              )}
             </Box>
           </Stack>
-          <Box>
-            <Stack
-              direction="row"
-              spacing={2}
-              onClick={() => {
-                setIndicesMethod(ProjectionIndicesMethod.Interval);
-              }}
-              sx={{
-                padding: "10px",
-                "border-radius": "5px",
-                ...(submittedProjecitonIndicesMethod ===
-                ProjectionIndicesMethod.Interval
-                  ? { border: "2px solid grey" }
-                  : { border: "2px solid transparent" }),
-              }}
-            >
-              {/* TODO: can definitely make a function for these onClick functions */}
-              <TextField
-                label="Start"
-                type="number"
-                defaultValue={
-                  submittedProjectionIndicesValues.intervalValues.start
-                }
-                onChange={(e) => {
-                  const raw = e.target.value;
-                  const parsed = raw === "" ? 0 : Number(raw);
-                  setProjectionIndicesValues({
-                    ...submittedProjectionIndicesValues,
-                    intervalValues: {
-                      ...submittedProjectionIndicesValues.intervalValues,
-                      start: parsed ?? firstIndex,
-                    },
-                  });
-                }}
-                fullWidth
-                size="small"
-              />
-              <TextField
-                label="Stop"
-                type="number"
-                defaultValue={
-                  submittedProjectionIndicesValues.intervalValues.stop
-                }
-                onChange={(e) => {
-                  const raw = e.target.value;
-                  const parsed = raw === "" ? 0 : Number(raw);
-                  setProjectionIndicesValues({
-                    ...submittedProjectionIndicesValues,
-                    intervalValues: {
-                      ...submittedProjectionIndicesValues.intervalValues,
-                      stop: parsed ?? lastIndex,
-                    },
-                  });
-                }}
-                fullWidth
-                size="small"
-              />
-              <TextField
-                label="Step"
-                type="number"
-                defaultValue={
-                  submittedProjectionIndicesValues.intervalValues.step
-                }
-                onChange={(e) => {
-                  const raw = e.target.value;
-                  const parsed = raw === "" ? 0 : Number(raw);
-                  setProjectionIndicesValues({
-                    ...submittedProjectionIndicesValues,
-                    intervalValues: {
-                      ...submittedProjectionIndicesValues.intervalValues,
-                      start: parsed ?? 100,
-                    },
-                  });
-                }}
-                fullWidth
-                size="small"
-              />
-            </Stack>
-          </Box>
+
           <Divider />
           <Typography variant="h6">Advanced Parameters</Typography>
           <Stack direction="row" spacing={2} alignItems="center">
