@@ -25,6 +25,16 @@ import { WorkflowStatusSubscription$data } from "../__generated__/WorkflowStatus
 import { useFragment } from "react-relay";
 import { useTifURLContext } from "../../../contexts/CropContext";
 import { sharedFragment } from "../Submission";
+import MandatoryParametersForm from "./MandatoryParametersForm";
+
+export type RawProjectionWorkflowArguments = {
+  input: string;
+  "tmpdir-path": string;
+  "dataset-path": string;
+  memory: string;
+  nprocs: number;
+  "output-filename": string;
+};
 
 interface SubmissionFormRawProjectionsProps {
   template: SubmissionFormSharedFragment$key;
@@ -57,15 +67,16 @@ export default function SubmissionFormRawProjections({
     undefined
   );
 
-  const [submittedWorkflowArguments, setSubmittedWorkflowArguments] = useState({
-    input: "",
-    "tmpdir-path": templateData.arguments.properties["tmpdir-path"].default,
-    "dataset-path": "",
-    memory: templateData.arguments.properties.memory.default,
-    nprocs: Number(templateData.arguments.properties.nprocs.default),
-    "output-filename":
-      templateData.arguments.properties["output-filename"].default,
-  });
+  const [submittedWorkflowArguments, setSubmittedWorkflowArguments] =
+    useState<RawProjectionWorkflowArguments>({
+      input: "",
+      "tmpdir-path": templateData.arguments.properties["tmpdir-path"].default,
+      "dataset-path": "",
+      memory: templateData.arguments.properties.memory.default,
+      nprocs: Number(templateData.arguments.properties.nprocs.default),
+      "output-filename":
+        templateData.arguments.properties["output-filename"].default,
+    });
   const [submittedVisit, setSubmittedVisit] = useState<undefined | Visit>(
     undefined
   );
@@ -191,30 +202,9 @@ export default function SubmissionFormRawProjections({
             {templateData.title ? templateData.title : templateData.name}
           </Typography>
           <Divider />
-          <Typography variant="h6">Mandatory Parameters</Typography>
-          <TextField
-            label="Input"
-            type="string"
-            fullWidth
-            size="small"
-            onChange={(e) => {
-              setSubmittedWorkflowArguments({
-                ...submittedWorkflowArguments,
-                input: e.target.value,
-              });
-            }}
-          />
-          <TextField
-            label="Key Path"
-            type="string"
-            fullWidth
-            size="small"
-            onChange={(e) => {
-              setSubmittedWorkflowArguments({
-                ...submittedWorkflowArguments,
-                "dataset-path": e.target.value,
-              });
-            }}
+          <MandatoryParametersForm
+            submittedWorkflowArguments={submittedWorkflowArguments}
+            setSubmittedWorkflowArguments={setSubmittedWorkflowArguments}
           />
           <Divider />
           <Typography variant="h6">Projections</Typography>
