@@ -48,8 +48,6 @@ export default function Crop({ setVisit }: CropProps) {
       images={images}
       sampleRate={sampleRate}
     />
-  ) : loadingImages ? (
-    <p>loading images</p>
   ) : (
     <Box>
       <Submission workflowName="extract-raw-projections" setVisit={setVisit} />
