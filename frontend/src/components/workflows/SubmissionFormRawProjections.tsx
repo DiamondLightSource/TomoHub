@@ -205,7 +205,7 @@ export default function SubmissionFormRawProjections({
             }}
           />
           <TextField
-            label="Dataset Path"
+            label="Key Path"
             type="string"
             fullWidth
             size="small"
