@@ -18,6 +18,7 @@ export default function MandatoryParameters({
         type="string"
         fullWidth
         size="small"
+        placeholder="/dls/beamline/..."
         onChange={(e) => {
           setSubmittedWorkflowArguments({
             ...submittedWorkflowArguments,
@@ -30,6 +31,7 @@ export default function MandatoryParameters({
         type="string"
         fullWidth
         size="small"
+        placeholder="/entry1/tomo_entry/data/data"
         onChange={(e) => {
           setSubmittedWorkflowArguments({
             ...submittedWorkflowArguments,
