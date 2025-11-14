@@ -1,19 +1,26 @@
-import { Box, Stack, TextField, Typography } from "@mui/material";
+import { Box, Stack, TextField, Theme, Typography } from "@mui/material";
 import { RawProjectionWorkflowArguments } from "./SubmissionFormRawProjections";
 
 interface AdvancedParametersProps {
   submittedWorkflowArguments: RawProjectionWorkflowArguments;
   setSubmittedWorkflowArguments: (args: RawProjectionWorkflowArguments) => void;
+  theme: Theme;
 }
 
 export default function AdvancedParameters({
   submittedWorkflowArguments,
   setSubmittedWorkflowArguments,
+  theme,
 }: AdvancedParametersProps) {
   return (
     <Box>
       <Typography variant="h6">Advanced Parameters</Typography>
-      <Stack direction="row" spacing={2} alignItems="center">
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        sx={{ "margin-top": theme.spacing(2) }}
+      >
         <TextField
           label="Memory"
           type="string"

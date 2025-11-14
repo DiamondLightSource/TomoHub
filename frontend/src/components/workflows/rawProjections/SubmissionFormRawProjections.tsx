@@ -208,6 +208,7 @@ export default function SubmissionFormRawProjections({
           <AdvancedParameters
             submittedWorkflowArguments={submittedWorkflowArguments}
             setSubmittedWorkflowArguments={setSubmittedWorkflowArguments}
+            theme={theme}
           />
           <Divider />
           <VisitInput
