@@ -26,7 +26,7 @@ export default function MandatoryParameters({
         }}
       />
       <TextField
-        label="Key Path"
+        label="Key"
         type="string"
         fullWidth
         size="small"
