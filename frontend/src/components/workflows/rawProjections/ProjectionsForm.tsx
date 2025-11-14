@@ -7,6 +7,7 @@ import {
   Select,
   Stack,
   TextField,
+  Theme,
   Typography,
 } from "@mui/material";
 import {
@@ -21,6 +22,7 @@ interface ProjectionsFormProps {
   setIndicesMethod: (method: ProjectionIndicesMethod) => void;
   firstIndex: number;
   lastIndex: number;
+  theme: Theme;
 }
 
 export default function ProjectionsForm({
@@ -30,6 +32,7 @@ export default function ProjectionsForm({
   setIndicesMethod,
   firstIndex,
   lastIndex,
+  theme,
 }: ProjectionsFormProps) {
   function ProjectionsCheckbox({
     label,
@@ -95,7 +98,7 @@ export default function ProjectionsForm({
         spacing={4}
         alignItems="center"
         justifyContent="space-between"
-        sx={{ height: "100px" }}
+        sx={{ height: "60px", "margin-top": theme.spacing(2) }}
       >
         <Select
           defaultValue={submittedProjectionIndicesMethod}
