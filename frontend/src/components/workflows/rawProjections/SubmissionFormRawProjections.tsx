@@ -1,4 +1,4 @@
-import { Button, Divider, Stack, Typography, useTheme } from "@mui/material";
+import { Button, Divider, Stack, useTheme } from "@mui/material";
 import {
   Visit,
   VisitInput,
@@ -190,11 +190,6 @@ export default function SubmissionFormRawProjections({
         </div>
       ) : (
         <Stack direction="column" spacing={theme.spacing(2)}>
-          <Typography variant="h4" align="center">
-            Workflow:
-            {templateData.title ? templateData.title : templateData.name}
-          </Typography>
-          <Divider />
           <MandatoryParametersForm
             submittedWorkflowArguments={submittedWorkflowArguments}
             setSubmittedWorkflowArguments={setSubmittedWorkflowArguments}
