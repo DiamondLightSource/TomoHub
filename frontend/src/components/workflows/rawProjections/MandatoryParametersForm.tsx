@@ -1,17 +1,19 @@
-import { Box, TextField, Typography } from "@mui/material";
+import { Stack, TextField, Theme, Typography } from "@mui/material";
 import { RawProjectionWorkflowArguments } from "./SubmissionFormRawProjections";
 
 interface MandatoryParametersProps {
   submittedWorkflowArguments: RawProjectionWorkflowArguments;
   setSubmittedWorkflowArguments: (args: RawProjectionWorkflowArguments) => void;
+  theme: Theme;
 }
 
 export default function MandatoryParameters({
   submittedWorkflowArguments,
   setSubmittedWorkflowArguments,
+  theme,
 }: MandatoryParametersProps) {
   return (
-    <Box>
+    <Stack direction="column" spacing={theme.spacing(2)}>
       <Typography variant="h6">Mandatory Parameters</Typography>
       <TextField
         label="Input"
@@ -39,6 +41,6 @@ export default function MandatoryParameters({
           });
         }}
       />
-    </Box>
+    </Stack>
   );
 }

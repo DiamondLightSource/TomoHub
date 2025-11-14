@@ -193,6 +193,7 @@ export default function SubmissionFormRawProjections({
           <MandatoryParametersForm
             submittedWorkflowArguments={submittedWorkflowArguments}
             setSubmittedWorkflowArguments={setSubmittedWorkflowArguments}
+            theme={theme}
           />
           <Divider />
           <ProjectionsForm
