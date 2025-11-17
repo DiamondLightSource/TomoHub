@@ -1,4 +1,11 @@
-import { Button, Divider, Stack, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  Stack,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import {
   Visit,
   VisitInput,
@@ -120,6 +127,7 @@ export default function SubmissionFormRawProjections({
   });
 
   function onRawProjectionsFormSubmit(visit: Visit) {
+    console.log("submitting");
     if (
       !formErrors.keyEmpty ||
       !formErrors.inputEmpty ||
@@ -270,6 +278,12 @@ export default function SubmissionFormRawProjections({
             submitOnReturn={false}
             submitButton={true}
           />
+          <Box sx={{ height: "6px" }}>
+            <Typography align="right" color="red">
+              {formErrors.submissionDisallowed &&
+                "Fix errors before submitting form"}
+            </Typography>
+          </Box>
           <Divider />
         </Stack>
       )}
