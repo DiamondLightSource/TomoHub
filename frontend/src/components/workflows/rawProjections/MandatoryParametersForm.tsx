@@ -1,4 +1,4 @@
-import { Stack, TextField, Theme, Typography } from "@mui/material";
+import { Box, Stack, TextField, Theme, Typography } from "@mui/material";
 import {
   RawProjectionWorkflowArguments,
   RawProjectionWorkflowErrors,
@@ -58,6 +58,19 @@ export default function MandatoryParameters({
         }}
         error={formErrors.keyEmpty}
       />
+      <Box sx={{ height: "8px" }}>
+        {formErrors.inputEmpty ? (
+          <Typography align="center" color="red">
+            Input field cannot be empty
+          </Typography>
+        ) : (
+          formErrors.keyEmpty && (
+            <Typography align="center" color="red">
+              Key field cannot be empty
+            </Typography>
+          )
+        )}
+      </Box>
     </Stack>
   );
 }

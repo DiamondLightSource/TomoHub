@@ -224,6 +224,25 @@ export default function ProjectionsForm({
           )}
         </Box>
       </Stack>
+      <Box sx={{ height: "10px", "margin-top": "8px" }}>
+        {formErrors.allBoxesUnchecked &&
+        submittedProjectionIndicesMethod ===
+          ProjectionIndicesMethod.Checkbox ? (
+          <Typography align="center" color="red">
+            At least one checkbox must be ticked
+          </Typography>
+        ) : (
+          submittedProjectionIndicesMethod ===
+            ProjectionIndicesMethod.Interval &&
+          (formErrors.projectionsIntervalNaN.start ||
+            formErrors.projectionsIntervalNaN.stop ||
+            formErrors.projectionsIntervalNaN.step) && (
+            <Typography align="center" color="red">
+              Interval values must be a positive integer
+            </Typography>
+          )
+        )}
+      </Box>
     </Box>
   );
 }

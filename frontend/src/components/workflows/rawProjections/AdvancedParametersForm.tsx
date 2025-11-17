@@ -118,6 +118,28 @@ export default function AdvancedParameters({
           error={formErrors.tmpdirPathInvalid}
         />
       </Stack>
+      <Box sx={{ height: "10px", "margin-top": "8px" }}>
+        {formErrors.memoryFormatInvalid ? (
+          <Typography align="center" color="red">
+            Memory format invalid
+          </Typography>
+        ) : formErrors.nprocsNaN ? (
+          <Typography align="center" color="red">
+            Nprocs must be a positive integer
+          </Typography>
+        ) : formErrors.outputNameInvalid ? (
+          <Typography align="center" color="red">
+            Output filename can only include letters, number and underscores and
+            must end in .tif
+          </Typography>
+        ) : (
+          formErrors.tmpdirPathInvalid && (
+            <Typography align="center" color="red">
+              Tmpdirpath format invalid
+            </Typography>
+          )
+        )}
+      </Box>
     </Box>
   );
 }
