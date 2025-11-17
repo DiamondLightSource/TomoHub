@@ -33,6 +33,10 @@ export default function MandatoryParameters({
             ...submittedWorkflowArguments,
             input: e.target.value,
           });
+          setFormErrors({
+            ...formErrors,
+            inputEmpty: e.target.value === "",
+          });
         }}
         error={formErrors.inputEmpty}
       />
@@ -46,6 +50,10 @@ export default function MandatoryParameters({
           setSubmittedWorkflowArguments({
             ...submittedWorkflowArguments,
             "dataset-path": e.target.value,
+          });
+          setFormErrors({
+            ...formErrors,
+            keyEmpty: e.target.value === "",
           });
         }}
         error={formErrors.keyEmpty}

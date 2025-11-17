@@ -39,8 +39,17 @@ export default function AdvancedParameters({
               ...submittedWorkflowArguments,
               memory: e.target.value,
             });
+            setFormErrors({
+              ...formErrors,
+              memoryFormatInvalid: !e.target.checkValidity(),
+            });
           }}
           error={formErrors.memoryFormatInvalid}
+          slotProps={{
+            htmlInput: {
+              pattern: "[0-9]+[GMK]i",
+            },
+          }}
         />
         <TextField
           label="Nprocs"
@@ -67,8 +76,18 @@ export default function AdvancedParameters({
               ...submittedWorkflowArguments,
               "output-filename": e.target.value,
             });
+            setFormErrors({
+              ...formErrors,
+              outputNameInvalid: !e.target.checkValidity(),
+            });
           }}
           error={formErrors.outputNameInvalid}
+          slotProps={{
+            htmlInput: {
+              // TODO: allow "-" too
+              pattern: "[a-zA-Z0-9][a-zA-Z0-9_]*.tif",
+            },
+          }}
         />
         <TextField
           label="Tmpdir Path"
@@ -81,6 +100,7 @@ export default function AdvancedParameters({
               ...submittedWorkflowArguments,
               "tmpdir-path": e.target.value,
             });
+            // TODO: not sure what to error check here, if its necessary??
           }}
           error={formErrors.tmpdirPathInvalid}
         />

@@ -39,6 +39,16 @@ export default function ProjectionsForm({
   lastIndex,
   theme,
 }: ProjectionsFormProps) {
+  const allBoxesUnchecked =
+    !submittedProjectionIndicesValues.boxesChecked.start &&
+    !submittedProjectionIndicesValues.boxesChecked.mid &&
+    !submittedProjectionIndicesValues.boxesChecked.end;
+  if (formErrors.allBoxesUnchecked !== allBoxesUnchecked) {
+    setFormErrors({
+      ...formErrors,
+      allBoxesUnchecked: allBoxesUnchecked,
+    });
+  }
   function ProjectionsCheckbox({
     label,
     value,
