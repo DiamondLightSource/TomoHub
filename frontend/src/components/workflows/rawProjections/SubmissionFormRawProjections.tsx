@@ -233,8 +233,6 @@ export default function SubmissionFormRawProjections({
             setIndicesMethod={setIndicesMethod}
             formErrors={formErrors}
             setFormErrors={setFormErrors}
-            firstIndex={firstIndex}
-            lastIndex={lastIndex}
             theme={theme}
           />
           <Divider />

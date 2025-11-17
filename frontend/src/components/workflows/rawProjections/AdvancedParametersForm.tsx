@@ -58,10 +58,23 @@ export default function AdvancedParameters({
           size="small"
           value={Number(submittedWorkflowArguments.nprocs)}
           onChange={(e) => {
-            setSubmittedWorkflowArguments({
-              ...submittedWorkflowArguments,
-              nprocs: Number(e.target.value),
-            });
+            const raw = e.target.value;
+            const numberValue = Number(raw);
+            let error = false;
+            if (raw === "") {
+              error = true;
+            } else if (numberValue < 1 || !Number.isInteger(numberValue)) {
+              error = true;
+            } else {
+              setSubmittedWorkflowArguments({
+                ...submittedWorkflowArguments,
+                nprocs: Number(e.target.value),
+              });
+            }
+            setFormErrors({ ...formErrors, nprocsNaN: error });
+          }}
+          onBlur={() => {
+            setFormErrors({ ...formErrors, nprocsNaN: false });
           }}
           error={formErrors.nprocsNaN}
         />

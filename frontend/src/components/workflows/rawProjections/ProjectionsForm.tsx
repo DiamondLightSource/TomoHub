@@ -23,9 +23,65 @@ interface ProjectionsFormProps {
   setIndicesMethod: (method: ProjectionIndicesMethod) => void;
   formErrors: RawProjectionWorkflowErrors;
   setFormErrors: (args: RawProjectionWorkflowErrors) => void;
-  firstIndex: number;
-  lastIndex: number;
   theme: Theme;
+}
+// needs to be defined outside the render function
+// or textfield blurs as soon as anything is typed
+function ProjectionsNumberInput({
+  label,
+  field,
+  submittedProjectionIndicesValues,
+  setProjectionIndicesValues,
+  formErrors,
+  setFormErrors,
+}: {
+  label: string;
+  field: "start" | "stop" | "step";
+  submittedProjectionIndicesValues: RawProjectionIndicesArguments;
+  setProjectionIndicesValues: (args: RawProjectionIndicesArguments) => void;
+  formErrors: RawProjectionWorkflowErrors;
+  setFormErrors: (args: RawProjectionWorkflowErrors) => void;
+}) {
+  const projectionIndicesObject: RawProjectionIndicesArguments = {
+    ...submittedProjectionIndicesValues,
+  };
+  const formErrorsObject: RawProjectionWorkflowErrors = {
+    ...formErrors,
+  };
+  return (
+    <TextField
+      label={label}
+      type="number"
+      value={submittedProjectionIndicesValues.intervalValues[field]}
+      onChange={(e) => {
+        const raw = e.target.value;
+        const numberValue = Number(raw);
+        let error = false;
+        if (raw === "") {
+          error = true;
+        } else if (numberValue < 1 || !Number.isInteger(numberValue)) {
+          // TODO: could add a different field for this case (with a different error message)
+          error = true;
+        } else {
+          projectionIndicesObject.intervalValues[field] = numberValue;
+        }
+        formErrorsObject.projectionsIntervalNaN[field] = false; // error;
+        setProjectionIndicesValues(projectionIndicesObject);
+        formErrorsObject.projectionsIntervalNaN[field] = error;
+        setFormErrors({ ...formErrorsObject });
+      }}
+      onBlur={() => {
+        const formErrorsObject: RawProjectionWorkflowErrors = {
+          ...formErrors,
+        };
+        formErrorsObject.projectionsIntervalNaN[field] = false;
+        setFormErrors(formErrorsObject);
+      }}
+      fullWidth
+      size="small"
+      error={formErrors.projectionsIntervalNaN[field]}
+    />
+  );
 }
 
 export default function ProjectionsForm({
@@ -35,8 +91,6 @@ export default function ProjectionsForm({
   setIndicesMethod,
   formErrors,
   setFormErrors,
-  firstIndex,
-  lastIndex,
   theme,
 }: ProjectionsFormProps) {
   const allBoxesUnchecked =
@@ -71,37 +125,6 @@ export default function ProjectionsForm({
           />
         }
         label={label}
-      />
-    );
-  }
-
-  function ProjectionsNumberInput({
-    label,
-    field,
-    defaultValue,
-  }: {
-    label: string;
-    field: "start" | "stop" | "step";
-    defaultValue: number;
-  }) {
-    const projectionIndicesObject: RawProjectionIndicesArguments = {
-      ...submittedProjectionIndicesValues,
-    };
-    return (
-      <TextField
-        label={label}
-        type="number"
-        defaultValue={submittedProjectionIndicesValues.intervalValues[field]}
-        onChange={(e) => {
-          const raw = e.target.value;
-          const parsed = raw === "" ? 0 : Number(raw);
-          projectionIndicesObject.intervalValues[field] =
-            parsed ?? defaultValue;
-          setProjectionIndicesValues(projectionIndicesObject);
-        }}
-        fullWidth
-        size="small"
-        error={formErrors.projectionsIntervalNaN[field]}
       />
     );
   }
@@ -169,17 +192,32 @@ export default function ProjectionsForm({
                 <ProjectionsNumberInput
                   label="Start"
                   field="start"
-                  defaultValue={firstIndex}
+                  submittedProjectionIndicesValues={
+                    submittedProjectionIndicesValues
+                  }
+                  setProjectionIndicesValues={setProjectionIndicesValues}
+                  formErrors={formErrors}
+                  setFormErrors={setFormErrors}
                 />
                 <ProjectionsNumberInput
                   label="Stop"
                   field="stop"
-                  defaultValue={lastIndex}
+                  submittedProjectionIndicesValues={
+                    submittedProjectionIndicesValues
+                  }
+                  setProjectionIndicesValues={setProjectionIndicesValues}
+                  formErrors={formErrors}
+                  setFormErrors={setFormErrors}
                 />
                 <ProjectionsNumberInput
                   label="Step"
                   field="step"
-                  defaultValue={100}
+                  submittedProjectionIndicesValues={
+                    submittedProjectionIndicesValues
+                  }
+                  setProjectionIndicesValues={setProjectionIndicesValues}
+                  formErrors={formErrors}
+                  setFormErrors={setFormErrors}
                 />
               </Stack>
             </Box>
