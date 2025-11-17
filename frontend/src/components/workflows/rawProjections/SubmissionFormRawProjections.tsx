@@ -30,6 +30,23 @@ export type RawProjectionIndicesArguments = {
   intervalValues: { start: number; stop: number; step: number };
 };
 
+export type RawProjectionWorkflowErrors = {
+  inputEmpty: boolean;
+  keyEmpty: boolean;
+  allBoxesUnchecked: boolean;
+  projectionsInterval: {
+    startNaN: boolean;
+    stopNaN: boolean;
+    stepNaN: boolean;
+  };
+  indicesListNotCSV: boolean;
+  tooManyIndicesWarning: boolean;
+  memoryFormatInvalid: boolean;
+  nprocsNaN: boolean;
+  outputNameInvalid: boolean;
+  tmpdirPathInvalid: boolean;
+};
+
 export enum ProjectionIndicesMethod {
   Checkbox,
   Interval,
@@ -88,6 +105,19 @@ export default function SubmissionFormRawProjections({
       boxesChecked: { start: true, mid: true, end: true },
       intervalValues: { start: firstIndex, stop: lastIndex, step: 100 },
     });
+
+  const [formErrors, setFormErrors] = useState<RawProjectionWorkflowErrors>({
+    inputEmpty: false,
+    keyEmpty: false,
+    allBoxesUnchecked: false,
+    projectionsInterval: { startNaN: false, stopNaN: false, stepNaN: false },
+    indicesListNotCSV: false,
+    tooManyIndicesWarning: false,
+    memoryFormatInvalid: false,
+    nprocsNaN: false,
+    outputNameInvalid: false,
+    tmpdirPathInvalid: false,
+  });
 
   function onRawProjectionsFormSubmit(visit: Visit) {
     setSubmittedVisit(visit);
