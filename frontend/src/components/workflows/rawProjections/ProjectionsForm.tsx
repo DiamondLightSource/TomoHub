@@ -63,7 +63,7 @@ export default function ProjectionsForm({
       <FormControlLabel
         control={
           <Checkbox
-            checked={submittedProjectionIndicesValues.boxesChecked.start}
+            checked={submittedProjectionIndicesValues.boxesChecked[value]}
             onChange={(e) => {
               projectionIndicesObject.boxesChecked[value] = e.target.checked;
               setProjectionIndicesValues(projectionIndicesObject);
@@ -134,8 +134,9 @@ export default function ProjectionsForm({
             width: "100%",
             "border-radius": "5px",
             ...(submittedProjectionIndicesMethod ===
-              ProjectionIndicesMethod.Checkbox &&
-              formErrors.allBoxesUnchecked && { border: "2px solid red" }),
+              ProjectionIndicesMethod.Checkbox && formErrors.allBoxesUnchecked
+              ? { border: "2px solid red" }
+              : { border: "2px solid transparent" }),
           }}
         >
           {submittedProjectionIndicesMethod ===
