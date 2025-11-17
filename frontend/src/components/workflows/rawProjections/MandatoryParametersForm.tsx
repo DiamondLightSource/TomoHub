@@ -1,15 +1,22 @@
 import { Stack, TextField, Theme, Typography } from "@mui/material";
-import { RawProjectionWorkflowArguments } from "./SubmissionFormRawProjections";
+import {
+  RawProjectionWorkflowArguments,
+  RawProjectionWorkflowErrors,
+} from "./SubmissionFormRawProjections";
 
 interface MandatoryParametersProps {
   submittedWorkflowArguments: RawProjectionWorkflowArguments;
   setSubmittedWorkflowArguments: (args: RawProjectionWorkflowArguments) => void;
+  formErrors: RawProjectionWorkflowErrors;
+  setFormErrors: (args: RawProjectionWorkflowErrors) => void;
   theme: Theme;
 }
 
 export default function MandatoryParameters({
   submittedWorkflowArguments,
   setSubmittedWorkflowArguments,
+  formErrors,
+  setFormErrors,
   theme,
 }: MandatoryParametersProps) {
   return (
@@ -27,6 +34,7 @@ export default function MandatoryParameters({
             input: e.target.value,
           });
         }}
+        error={formErrors.inputEmpty}
       />
       <TextField
         label="Key"
@@ -40,6 +48,7 @@ export default function MandatoryParameters({
             "dataset-path": e.target.value,
           });
         }}
+        error={formErrors.keyEmpty}
       />
     </Stack>
   );

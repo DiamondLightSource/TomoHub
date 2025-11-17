@@ -1,15 +1,22 @@
 import { Box, Stack, TextField, Theme, Typography } from "@mui/material";
-import { RawProjectionWorkflowArguments } from "./SubmissionFormRawProjections";
+import {
+  RawProjectionWorkflowArguments,
+  RawProjectionWorkflowErrors,
+} from "./SubmissionFormRawProjections";
 
 interface AdvancedParametersProps {
   submittedWorkflowArguments: RawProjectionWorkflowArguments;
   setSubmittedWorkflowArguments: (args: RawProjectionWorkflowArguments) => void;
+  formErrors: RawProjectionWorkflowErrors;
+  setFormErrors: (args: RawProjectionWorkflowErrors) => void;
   theme: Theme;
 }
 
 export default function AdvancedParameters({
   submittedWorkflowArguments,
   setSubmittedWorkflowArguments,
+  formErrors,
+  setFormErrors,
   theme,
 }: AdvancedParametersProps) {
   return (
@@ -33,6 +40,7 @@ export default function AdvancedParameters({
               memory: e.target.value,
             });
           }}
+          error={formErrors.memoryFormatInvalid}
         />
         <TextField
           label="Nprocs"
@@ -46,6 +54,7 @@ export default function AdvancedParameters({
               nprocs: Number(e.target.value),
             });
           }}
+          error={formErrors.nprocsNaN}
         />
         <TextField
           label="Output Filename"
@@ -59,6 +68,7 @@ export default function AdvancedParameters({
               "output-filename": e.target.value,
             });
           }}
+          error={formErrors.outputNameInvalid}
         />
         <TextField
           label="Tmpdir Path"
@@ -72,6 +82,7 @@ export default function AdvancedParameters({
               "tmpdir-path": e.target.value,
             });
           }}
+          error={formErrors.tmpdirPathInvalid}
         />
       </Stack>
     </Box>

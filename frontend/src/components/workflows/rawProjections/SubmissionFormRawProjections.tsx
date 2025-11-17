@@ -34,12 +34,11 @@ export type RawProjectionWorkflowErrors = {
   inputEmpty: boolean;
   keyEmpty: boolean;
   allBoxesUnchecked: boolean;
-  projectionsInterval: {
-    startNaN: boolean;
-    stopNaN: boolean;
-    stepNaN: boolean;
+  projectionsIntervalNaN: {
+    start: boolean;
+    stop: boolean;
+    step: boolean;
   };
-  indicesListNotCSV: boolean;
   tooManyIndicesWarning: boolean;
   memoryFormatInvalid: boolean;
   nprocsNaN: boolean;
@@ -110,8 +109,7 @@ export default function SubmissionFormRawProjections({
     inputEmpty: false,
     keyEmpty: false,
     allBoxesUnchecked: false,
-    projectionsInterval: { startNaN: false, stopNaN: false, stepNaN: false },
-    indicesListNotCSV: false,
+    projectionsIntervalNaN: { start: false, stop: false, step: false },
     tooManyIndicesWarning: false,
     memoryFormatInvalid: false,
     nprocsNaN: false,
@@ -223,6 +221,8 @@ export default function SubmissionFormRawProjections({
           <MandatoryParametersForm
             submittedWorkflowArguments={submittedWorkflowArguments}
             setSubmittedWorkflowArguments={setSubmittedWorkflowArguments}
+            formErrors={formErrors}
+            setFormErrors={setFormErrors}
             theme={theme}
           />
           <Divider />
@@ -231,6 +231,8 @@ export default function SubmissionFormRawProjections({
             setProjectionIndicesValues={setProjectionIndicesValues}
             submittedProjectionIndicesMethod={submittedProjecitonIndicesMethod}
             setIndicesMethod={setIndicesMethod}
+            formErrors={formErrors}
+            setFormErrors={setFormErrors}
             firstIndex={firstIndex}
             lastIndex={lastIndex}
             theme={theme}
@@ -239,6 +241,8 @@ export default function SubmissionFormRawProjections({
           <AdvancedParameters
             submittedWorkflowArguments={submittedWorkflowArguments}
             setSubmittedWorkflowArguments={setSubmittedWorkflowArguments}
+            formErrors={formErrors}
+            setFormErrors={setFormErrors}
             theme={theme}
           />
           <Divider />

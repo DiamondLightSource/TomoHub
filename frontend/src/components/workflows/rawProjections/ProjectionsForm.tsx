@@ -13,6 +13,7 @@ import {
 import {
   ProjectionIndicesMethod,
   RawProjectionIndicesArguments,
+  RawProjectionWorkflowErrors,
 } from "./SubmissionFormRawProjections";
 
 interface ProjectionsFormProps {
@@ -20,6 +21,8 @@ interface ProjectionsFormProps {
   setProjectionIndicesValues: (args: RawProjectionIndicesArguments) => void;
   submittedProjectionIndicesMethod: ProjectionIndicesMethod;
   setIndicesMethod: (method: ProjectionIndicesMethod) => void;
+  formErrors: RawProjectionWorkflowErrors;
+  setFormErrors: (args: RawProjectionWorkflowErrors) => void;
   firstIndex: number;
   lastIndex: number;
   theme: Theme;
@@ -30,6 +33,8 @@ export default function ProjectionsForm({
   setProjectionIndicesValues,
   submittedProjectionIndicesMethod,
   setIndicesMethod,
+  formErrors,
+  setFormErrors,
   firstIndex,
   lastIndex,
   theme,
@@ -86,6 +91,7 @@ export default function ProjectionsForm({
         }}
         fullWidth
         size="small"
+        error={formErrors.projectionsIntervalNaN[field]}
       />
     );
   }
@@ -116,6 +122,10 @@ export default function ProjectionsForm({
           sx={{
             padding: "10px",
             width: "100%",
+            "border-radius": "5px",
+            ...(submittedProjectionIndicesMethod ===
+              ProjectionIndicesMethod.Checkbox &&
+              formErrors.allBoxesUnchecked && { border: "2px solid red" }),
           }}
         >
           {submittedProjectionIndicesMethod ===
@@ -156,7 +166,7 @@ export default function ProjectionsForm({
                   defaultValue={lastIndex}
                 />
                 <ProjectionsNumberInput
-                  label="Steo"
+                  label="Step"
                   field="step"
                   defaultValue={100}
                 />
