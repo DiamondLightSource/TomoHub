@@ -44,6 +44,7 @@ export type RawProjectionWorkflowErrors = {
   nprocsNaN: boolean;
   outputNameInvalid: boolean;
   tmpdirPathInvalid: boolean;
+  submissionDisallowed: boolean;
 };
 
 export enum ProjectionIndicesMethod {
@@ -115,9 +116,27 @@ export default function SubmissionFormRawProjections({
     nprocsNaN: false,
     outputNameInvalid: false,
     tmpdirPathInvalid: false,
+    submissionDisallowed: false,
   });
 
   function onRawProjectionsFormSubmit(visit: Visit) {
+    if (
+      !formErrors.keyEmpty ||
+      !formErrors.inputEmpty ||
+      !formErrors.allBoxesUnchecked ||
+      !formErrors.projectionsIntervalNaN.start ||
+      !formErrors.projectionsIntervalNaN.stop ||
+      !formErrors.projectionsIntervalNaN.step ||
+      !formErrors.memoryFormatInvalid ||
+      !formErrors.nprocsNaN ||
+      !formErrors.outputNameInvalid ||
+      !formErrors.tmpdirPathInvalid
+    ) {
+      setFormErrors({ ...formErrors, submissionDisallowed: true });
+      return;
+    }
+    setFormErrors({ ...formErrors, submissionDisallowed: false });
+
     setSubmittedVisit(visit);
     let indices = "";
     if (submittedProjecitonIndicesMethod === ProjectionIndicesMethod.Checkbox) {
