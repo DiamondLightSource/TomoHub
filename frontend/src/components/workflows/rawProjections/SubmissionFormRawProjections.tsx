@@ -127,7 +127,6 @@ export default function SubmissionFormRawProjections({
   });
 
   function onRawProjectionsFormSubmit(visit: Visit) {
-    console.log("submitting");
     if (
       !formErrors.keyEmpty ||
       !formErrors.inputEmpty ||
