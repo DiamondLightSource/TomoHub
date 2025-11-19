@@ -127,18 +127,17 @@ export default function SubmissionFormRawProjections({
   });
 
   function onRawProjectionsFormSubmit(visit: Visit) {
-    console.log("submitting");
     if (
-      !formErrors.keyEmpty ||
-      !formErrors.inputEmpty ||
-      !formErrors.allBoxesUnchecked ||
-      !formErrors.projectionsIntervalNaN.start ||
-      !formErrors.projectionsIntervalNaN.stop ||
-      !formErrors.projectionsIntervalNaN.step ||
-      !formErrors.memoryFormatInvalid ||
-      !formErrors.nprocsNaN ||
-      !formErrors.outputNameInvalid ||
-      !formErrors.tmpdirPathInvalid
+      formErrors.keyEmpty ||
+      formErrors.inputEmpty ||
+      formErrors.allBoxesUnchecked ||
+      formErrors.projectionsIntervalNaN.start ||
+      formErrors.projectionsIntervalNaN.stop ||
+      formErrors.projectionsIntervalNaN.step ||
+      formErrors.memoryFormatInvalid ||
+      formErrors.nprocsNaN ||
+      formErrors.outputNameInvalid ||
+      formErrors.tmpdirPathInvalid
     ) {
       setFormErrors({ ...formErrors, submissionDisallowed: true });
       return;
@@ -209,12 +208,13 @@ export default function SubmissionFormRawProjections({
 
     if ("tasks" in c) {
       const zipFilesList = c.tasks[0].artifacts.filter(
-        (a) => a.name === "projections.tif"
+        (a) => a.name === submittedWorkflowArguments["output-filename"]
       );
       if (zipFilesList.length !== 0) {
         setTifURL(
-          c.tasks[0].artifacts.filter((a) => a.name === "projections.tif")[0]
-            .url
+          c.tasks[0].artifacts.filter(
+            (a) => a.name === submittedWorkflowArguments["output-filename"]
+          )[0].url
         );
       }
     }

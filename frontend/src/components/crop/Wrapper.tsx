@@ -69,16 +69,26 @@ export default function DisplayAreaWrapper({
       <Contextbar selections={imageSelections} sampleRate={sampleRate} />
       <ImagePlot
         image={images[imageIndex]}
-        maxPixelValue={maxPixelValue}
         onScreenSelections={onScreenSelections}
-        selectionOperations={selectionOperations}
+        maxPixelValue={maxPixelValue}
+        createSelection={selectionOperations.createSelection}
+        forceRefresh={selectionOperations.forceRefresh}
+        removeSelection={selectionOperations.removeSelection}
+        onScreenBeingModified={selectionOperations.onScreenBeingModified}
         selectionMode={selectionMode}
       />
       <ImageNavbar
         totalImages={copies}
         currentImageIndex={imageIndex}
         setImageIndex={setImageIndex}
-        selectionOperations={selectionOperations}
+        initialiseSingleSelectionMode={
+          selectionOperations.initialiseSingleSelectionMode
+        }
+        toPrevious={selectionOperations.toPrevious}
+        removeSelection={selectionOperations.removeSelection}
+        removeAll={selectionOperations.removeAll}
+        selectionsEmpty={selectionOperations.selectionsEmpty}
+        undoPossible={selectionOperations.undoPossible}
         selectionMode={selectionMode}
         setSelectionMode={setSelectionMode}
       />

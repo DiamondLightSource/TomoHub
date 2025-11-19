@@ -30,6 +30,9 @@ export default function Crop({ setVisit }: CropProps) {
 
   useEffect(() => {
     if (tifURL === undefined) {
+      setImages(undefined);
+      setLoadingImageIndex(undefined);
+      setTotalImages(undefined);
       return;
     }
     setLoadingImages(true);

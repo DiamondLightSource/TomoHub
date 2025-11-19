@@ -1,23 +1,31 @@
 import { Box } from "@mui/material";
 import { HeatmapPlot, ScaleType } from "@diamondlightsource/davidia";
 import { NDT, RectangularSelection } from "@diamondlightsource/davidia";
-import type { SelectionOperations } from "./SelectionOperations";
 import { SelectionMode } from "../../types/crop.ts";
 
 interface ImagePlotProps {
   image: NDT;
   onScreenSelections: RectangularSelection[];
   maxPixelValue: number;
-  selectionOperations: SelectionOperations;
+  createSelection: (
+    selection: RectangularSelection,
+    deleteOthers: boolean
+  ) => void;
+  forceRefresh: () => void;
+  removeSelection: () => void;
+  onScreenBeingModified: (selection: RectangularSelection) => boolean;
   selectionMode: SelectionMode;
 }
 
 export default function ImagePlot({
   image,
-  onScreenSelections: onScreenSelections,
-  maxPixelValue: maxPixelValue,
-  selectionOperations: selectionOperations,
-  selectionMode: selectionMode,
+  onScreenSelections,
+  maxPixelValue,
+  createSelection,
+  forceRefresh,
+  removeSelection,
+  onScreenBeingModified,
+  selectionMode,
 }: ImagePlotProps) {
   return (
     <Box style={{ display: "grid", height: "49vh", minHeight: "400px" }}>
@@ -42,31 +50,28 @@ export default function ImagePlot({
               selection instanceof RectangularSelection &&
               selectionMode === SelectionMode.Multi
             ) {
-              selectionOperations.createSelection(selection, false);
+              createSelection(selection, false);
             } else {
               // selection area is not a rectangle
               // dont add anything to the list and force refresh so it disapears
-              selectionOperations.forceRefresh();
+              forceRefresh();
             }
           } else if (eventType === "removed") {
             if (selectionMode === SelectionMode.Single) {
               // dont allow removing on single selection, force refresh
-              selectionOperations.forceRefresh();
+              forceRefresh();
             } else {
-              selectionOperations.removeSelection();
+              removeSelection();
             }
           } else if (
             eventType === "updated" &&
             !dragging &&
             selection instanceof RectangularSelection &&
-            !selectionOperations.onScreenBeingModified(selection)
+            !onScreenBeingModified(selection)
           ) {
             // when a box is modified on single selection
             // make a new one to represent the modification and make sure no others exist
-            selectionOperations.createSelection(
-              selection,
-              selectionMode === SelectionMode.Single
-            );
+            createSelection(selection, selectionMode === SelectionMode.Single);
           }
         }}
         selections={onScreenSelections}

@@ -3,6 +3,7 @@ import SaveOutlined from "@mui/icons-material/SaveOutlined";
 import FileOpenOutlined from "@mui/icons-material/FileOpenOutlined";
 import { useLoader, PreviewType } from "../../contexts/LoaderContext";
 import type { RectangularSelection } from "@diamondlightsource/davidia";
+import { useTifURLContext } from "../../contexts/CropContext";
 
 interface ContextbarProps {
   selections: RectangularSelection[][];
@@ -14,15 +15,24 @@ export default function Contextbar({
   sampleRate: sampleRate,
 }: ContextbarProps) {
   const { setDetectorX, setDetectorY } = useLoader();
+  const { setTifURL } = useTifURLContext();
 
   return (
     <Box style={{ height: "6vh", minHeight: "50px" }}>
       <Grid2 container spacing={2} sx={{ alignItems: "center" }}>
         <Grid2 size={1} />
         <Grid2 size={1}>
-          <Button variant="outlined" sx={{ margin: "auto" }}>
-            <FileOpenOutlined fontSize="large" />
-          </Button>
+          <Tooltip title="Re-fill projections fetch form">
+            <Button
+              variant="outlined"
+              sx={{ margin: "auto" }}
+              onClick={() => {
+                setTifURL(undefined);
+              }}
+            >
+              <FileOpenOutlined fontSize="large" />
+            </Button>
+          </Tooltip>
         </Grid2>
         <Grid2 size={8} />
         <Grid2 size={1}>

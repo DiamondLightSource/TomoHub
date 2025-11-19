@@ -15,7 +15,6 @@ import StopOutlined from "@mui/icons-material/StopOutlined";
 import Clear from "@mui/icons-material/Clear";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import InfoIcon from "@mui/icons-material/Info";
-import type { SelectionOperations } from "./SelectionOperations";
 import { useRef, useState } from "react";
 import { SelectionMode } from "../../types/crop.ts";
 
@@ -23,7 +22,12 @@ interface ImageNavbarProps {
   totalImages: number;
   currentImageIndex: number;
   setImageIndex: React.Dispatch<React.SetStateAction<number>>;
-  selectionOperations: SelectionOperations;
+  initialiseSingleSelectionMode: () => void;
+  toPrevious: () => void;
+  removeSelection: () => void;
+  removeAll: () => void;
+  selectionsEmpty: boolean;
+  undoPossible: boolean;
   selectionMode: SelectionMode;
   setSelectionMode: (value: SelectionMode) => void;
 }
@@ -31,10 +35,15 @@ interface ImageNavbarProps {
 export default function ImageNavbar({
   totalImages: totalImages,
   currentImageIndex,
-  setImageIndex: setImageIndex,
-  selectionOperations,
-  selectionMode: selectionMode,
-  setSelectionMode: setSelectionMode,
+  setImageIndex,
+  initialiseSingleSelectionMode,
+  toPrevious,
+  removeSelection,
+  removeAll,
+  selectionsEmpty,
+  undoPossible,
+  selectionMode,
+  setSelectionMode,
 }: ImageNavbarProps) {
   // id value of the interval that is playing the animation
   // cant use state for this as the initial value will be copied into the interval function and it will not be updated
@@ -107,7 +116,7 @@ export default function ImageNavbar({
               onChange={(e) => {
                 if (e.target.value === SelectionMode.Single) {
                   setSelectionMode(SelectionMode.Single);
-                  selectionOperations.initialiseSingleSelectionMode();
+                  initialiseSingleSelectionMode();
                 } else if (e.target.value === SelectionMode.Multi) {
                   setSelectionMode(SelectionMode.Multi);
                 }
@@ -137,8 +146,8 @@ export default function ImageNavbar({
             <Button
               variant="outlined"
               fullWidth
-              onClick={selectionOperations.toPrevious}
-              disabled={!selectionOperations.undoPossible}
+              onClick={toPrevious}
+              disabled={!undoPossible}
             >
               <Undo />
             </Button>
@@ -190,10 +199,9 @@ export default function ImageNavbar({
             <Button
               variant="outlined"
               fullWidth
-              onClick={selectionOperations.removeSelection}
+              onClick={removeSelection}
               disabled={
-                selectionMode === SelectionMode.Single ||
-                selectionOperations.selectionsEmpty
+                selectionMode === SelectionMode.Single || selectionsEmpty
               }
             >
               <DeleteOutline />
@@ -205,10 +213,9 @@ export default function ImageNavbar({
             <Button
               variant="outlined"
               fullWidth
-              onClick={selectionOperations.removeAll}
+              onClick={removeAll}
               disabled={
-                selectionMode === SelectionMode.Single ||
-                selectionOperations.selectionsEmpty
+                selectionMode === SelectionMode.Single || selectionsEmpty
               }
             >
               <Clear />
