@@ -128,16 +128,16 @@ export default function SubmissionFormRawProjections({
 
   function onRawProjectionsFormSubmit(visit: Visit) {
     if (
-      !formErrors.keyEmpty ||
-      !formErrors.inputEmpty ||
-      !formErrors.allBoxesUnchecked ||
-      !formErrors.projectionsIntervalNaN.start ||
-      !formErrors.projectionsIntervalNaN.stop ||
-      !formErrors.projectionsIntervalNaN.step ||
-      !formErrors.memoryFormatInvalid ||
-      !formErrors.nprocsNaN ||
-      !formErrors.outputNameInvalid ||
-      !formErrors.tmpdirPathInvalid
+      formErrors.keyEmpty ||
+      formErrors.inputEmpty ||
+      formErrors.allBoxesUnchecked ||
+      formErrors.projectionsIntervalNaN.start ||
+      formErrors.projectionsIntervalNaN.stop ||
+      formErrors.projectionsIntervalNaN.step ||
+      formErrors.memoryFormatInvalid ||
+      formErrors.nprocsNaN ||
+      formErrors.outputNameInvalid ||
+      formErrors.tmpdirPathInvalid
     ) {
       setFormErrors({ ...formErrors, submissionDisallowed: true });
       return;
