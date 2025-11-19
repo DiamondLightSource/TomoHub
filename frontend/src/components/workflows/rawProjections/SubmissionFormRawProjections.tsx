@@ -1,4 +1,11 @@
-import { Button, Divider, Stack, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  Stack,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import {
   Visit,
   VisitInput,
@@ -28,6 +35,23 @@ export type RawProjectionWorkflowArguments = {
 export type RawProjectionIndicesArguments = {
   boxesChecked: { start: boolean; mid: boolean; end: boolean };
   intervalValues: { start: number; stop: number; step: number };
+};
+
+export type RawProjectionWorkflowErrors = {
+  inputEmpty: boolean;
+  keyEmpty: boolean;
+  allBoxesUnchecked: boolean;
+  projectionsIntervalNaN: {
+    start: boolean;
+    stop: boolean;
+    step: boolean;
+  };
+  tooManyIndicesWarning: boolean;
+  memoryFormatInvalid: boolean;
+  nprocsNaN: boolean;
+  outputNameInvalid: boolean;
+  tmpdirPathInvalid: boolean;
+  submissionDisallowed: boolean;
 };
 
 export enum ProjectionIndicesMethod {
@@ -89,7 +113,38 @@ export default function SubmissionFormRawProjections({
       intervalValues: { start: firstIndex, stop: lastIndex, step: 100 },
     });
 
+  const [formErrors, setFormErrors] = useState<RawProjectionWorkflowErrors>({
+    inputEmpty: false,
+    keyEmpty: false,
+    allBoxesUnchecked: false,
+    projectionsIntervalNaN: { start: false, stop: false, step: false },
+    tooManyIndicesWarning: false,
+    memoryFormatInvalid: false,
+    nprocsNaN: false,
+    outputNameInvalid: false,
+    tmpdirPathInvalid: false,
+    submissionDisallowed: false,
+  });
+
   function onRawProjectionsFormSubmit(visit: Visit) {
+    console.log("submitting");
+    if (
+      !formErrors.keyEmpty ||
+      !formErrors.inputEmpty ||
+      !formErrors.allBoxesUnchecked ||
+      !formErrors.projectionsIntervalNaN.start ||
+      !formErrors.projectionsIntervalNaN.stop ||
+      !formErrors.projectionsIntervalNaN.step ||
+      !formErrors.memoryFormatInvalid ||
+      !formErrors.nprocsNaN ||
+      !formErrors.outputNameInvalid ||
+      !formErrors.tmpdirPathInvalid
+    ) {
+      setFormErrors({ ...formErrors, submissionDisallowed: true });
+      return;
+    }
+    setFormErrors({ ...formErrors, submissionDisallowed: false });
+
     setSubmittedVisit(visit);
     let indices = "";
     if (submittedProjecitonIndicesMethod === ProjectionIndicesMethod.Checkbox) {
@@ -193,6 +248,8 @@ export default function SubmissionFormRawProjections({
           <MandatoryParametersForm
             submittedWorkflowArguments={submittedWorkflowArguments}
             setSubmittedWorkflowArguments={setSubmittedWorkflowArguments}
+            formErrors={formErrors}
+            setFormErrors={setFormErrors}
             theme={theme}
           />
           <Divider />
@@ -201,14 +258,16 @@ export default function SubmissionFormRawProjections({
             setProjectionIndicesValues={setProjectionIndicesValues}
             submittedProjectionIndicesMethod={submittedProjecitonIndicesMethod}
             setIndicesMethod={setIndicesMethod}
-            firstIndex={firstIndex}
-            lastIndex={lastIndex}
+            formErrors={formErrors}
+            setFormErrors={setFormErrors}
             theme={theme}
           />
           <Divider />
           <AdvancedParameters
             submittedWorkflowArguments={submittedWorkflowArguments}
             setSubmittedWorkflowArguments={setSubmittedWorkflowArguments}
+            formErrors={formErrors}
+            setFormErrors={setFormErrors}
             theme={theme}
           />
           <Divider />
@@ -219,6 +278,12 @@ export default function SubmissionFormRawProjections({
             submitOnReturn={false}
             submitButton={true}
           />
+          <Box sx={{ height: "6px" }}>
+            <Typography align="right" color="red">
+              {formErrors.submissionDisallowed &&
+                "Fix errors before submitting form"}
+            </Typography>
+          </Box>
           <Divider />
         </Stack>
       )}
