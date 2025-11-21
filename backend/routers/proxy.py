@@ -6,6 +6,7 @@ from PIL import Image
 from io import BytesIO
 import json
 import numpy as np
+import requests, zipfile, io
 
 logger = logging.getLogger(__name__)
 
@@ -199,7 +200,8 @@ async def proxy_zip_pages(
 
     # error check: make sure url is valid
     # error check: make sure file is zip?
-    imgzip = zipfile.ZipFile(url)
+    r = requests.get(url)
+    imgzip = zipfile.ZipFile(io.BytesIO(r.content))
     inflist = imgzip.infolist()
 
     print("opening png in zip")
