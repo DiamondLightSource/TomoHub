@@ -17,13 +17,15 @@ import { JSONObject } from "../../../types";
 import { useState } from "react";
 import WorkflowStatus from "../WorkflowStatus";
 import { WorkflowStatusSubscription$data } from "../__generated__/WorkflowStatusSubscription.graphql";
-import { useFragment } from "react-relay";
+import { graphql, useFragment, useLazyLoadQuery } from "react-relay";
 import { useTifURLContext } from "../../../contexts/CropContext";
 import { sharedFragment } from "../Submission";
 import MandatoryParametersForm from "./MandatoryParametersForm";
 import ProjectionsForm from "./ProjectionsForm";
 import AdvancedParameters from "./AdvancedParametersForm";
 import { setKey } from "../../../devKey";
+import { SubmissionFormRawProjectionsQuery as SubmissionFormRawProjectionsQueryType } from "./__generated__/SubmissionFormRawProjectionsQuery.graphql";
+import { proxyService } from "../../../api/services";
 
 export type RawProjectionWorkflowArguments = {
   input: string;
@@ -59,6 +61,56 @@ export type RawProjectionWorkflowErrors = {
 export enum ProjectionIndicesMethod {
   Checkbox,
   Interval,
+}
+
+const query = graphql`
+  query SubmissionFormRawProjectionsQuery {
+    workflow(
+      name: "extract-raw-projections-vqxt4"
+      visit: { proposalCode: "cm", proposalNumber: 40628, number: 2 }
+    ) {
+      status {
+        ... on WorkflowSucceededStatus {
+          tasks {
+            artifacts {
+              url
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+async function toBackend(zipUrl: string) {
+  console.log("entering toBackend");
+  const pngAsString: string = await proxyService.getZipPage(zipUrl, 0, 1);
+  console.log(pngAsString);
+  console.log("it worked?!?");
+}
+
+function ZipFetchComponent() {
+  const data = useLazyLoadQuery<SubmissionFormRawProjectionsQueryType>(
+    query,
+    {}
+  );
+
+  console.log(data);
+  const c = data.workflow.status;
+  if (c === null || c === undefined) {
+    return;
+  }
+  console.log("going in");
+  if (c.tasks !== undefined) {
+    const zipFilesList = c.tasks[0].artifacts;
+    if (zipFilesList.length !== 0) {
+      console.log("made it!");
+      const url = c.tasks[0].artifacts[0].url;
+      toBackend(url);
+    }
+  }
+
+  return <p>fetching pngs from zip</p>;
 }
 
 interface SubmissionFormRawProjectionsProps {
@@ -132,7 +184,10 @@ export default function SubmissionFormRawProjections({
     undefined
   );
 
+  const [showFetcher, setShowFetcher] = useState(false);
+
   function onRawProjectionsFormSubmit(visit: Visit) {
+    setShowFetcher(true);
     setKey(keyFormValue);
     return;
 
@@ -299,6 +354,7 @@ export default function SubmissionFormRawProjections({
               setKeyFormValue(e.target.value);
             }}
           />
+          {showFetcher && <ZipFetchComponent />}
         </Stack>
       )}
     </div>
