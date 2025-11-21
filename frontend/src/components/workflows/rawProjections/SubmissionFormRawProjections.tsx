@@ -3,6 +3,7 @@ import {
   Button,
   Divider,
   Stack,
+  TextField,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -22,6 +23,7 @@ import { sharedFragment } from "../Submission";
 import MandatoryParametersForm from "./MandatoryParametersForm";
 import ProjectionsForm from "./ProjectionsForm";
 import AdvancedParameters from "./AdvancedParametersForm";
+import { setKey } from "../../../devKey";
 
 export type RawProjectionWorkflowArguments = {
   input: string;
@@ -126,7 +128,14 @@ export default function SubmissionFormRawProjections({
     submissionDisallowed: false,
   });
 
+  const [keyFormValue, setKeyFormValue] = useState<string | undefined>(
+    undefined
+  );
+
   function onRawProjectionsFormSubmit(visit: Visit) {
+    setKey(keyFormValue);
+    return;
+
     if (
       formErrors.keyEmpty ||
       formErrors.inputEmpty ||
@@ -285,6 +294,11 @@ export default function SubmissionFormRawProjections({
             </Typography>
           </Box>
           <Divider />
+          <TextField
+            onChange={(e) => {
+              setKeyFormValue(e.target.value);
+            }}
+          />
         </Stack>
       )}
     </div>
