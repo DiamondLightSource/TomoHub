@@ -121,4 +121,27 @@ export const proxyService = {
 
     return `data:image/png;base64,${base64}`;
   },
+
+  getZipPage: async (
+    zipUrl: string,
+    page: number,
+    downsample_rate: number = 1
+  ): Promise<string> => {
+    const response = await apiClient.get(
+      `/proxy/zip-pages?url=${encodeURIComponent(zipUrl)}&page=${page}&downsample_rate=${downsample_rate}`,
+      {
+        responseType: "arraybuffer",
+      }
+    );
+
+    // Convert ArrayBuffer to base64 data URL instead of blob URL
+    const base64 = btoa(
+      new Uint8Array(response.data).reduce(
+        (data, byte) => data + String.fromCharCode(byte),
+        ""
+      )
+    );
+
+    return `data:image/png;base64,${base64}`;
+  },
 };

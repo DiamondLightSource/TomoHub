@@ -188,3 +188,41 @@ async def proxy_tiff_pages(
     except Exception as e:
         logger.error(f"Unexpected error processing TIFF: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@proxy_router.get("/zip-pages")
+async def proxy_zip_pages(
+    url: str = Query(..., description="The S3 URL to proxy"),
+    page: int = Query(None, description="Page number to extract (0-based). If not provided, returns metadata."),
+    downsample_rate: int = 1
+):
+    print("zip pages entered")
+
+    # error check: make sure url is valid
+    # error check: make sure file is zip?
+    imgzip = zipfile.ZipFile(url)
+    inflist = imgzip.infolist()
+
+    print("opening png in zip")
+    # error check: make sure page is in list length
+    ifile = imgzip.open(inflist[page])
+    img = Image.open(ifile)
+
+    print("converting to string data")
+    # hopefully no conversions are needed but if so do them here
+    # downsampling here
+    png_buffer = BytesIO()
+    img.save(png_buffer, format='PNG', optimize=True)
+    png_data = png_buffer.getvalue()
+
+    print("returning")
+    return Response(
+        content=png_data,
+        media_type="image/png",
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET",
+            "Access-Control-Allow-Headers": "*",
+            "Content-Length": str(len(png_data)),
+            "Cache-Control": "public, max-age=3600"
+        }
+    )
