@@ -213,7 +213,12 @@ async def proxy_zip_pages(
     # hopefully no conversions are needed but if so do them here
     # downsampling here
     png_buffer = BytesIO()
-    img.save(png_buffer, format='PNG', optimize=True)
+    data = Image.Image.getdata(img)
+    string_list = ""
+    for i in range(len(data)):
+        string_list += str(data[i]) + ", "
+    png_buffer.write(bytes(string_list, 'utf-8'))
+    # img.save(png_buffer, format='PNG', optimize=False)
     png_data = png_buffer.getvalue()
 
     print("returning")

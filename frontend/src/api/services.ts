@@ -134,14 +134,19 @@ export const proxyService = {
       }
     );
 
-    // Convert ArrayBuffer to base64 data URL instead of blob URL
-    const base64 = btoa(
-      new Uint8Array(response.data).reduce(
-        (data, byte) => data + String.fromCharCode(byte),
-        ""
-      )
-    );
+    const decoder = new TextDecoder();
+    console.log(response.data);
+    const v = decoder.decode(response.data);
+    console.log(v);
 
-    return `data:image/png;base64,${base64}`;
+    // Convert ArrayBuffer to base64 data URL instead of blob URL
+    // const base64 = btoa(
+    //   new Uint8Array(response.data).reduce(
+    //     (data, byte) => data + String.fromCharCode(byte),
+    //     ""
+    //   )
+    // );
+
+    return v;
   },
 };

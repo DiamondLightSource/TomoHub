@@ -82,18 +82,19 @@ const query = graphql`
   }
 `;
 
-async function toBackend(zipUrl: string) {
-  console.log("entering toBackend");
-  const pngAsString: string = await proxyService.getZipPage(zipUrl, 0, 1);
-  console.log(pngAsString);
-  console.log("it worked?!?");
-}
+// async function toBackend(zipUrl: string) {
+//   console.log("entering toBackend");
+//   const pngAsString: string = await proxyService.getZipPage(zipUrl, 0, 1);
+//   console.log(pngAsString);
+//   console.log("it worked?!?");
+// }
 
 function ZipFetchComponent() {
   const data = useLazyLoadQuery<SubmissionFormRawProjectionsQueryType>(
     query,
     {}
   );
+  const { setTifURL } = useTifURLContext();
 
   console.log(data);
   const c = data.workflow.status;
@@ -106,7 +107,7 @@ function ZipFetchComponent() {
     if (zipFilesList.length !== 0) {
       console.log("made it!");
       const url = c.tasks[0].artifacts[0].url;
-      toBackend(url);
+      setTifURL(url);
     }
   }
 
