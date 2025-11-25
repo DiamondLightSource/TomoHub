@@ -59,6 +59,22 @@ function ensureKeycloakInit(): Promise<boolean> {
   return kcinitPromise;
 }
 
+keycloak.onTokenExpired = () => {
+  console.log("JWT expired");
+  keycloak
+    .updateToken(10)
+    .then((refreshed) => {
+      if (refreshed) {
+        console.log("Fetched new JWT");
+      } else {
+        console.warn("Token still valid");
+      }
+    })
+    .catch((err: unknown) => {
+      console.error("Failed to update JWT", err);
+    });
+};
+
 export const wsClient = createClient({
   url: WS_ENDPOINT,
   connectionParams: async () => {
