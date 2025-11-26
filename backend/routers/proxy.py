@@ -209,16 +209,17 @@ async def proxy_zip_pages(
     ifile = imgzip.open(inflist[page])
     img = Image.open(ifile)
 
+    # convert image to RGBA
+    # array = np.array(img)
+    # normalized = (array.astype(np.uint16) - array.min()) * 255.0 / (array.max() - array.min())
+    # img = Image.fromarray(normalized.astype(np.uint8))
+    # img = img.convert('RGB')
+
     print("converting to string data")
     # hopefully no conversions are needed but if so do them here
     # downsampling here
     png_buffer = BytesIO()
-    data = Image.Image.getdata(img)
-    string_list = ""
-    for i in range(len(data)):
-        string_list += str(data[i]) + ", "
-    png_buffer.write(bytes(string_list, 'utf-8'))
-    # img.save(png_buffer, format='PNG', optimize=False)
+    img.save(png_buffer, format='PNG', optimize=True)
     png_data = png_buffer.getvalue()
 
     print("returning")

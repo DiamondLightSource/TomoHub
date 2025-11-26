@@ -126,7 +126,7 @@ export const proxyService = {
     zipUrl: string,
     page: number,
     downsample_rate: number = 1
-  ): Promise<string> => {
+  ): Promise<Uint8Array> => {
     const response = await apiClient.get(
       `/proxy/zip-pages?url=${encodeURIComponent(zipUrl)}&page=${page}&downsample_rate=${downsample_rate}`,
       {
@@ -134,19 +134,8 @@ export const proxyService = {
       }
     );
 
-    const decoder = new TextDecoder();
-    console.log(response.data);
-    const v = decoder.decode(response.data);
-    console.log(v);
+    const byteArray = new Uint8Array(response.data);
 
-    // Convert ArrayBuffer to base64 data URL instead of blob URL
-    // const base64 = btoa(
-    //   new Uint8Array(response.data).reduce(
-    //     (data, byte) => data + String.fromCharCode(byte),
-    //     ""
-    //   )
-    // );
-
-    return v;
+    return byteArray;
   },
 };

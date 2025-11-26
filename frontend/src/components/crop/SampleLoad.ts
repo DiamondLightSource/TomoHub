@@ -1,7 +1,7 @@
 import type { NDT } from "@diamondlightsource/davidia";
 import ndarray from "ndarray";
 import { proxyService } from "../../api/services";
-import pixels from "image-pixels";
+import { decode } from "fast-png";
 
 export default async function loadData(
   tifURL: string,
@@ -31,23 +31,16 @@ export default async function loadData(
   for (let i = 0; i < 5; i++) {
     setLoadingImageIndex(i);
 
-    const pngAsString: string = await proxyService.getZipPage(
+    const byteArray: Uint8Array = await proxyService.getZipPage(
       tifURL,
       i,
       sampleRate
     );
 
     // const { data }: { data: Uint8ClampedArray } = await pixels(pngAsString);
-    const data = new Uint8ClampedArray(
-      pngAsString.split(", ").map((i) => {
-        return Math.floor(parseInt(i) / 256);
-      })
-    );
+    const image = decode(byteArray);
 
-    const currentPageNDT = ndarray(new Uint8Array(data), [
-      height,
-      width,
-    ]) as NDT;
+    const currentPageNDT = ndarray(image.data, [height, width]) as NDT;
     images.push(currentPageNDT);
   }
 

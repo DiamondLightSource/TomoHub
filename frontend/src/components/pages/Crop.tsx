@@ -18,7 +18,7 @@ interface CropProps {
 
 export default function Crop({ setVisit }: CropProps) {
   const sampleRate = 10;
-  const maxPixelValue = 255;
+  const maxPixelValue = 65536;
   const [images, setImages] = useState<NDT[] | undefined>(undefined);
 
   const [loadingImages, setLoadingImages] = useState(false);
