@@ -27,6 +27,7 @@
     "@mui/material": "^6.4.8",
     "@react-three/fiber": "^8.18.0",
     "axios": "^1.7.9",
+    "fast-png": "^7.0.1",
     "graphql-ws": "^6.0.6",
     "image-pixels": "^2.2.2",
     "js-yaml": "^4.1.0",
