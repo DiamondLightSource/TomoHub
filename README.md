@@ -39,6 +39,8 @@ git clone https://github.com/DiamondLightSource/TomoHub
 In `frontend/`, add an `.env.local` file with the following contents:
 ```
 VITE_API_BASE_URL = "http://localhost:8000"
+VITE_KEYCLOAK_URL = "https://authn.diamond.ac.uk/"
+VITE_KEYCLOAK_REALM = "master"
 VITE_KEYCLOAK_CLIENT_ID = "tomohub-dev"
 ```
 
