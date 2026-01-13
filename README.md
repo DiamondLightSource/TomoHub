@@ -39,7 +39,9 @@ git clone https://github.com/DiamondLightSource/TomoHub
 In `frontend/`, add an `.env.local` file with the following contents:
 ```
 VITE_API_BASE_URL = "http://localhost:8000"
-VITE_KEYCLOAK_CLIENT_ID = "tomohub-dev"
+VITE_KEYCLOAK_URL = "https://identity-test.diamond.ac.uk"
+VITE_KEYCLOAK_REALM = "dls"
+VITE_KEYCLOAK_CLIENT_ID = "TomoHubDev"
 ```
 
 #### Install dependencies and generate code from GraphQL schema
