@@ -1,10 +1,4 @@
 import { useFragment, graphql } from "react-relay";
-import {
-  materialCells,
-  materialRenderers,
-} from "@jsonforms/material-renderers";
-import { UISchemaElement, createAjv } from "@jsonforms/core";
-import { JsonForms } from "@jsonforms/react";
 import { useState } from "react";
 import {
   Divider,
@@ -14,7 +8,7 @@ import {
   useTheme,
   Alert,
 } from "@mui/material";
-import { ErrorObject } from "ajv";
+import { Ajv } from "ajv";
 import { JSONObject } from "../../types";
 import {
   Visit,
@@ -44,7 +38,6 @@ const SubmissionFormGPURun = (props: {
 }) => {
   const data = useFragment(sharedFragment, props.template);
   const theme = useTheme();
-  const validator = createAjv({ useDefaults: true, coerceTypes: true });
   const {
     method,
     module_path,
@@ -71,41 +64,6 @@ const SubmissionFormGPURun = (props: {
   const [isNProcsValid, setIsNProcsValid] = useState(true);
   const [isMemoryValid, setIsMemoryValid] = useState(true);
 
-  const customSchema = {
-    type: "object",
-    properties: {
-      input: { type: "string", title: "Input Path" },
-      output: { type: "string", title: "Output Path" },
-      nprocs: { type: "string", default: "1", title: "Number of Processes" },
-      memory: { type: "string", default: "20Gi", title: "Memory" },
-    },
-    required: ["input", "output", "nprocs", "memory"],
-  };
-
-  const customUISchema: UISchemaElement = {
-    type: "VerticalLayout",
-    elements: [
-      {
-        type: "HorizontalLayout",
-        elements: [
-          { type: "Control", scope: "#/properties/input" },
-          { type: "Control", scope: "#/properties/output" },
-        ],
-      },
-      {
-        type: "HorizontalLayout",
-        elements: [
-          { type: "Control", scope: "#/properties/nprocs" },
-          { type: "Control", scope: "#/properties/memory" },
-        ],
-      },
-    ],
-  };
-
-  const [parameters, setParameters] = useState(
-    props.prepopulatedParameters ?? {}
-  );
-  const [errors, setErrors] = useState<ErrorObject[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [submittedWorkflowName, setSubmittedWorkflowName] = useState<
     string | null
@@ -117,19 +75,32 @@ const SubmissionFormGPURun = (props: {
     return JSON.stringify(combinedData);
   };
 
-  const onClick = (visit: Visit, submitParams?: object) => {
-    if (errors.length === 0) {
+  const validator = new Ajv().compile(data.arguments);
+
+  const onClick = (visit: Visit, _?: object) => {
+    if (
+      isInputPathValid &&
+      isOutputPathValid &&
+      isNProcsValid &&
+      isMemoryValid
+    ) {
       const configJSON = generateConfigJSON();
 
       console.log("Generated config JSON for httomo-gpu-job:", configJSON);
 
       const finalParams = {
         config: configJSON,
-        input: parameters.input,
-        output: parameters.output,
-        nprocs: parameters.nprocs,
-        memory: parameters.memory,
+        input: inputPath,
+        output: outputPath,
+        nprocs: nProcs.toString(),
+        memory: memory,
       };
+
+      const validationRes = validator(finalParams);
+      if (!validationRes) {
+        console.error("Parameter validation failed: ", validator.errors);
+        return;
+      }
 
       props.onSubmit(visit, finalParams, (workflowName: string) => {
         console.log("SUCCESS CALLBACK RECEIVED:", workflowName);
@@ -217,26 +188,9 @@ const SubmissionFormGPURun = (props: {
 
       <Divider />
 
-      <JsonForms
-        schema={customSchema}
-        uischema={customUISchema}
-        data={parameters}
-        renderers={materialRenderers}
-        cells={materialCells}
-        ajv={validator}
-        onChange={({ data, errors }) => {
-          setParameters(data as JSONObject);
-          setErrors(errors ? errors : []);
-        }}
-        data-testid="parameters-form"
-      />
-
-      <Divider />
-
       <VisitInput
         visit={props.visit}
         onSubmit={onClick}
-        parameters={parameters}
         submitOnReturn={false}
       />
 
