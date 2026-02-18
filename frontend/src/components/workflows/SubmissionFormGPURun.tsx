@@ -30,6 +30,8 @@ import WorkflowStatus from "./WorkflowStatus";
 import { useHTTOMOConfig } from "../../hooks/useHTTOMOConfig";
 import React from "react";
 
+import { GpuJobWorkflowParametersForm } from "./GpuJobWorkflowParametersForm";
+
 const SubmissionFormGPURun = (props: {
   template: SubmissionFormSharedFragment$key;
   prepopulatedParameters?: JSONObject;
@@ -145,6 +147,10 @@ const SubmissionFormGPURun = (props: {
       <Typography variant="body1" align="center">
         {data.description}
       </Typography>
+
+      <Divider />
+
+      <GpuJobWorkflowParametersForm />
 
       <Divider />
 
