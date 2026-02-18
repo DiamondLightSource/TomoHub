@@ -1,21 +1,48 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
 import { Box, Card, Stack, TextField, Typography } from "@mui/material";
 
 const memoryParamRegex = /[0-9]+[GMK]i/;
 const nonEmptyStringRegex = /(.|\s)*\S(.|\s)*/;
 
-const Form = () => {
+type FormProps = {
+  inputPath: string;
+  isInputPathValid: boolean;
+  outputPath: string;
+  isOutputPathValid: boolean;
+  nProcs: number;
+  isNProcsValid: boolean;
+  memory: string;
+  isMemoryValid: boolean;
+  handleInputPathChange: (_: string) => void;
+  handleIsInputPathValidChange: (_: boolean) => void;
+  handleOutputPathChange: (_: string) => void;
+  handleIsOutputPathValidChange: (_: boolean) => void;
+  handleNProcsChange: (_: number) => void;
+  handleIsNProcsValidChange: (_: boolean) => void;
+  handleMemoryChange: (_: string) => void;
+  handleIsMemoryValidChange: (_: boolean) => void;
+};
+
+const Form = ({
+  inputPath,
+  isInputPathValid,
+  outputPath,
+  isOutputPathValid,
+  nProcs,
+  isNProcsValid,
+  memory,
+  isMemoryValid,
+  handleInputPathChange,
+  handleIsInputPathValidChange,
+  handleOutputPathChange,
+  handleIsOutputPathValidChange,
+  handleNProcsChange,
+  handleIsNProcsValidChange,
+  handleMemoryChange,
+  handleIsMemoryValidChange,
+}: FormProps) => {
   const nProcsMin = 1;
   const nProcsMax = 40;
-
-  const [inputPath, setInputPath] = useState("");
-  const [outputPath, setOutputPath] = useState("");
-  const [nProcs, setNProcs] = useState(1);
-  const [memory, setMemory] = useState("20Gi");
-  const [isInputPathValid, setIsInputPathValid] = useState(false);
-  const [isOutputPathValid, setIsOutputPathValid] = useState(false);
-  const [isNProcsValid, setIsNProcsValid] = useState(true);
-  const [isMemoryValid, setIsMemoryValid] = useState(true);
 
   return (
     <>
@@ -28,8 +55,8 @@ const Form = () => {
         value={inputPath}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           const value = e.target.value;
-          setInputPath(value);
-          setIsInputPathValid(nonEmptyStringRegex.test(value));
+          handleInputPathChange(value);
+          handleIsInputPathValidChange(nonEmptyStringRegex.test(value));
         }}
         placeholder="Path to input data file"
         helperText={!isInputPathValid && "is required"}
@@ -45,8 +72,8 @@ const Form = () => {
         value={outputPath}
         onChange={(e: ChangeEvent<HTMLInputElement>) => {
           const value = e.target.value;
-          setOutputPath(value);
-          setIsOutputPathValid(nonEmptyStringRegex.test(value));
+          handleOutputPathChange(value);
+          handleIsOutputPathValidChange(nonEmptyStringRegex.test(value));
         }}
         placeholder="Path to output folder"
         helperText={!isOutputPathValid && "is required"}
@@ -63,8 +90,8 @@ const Form = () => {
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
             const value =
               e.target.value === "" ? nProcsMin : Number(e.target.value);
-            setNProcs(value);
-            setIsNProcsValid(value >= nProcsMin && value <= nProcsMax);
+            handleNProcsChange(value);
+            handleIsNProcsValidChange(value >= nProcsMin && value <= nProcsMax);
           }}
           error={!isNProcsValid}
           helperText={
@@ -80,8 +107,8 @@ const Form = () => {
           value={memory}
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
             const value = e.target.value;
-            setMemory(value);
-            setIsMemoryValid(memoryParamRegex.test(value));
+            handleMemoryChange(value);
+            handleIsMemoryValidChange(memoryParamRegex.test(value));
           }}
           error={!isMemoryValid}
           helperText={
@@ -93,7 +120,7 @@ const Form = () => {
   );
 };
 
-export const GpuJobWorkflowParametersForm = () => {
+export const GpuJobWorkflowParametersForm = (props: FormProps) => {
   return (
     <Card
       variant="outlined"
@@ -123,7 +150,24 @@ export const GpuJobWorkflowParametersForm = () => {
           <strong>Workflow Parameters</strong>
         </Typography>
       </Box>
-      <Form />
+      <Form
+        inputPath={props.inputPath}
+        isInputPathValid={props.isInputPathValid}
+        outputPath={props.outputPath}
+        isOutputPathValid={props.isOutputPathValid}
+        nProcs={props.nProcs}
+        isNProcsValid={props.isNProcsValid}
+        memory={props.memory}
+        isMemoryValid={props.isMemoryValid}
+        handleInputPathChange={props.handleInputPathChange}
+        handleIsInputPathValidChange={props.handleIsInputPathValidChange}
+        handleOutputPathChange={props.handleOutputPathChange}
+        handleIsOutputPathValidChange={props.handleIsOutputPathValidChange}
+        handleNProcsChange={props.handleNProcsChange}
+        handleIsNProcsValidChange={props.handleIsNProcsValidChange}
+        handleMemoryChange={props.handleMemoryChange}
+        handleIsMemoryValidChange={props.handleIsMemoryValidChange}
+      />
     </Card>
   );
 };

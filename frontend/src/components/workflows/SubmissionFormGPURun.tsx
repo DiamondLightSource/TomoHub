@@ -58,6 +58,19 @@ const SubmissionFormGPURun = (props: {
   const { generateHTTOMOConfig, hasLoaderData, hasMethodsData } =
     useHTTOMOConfig();
 
+  const [inputPath, setInputPath] = useState("");
+  const [outputPath, setOutputPath] = useState("");
+  const [nProcs, setNProcs] = useState(
+    Number(data.arguments.properties.nprocs.default)
+  );
+  const [memory, setMemory] = useState(
+    data.arguments.properties.memory.default
+  );
+  const [isInputPathValid, setIsInputPathValid] = useState(false);
+  const [isOutputPathValid, setIsOutputPathValid] = useState(false);
+  const [isNProcsValid, setIsNProcsValid] = useState(true);
+  const [isMemoryValid, setIsMemoryValid] = useState(true);
+
   const customSchema = {
     type: "object",
     properties: {
@@ -150,7 +163,32 @@ const SubmissionFormGPURun = (props: {
 
       <Divider />
 
-      <GpuJobWorkflowParametersForm />
+      <GpuJobWorkflowParametersForm
+        inputPath={inputPath}
+        isInputPathValid={isInputPathValid}
+        outputPath={outputPath}
+        isOutputPathValid={isOutputPathValid}
+        nProcs={nProcs}
+        isNProcsValid={isNProcsValid}
+        memory={memory}
+        isMemoryValid={isMemoryValid}
+        handleInputPathChange={(input: string) => setInputPath(input)}
+        handleIsInputPathValidChange={(isValid: boolean) =>
+          setIsInputPathValid(isValid)
+        }
+        handleOutputPathChange={(output: string) => setOutputPath(output)}
+        handleIsOutputPathValidChange={(isValid: boolean) =>
+          setIsOutputPathValid(isValid)
+        }
+        handleNProcsChange={(nProcs: number) => setNProcs(nProcs)}
+        handleIsNProcsValidChange={(isValid: boolean) =>
+          setIsNProcsValid(isValid)
+        }
+        handleMemoryChange={(memory: string) => setMemory(memory)}
+        handleIsMemoryValidChange={(isValid: boolean) =>
+          setIsMemoryValid(isValid)
+        }
+      />
 
       <Divider />
 
