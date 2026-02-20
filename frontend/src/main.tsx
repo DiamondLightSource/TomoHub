@@ -4,28 +4,17 @@ import App from "./App";
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider, DiamondTheme } from "@diamondlightsource/sci-react-ui";
 import { RelayEnvironmentProvider } from "react-relay";
-import { RelayEnvironment } from "./RelayEnviornment";
-import keycloak from "./keycloak";
+import { getRelayEnvironment } from "./RelayEnviornment";
 
-// Wait for Keycloak before rendering
-keycloak
-  .init({
-    onLoad: "login-required",
-    scope: import.meta.env.VITE_KEYCLOAK_SCOPE,
-  })
-  .then((authenticated) => {
-    if (authenticated) {
-      createRoot(document.getElementById("root")!).render(
-        <StrictMode>
-          <ThemeProvider theme={DiamondTheme} defaultMode="light">
-            <CssBaseline />
-            <RelayEnvironmentProvider environment={RelayEnvironment}>
-              <App />
-            </RelayEnvironmentProvider>
-          </ThemeProvider>
-        </StrictMode>
-      );
-    } else {
-      window.location.reload();
-    }
-  });
+getRelayEnvironment().then((environment) => {
+  createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+      <ThemeProvider theme={DiamondTheme} defaultMode="light">
+        <CssBaseline />
+        <RelayEnvironmentProvider environment={environment}>
+          <App />
+        </RelayEnvironmentProvider>
+      </ThemeProvider>
+    </StrictMode>
+  );
+});
