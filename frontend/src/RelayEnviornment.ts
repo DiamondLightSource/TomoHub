@@ -50,6 +50,7 @@ function ensureKeycloakInit(): Promise<boolean> {
     kcinitPromise = keycloak
       .init({
         onLoad: "login-required",
+        scope: import.meta.env.VITE_KEYCLOAK_SCOPE,
       })
       .catch((err: unknown) => {
         console.error("Keycloak init failed", err);
@@ -122,4 +123,10 @@ function createRelayEnvironment() {
   });
 }
 
-export const RelayEnvironment = createRelayEnvironment();
+export async function getRelayEnvironment(): Promise<Environment> {
+  await ensureKeycloakInit();
+  return new Environment({
+    network: Network.create(fetchFn, subscribe),
+    store: new Store(new RecordSource()),
+  });
+}
