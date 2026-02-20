@@ -8,19 +8,24 @@ import { RelayEnvironment } from "./RelayEnviornment";
 import keycloak from "./keycloak";
 
 // Wait for Keycloak before rendering
-keycloak.init({ onLoad: "login-required" }).then((authenticated) => {
-  if (authenticated) {
-    createRoot(document.getElementById("root")!).render(
-      <StrictMode>
-        <ThemeProvider theme={DiamondTheme} defaultMode="light">
-          <CssBaseline />
-          <RelayEnvironmentProvider environment={RelayEnvironment}>
-            <App />
-          </RelayEnvironmentProvider>
-        </ThemeProvider>
-      </StrictMode>
-    );
-  } else {
-    window.location.reload();
-  }
-});
+keycloak
+  .init({
+    onLoad: "login-required",
+    scope: import.meta.env.VITE_KEYCLOAK_SCOPE,
+  })
+  .then((authenticated) => {
+    if (authenticated) {
+      createRoot(document.getElementById("root")!).render(
+        <StrictMode>
+          <ThemeProvider theme={DiamondTheme} defaultMode="light">
+            <CssBaseline />
+            <RelayEnvironmentProvider environment={RelayEnvironment}>
+              <App />
+            </RelayEnvironmentProvider>
+          </ThemeProvider>
+        </StrictMode>
+      );
+    } else {
+      window.location.reload();
+    }
+  });

@@ -42,6 +42,7 @@ VITE_API_BASE_URL = "http://localhost:8000"
 VITE_KEYCLOAK_URL = "https://identity-test.diamond.ac.uk"
 VITE_KEYCLOAK_REALM = "dls"
 VITE_KEYCLOAK_CLIENT_ID = "TomoHubDev"
+VITE_KEYCLOAK_SCOPE = "openid profile posix-uid email"
 ```
 
 #### Install dependencies and generate code from GraphQL schema
