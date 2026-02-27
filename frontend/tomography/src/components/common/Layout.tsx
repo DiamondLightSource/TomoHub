@@ -7,6 +7,7 @@ import { CenterProvider } from "../../contexts/CenterContext";
 import { Box, CssBaseline, Paper, styled } from "@mui/material";
 import Header from "./Header";
 import CropProvider from "../../contexts/CropContext";
+import { Example } from "../../../../imaging-lib/lib/components/Example";
 
 const LeftSection = styled(Box)({
   display: "flex",
@@ -55,6 +56,7 @@ const Layout = () => {
                     <LeftSection as="section" className="left-section">
                       <Outlet />
                     </LeftSection>
+                    <Example />
                     {/* <RightSection as="section" className="right-section"> */}
                     {/*   <Pipeline /> */}
                     {/* </RightSection> */}
