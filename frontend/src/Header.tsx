@@ -15,11 +15,6 @@ import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 import CropIcon from "@mui/icons-material/Crop";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import yaml from "js-yaml";
-import { useLoader, PreviewType } from "../../contexts/LoaderContext";
-import {
-  useMethods,
-  Method as MethodType,
-} from "../../contexts/MethodsContext";
 
 const Alert = React.forwardRef<
   HTMLDivElement,
@@ -31,10 +26,6 @@ const Alert = React.forwardRef<
 function Header() {
   const location = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Get context functions
-  const loaderContext = useLoader();
-  const methodsContext = useMethods();
 
   // Snackbar state
   const [snackbarState, setSnackbarState] = useState({

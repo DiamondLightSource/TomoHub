@@ -1,4 +1,3 @@
-import React from "react";
 import { Outlet } from "react-router-dom";
 import Pipeline from "../pipeline/Pipeline";
 import { MethodsProvider } from "../../contexts/MethodsContext";
@@ -7,8 +6,6 @@ import { LoaderProvider } from "../../contexts/LoaderContext";
 import { CenterProvider } from "../../contexts/CenterContext";
 import { Box, CssBaseline, Paper, styled } from "@mui/material";
 import Header from "./Header";
-import { Footer, Navbar, User } from "@diamondlightsource/sci-react-ui";
-import keycloak from "../../keycloak";
 import CropProvider from "../../contexts/CropContext";
 
 const LeftSection = styled(Box)({
@@ -34,7 +31,8 @@ const AppContainer = styled(Box)({
 
 const MainContainer = styled(Box)({
   display: "grid",
-  gridTemplateColumns: "900px auto",
+  // gridTemplateColumns: "900px auto", //  commented out due to it messing with the displaying
+  // of the Pipeline component that is fixed on the RHS of every page
   gap: "30px",
   padding: "20px",
   flex: 1,
@@ -43,24 +41,6 @@ const MainContainer = styled(Box)({
 });
 
 const Layout = () => {
-  // Determine the username to display
-  let username = "Guest User";
-
-  if (keycloak.authenticated && keycloak.tokenParsed) {
-    username =
-      keycloak.tokenParsed.preferred_username ||
-      keycloak.tokenParsed.name ||
-      keycloak.tokenParsed.email ||
-      "Authenticated User";
-  }
-
-  // Handle logout
-  const handleLogout = () => {
-    if (keycloak.authenticated) {
-      keycloak.logout();
-    }
-  };
-
   return (
     <>
       <LoaderProvider>
@@ -70,37 +50,15 @@ const Layout = () => {
               <CropProvider>
                 <CssBaseline />
                 <AppContainer>
-                  <Navbar
-                    logo="theme"
-                    rightSlot={
-                      <User
-                        color="white"
-                        onLogout={handleLogout}
-                        user={{
-                          fedid: username,
-                        }}
-                      />
-                    }
-                  ></Navbar>
                   <Header />
                   <MainContainer>
                     <LeftSection as="section" className="left-section">
                       <Outlet />
                     </LeftSection>
-                    <RightSection as="section" className="right-section">
-                      <Pipeline />
-                    </RightSection>
+                    {/* <RightSection as="section" className="right-section"> */}
+                    {/*   <Pipeline /> */}
+                    {/* </RightSection> */}
                   </MainContainer>
-                  <Footer
-                    copyright=""
-                    logo="theme"
-                    style={{
-                      width: "100%",
-                      backgroundColor: "#4C5266",
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  ></Footer>
                 </AppContainer>
               </CropProvider>
             </CenterProvider>
