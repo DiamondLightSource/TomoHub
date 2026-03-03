@@ -1,7 +1,14 @@
 {
-  "src": "./src",
-  "language": "typescript",
-  "schema": "./src/workflows.graphql",
-  "exclude": ["**/node_modules/**", "**/__mocks__/**", "**/__generated__/**"],
-  "eagerEsModules": true
+  "root": ".",
+  "projects": {
+    "tomography": {
+      "language": "typescript",
+      "schema": "src/workflows.graphql",
+      "eagerEsModules": true
+    }
+  },
+  "sources": {
+    "tomography/src": "tomography"
+  },
+  "excludes": ["**/node_modules/**", "**/__mocks__/**", "**/__generated__/**"]
 }
