@@ -1,7 +1,13 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, NavLink as RouterNavLink } from "react-router-dom";
 import { Box, CssBaseline, styled } from "@mui/material";
-import { Footer, Navbar, User } from "@diamondlightsource/sci-react-ui";
+import {
+  Footer,
+  Navbar,
+  NavLink,
+  NavLinks,
+  User,
+} from "@diamondlightsource/sci-react-ui";
 import keycloak from "./keycloak";
 
 const AppContainer = styled(Box)({
@@ -47,6 +53,16 @@ const Layout = () => {
       <AppContainer>
         <Navbar
           logo="theme"
+          leftSlot={
+            <NavLinks>
+              <NavLink to="/" linkComponent={RouterNavLink}>
+                Home
+              </NavLink>
+              <NavLink to="/tomography" linkComponent={RouterNavLink}>
+                Tomography
+              </NavLink>
+            </NavLinks>
+          }
           rightSlot={
             <User
               color="white"
