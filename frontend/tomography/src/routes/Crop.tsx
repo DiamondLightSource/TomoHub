@@ -1,8 +1,8 @@
-import loadData from "../crop/SampleLoad";
-import DisplayAreaWrapper from "../crop/Wrapper";
-import Submission from "../workflows/Submission";
+import loadData from "../components/crop/SampleLoad";
+import DisplayAreaWrapper from "../components/crop/Wrapper";
+import Submission from "../components/workflows/Submission";
 import { Visit } from "@diamondlightsource/sci-react-ui";
-import { useTifURLContext } from "../../contexts/CropContext";
+import { useTifURLContext } from "../contexts/CropContext";
 import { useEffect, useState } from "react";
 import { NDT } from "@diamondlightsource/davidia";
 import { Box, LinearProgress, Modal, Typography } from "@mui/material";

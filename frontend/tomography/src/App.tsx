@@ -1,11 +1,11 @@
 import React, { useState, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-import Home from "./components/pages/Home";
+import Home from "./routes/Home";
 import Layout from "./components/common/Layout";
-import Methods from "./components/pages/Methods";
-import FullPipelines from "./components/pages/FullPipelines";
+import Methods from "./routes/Methods";
+import FullPipelines from "./routes/FullPipelines";
 import Submission from "./components/workflows/Submission";
-import Crop from "./components/pages/Crop";
+import Crop from "./routes/Crop";
 import { Visit } from "@diamondlightsource/sci-react-ui";
 
 const App: React.FC = () => {
