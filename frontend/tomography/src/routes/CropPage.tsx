@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { NDT } from "@diamondlightsource/davidia";
 import { Box, LinearProgress, Modal, Typography } from "@mui/material";
 
-interface CropProps {
+interface CropPageProps {
   setVisit: (
     value:
       | Visit
@@ -16,7 +16,7 @@ interface CropProps {
   ) => void;
 }
 
-export default function Crop({ setVisit }: CropProps) {
+export default function CropPage({ setVisit }: CropPageProps) {
   const sampleRate = 10;
   const maxPixelValue = 255;
   const [images, setImages] = useState<NDT[] | undefined>(undefined);

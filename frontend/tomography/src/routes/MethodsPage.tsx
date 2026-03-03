@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import YMLG from "../components/common/YamlGenerator";
 import MethodsTabs from "../components/methods/MethodsTabs";
 
-const Methods: React.FC = () => {
+const MethodsPage: React.FC = () => {
   return (
     <Box component="section" className="dropdowns">
       <MethodsTabs />
@@ -12,4 +12,4 @@ const Methods: React.FC = () => {
   );
 };
 
-export default Methods;
+export default MethodsPage;

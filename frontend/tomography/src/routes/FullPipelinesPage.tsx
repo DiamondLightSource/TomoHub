@@ -16,7 +16,7 @@ import { ApiFullPipelineSchema } from "../types/APIresponse";
 import { useMethods } from "../contexts/MethodsContext";
 import InfoIcon from "@mui/icons-material/Info";
 
-const FullPipelines: React.FC = () => {
+const FullPipelinesPage: React.FC = () => {
   const [pipelines, setPipelines] = useState<ApiFullPipelineSchema | null>(
     null
   );
@@ -108,4 +108,4 @@ const FullPipelines: React.FC = () => {
   );
 };
 
-export default FullPipelines;
+export default FullPipelinesPage;

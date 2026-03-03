@@ -1,11 +1,11 @@
 import React, { useState, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-import Home from "./routes/Home";
+import HomePage from "./routes/HomePage";
 import Layout from "./components/common/Layout";
-import Methods from "./routes/Methods";
-import FullPipelines from "./routes/FullPipelines";
+import MethodsPage from "./routes/MethodsPage";
+import FullPipelinesPage from "./routes/FullPipelinesPage";
 import Submission from "./components/workflows/Submission";
-import Crop from "./routes/Crop";
+import CropPage from "./routes/CropPage";
 import { Visit } from "@diamondlightsource/sci-react-ui";
 
 const App: React.FC = () => {
@@ -14,9 +14,9 @@ const App: React.FC = () => {
     <Suspense fallback={<div>Loading workflow...</div>}>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="methods" element={<Methods />} />
-          <Route path="fullpipelines" element={<FullPipelines />} />
+          <Route index element={<HomePage />} />
+          <Route path="methods" element={<MethodsPage />} />
+          <Route path="fullpipelines" element={<FullPipelinesPage />} />
           <Route
             path="workflow-run"
             element={
@@ -35,7 +35,7 @@ const App: React.FC = () => {
               />
             }
           />
-          <Route path="crop" element={<Crop setVisit={setUserVisit} />} />
+          <Route path="crop" element={<CropPage setVisit={setUserVisit} />} />
         </Route>
       </Routes>
     </Suspense>
