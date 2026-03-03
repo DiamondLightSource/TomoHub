@@ -134,7 +134,7 @@ const YMLG = () => {
           </Button>
           <Button
             component={Link}
-            to="/workflow-run"
+            to="../workflow-run"
             startIcon={<PlayArrowIcon />}
             size="small"
           >

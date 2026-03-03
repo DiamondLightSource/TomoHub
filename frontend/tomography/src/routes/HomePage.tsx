@@ -1,8 +1,8 @@
 import React from "react";
 import { Box } from "@mui/material";
-import Guide from "../common/Guide";
+import Guide from "../components/common/Guide";
 
-const Home: React.FC = () => {
+const HomePage: React.FC = () => {
   return (
     <Box component="section" className="dropdowns">
       <Guide />
@@ -10,4 +10,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default HomePage;

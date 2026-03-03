@@ -7,7 +7,7 @@ import {
   Alert as MuiAlert,
 } from "@mui/material";
 import React, { useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useResolvedPath } from "react-router-dom";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import ScienceIcon from "@mui/icons-material/Science";
 import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
@@ -43,8 +43,20 @@ function Header() {
     severity: "success" as "success" | "error" | "info" | "warning",
   });
 
+  const trimTrailingSlashChar = (path: string) => {
+    if (path.charAt(path.length - 1) === "/") {
+      return path.slice(0, -1);
+    } else {
+      return path;
+    }
+  };
+
   const isActive = (path: string) => {
-    return location.pathname === path;
+    const resolvedTarget = trimTrailingSlashChar(
+      useResolvedPath(`../${path}`).pathname
+    );
+    const currentLocation = trimTrailingSlashChar(location.pathname);
+    return currentLocation === resolvedTarget;
   };
 
   const handleSnackbarClose = (
@@ -228,13 +240,13 @@ function Header() {
       >
         <Button
           component={Link}
-          to="/"
+          to="../"
           startIcon={<MenuBookIcon />}
           sx={{
-            backgroundColor: isActive("/") ? "primary.main" : "transparent",
-            color: isActive("/") ? "white" : "primary.main",
+            backgroundColor: isActive("") ? "primary.main" : "transparent",
+            color: isActive("") ? "white" : "primary.main",
             "&:hover": {
-              backgroundColor: isActive("/")
+              backgroundColor: isActive("")
                 ? "primary.dark"
                 : "rgba(25, 118, 210, 0.04)",
             },
@@ -244,15 +256,15 @@ function Header() {
         </Button>
         <Button
           component={Link}
-          to="/methods"
+          to="methods"
           startIcon={<ScienceIcon />}
           sx={{
-            backgroundColor: isActive("/methods")
+            backgroundColor: isActive("methods")
               ? "primary.main"
               : "transparent",
-            color: isActive("/methods") ? "white" : "primary.main",
+            color: isActive("methods") ? "white" : "primary.main",
             "&:hover": {
-              backgroundColor: isActive("/methods")
+              backgroundColor: isActive("methods")
                 ? "primary.dark"
                 : "rgba(25, 118, 210, 0.04)",
             },
@@ -278,15 +290,15 @@ function Header() {
         </Button>
         <Button
           component={Link}
-          to={"/workflow-cor"}
+          to={"workflow-cor"}
           startIcon={<CenterFocusStrongIcon />}
           sx={{
-            backgroundColor: isActive("/workflow-cor")
+            backgroundColor: isActive("workflow-cor")
               ? "primary.main"
               : "transparent",
-            color: isActive("/workflow-cor") ? "white" : "primary.main",
+            color: isActive("workflow-cor") ? "white" : "primary.main",
             "&:hover": {
-              backgroundColor: isActive("/workflow-cor")
+              backgroundColor: isActive("workflow-cor")
                 ? "primary.dark"
                 : "rgba(25, 118, 210, 0.04)",
               cursor: "pointer",
@@ -297,15 +309,15 @@ function Header() {
         </Button>
         <Button
           component={Link}
-          to="/fullpipelines"
+          to="fullpipelines"
           startIcon={<AutoFixHighIcon />}
           sx={{
-            backgroundColor: isActive("/fullpipelines")
+            backgroundColor: isActive("fullpipelines")
               ? "primary.main"
               : "transparent",
-            color: isActive("/fullpipelines") ? "white" : "primary.main",
+            color: isActive("fullpipelines") ? "white" : "primary.main",
             "&:hover": {
-              backgroundColor: isActive("/fullpipelines")
+              backgroundColor: isActive("fullpipelines")
                 ? "primary.dark"
                 : "rgba(25, 118, 210, 0.04)",
             },
@@ -315,13 +327,13 @@ function Header() {
         </Button>
         <Button
           component={Link}
-          to="/crop"
+          to="crop"
           startIcon={<CropIcon />}
           sx={{
-            backgroundColor: isActive("/crop") ? "primary.main" : "transparent",
-            color: isActive("/crop") ? "white" : "primary.main",
+            backgroundColor: isActive("crop") ? "primary.main" : "transparent",
+            color: isActive("crop") ? "white" : "primary.main",
             "&:hover": {
-              backgroundColor: isActive("/crop")
+              backgroundColor: isActive("crop")
                 ? "primary.dark"
                 : "rgba(25, 118, 210, 0.04)",
             },

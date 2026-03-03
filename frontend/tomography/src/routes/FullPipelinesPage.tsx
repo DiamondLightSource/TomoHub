@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import YMLG from "../common/YamlGenerator";
+import YMLG from "../components/common/YamlGenerator";
 import React, { useEffect, useState } from "react";
 import {
   Select,
@@ -11,12 +11,12 @@ import {
   Typography,
   Tooltip,
 } from "@mui/material";
-import { fullpipelinesService } from "../../api/services";
-import { ApiFullPipelineSchema } from "../../types/APIresponse";
-import { useMethods } from "../../contexts/MethodsContext";
+import { fullpipelinesService } from "../api/services";
+import { ApiFullPipelineSchema } from "../types/APIresponse";
+import { useMethods } from "../contexts/MethodsContext";
 import InfoIcon from "@mui/icons-material/Info";
 
-const FullPipelines: React.FC = () => {
+const FullPipelinesPage: React.FC = () => {
   const [pipelines, setPipelines] = useState<ApiFullPipelineSchema | null>(
     null
   );
@@ -108,4 +108,4 @@ const FullPipelines: React.FC = () => {
   );
 };
 
-export default FullPipelines;
+export default FullPipelinesPage;
