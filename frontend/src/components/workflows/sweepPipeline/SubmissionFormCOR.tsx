@@ -285,13 +285,6 @@ const SubmissionFormCOR = (props: {
         />
       )}
 
-      {!isContextValid() && (
-        <Alert severity="info">
-          Some Loader fields are empty. They will be auto-filled with default
-          values during submission.
-        </Alert>
-      )}
-
       <Divider />
 
       <Typography variant="h6">Parameter Sweep Configuration</Typography>
