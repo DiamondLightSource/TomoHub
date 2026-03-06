@@ -130,8 +130,7 @@ const SubmissionFormCOR = (props: {
         typeof updatedLoaderParams.rotation_angles === "string" ||
         !updatedLoaderParams.rotation_angles ||
         !updatedLoaderParams.rotation_angles.data_path ||
-        updatedLoaderParams.rotation_angles.data_path.trim() === "" ||
-        updatedLoaderParams.rotation_angles.data_path === "auto"
+        updatedLoaderParams.rotation_angles.data_path.trim() === ""
       ) {
         updatedLoaderParams.rotation_angles = { data_path: null };
       }
@@ -149,8 +148,7 @@ const SubmissionFormCOR = (props: {
         delete updatedLoaderParams.image_key_path;
       } else if (
         !updatedLoaderParams.image_key_path ||
-        updatedLoaderParams.image_key_path.trim() === "" ||
-        updatedLoaderParams.image_key_path === "auto"
+        updatedLoaderParams.image_key_path.trim() === ""
       ) {
         updatedLoaderParams.image_key_path = null;
       }

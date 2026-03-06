@@ -165,17 +165,13 @@ export const LoaderProvider: React.FC<{ children: ReactNode }> = ({
 
   // Add this function to validate the loader context
   const isContextValid = (): boolean => {
-    // Replace 'auto' with null for validation
     const hasDataPath =
-      parameters.data_path !== null &&
-      parameters.data_path.trim() !== "" &&
-      parameters.data_path !== "auto";
+      parameters.data_path !== null && parameters.data_path.trim() !== "";
 
     const hasRotationAnglesPath =
       typeof parameters.rotation_angles === "object" &&
       parameters.rotation_angles?.data_path &&
-      parameters.rotation_angles.data_path.trim() !== "" &&
-      parameters.rotation_angles.data_path !== "auto";
+      parameters.rotation_angles.data_path.trim() !== "";
 
     const hasUserDefinedAngles =
       typeof parameters.rotation_angles === "object" &&
@@ -189,8 +185,7 @@ export const LoaderProvider: React.FC<{ children: ReactNode }> = ({
     const hasImageKeyPath =
       parameters.image_key_path !== undefined &&
       parameters.image_key_path !== null &&
-      parameters.image_key_path.trim() !== "" &&
-      parameters.image_key_path !== "auto";
+      parameters.image_key_path.trim() !== "";
 
     const hasDarks =
       parameters.darks !== undefined &&
