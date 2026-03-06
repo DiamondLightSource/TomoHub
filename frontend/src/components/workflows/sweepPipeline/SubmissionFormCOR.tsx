@@ -130,8 +130,7 @@ const SubmissionFormCOR = (props: {
         typeof updatedLoaderParams.rotation_angles === "string" ||
         !updatedLoaderParams.rotation_angles ||
         !updatedLoaderParams.rotation_angles.data_path ||
-        updatedLoaderParams.rotation_angles.data_path.trim() === "" ||
-        updatedLoaderParams.rotation_angles.data_path === "auto"
+        updatedLoaderParams.rotation_angles.data_path.trim() === ""
       ) {
         updatedLoaderParams.rotation_angles = { data_path: null };
       }
@@ -149,8 +148,7 @@ const SubmissionFormCOR = (props: {
         delete updatedLoaderParams.image_key_path;
       } else if (
         !updatedLoaderParams.image_key_path ||
-        updatedLoaderParams.image_key_path.trim() === "" ||
-        updatedLoaderParams.image_key_path === "auto"
+        updatedLoaderParams.image_key_path.trim() === ""
       ) {
         updatedLoaderParams.image_key_path = null;
       }
@@ -220,6 +218,10 @@ const SubmissionFormCOR = (props: {
       return; // Stop submission
     }
 
+    if (errorMessages.length > 0) {
+      setErrorMessages([]);
+    }
+
     // Build final submission payload (config as string)
     const finalParams = {
       ...validationObject,
@@ -285,13 +287,6 @@ const SubmissionFormCOR = (props: {
           stop={parameters.stop as number}
           step={parameters.step as number}
         />
-      )}
-
-      {!isContextValid() && (
-        <Alert severity="info">
-          Some Loader fields are empty. They will be auto-filled with default
-          values during submission.
-        </Alert>
       )}
 
       <Divider />
