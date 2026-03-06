@@ -218,6 +218,10 @@ const SubmissionFormCOR = (props: {
       return; // Stop submission
     }
 
+    if (errorMessages.length > 0) {
+      setErrorMessages([]);
+    }
+
     // Build final submission payload (config as string)
     const finalParams = {
       ...validationObject,
