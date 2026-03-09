@@ -161,16 +161,6 @@ const SubmissionFormCOR = (props: {
         parameters: updatedLoaderParams,
       },
       {
-        method: "normalize",
-        module_path: "tomopy.prep.normalize",
-        parameters: { cutoff: null, averaging: "mean" },
-      },
-      {
-        method: "minus_log",
-        module_path: "tomopy.prep.normalize",
-        parameters: {},
-      },
-      {
         method: "recon",
         module_path: "tomopy.recon.algorithm",
         parameters: {
