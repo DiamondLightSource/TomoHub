@@ -33,8 +33,8 @@ export function createMethodComponent({
       fetchMethods();
     }, []);
 
-    const toggleMethodExpansion = (methodName: string) => {
-      setExpandedMethod((prev) => (prev === methodName ? null : methodName));
+    const toggleMethodExpansion = (methodPath: string) => {
+      setExpandedMethod((prev) => (prev === methodPath ? null : methodPath));
     };
 
     const {
@@ -64,9 +64,11 @@ export function createMethodComponent({
       <div>
         {methods.map((method) => (
           <MethodAccordion
-            key={method.method_name}
+            key={`${method.module_path}.${method.method_name}`}
             method={method}
-            isExpanded={expandedMethod === method.method_name}
+            isExpanded={
+              expandedMethod === `${method.module_path}.${method.method_name}`
+            }
             isMethodAdded={isMethodAdded(method.method_name)}
             currentParameters={
               selectedMethods.find((m) => m.method_name === method.method_name)
@@ -74,7 +76,9 @@ export function createMethodComponent({
             }
             onExpand={(expanded) => {
               if (expanded) {
-                toggleMethodExpansion(method.method_name);
+                toggleMethodExpansion(
+                  `${method.module_path}.${method.method_name}`
+                );
               } else {
                 setExpandedMethod(null);
               }
