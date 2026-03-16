@@ -15,15 +15,16 @@ METHOD_CATEGORIES = {
         "httomolibgpu.misc.morph": ["sino_360_to_180", "data_resampler"]
     },
     "normalization": {
-        "httomolibgpu.prep.normalize": ["normalize"]
+        "httomolibgpu.prep.normalize": ["dark_flat_field_correction", "minus_log"]
     },
     "phase-retrieval": {
         "httomolib.prep.phase": ["paganin_filter"],
-        "httomolibgpu.prep.phase": ["paganin_filter_savu", "paganin_filter_tomopy"]
+        "httomolibgpu.prep.phase": ["paganin_filter_savu_legacy", "paganin_filter"]
     },
     "stripe-removal": {
         "httomolibgpu.prep.stripe": [
             "remove_stripe_based_sorting",
+            "remove_stripe_fw",
             "remove_stripe_ti",
             "remove_all_stripe",
             "raven_filter"
@@ -40,6 +41,6 @@ METHOD_CATEGORIES = {
         ]
     },
     "reconstruction": {
-        "httomolibgpu.recon.algorithm": ["FBP3d_tomobar", "SIRT3d_tomobar", "CGLS3d_tomobar", "LPRec3d_tomobar","FBP2d_astra"]
+        "httomolibgpu.recon.algorithm": ["FBP3d_tomobar", "SIRT3d_tomobar", "CGLS3d_tomobar", "LPRec3d_tomobar","FBP2d_astra", "FISTA3d_tomobar", "ADMM3d_tomobar"]
     },
 }
