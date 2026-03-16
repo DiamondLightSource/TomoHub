@@ -64,7 +64,7 @@ export function createMethodComponent({
       <div>
         {methods.map((method) => (
           <MethodAccordion
-            key={method.method_name}
+            key={`${method.module_path}.${method.method_name}`}
             method={method}
             isExpanded={expandedMethod === method.method_name}
             isMethodAdded={isMethodAdded(method.method_name)}
