@@ -7,7 +7,7 @@ import { useState } from "react";
 
 const initialResourceParams: ResourceParameters = {
   cpus: "1",
-  gpus: "0",
+  gpus: null,
   nprocs: "8",
   memory: "16Gi",
 };
@@ -20,7 +20,11 @@ export const App: React.FC = () => {
   return (
     <>
       <WorkflowForm />
-      <ResourceForm params={resourceParams} setParams={setResourceParams} />
+      <ResourceForm
+        params={resourceParams}
+        setParams={setResourceParams}
+        showGpu={false}
+      />
     </>
   );
 };

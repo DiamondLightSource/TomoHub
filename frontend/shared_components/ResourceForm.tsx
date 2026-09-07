@@ -4,11 +4,12 @@ import { InputLabel, Grid, Stack, TextField } from "@mui/material";
 export type ResourceFormProps = {
   params: ResourceParameters;
   setParams: (_: ResourceParameters) => void;
+  showGpu?: boolean;
 };
 
 export type ResourceParameters = {
   cpus: string;
-  gpus: string;
+  gpus: string | null;
   nprocs: string;
   memory: string;
 };
@@ -16,6 +17,7 @@ export type ResourceParameters = {
 export const ResourceForm: FC<ResourceFormProps> = ({
   params,
   setParams,
+  showGpu = true,
 }: ResourceFormProps) => {
   return (
     <Grid container justifyContent="start" spacing={1}>
@@ -37,19 +39,21 @@ export const ResourceForm: FC<ResourceFormProps> = ({
               setParams((prev) => ({ ...prev, cpus: value }));
             }}
           />
-          <TextField
-            name="gpus"
-            label="gpus"
-            variant="outlined"
-            size="small"
-            placeholder="1"
-            type="number"
-            value={params.gpus}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              const value = e.target.value;
-              setParams((prev) => ({ ...prev, gpus: value }));
-            }}
-          />
+          {showGpu && (
+            <TextField
+              name="gpus"
+              label="gpus"
+              variant="outlined"
+              size="small"
+              placeholder="1"
+              type="number"
+              value={params.gpus}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                const value = e.target.value;
+                setParams((prev) => ({ ...prev, gpus: value }));
+              }}
+            />
+          )}
           <TextField
             name="nprocs"
             label="number of processes"
