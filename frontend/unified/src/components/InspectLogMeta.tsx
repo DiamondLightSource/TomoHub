@@ -35,12 +35,15 @@ export const InspectLog_Query: TypedDocumentNode<
   }
 `;
 
-export const DisplayLogMeta: FC = () => {
-  const Visitobj2 = { proposalCode: "mg", proposalNumber: 36964, number: 1 };
+export const DisplayLogMeta: FC = (props :{
+  visit: any
+}) => {
+
   const { loading, error, data } = useQuery(InspectLog_Query, {
-    variables: { visitobj: Visitobj2, name: "numpy-benchmark-l5xqk" },
+    variables: { visitobj: props.visit, name: "example-template-599zg" },
   });
   let x: any = [];
+
 
   if (data !== undefined && data !== null) {
     if (data.workflow !== undefined && data.workflow !== null) {
@@ -48,7 +51,9 @@ export const DisplayLogMeta: FC = () => {
         element.artifacts.forEach((subElement: any) => {
           if (subElement !== undefined) {
             if (subElement.url !== undefined) {
-              x.push([subElement.url, element.name + ".log"]);
+              if(subElement.mimeType == "text/plain") {
+                x.push([subElement.url, element.name + ".log"]);
+              }
             }
           }
         });
@@ -78,6 +83,8 @@ export const DisplayLogMeta: FC = () => {
       </Stack>
     );
   }
+
+  
 
   return <div>{makeButtonArray(x)}</div>;
 };
