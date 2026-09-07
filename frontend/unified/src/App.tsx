@@ -118,17 +118,15 @@ export const App: React.FC = () => {
   };
 
   const selectdVisit = {
-    "proposalCode": instrumentSession?.proposal.proposalCategory.toLowerCase(),
-    "proposalNumber": instrumentSession?.proposal.proposalNumber,
-    "number": instrumentSession?.instrumentSessionNumber,
-  }
+    proposalCode: instrumentSession?.proposal.proposalCategory.toLowerCase(),
+    proposalNumber: instrumentSession?.proposal.proposalNumber,
+    number: instrumentSession?.instrumentSessionNumber,
+  };
 
   const filterTechniques = () => {
     if (showAllTechniques) {
       return Object.values(Technique);
     }
-
-  
 
     return BEAMLINE_TECHNIQUES_SUBSET[currentBeamline];
   };
@@ -195,7 +193,7 @@ export const App: React.FC = () => {
             />
             <Divider sx={{ width: "100%" }} />
             <Typography variant="h5">Log</Typography>
-            <DisplayLogMeta visit={selectdVisit}/>
+            <DisplayLogMeta visit={selectdVisit} />
 
             <PlaceholderComponent
               placeholderText="Log component placeholder"
