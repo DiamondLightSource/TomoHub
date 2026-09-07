@@ -1,5 +1,8 @@
 import { Box, Divider, Grid, Stack, Typography } from "@mui/material";
-import { SessionSelector } from "./components/SessionSelector";
+import {
+  SessionSelectionMode,
+  SessionSelector,
+} from "./components/SessionSelector";
 import { ScanSelector } from "./components/ScanSelector";
 import JobsViewer from "./components/JobsViewer/JobsViewer";
 
@@ -86,6 +89,8 @@ export const App: React.FC = () => {
     );
     return filteredTemplates[0].value;
   });
+  const [sessionSelectionMode, setSessionSelectionMode] =
+    useState<SessionSelectionMode>(SessionSelectionMode.Latest);
   const { loading, error, data } = useQuery(SESSION_QUERY, { variables: {} });
 
   if (loading) return <p>Loading...</p>;
@@ -134,7 +139,11 @@ export const App: React.FC = () => {
   return (
     <>
       <Typography variant="h5">Session</Typography>
-      <SessionSelector session={instrumentSession} />
+      <SessionSelector
+        session={instrumentSession}
+        mode={sessionSelectionMode}
+        setMode={setSessionSelectionMode}
+      />
       <ApolloProvider client={apolloClientWorkflows}>
         <Grid container spacing={HORIZONTAL_SPACING} columns={2}>
           <Stack spacing={VERTICAL_SPACING} width="500px">

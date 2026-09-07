@@ -9,7 +9,7 @@ import {
 import { useState } from "react";
 import { SessionQueryQuery } from "../__generated__/App.generated";
 
-enum SessionSelectionMode {
+export enum SessionSelectionMode {
   Latest = "Latest",
   Custom = "Custom",
 }
@@ -18,14 +18,16 @@ type NonNullAccount = NonNullable<SessionQueryQuery["account"]>;
 
 type SessionSelectorProps = {
   session: NonNullAccount["instrumentSessionRoles"]["edges"][0]["node"]["instrumentSession"];
+  mode: SessionSelectionMode;
+  setMode: (_: SessionSelectionMode) => void;
 };
 
 export const SessionSelector: React.FC<SessionSelectorProps> = ({
   session,
+  mode,
+  setMode,
 }: SessionSelectorProps) => {
   const [beamline] = useState<string>(session.instrument.name);
-  const [sessionSelectionMode, setSessionSelectionMode] =
-    useState<SessionSelectionMode>(SessionSelectionMode.Latest);
   const [textInputValue, setTextInputValue] = useState<string>("");
 
   const proposal = session?.proposal;
@@ -35,12 +37,12 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
     <Stack direction="row" spacing={2} alignItems={"center"}>
       <ToggleButtonGroup
         exclusive
-        value={sessionSelectionMode}
+        value={mode}
         onChange={(_, toggleButtonLabel: string) => {
           if (toggleButtonLabel === SessionSelectionMode.Latest) {
-            setSessionSelectionMode(SessionSelectionMode.Latest);
+            setMode(SessionSelectionMode.Latest);
           } else if (toggleButtonLabel === SessionSelectionMode.Custom) {
-            setSessionSelectionMode(SessionSelectionMode.Custom);
+            setMode(SessionSelectionMode.Custom);
           }
         }}
       >
@@ -61,11 +63,9 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
         data-testid="session-selector-input"
         variant="outlined"
         label="Session"
-        disabled={sessionSelectionMode === SessionSelectionMode.Latest}
+        disabled={mode === SessionSelectionMode.Latest}
         value={
-          sessionSelectionMode === SessionSelectionMode.Latest
-            ? latestSession
-            : textInputValue
+          mode === SessionSelectionMode.Latest ? latestSession : textInputValue
         }
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           setTextInputValue(e.currentTarget.value);
