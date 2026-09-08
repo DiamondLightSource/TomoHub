@@ -1,4 +1,4 @@
-import { Box, Divider, Grid, Stack, Typography } from "@mui/material";
+import { Box, Chip, Divider, Grid, Stack, Typography } from "@mui/material";
 import {
   SessionSelectionMode,
   SessionSelector,
@@ -174,9 +174,12 @@ export const App: React.FC = () => {
     <>
       <Stack direction="row" spacing={2} alignItems="center">
         <Typography variant="h5">Session</Typography>
-        <p>
-          {sessionName} / {session.instrument.name}
-        </p>
+        <Chip color="primary" variant="outlined" label={sessionName} />
+        <Chip
+          color="secondary"
+          variant="outlined"
+          label={session.instrument.name}
+        />
       </Stack>
       <SessionSelector
         setSession={setCustomSession}
