@@ -1,5 +1,6 @@
 import { Box, Chip, Divider, Grid, Stack, Typography } from "@mui/material";
 import {
+  InstrumentSession,
   SessionSelectionMode,
   SessionSelector,
 } from "./components/SessionSelector";
@@ -91,12 +92,9 @@ export const App: React.FC = () => {
   });
   const [sessionSelectionMode, setSessionSelectionMode] =
     useState<SessionSelectionMode>(SessionSelectionMode.Latest);
-  const [customSession, setCustomSession] = useState<
-    | NonNullable<
-        SessionQueryQuery["account"]
-      >["instrumentSessionRoles"]["edges"][0]["node"]["instrumentSession"]
-    | null
-  >(null);
+  const [customSession, setCustomSession] = useState<InstrumentSession | null>(
+    null
+  );
   const { loading, error, data } = useQuery(SESSION_QUERY, { variables: {} });
 
   if (loading) return <p>Loading...</p>;
@@ -142,9 +140,7 @@ export const App: React.FC = () => {
     return BEAMLINE_TECHNIQUES_SUBSET[currentBeamline];
   };
 
-  let session: NonNullable<
-    SessionQueryQuery["account"]
-  >["instrumentSessionRoles"]["edges"][0]["node"]["instrumentSession"];
+  let session: InstrumentSession;
   let sessionName: string;
   if (sessionSelectionMode === SessionSelectionMode.Latest) {
     session =

@@ -41,12 +41,11 @@ export enum SessionSelectionMode {
 
 type NonNullAccount = NonNullable<SessionQueryQuery["account"]>;
 
+export type InstrumentSession =
+  NonNullAccount["instrumentSessionRoles"]["edges"][0]["node"]["instrumentSession"];
+
 type SessionSelectorProps = {
-  setSession: (
-    _:
-      | NonNullAccount["instrumentSessionRoles"]["edges"][0]["node"]["instrumentSession"]
-      | null
-  ) => void;
+  setSession: (_: InstrumentSession | null) => void;
   mode: SessionSelectionMode;
   setMode: (_: SessionSelectionMode) => void;
 };
@@ -109,11 +108,7 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
 type SelectSessionButtonProps = {
   sessionInputValue: string;
   sessionSelectionMode: SessionSelectionMode;
-  setSession: (
-    _:
-      | NonNullAccount["instrumentSessionRoles"]["edges"][0]["node"]["instrumentSession"]
-      | null
-  ) => void;
+  setSession: (_: InstrumentSession | null) => void;
 };
 
 const SelectSessionButton: React.FC<SelectSessionButtonProps> = ({
