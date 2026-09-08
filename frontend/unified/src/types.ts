@@ -8,6 +8,7 @@ export enum Technique {
 }
 
 export enum Beamline {
+  DIAD,
   I12,
   "I13-1",
   I14,

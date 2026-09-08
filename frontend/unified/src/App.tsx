@@ -26,6 +26,7 @@ const VERTICAL_SPACING = 2;
 const HORIZONTAL_SPACING = 2;
 
 const BEAMLINE_TECHNIQUES_SUBSET = {
+  [Beamline.DIAD]: [Technique.Tomo],
   [Beamline.I12]: [Technique.Tomo],
   [Beamline["I13-1"]]: [
     Technique.Dpc,
@@ -39,6 +40,7 @@ const BEAMLINE_TECHNIQUES_SUBSET = {
 };
 
 const BEAMLINES_DEFAULT_TECHNIQUE = {
+  [Beamline.DIAD]: Technique.Tomo,
   [Beamline.Epsic]: Technique.Ptycho,
   [Beamline.I12]: Technique.Tomo,
   [Beamline["I13-1"]]: Technique.Ptycho,
