@@ -5,6 +5,7 @@ import {
   ToggleButtonGroup,
   Stack,
   Button,
+  Tooltip,
 } from "@mui/material";
 import { SessionQueryQuery } from "../__generated__/App.generated";
 import {
@@ -135,14 +136,31 @@ const SelectSessionButton: React.FC<SelectSessionButtonProps> = ({
     }
   };
 
+  const generateTooltipText = () => {
+    if (sessionSelectionMode === SessionSelectionMode.Latest) {
+      return "";
+    } else if (visitRegex.exec(sessionInputValue) === null) {
+      return "Session must be of the following format: abcdef12345-1";
+    } else if (
+      visitRegex.exec(sessionInputValue) !== null &&
+      data.instrumentSessionByReference === null
+    ) {
+      return `The session ${sessionInputValue} doesn't exist`;
+    }
+  };
+
   return (
-    <Button
-      variant="contained"
-      color="primary"
-      onClick={() => setSession(data.instrumentSessionByReference)}
-      disabled={isDisabled()}
-    >
-      Select session
-    </Button>
+    <Tooltip title={generateTooltipText()}>
+      <span>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setSession(data.instrumentSessionByReference)}
+          disabled={isDisabled()}
+        >
+          Select session
+        </Button>
+      </span>
+    </Tooltip>
   );
 };
