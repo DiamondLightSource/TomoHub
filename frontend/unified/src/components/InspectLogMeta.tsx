@@ -70,7 +70,11 @@ export const DisplayLogMeta: FC = (props: { visit: any }) => {
         {" "}
         {Arr.map((subArr: any) => {
           return (
-            <Button variant="contained" onClick={() => openInNewTab(subArr[0])}>
+            <Button
+              key={subArr[1]}
+              variant="contained"
+              onClick={() => openInNewTab(subArr[0])}
+            >
               {" "}
               {subArr[1]}{" "}
             </Button>
