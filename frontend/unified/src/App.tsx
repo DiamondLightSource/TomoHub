@@ -91,6 +91,12 @@ export const App: React.FC = () => {
   });
   const [sessionSelectionMode, setSessionSelectionMode] =
     useState<SessionSelectionMode>(SessionSelectionMode.Latest);
+  const [customSession, setCustomSession] = useState<
+    | NonNullable<
+        SessionQueryQuery["account"]
+      >["instrumentSessionRoles"]["edges"][0]["node"]["instrumentSession"]
+    | null
+  >(null);
   const { loading, error, data } = useQuery(SESSION_QUERY, { variables: {} });
 
   if (loading) return <p>Loading...</p>;
@@ -136,11 +142,44 @@ export const App: React.FC = () => {
     return BEAMLINE_TECHNIQUES_SUBSET[currentBeamline];
   };
 
+  let session: NonNullable<
+    SessionQueryQuery["account"]
+  >["instrumentSessionRoles"]["edges"][0]["node"]["instrumentSession"];
+  let sessionName: string;
+  if (sessionSelectionMode === SessionSelectionMode.Latest) {
+    session =
+      data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
+    sessionName = `${session.proposal.proposalCategory?.toLowerCase()}${session.proposal.proposalNumber}-${session.instrumentSessionNumber}`;
+  } else if (
+    sessionSelectionMode === SessionSelectionMode.Custom &&
+    customSession !== null
+  ) {
+    session = customSession;
+    sessionName = `${session.proposal.proposalCategory?.toLowerCase()}${session.proposal.proposalNumber}-${session.instrumentSessionNumber}`;
+  } else {
+    // The only other possible case is:
+    // ```
+    // sessionSelectionMode === SessionSelectionMode.Custom && customSession === null
+    // ```
+    // and in this case the latest visit is selected.
+    //
+    // Used an else rather than else-if so then TypeScript knows that all cases have been
+    // exhausted and won't say that `session` or `sessionName` may be undefined.
+    session =
+      data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
+    sessionName = `${session.proposal.proposalCategory?.toLowerCase()}${session.proposal.proposalNumber}-${session.instrumentSessionNumber}`;
+  }
+
   return (
     <>
-      <Typography variant="h5">Session</Typography>
+      <Stack direction="row" spacing={2} alignItems="center">
+        <Typography variant="h5">Session</Typography>
+        <p>
+          {sessionName} / {session.instrument.name}
+        </p>
+      </Stack>
       <SessionSelector
-        session={instrumentSession}
+        setSession={setCustomSession}
         mode={sessionSelectionMode}
         setMode={setSessionSelectionMode}
       />
@@ -217,10 +256,9 @@ export const App: React.FC = () => {
                 // TODO: using `toLowerCase()` as the ULIMS instrument session service returns
                 // a capitalised "proposal code", whereas the workflows service only accepts
                 // it in lowercase
-                proposalCode:
-                  instrumentSession.proposal.proposalCategory.toLowerCase(),
-                proposalNumber: instrumentSession.proposal.proposalNumber,
-                number: instrumentSession.instrumentSessionNumber,
+                proposalCode: session.proposal.proposalCategory.toLowerCase(),
+                proposalNumber: session.proposal.proposalNumber,
+                number: session.instrumentSessionNumber,
               }}
             />
           </Stack>

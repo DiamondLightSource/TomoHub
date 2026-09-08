@@ -1,13 +1,37 @@
-import React from "react";
+import React, { Suspense, useState } from "react";
 import {
-  Chip,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
   Stack,
+  Button,
 } from "@mui/material";
-import { useState } from "react";
 import { SessionQueryQuery } from "../__generated__/App.generated";
+import {
+  GetSessionByReferenceQuery,
+  GetSessionByReferenceQueryVariables,
+} from "./__generated__/SessionSelector.generated";
+import { visitRegex } from "@diamondlightsource/sci-react-ui";
+import { gql, TypedDocumentNode } from "@apollo/client";
+import { useSuspenseQuery } from "@apollo/client/react";
+
+const GET_SESSION_BY_REFERENCE: TypedDocumentNode<
+  GetSessionByReferenceQuery,
+  GetSessionByReferenceQueryVariables
+> = gql`
+  query GetSessionByReference($reference: String!) {
+    instrumentSessionByReference(reference: $reference) {
+      instrument {
+        name
+      }
+      instrumentSessionNumber
+      proposal {
+        proposalNumber
+        proposalCategory
+      }
+    }
+  }
+`;
 
 export enum SessionSelectionMode {
   Latest = "Latest",
@@ -17,21 +41,22 @@ export enum SessionSelectionMode {
 type NonNullAccount = NonNullable<SessionQueryQuery["account"]>;
 
 type SessionSelectorProps = {
-  session: NonNullAccount["instrumentSessionRoles"]["edges"][0]["node"]["instrumentSession"];
+  setSession: (
+    _:
+      | NonNullAccount["instrumentSessionRoles"]["edges"][0]["node"]["instrumentSession"]
+      | null
+  ) => void;
   mode: SessionSelectionMode;
   setMode: (_: SessionSelectionMode) => void;
 };
 
 export const SessionSelector: React.FC<SessionSelectorProps> = ({
-  session,
+  setSession,
   mode,
   setMode,
 }: SessionSelectorProps) => {
-  const [beamline] = useState<string>(session.instrument.name);
-  const [textInputValue, setTextInputValue] = useState<string>("");
-
-  const proposal = session?.proposal;
-  const latestSession = `${proposal.proposalCategory?.toLowerCase()}${proposal.proposalNumber}-${session.instrumentSessionNumber}`;
+  const [customeSessionInputValue, setCustomSessionInputValue] =
+    useState<string>("");
 
   return (
     <Stack direction="row" spacing={2} alignItems={"center"}>
@@ -64,14 +89,60 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
         variant="outlined"
         label="Session"
         disabled={mode === SessionSelectionMode.Latest}
-        value={
-          mode === SessionSelectionMode.Latest ? latestSession : textInputValue
-        }
+        value={customeSessionInputValue}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          setTextInputValue(e.currentTarget.value);
+          setCustomSessionInputValue(e.target.value);
         }}
       />
-      <Chip label={beamline} variant="outlined" color="primary"></Chip>
+      <Suspense fallback={<p>Checking session...</p>}>
+        <SelectSessionButton
+          sessionInputValue={customeSessionInputValue}
+          sessionSelectionMode={mode}
+          setSession={setSession}
+        />
+      </Suspense>
     </Stack>
+  );
+};
+
+type SelectSessionButtonProps = {
+  sessionInputValue: string;
+  sessionSelectionMode: SessionSelectionMode;
+  setSession: (
+    _:
+      | NonNullAccount["instrumentSessionRoles"]["edges"][0]["node"]["instrumentSession"]
+      | null
+  ) => void;
+};
+
+const SelectSessionButton: React.FC<SelectSessionButtonProps> = ({
+  sessionInputValue,
+  sessionSelectionMode,
+  setSession,
+}) => {
+  const { data } = useSuspenseQuery(GET_SESSION_BY_REFERENCE, {
+    variables: { reference: sessionInputValue },
+  });
+
+  const isDisabled = () => {
+    if (sessionSelectionMode === SessionSelectionMode.Latest) {
+      return true;
+    } else {
+      return (
+        visitRegex.exec(sessionInputValue) === null ||
+        data.instrumentSessionByReference === null
+      );
+    }
+  };
+
+  return (
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={() => setSession(data.instrumentSessionByReference)}
+      disabled={isDisabled()}
+    >
+      Select session
+    </Button>
   );
 };
