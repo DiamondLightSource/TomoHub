@@ -82,6 +82,8 @@ export const SESSION_QUERY: TypedDocumentNode<
 export const App: React.FC = () => {
   //adding common states of beamlines, Techique, workflow
   const [showAllTechniques, setShowAllTechniques] = useState(false);
+  const [technique, setTechnique] = useState<Technique | null>(null);
+  const [template, setTemplate] = useState<string | null>(null);
   const [sessionSelectionMode, setSessionSelectionMode] =
     useState<SessionSelectionMode>(SessionSelectionMode.Latest);
   const [customSession, setCustomSession] = useState<InstrumentSession | null>(
@@ -164,12 +166,16 @@ export const App: React.FC = () => {
         return Beamline.I12;
       case "DIAD":
         return Beamline.DIAD;
+      case "I14":
+        return Beamline.I14;
+      case "I13-2":
+        return Beamline["I13-1"];
     }
   };
 
   const beamline = mapStringsToBeamline(session.instrument.name);
-  let technique = BEAMLINES_DEFAULT_TECHNIQUE[beamline];
-  let template = filterTemplates(technique)[0];
+  const initialTechnique = BEAMLINES_DEFAULT_TECHNIQUE[beamline];
+  const initialTemplate = filterTemplates(initialTechnique)[0].label;
 
   return (
     <>
@@ -202,33 +208,36 @@ export const App: React.FC = () => {
                 e: React.ChangeEvent<HTMLInputElement>
               ) => {
                 setShowAllTechniques(e.target.checked);
-                const isSelectedTechniqueInSubset =
-                  BEAMLINE_TECHNIQUES_SUBSET[beamline].includes(technique);
+                const isSelectedTechniqueInSubset = BEAMLINE_TECHNIQUES_SUBSET[
+                  beamline
+                ].includes(technique ?? initialTechnique);
                 if (!e.target.checked && !isSelectedTechniqueInSubset) {
                   const newTechnique = BEAMLINES_DEFAULT_TECHNIQUE[beamline];
-                  technique = newTechnique;
+                  setTechnique(newTechnique);
                   const filteredTemplates = filterTemplates(
                     Technique[newTechnique as keyof typeof Technique]
                   );
-                  template = filteredTemplates[0].value;
+                  setTemplate(filteredTemplates[0].value);
                 }
               }}
               filteredTechniques={filterTechniques(beamline)}
-              templateOptions={filterTemplates(technique)}
+              templateOptions={filterTemplates(technique ?? initialTechnique)}
               technique={technique}
               template={template}
-              setTemplate={() => console.log("Set template")}
+              setTemplate={setTemplate}
             />
 
             <Divider sx={{ width: "100%" }} />
             <Typography variant="h5">Parameter Configuration</Typography>
 
             <ParameterConfiguration
-              technique={technique}
-              template={template.label}
-              setTemplate={() => console.log("Set template")}
+              technique={technique ?? initialTechnique}
+              template={template ?? initialTemplate}
+              setTemplate={setTemplate}
               availableTemplates={filterTemplates(
-                Technique[technique as keyof typeof Technique]
+                Technique[
+                  (technique ?? initialTechnique) as keyof typeof Technique
+                ]
               )}
             />
           </Stack>

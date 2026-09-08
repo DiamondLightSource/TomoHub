@@ -47,7 +47,6 @@ export const ParameterConfiguration: React.FC<ParameterConfigurationProps> = ({
     nprocs: 1,
     memory: "20Gi",
   });
-
   const [mutation] = useMutation(SUBMIT_WORKFLOW_TEMPLATE);
 
   const handleSubmitJob = () => {
@@ -80,6 +79,7 @@ export const ParameterConfiguration: React.FC<ParameterConfigurationProps> = ({
           />
         </LoaderProvider>
       ),
+      "ptycho-tomography": <p>ptycho-tomo template</p>,
     },
     [Technique.Xanes]: {},
     [Technique.Xrd]: {},
