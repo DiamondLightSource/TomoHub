@@ -232,8 +232,9 @@ export const App: React.FC = () => {
   };
 
   const beamline = mapStringsToBeamline(session.instrument.name);
-  const initialTechnique = BEAMLINES_DEFAULT_TECHNIQUE[beamline];
-  const initialTemplate = filterTemplates(initialTechnique)[0].label;
+  const currentTechnique = technique ?? BEAMLINES_DEFAULT_TECHNIQUE[beamline];
+  const currentTemplate =
+    template ?? filterTemplates(currentTechnique)[0].label;
 
   return (
     <>
@@ -266,17 +267,18 @@ export const App: React.FC = () => {
                 e: React.ChangeEvent<HTMLInputElement>
               ) => {
                 setShowAllTechniques(e.target.checked);
-                const isSelectedTechniqueInSubset = BEAMLINE_TECHNIQUES_SUBSET[
-                  beamline
-                ].includes(technique ?? initialTechnique);
+                const isSelectedTechniqueInSubset =
+                  BEAMLINE_TECHNIQUES_SUBSET[beamline].includes(
+                    currentTechnique
+                  );
                 if (!e.target.checked && !isSelectedTechniqueInSubset) {
                   updateTechniqueAndTemplate(beamline);
                 }
               }}
               filteredTechniques={filterTechniques(beamline)}
-              templateOptions={filterTemplates(technique ?? initialTechnique)}
-              technique={technique ?? initialTechnique}
-              template={template ?? initialTemplate}
+              templateOptions={filterTemplates(currentTechnique)}
+              technique={currentTechnique}
+              template={currentTemplate}
               setTemplate={setTemplate}
             />
 
@@ -284,13 +286,11 @@ export const App: React.FC = () => {
             <Typography variant="h5">Parameter Configuration</Typography>
 
             <ParameterConfiguration
-              technique={technique ?? initialTechnique}
-              template={template ?? initialTemplate}
+              technique={currentTechnique}
+              template={currentTemplate}
               setTemplate={setTemplate}
               availableTemplates={filterTemplates(
-                Technique[
-                  technique ?? (initialTechnique as keyof typeof Technique)
-                ]
+                Technique[currentTechnique as keyof typeof Technique]
               )}
             />
           </Stack>
