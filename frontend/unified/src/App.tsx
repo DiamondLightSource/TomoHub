@@ -107,6 +107,19 @@ export const App: React.FC = () => {
   const instrumentSession =
     data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
 
+  const updateCustomSession = (session: InstrumentSession | null) => {
+    setCustomSession(session);
+    const newTechnique =
+      BEAMLINES_DEFAULT_TECHNIQUE[
+        mapStringsToBeamline(session.instrument.name)
+      ];
+    setTechnique(newTechnique);
+    const filteredTemplates = filterTemplates(
+      Technique[newTechnique as keyof typeof Technique]
+    );
+    setTemplate(filteredTemplates[0].value);
+  };
+
   const handleChangeTechnique = (
     /**
      * This function handles the clicking of the toggle button which choose the technique and therefore determines which
@@ -199,7 +212,7 @@ export const App: React.FC = () => {
         />
       </Stack>
       <SessionSelector
-        setSession={setCustomSession}
+        setSession={updateCustomSession}
         mode={sessionSelectionMode}
         setMode={setSessionSelectionMode}
       />
