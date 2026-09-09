@@ -1,32 +1,72 @@
-import React from "react";
+import React, { Suspense } from "react";
 import "@testing-library/jest-dom";
 import { expect, test, vi, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import {
-  InstrumentSession,
+  GET_SESSION_BY_REFERENCE,
+  SessionSelectionMode,
   SessionSelector,
 } from "../src/components/SessionSelector";
+import { MockedProvider } from "@apollo/client/testing/react";
 
 afterEach(() => {
   vi.clearAllMocks();
 });
 
-const INSTRUMENT_SESSION: InstrumentSession = {
-  instrument: {
-    name: "test instrument",
+const mocks = [
+  {
+    request: {
+      query: GET_SESSION_BY_REFERENCE,
+      variables: {
+        reference: "",
+      },
+    },
+    result: {
+      data: {
+        instrumentSessionByReference: null,
+      },
+    },
   },
-  proposal: {
-    proposalNumber: 12345,
-    proposalCategory: "MG",
-  },
-  instrumentSessionNumber: 2,
-};
+];
 
-test("session selector input field renders latest session", async () => {
-  render(<SessionSelector session={INSTRUMENT_SESSION} />);
-  const sessionSelectorInput = await screen.findByTestId(
-    "session-selector-input"
+test("set session button disabled when session selection in latest mode", async () => {
+  await act(() =>
+    render(
+      <MockedProvider mocks={mocks}>
+        <Suspense fallback={<div>Loading...</div>}>
+          <SessionSelector
+            mode={SessionSelectionMode.Latest}
+            setMode={() => console.log("setMode")}
+            setSession={() => console.log("setSession")}
+          />
+        </Suspense>
+      </MockedProvider>
+    )
   );
-  const input = sessionSelectorInput.querySelector("input");
-  expect(input).toHaveValue("mg12345-2");
+
+  const sessionSelectorInput = await screen.findByTestId(
+    "select-session-button"
+  );
+  expect(sessionSelectorInput).toBeDisabled();
+});
+
+test("set session button disabled when session input doesn't match visit regex", async () => {
+  await act(() =>
+    render(
+      <MockedProvider mocks={mocks}>
+        <Suspense fallback={<div>Loading...</div>}>
+          <SessionSelector
+            mode={SessionSelectionMode.Custom}
+            setMode={() => console.log("setMode")}
+            setSession={() => console.log("setSession")}
+          />
+        </Suspense>
+      </MockedProvider>
+    )
+  );
+
+  const sessionSelectorInput = await screen.findByTestId(
+    "select-session-button"
+  );
+  expect(sessionSelectorInput).toBeDisabled();
 });

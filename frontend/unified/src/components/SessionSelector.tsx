@@ -1,46 +1,73 @@
-import React from "react";
+import React, { Suspense, useState } from "react";
 import {
-  Chip,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
   Stack,
+  Button,
+  Tooltip,
 } from "@mui/material";
-import { useState } from "react";
 import { SessionQueryQuery } from "../__generated__/App.generated";
+import {
+  GetSessionByReferenceQuery,
+  GetSessionByReferenceQueryVariables,
+} from "./__generated__/SessionSelector.generated";
+import { visitRegex } from "@diamondlightsource/sci-react-ui";
+import { gql, TypedDocumentNode } from "@apollo/client";
+import { useSuspenseQuery } from "@apollo/client/react";
 
-enum SessionSelectionMode {
+export const GET_SESSION_BY_REFERENCE: TypedDocumentNode<
+  GetSessionByReferenceQuery,
+  GetSessionByReferenceQueryVariables
+> = gql`
+  query GetSessionByReference($reference: String!) {
+    instrumentSessionByReference(reference: $reference) {
+      instrument {
+        name
+      }
+      instrumentSessionNumber
+      proposal {
+        proposalNumber
+        proposalCategory
+      }
+    }
+  }
+`;
+
+export enum SessionSelectionMode {
   Latest = "Latest",
   Custom = "Custom",
 }
 
 type NonNullAccount = NonNullable<SessionQueryQuery["account"]>;
 
+export type InstrumentSession =
+  NonNullAccount["instrumentSessionRoles"]["edges"][0]["node"]["instrumentSession"];
+
 type SessionSelectorProps = {
-  session: NonNullAccount["instrumentSessionRoles"]["edges"][0]["node"]["instrumentSession"];
+  setSession: (_: InstrumentSession | null) => void;
+  mode: SessionSelectionMode;
+  setMode: (_: SessionSelectionMode) => void;
 };
 
 export const SessionSelector: React.FC<SessionSelectorProps> = ({
-  session,
+  setSession,
+  mode,
+  setMode,
 }: SessionSelectorProps) => {
-  const [beamline] = useState<string>(session.instrument.name);
-  const [sessionSelectionMode, setSessionSelectionMode] =
-    useState<SessionSelectionMode>(SessionSelectionMode.Latest);
-  const [textInputValue, setTextInputValue] = useState<string>("");
-
-  const proposal = session?.proposal;
-  const latestSession = `${proposal.proposalCategory?.toLowerCase()}${proposal.proposalNumber}-${session.instrumentSessionNumber}`;
+  const [customeSessionInputValue, setCustomSessionInputValue] =
+    useState<string>("");
 
   return (
     <Stack direction="row" spacing={2} alignItems={"center"}>
       <ToggleButtonGroup
         exclusive
-        value={sessionSelectionMode}
+        value={mode}
         onChange={(_, toggleButtonLabel: string) => {
           if (toggleButtonLabel === SessionSelectionMode.Latest) {
-            setSessionSelectionMode(SessionSelectionMode.Latest);
+            setMode(SessionSelectionMode.Latest);
           } else if (toggleButtonLabel === SessionSelectionMode.Custom) {
-            setSessionSelectionMode(SessionSelectionMode.Custom);
+            setMode(SessionSelectionMode.Custom);
           }
         }}
       >
@@ -58,20 +85,77 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
         </ToggleButton>
       </ToggleButtonGroup>
       <TextField
-        data-testid="session-selector-input"
         variant="outlined"
         label="Session"
-        disabled={sessionSelectionMode === SessionSelectionMode.Latest}
-        value={
-          sessionSelectionMode === SessionSelectionMode.Latest
-            ? latestSession
-            : textInputValue
-        }
+        disabled={mode === SessionSelectionMode.Latest}
+        value={customeSessionInputValue}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          setTextInputValue(e.currentTarget.value);
+          setCustomSessionInputValue(e.target.value);
         }}
       />
-      <Chip label={beamline} variant="outlined" color="primary"></Chip>
+      <Suspense fallback={<p>Checking session...</p>}>
+        <SelectSessionButton
+          sessionInputValue={customeSessionInputValue}
+          sessionSelectionMode={mode}
+          setSession={setSession}
+        />
+      </Suspense>
     </Stack>
+  );
+};
+
+type SelectSessionButtonProps = {
+  sessionInputValue: string;
+  sessionSelectionMode: SessionSelectionMode;
+  setSession: (_: InstrumentSession | null) => void;
+};
+
+const SelectSessionButton: React.FC<SelectSessionButtonProps> = ({
+  sessionInputValue,
+  sessionSelectionMode,
+  setSession,
+}) => {
+  const { data } = useSuspenseQuery(GET_SESSION_BY_REFERENCE, {
+    variables: { reference: sessionInputValue },
+  });
+
+  const isDisabled = () => {
+    if (sessionSelectionMode === SessionSelectionMode.Latest) {
+      return true;
+    } else {
+      return (
+        visitRegex.exec(sessionInputValue) === null ||
+        data.instrumentSessionByReference === null
+      );
+    }
+  };
+
+  const generateTooltipText = () => {
+    if (sessionSelectionMode === SessionSelectionMode.Latest) {
+      return "";
+    } else if (visitRegex.exec(sessionInputValue) === null) {
+      return "Session must be of the following format: abcdef12345-1";
+    } else if (
+      visitRegex.exec(sessionInputValue) !== null &&
+      data.instrumentSessionByReference === null
+    ) {
+      return `The session ${sessionInputValue} doesn't exist`;
+    }
+  };
+
+  return (
+    <Tooltip title={generateTooltipText()}>
+      <span>
+        <Button
+          data-testid="select-session-button"
+          variant="contained"
+          color="primary"
+          onClick={() => setSession(data.instrumentSessionByReference)}
+          disabled={isDisabled()}
+        >
+          Select session
+        </Button>
+      </span>
+    </Tooltip>
   );
 };
