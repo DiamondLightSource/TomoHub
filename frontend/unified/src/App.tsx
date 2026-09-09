@@ -107,6 +107,11 @@ export const App: React.FC = () => {
   const instrumentSession =
     data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
 
+  /**
+   * Based on the beamline changing when the session changes, update the technique to be the
+   * default technique associated with the beamline, and update the template to be the first
+   * template in the list of templates associated with the technique.
+   */
   const updateTechniqueAndTemplate = (beamline: Beamline) => {
     const newTechnique = BEAMLINES_DEFAULT_TECHNIQUE[beamline];
     setTechnique(newTechnique);
@@ -116,11 +121,19 @@ export const App: React.FC = () => {
     setTemplate(filteredTemplates[0].value);
   };
 
+  /**
+   * Update the custom session and update the technique and template based on the beamline
+   * associated with the newly chosen session.
+   */
   const updateCustomSession = (session: InstrumentSession | null) => {
     setCustomSession(session);
     updateTechniqueAndTemplate(mapStringsToBeamline(session.instrument.name));
   };
 
+  /**
+   * Update the session-selection mode, and update the technique and template based on the
+   * beamline associated with the newly chosen session.
+   */
   const updateSessionSelectionMode = (mode: SessionSelectionMode) => {
     setSessionSelectionMode(mode);
     const session = determineCurrentSession(
@@ -162,6 +175,14 @@ export const App: React.FC = () => {
     return BEAMLINE_TECHNIQUES_SUBSET[beamline];
   };
 
+  /**
+   * Determine the current session based on which session-selection mode is enabled.
+   *
+   * Note: if the session-selection mode is "latest", then the current session will only be
+   * updated to the `customSession` state if the session input string both matches the visit
+   * regex and the string corresponds to an actual visit (when both conditions are fulfilled,
+   * the `customSession` state is not `null`).
+   */
   const determineCurrentSession = (
     mode: SessionSelectionMode,
     latestSession: InstrumentSession,
