@@ -1,14 +1,15 @@
-import React, { FC, useMemo, useState } from "react";
-import {
-  Button,
-  FormLabel,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-  Grid,
-  Stack,
-  Typography,
-} from "@mui/material";
+import type { FC, ChangeEvent } from "react";
+import React, { useState } from "react";
+
+import Button from "@mui/material/Button";
+import FormLabel from "@mui/material/FormLabel";
+import Grid from "@mui/material/Grid";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import Typography from "@mui/material/Typography";
+
 import { visitRegex } from "@diamondlightsource/sci-react-ui";
 
 import { initialData } from "../../data/form";
@@ -59,7 +60,8 @@ export const WorkflowForm: FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const url = `https://workflows.diamond.ac.uk/templates/${data.template}/${data.visit}?outputFolder=${data.outpath}`;
+    const urlArguments = `outputFolder=${data.outpath}`;
+    const url = `https://workflows.diamond.ac.uk/templates/${data.template}/${data.visit}?${urlArguments}`;
     openInNewTab(url);
   };
 
@@ -109,7 +111,6 @@ export const WorkflowForm: FC = () => {
               helperText={visitMatch ? "" : "Expected format: xx12345-1"}
               error={!visitMatch}
             />
-
             <TextField
               name="outpath"
               label="Output path"
