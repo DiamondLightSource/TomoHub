@@ -120,6 +120,30 @@ export const App: React.FC = () => {
     setTemplate(filteredTemplates[0].value);
   };
 
+  const updateSessionSelectionMode = (mode: SessionSelectionMode) => {
+    setSessionSelectionMode(mode);
+    let session: InstrumentSession;
+    if (mode === SessionSelectionMode.Latest) {
+      session =
+        data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
+    } else if (mode === SessionSelectionMode.Custom && customSession !== null) {
+      session = customSession;
+    } else {
+      session =
+        data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
+    }
+
+    const newTechnique =
+      BEAMLINES_DEFAULT_TECHNIQUE[
+        mapStringsToBeamline(session.instrument.name)
+      ];
+    setTechnique(newTechnique);
+    const filteredTemplates = filterTemplates(
+      Technique[newTechnique as keyof typeof Technique]
+    );
+    setTemplate(filteredTemplates[0].value);
+  };
+
   const handleChangeTechnique = (
     /**
      * This function handles the clicking of the toggle button which choose the technique and therefore determines which
@@ -214,7 +238,7 @@ export const App: React.FC = () => {
       <SessionSelector
         setSession={updateCustomSession}
         mode={sessionSelectionMode}
-        setMode={setSessionSelectionMode}
+        setMode={updateSessionSelectionMode}
       />
       <ApolloProvider client={apolloClientWorkflows}>
         <Grid container spacing={HORIZONTAL_SPACING} columns={2}>
