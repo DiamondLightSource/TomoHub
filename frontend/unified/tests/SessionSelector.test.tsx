@@ -29,6 +29,27 @@ const mocks = [
   },
 ];
 
+test("set session button disabled when session selection in latest mode", async () => {
+  await act(() =>
+    render(
+      <MockedProvider mocks={mocks}>
+        <Suspense fallback={<div>Loading...</div>}>
+          <SessionSelector
+            mode={SessionSelectionMode.Latest}
+            setMode={() => console.log("setMode")}
+            setSession={() => console.log("setSession")}
+          />
+        </Suspense>
+      </MockedProvider>
+    )
+  );
+
+  const sessionSelectorInput = await screen.findByTestId(
+    "select-session-button"
+  );
+  expect(sessionSelectorInput).toBeDisabled();
+});
+
 test("set session button disabled when session input doesn't match visit regex", async () => {
   await act(() =>
     render(
