@@ -122,17 +122,11 @@ export const App: React.FC = () => {
 
   const updateSessionSelectionMode = (mode: SessionSelectionMode) => {
     setSessionSelectionMode(mode);
-    let session: InstrumentSession;
-    if (mode === SessionSelectionMode.Latest) {
-      session =
-        data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
-    } else if (mode === SessionSelectionMode.Custom && customSession !== null) {
-      session = customSession;
-    } else {
-      session =
-        data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
-    }
-
+    const session = determineCurrentSession(
+      mode,
+      data.account.instrumentSessionRoles.edges[0].node.instrumentSession,
+      customSession
+    );
     const newTechnique =
       BEAMLINES_DEFAULT_TECHNIQUE[
         mapStringsToBeamline(session.instrument.name)
@@ -175,27 +169,33 @@ export const App: React.FC = () => {
     return BEAMLINE_TECHNIQUES_SUBSET[beamline];
   };
 
-  let session: InstrumentSession;
-  if (sessionSelectionMode === SessionSelectionMode.Latest) {
-    session =
-      data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
-  } else if (
-    sessionSelectionMode === SessionSelectionMode.Custom &&
-    customSession !== null
-  ) {
-    session = customSession;
-  } else {
-    // The only other possible case is:
-    // ```
-    // sessionSelectionMode === SessionSelectionMode.Custom && customSession === null
-    // ```
-    // and in this case the latest visit is selected.
-    //
-    // Used an else rather than else-if so then TypeScript knows that all cases have been
-    // exhausted and won't say that `session` or `sessionName` may be undefined.
-    session =
-      data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
-  }
+  const determineCurrentSession = (
+    mode: SessionSelectionMode,
+    latestSession: InstrumentSession,
+    customSession: InstrumentSession | null
+  ): InstrumentSession => {
+    if (mode === SessionSelectionMode.Latest) {
+      return latestSession;
+    } else if (mode === SessionSelectionMode.Custom && customSession !== null) {
+      return customSession;
+    } else {
+      // The only other possible case is:
+      // ```
+      // mode === SessionSelectionMode.Custom && customSession === null
+      // ```
+      // and in this case the latest visit is selected.
+      //
+      // Used an else rather than else-if so then TypeScript knows that all cases have been
+      // exhausted and won't say that `session` or `sessionName` may be undefined.
+      return latestSession;
+    }
+  };
+
+  const session = determineCurrentSession(
+    sessionSelectionMode,
+    data.account.instrumentSessionRoles.edges[0].node.instrumentSession,
+    customSession
+  );
   const sessionName = `${session.proposal.proposalCategory?.toLowerCase()}${session.proposal.proposalNumber}-${session.instrumentSessionNumber}`;
 
   const mapStringsToBeamline = (beamline: string): Beamline => {
