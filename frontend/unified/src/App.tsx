@@ -86,16 +86,8 @@ export const SESSION_QUERY: TypedDocumentNode<
 export const App: React.FC = () => {
   //adding common states of beamlines, Techique, workflow
   const [showAllTechniques, setShowAllTechniques] = useState(false);
-  const [currentBeamline] = useState<Beamline>(Beamline.I14);
-  const [technique, setTechnique] = useState<Technique>(
-    BEAMLINES_DEFAULT_TECHNIQUE[currentBeamline]
-  );
-  const [template, setTemplate] = useState<string>(() => {
-    const filteredTemplates = filterTemplates(
-      Technique[technique as keyof typeof Technique]
-    );
-    return filteredTemplates[0].value;
-  });
+  const [technique, setTechnique] = useState<Technique | null>(null);
+  const [template, setTemplate] = useState<string | null>(null);
   const [sessionSelectionMode, setSessionSelectionMode] =
     useState<SessionSelectionMode>(SessionSelectionMode.Latest);
   const [customSession, setCustomSession] = useState<InstrumentSession | null>(
@@ -114,6 +106,43 @@ export const App: React.FC = () => {
 
   const instrumentSession =
     data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
+
+  const updateCustomSession = (session: InstrumentSession | null) => {
+    setCustomSession(session);
+    const newTechnique =
+      BEAMLINES_DEFAULT_TECHNIQUE[
+        mapStringsToBeamline(session.instrument.name)
+      ];
+    setTechnique(newTechnique);
+    const filteredTemplates = filterTemplates(
+      Technique[newTechnique as keyof typeof Technique]
+    );
+    setTemplate(filteredTemplates[0].value);
+  };
+
+  const updateSessionSelectionMode = (mode: SessionSelectionMode) => {
+    setSessionSelectionMode(mode);
+    let session: InstrumentSession;
+    if (mode === SessionSelectionMode.Latest) {
+      session =
+        data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
+    } else if (mode === SessionSelectionMode.Custom && customSession !== null) {
+      session = customSession;
+    } else {
+      session =
+        data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
+    }
+
+    const newTechnique =
+      BEAMLINES_DEFAULT_TECHNIQUE[
+        mapStringsToBeamline(session.instrument.name)
+      ];
+    setTechnique(newTechnique);
+    const filteredTemplates = filterTemplates(
+      Technique[newTechnique as keyof typeof Technique]
+    );
+    setTemplate(filteredTemplates[0].value);
+  };
 
   const handleChangeTechnique = (
     /**
@@ -138,12 +167,12 @@ export const App: React.FC = () => {
     number: instrumentSession?.instrumentSessionNumber,
   };
 
-  const filterTechniques = () => {
+  const filterTechniques = (beamline: Beamline) => {
     if (showAllTechniques) {
       return Object.values(Technique);
     }
 
-    return BEAMLINE_TECHNIQUES_SUBSET[currentBeamline];
+    return BEAMLINE_TECHNIQUES_SUBSET[beamline];
   };
 
   let session: InstrumentSession;
@@ -172,6 +201,29 @@ export const App: React.FC = () => {
     sessionName = `${session.proposal.proposalCategory?.toLowerCase()}${session.proposal.proposalNumber}-${session.instrumentSessionNumber}`;
   }
 
+  const mapStringsToBeamline = (beamline: string): Beamline => {
+    switch (beamline) {
+      case "DIAD":
+        return Beamline.DIAD;
+      case "I08-1":
+        return Beamline["I08-1"];
+      case "I12":
+        return Beamline.I12;
+      case "I13-1":
+        return Beamline["I13-1"];
+      case "I13-2":
+        return Beamline["I13-2"];
+      case "I14":
+        return Beamline.I14;
+      default:
+        console.error(`Unrecognised beamline: ${beamline}`);
+    }
+  };
+
+  const beamline = mapStringsToBeamline(session.instrument.name);
+  const initialTechnique = BEAMLINES_DEFAULT_TECHNIQUE[beamline];
+  const initialTemplate = filterTemplates(initialTechnique)[0].label;
+
   return (
     <>
       <Stack direction="row" spacing={2} alignItems="center">
@@ -184,9 +236,9 @@ export const App: React.FC = () => {
         />
       </Stack>
       <SessionSelector
-        setSession={setCustomSession}
+        setSession={updateCustomSession}
         mode={sessionSelectionMode}
-        setMode={setSessionSelectionMode}
+        setMode={updateSessionSelectionMode}
       />
       <ApolloProvider client={apolloClientWorkflows}>
         <Grid container spacing={HORIZONTAL_SPACING} columns={2}>
@@ -203,13 +255,11 @@ export const App: React.FC = () => {
                 e: React.ChangeEvent<HTMLInputElement>
               ) => {
                 setShowAllTechniques(e.target.checked);
-                const isSelectedTechniqueInSubset =
-                  BEAMLINE_TECHNIQUES_SUBSET[currentBeamline].includes(
-                    technique
-                  );
+                const isSelectedTechniqueInSubset = BEAMLINE_TECHNIQUES_SUBSET[
+                  beamline
+                ].includes(technique ?? initialTechnique);
                 if (!e.target.checked && !isSelectedTechniqueInSubset) {
-                  const newTechnique =
-                    BEAMLINES_DEFAULT_TECHNIQUE[currentBeamline];
+                  const newTechnique = BEAMLINES_DEFAULT_TECHNIQUE[beamline];
                   setTechnique(newTechnique);
                   const filteredTemplates = filterTemplates(
                     Technique[newTechnique as keyof typeof Technique]
@@ -217,10 +267,10 @@ export const App: React.FC = () => {
                   setTemplate(filteredTemplates[0].value);
                 }
               }}
-              filteredTechniques={filterTechniques()}
-              templateOptions={filterTemplates(technique)}
-              technique={technique}
-              template={template}
+              filteredTechniques={filterTechniques(beamline)}
+              templateOptions={filterTemplates(technique ?? initialTechnique)}
+              technique={technique ?? initialTechnique}
+              template={template ?? initialTemplate}
               setTemplate={setTemplate}
             />
 
@@ -228,11 +278,13 @@ export const App: React.FC = () => {
             <Typography variant="h5">Parameter Configuration</Typography>
 
             <ParameterConfiguration
-              technique={technique}
-              template={template}
+              technique={technique ?? initialTechnique}
+              template={template ?? initialTemplate}
               setTemplate={setTemplate}
               availableTemplates={filterTemplates(
-                Technique[technique as keyof typeof Technique]
+                Technique[
+                  technique ?? (initialTechnique as keyof typeof Technique)
+                ]
               )}
             />
           </Stack>
