@@ -176,17 +176,14 @@ export const App: React.FC = () => {
   };
 
   let session: InstrumentSession;
-  let sessionName: string;
   if (sessionSelectionMode === SessionSelectionMode.Latest) {
     session =
       data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
-    sessionName = `${session.proposal.proposalCategory?.toLowerCase()}${session.proposal.proposalNumber}-${session.instrumentSessionNumber}`;
   } else if (
     sessionSelectionMode === SessionSelectionMode.Custom &&
     customSession !== null
   ) {
     session = customSession;
-    sessionName = `${session.proposal.proposalCategory?.toLowerCase()}${session.proposal.proposalNumber}-${session.instrumentSessionNumber}`;
   } else {
     // The only other possible case is:
     // ```
@@ -198,8 +195,8 @@ export const App: React.FC = () => {
     // exhausted and won't say that `session` or `sessionName` may be undefined.
     session =
       data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
-    sessionName = `${session.proposal.proposalCategory?.toLowerCase()}${session.proposal.proposalNumber}-${session.instrumentSessionNumber}`;
   }
+  const sessionName = `${session.proposal.proposalCategory?.toLowerCase()}${session.proposal.proposalNumber}-${session.instrumentSessionNumber}`;
 
   const mapStringsToBeamline = (beamline: string): Beamline => {
     switch (beamline) {
