@@ -26,7 +26,9 @@ const VERTICAL_SPACING = 2;
 const HORIZONTAL_SPACING = 2;
 
 const BEAMLINE_TECHNIQUES_SUBSET = {
+  [Beamline.DIAD]: [Technique.Tomo],
   [Beamline.I12]: [Technique.Tomo],
+  [Beamline["I08-1"]]: [Technique.Ptycho],
   [Beamline["I13-1"]]: [
     Technique.Dpc,
     Technique.Ptycho,
@@ -34,14 +36,18 @@ const BEAMLINE_TECHNIQUES_SUBSET = {
     Technique.Xanes,
     Technique.Xrd,
   ],
+  [Beamline["I13-2"]]: [Technique.Ptycho, Technique.Tomo],
   [Beamline.I14]: [Technique.Dpc, Technique.Xanes, Technique.Xrd],
   [Beamline.Epsic]: [Technique.Dpc, Technique.Nbed, Technique.Ptycho],
 };
 
 const BEAMLINES_DEFAULT_TECHNIQUE = {
+  [Beamline.DIAD]: Technique.Tomo,
   [Beamline.Epsic]: Technique.Ptycho,
   [Beamline.I12]: Technique.Tomo,
+  [Beamline["I08-1"]]: Technique.Ptycho,
   [Beamline["I13-1"]]: Technique.Ptycho,
+  [Beamline["I13-2"]]: Technique.Ptycho,
   [Beamline.I14]: Technique.Dpc,
 };
 
