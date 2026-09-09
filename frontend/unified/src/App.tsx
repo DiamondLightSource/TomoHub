@@ -107,12 +107,13 @@ export const App: React.FC = () => {
   const instrumentSession =
     data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
 
-  const updateCustomSession = (session: InstrumentSession | null) => {
-    setCustomSession(session);
-    const newTechnique =
-      BEAMLINES_DEFAULT_TECHNIQUE[
-        mapStringsToBeamline(session.instrument.name)
-      ];
+  /**
+   * Based on the beamline changing when the session changes, update the technique to be the
+   * default technique associated with the beamline, and update the template to be the first
+   * template in the list of templates associated with the technique.
+   */
+  const updateTechniqueAndTemplate = (beamline: Beamline) => {
+    const newTechnique = BEAMLINES_DEFAULT_TECHNIQUE[beamline];
     setTechnique(newTechnique);
     const filteredTemplates = filterTemplates(
       Technique[newTechnique as keyof typeof Technique]
@@ -120,28 +121,27 @@ export const App: React.FC = () => {
     setTemplate(filteredTemplates[0].value);
   };
 
+  /**
+   * Update the custom session and update the technique and template based on the beamline
+   * associated with the newly chosen session.
+   */
+  const updateCustomSession = (session: InstrumentSession | null) => {
+    setCustomSession(session);
+    updateTechniqueAndTemplate(mapStringsToBeamline(session.instrument.name));
+  };
+
+  /**
+   * Update the session-selection mode, and update the technique and template based on the
+   * beamline associated with the newly chosen session.
+   */
   const updateSessionSelectionMode = (mode: SessionSelectionMode) => {
     setSessionSelectionMode(mode);
-    let session: InstrumentSession;
-    if (mode === SessionSelectionMode.Latest) {
-      session =
-        data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
-    } else if (mode === SessionSelectionMode.Custom && customSession !== null) {
-      session = customSession;
-    } else {
-      session =
-        data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
-    }
-
-    const newTechnique =
-      BEAMLINES_DEFAULT_TECHNIQUE[
-        mapStringsToBeamline(session.instrument.name)
-      ];
-    setTechnique(newTechnique);
-    const filteredTemplates = filterTemplates(
-      Technique[newTechnique as keyof typeof Technique]
+    const session = determineCurrentSession(
+      mode,
+      data.account.instrumentSessionRoles.edges[0].node.instrumentSession,
+      customSession
     );
-    setTemplate(filteredTemplates[0].value);
+    updateTechniqueAndTemplate(mapStringsToBeamline(session.instrument.name));
   };
 
   const handleChangeTechnique = (
@@ -175,31 +175,42 @@ export const App: React.FC = () => {
     return BEAMLINE_TECHNIQUES_SUBSET[beamline];
   };
 
-  let session: InstrumentSession;
-  let sessionName: string;
-  if (sessionSelectionMode === SessionSelectionMode.Latest) {
-    session =
-      data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
-    sessionName = `${session.proposal.proposalCategory?.toLowerCase()}${session.proposal.proposalNumber}-${session.instrumentSessionNumber}`;
-  } else if (
-    sessionSelectionMode === SessionSelectionMode.Custom &&
-    customSession !== null
-  ) {
-    session = customSession;
-    sessionName = `${session.proposal.proposalCategory?.toLowerCase()}${session.proposal.proposalNumber}-${session.instrumentSessionNumber}`;
-  } else {
-    // The only other possible case is:
-    // ```
-    // sessionSelectionMode === SessionSelectionMode.Custom && customSession === null
-    // ```
-    // and in this case the latest visit is selected.
-    //
-    // Used an else rather than else-if so then TypeScript knows that all cases have been
-    // exhausted and won't say that `session` or `sessionName` may be undefined.
-    session =
-      data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
-    sessionName = `${session.proposal.proposalCategory?.toLowerCase()}${session.proposal.proposalNumber}-${session.instrumentSessionNumber}`;
-  }
+  /**
+   * Determine the current session based on which session-selection mode is enabled.
+   *
+   * Note: if the session-selection mode is "latest", then the current session will only be
+   * updated to the `customSession` state if the session input string both matches the visit
+   * regex and the string corresponds to an actual visit (when both conditions are fulfilled,
+   * the `customSession` state is not `null`).
+   */
+  const determineCurrentSession = (
+    mode: SessionSelectionMode,
+    latestSession: InstrumentSession,
+    customSession: InstrumentSession | null
+  ): InstrumentSession => {
+    if (mode === SessionSelectionMode.Latest) {
+      return latestSession;
+    } else if (mode === SessionSelectionMode.Custom && customSession !== null) {
+      return customSession;
+    } else {
+      // The only other possible case is:
+      // ```
+      // mode === SessionSelectionMode.Custom && customSession === null
+      // ```
+      // and in this case the latest visit is selected.
+      //
+      // Used an else rather than else-if so then TypeScript knows that all cases have been
+      // exhausted and won't say that `session` or `sessionName` may be undefined.
+      return latestSession;
+    }
+  };
+
+  const session = determineCurrentSession(
+    sessionSelectionMode,
+    data.account.instrumentSessionRoles.edges[0].node.instrumentSession,
+    customSession
+  );
+  const sessionName = `${session.proposal.proposalCategory?.toLowerCase()}${session.proposal.proposalNumber}-${session.instrumentSessionNumber}`;
 
   const mapStringsToBeamline = (beamline: string): Beamline => {
     switch (beamline) {
@@ -221,8 +232,9 @@ export const App: React.FC = () => {
   };
 
   const beamline = mapStringsToBeamline(session.instrument.name);
-  const initialTechnique = BEAMLINES_DEFAULT_TECHNIQUE[beamline];
-  const initialTemplate = filterTemplates(initialTechnique)[0].label;
+  const currentTechnique = technique ?? BEAMLINES_DEFAULT_TECHNIQUE[beamline];
+  const currentTemplate =
+    template ?? filterTemplates(currentTechnique)[0].label;
 
   return (
     <>
@@ -255,22 +267,18 @@ export const App: React.FC = () => {
                 e: React.ChangeEvent<HTMLInputElement>
               ) => {
                 setShowAllTechniques(e.target.checked);
-                const isSelectedTechniqueInSubset = BEAMLINE_TECHNIQUES_SUBSET[
-                  beamline
-                ].includes(technique ?? initialTechnique);
-                if (!e.target.checked && !isSelectedTechniqueInSubset) {
-                  const newTechnique = BEAMLINES_DEFAULT_TECHNIQUE[beamline];
-                  setTechnique(newTechnique);
-                  const filteredTemplates = filterTemplates(
-                    Technique[newTechnique as keyof typeof Technique]
+                const isSelectedTechniqueInSubset =
+                  BEAMLINE_TECHNIQUES_SUBSET[beamline].includes(
+                    currentTechnique
                   );
-                  setTemplate(filteredTemplates[0].value);
+                if (!e.target.checked && !isSelectedTechniqueInSubset) {
+                  updateTechniqueAndTemplate(beamline);
                 }
               }}
               filteredTechniques={filterTechniques(beamline)}
-              templateOptions={filterTemplates(technique ?? initialTechnique)}
-              technique={technique ?? initialTechnique}
-              template={template ?? initialTemplate}
+              templateOptions={filterTemplates(currentTechnique)}
+              technique={currentTechnique}
+              template={currentTemplate}
               setTemplate={setTemplate}
             />
 
@@ -278,13 +286,11 @@ export const App: React.FC = () => {
             <Typography variant="h5">Parameter Configuration</Typography>
 
             <ParameterConfiguration
-              technique={technique ?? initialTechnique}
-              template={template ?? initialTemplate}
+              technique={currentTechnique}
+              template={currentTemplate}
               setTemplate={setTemplate}
               availableTemplates={filterTemplates(
-                Technique[
-                  technique ?? (initialTechnique as keyof typeof Technique)
-                ]
+                Technique[currentTechnique as keyof typeof Technique]
               )}
             />
           </Stack>
