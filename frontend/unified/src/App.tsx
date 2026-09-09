@@ -218,10 +218,9 @@ export const App: React.FC = () => {
                 e: React.ChangeEvent<HTMLInputElement>
               ) => {
                 setShowAllTechniques(e.target.checked);
-                const isSelectedTechniqueInSubset =
-                  BEAMLINE_TECHNIQUES_SUBSET[beamline].includes(
-                    initialTechnique
-                  );
+                const isSelectedTechniqueInSubset = BEAMLINE_TECHNIQUES_SUBSET[
+                  beamline
+                ].includes(technique ?? initialTechnique);
                 if (!e.target.checked && !isSelectedTechniqueInSubset) {
                   const newTechnique = BEAMLINES_DEFAULT_TECHNIQUE[beamline];
                   setTechnique(newTechnique);
@@ -232,9 +231,9 @@ export const App: React.FC = () => {
                 }
               }}
               filteredTechniques={filterTechniques(beamline)}
-              templateOptions={filterTemplates(initialTechnique)}
-              technique={technique}
-              template={template}
+              templateOptions={filterTemplates(technique ?? initialTechnique)}
+              technique={technique ?? initialTechnique}
+              template={template ?? initialTemplate}
               setTemplate={setTemplate}
             />
 
@@ -242,11 +241,13 @@ export const App: React.FC = () => {
             <Typography variant="h5">Parameter Configuration</Typography>
 
             <ParameterConfiguration
-              technique={initialTechnique}
-              template={initialTemplate}
+              technique={technique ?? initialTechnique}
+              template={template ?? initialTemplate}
               setTemplate={setTemplate}
               availableTemplates={filterTemplates(
-                Technique[initialTechnique as keyof typeof Technique]
+                Technique[
+                  technique ?? (initialTechnique as keyof typeof Technique)
+                ]
               )}
             />
           </Stack>
