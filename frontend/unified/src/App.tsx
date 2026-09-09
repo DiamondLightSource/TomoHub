@@ -107,17 +107,18 @@ export const App: React.FC = () => {
   const instrumentSession =
     data.account.instrumentSessionRoles.edges[0].node.instrumentSession;
 
-  const updateCustomSession = (session: InstrumentSession | null) => {
-    setCustomSession(session);
-    const newTechnique =
-      BEAMLINES_DEFAULT_TECHNIQUE[
-        mapStringsToBeamline(session.instrument.name)
-      ];
+  const updateTechniqueAndTemplate = (beamline: Beamline) => {
+    const newTechnique = BEAMLINES_DEFAULT_TECHNIQUE[beamline];
     setTechnique(newTechnique);
     const filteredTemplates = filterTemplates(
       Technique[newTechnique as keyof typeof Technique]
     );
     setTemplate(filteredTemplates[0].value);
+  };
+
+  const updateCustomSession = (session: InstrumentSession | null) => {
+    setCustomSession(session);
+    updateTechniqueAndTemplate(mapStringsToBeamline(session.instrument.name));
   };
 
   const updateSessionSelectionMode = (mode: SessionSelectionMode) => {
@@ -127,15 +128,7 @@ export const App: React.FC = () => {
       data.account.instrumentSessionRoles.edges[0].node.instrumentSession,
       customSession
     );
-    const newTechnique =
-      BEAMLINES_DEFAULT_TECHNIQUE[
-        mapStringsToBeamline(session.instrument.name)
-      ];
-    setTechnique(newTechnique);
-    const filteredTemplates = filterTemplates(
-      Technique[newTechnique as keyof typeof Technique]
-    );
-    setTemplate(filteredTemplates[0].value);
+    updateTechniqueAndTemplate(mapStringsToBeamline(session.instrument.name));
   };
 
   const handleChangeTechnique = (
@@ -256,12 +249,7 @@ export const App: React.FC = () => {
                   beamline
                 ].includes(technique ?? initialTechnique);
                 if (!e.target.checked && !isSelectedTechniqueInSubset) {
-                  const newTechnique = BEAMLINES_DEFAULT_TECHNIQUE[beamline];
-                  setTechnique(newTechnique);
-                  const filteredTemplates = filterTemplates(
-                    Technique[newTechnique as keyof typeof Technique]
-                  );
-                  setTemplate(filteredTemplates[0].value);
+                  updateTechniqueAndTemplate(beamline);
                 }
               }}
               filteredTechniques={filterTechniques(beamline)}
