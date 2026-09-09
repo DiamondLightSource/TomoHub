@@ -16,7 +16,7 @@ import { visitRegex } from "@diamondlightsource/sci-react-ui";
 import { gql, TypedDocumentNode } from "@apollo/client";
 import { useSuspenseQuery } from "@apollo/client/react";
 
-const GET_SESSION_BY_REFERENCE: TypedDocumentNode<
+export const GET_SESSION_BY_REFERENCE: TypedDocumentNode<
   GetSessionByReferenceQuery,
   GetSessionByReferenceQueryVariables
 > = gql`
@@ -85,7 +85,6 @@ export const SessionSelector: React.FC<SessionSelectorProps> = ({
         </ToggleButton>
       </ToggleButtonGroup>
       <TextField
-        data-testid="session-selector-input"
         variant="outlined"
         label="Session"
         disabled={mode === SessionSelectionMode.Latest}
@@ -148,6 +147,7 @@ const SelectSessionButton: React.FC<SelectSessionButtonProps> = ({
     <Tooltip title={generateTooltipText()}>
       <span>
         <Button
+          data-testid="select-session-button"
           variant="contained"
           color="primary"
           onClick={() => setSession(data.instrumentSessionByReference)}
